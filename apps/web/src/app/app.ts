@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { NxWelcome } from './nx-welcome';
+import { Card } from 'primeng/card';
 
 @Component({
-  imports: [NxWelcome, RouterModule],
+  imports: [Card],
   selector: 'app-root',
   templateUrl: './app.html',
   styleUrl: './app.css',
