@@ -2,7 +2,9 @@
   "name": "@nex-house/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "prepare": "husky"
+  },
   "private": true,
   "devDependencies": {
     "@angular-devkit/core": "~21.1.0",
@@ -11,6 +13,8 @@
     "@angular/cli": "~21.1.0",
     "@angular/compiler-cli": "~21.1.0",
     "@angular/language-service": "~21.1.0",
+    "@commitlint/cli": "^20.4.3",
+    "@commitlint/config-conventional": "^20.4.3",
     "@eslint/js": "^9.8.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.0",
@@ -35,6 +39,7 @@
     "angular-eslint": "^21.0.1",
     "eslint": "^9.8.0",
     "eslint-config-prettier": "^10.0.0",
+    "husky": "^9.1.7",
     "jest": "^30.0.2",
     "jest-environment-jsdom": "^30.0.2",
     "jest-environment-node": "^30.0.2",
@@ -76,5 +81,11 @@
     "rxjs": "^7.8.0",
     "tailwindcss": "^4.2.1",
     "typeorm": "^0.3.28"
+  },
+  "lint-staged": {
+    "*.{ts,html,css,json}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   }
 }
