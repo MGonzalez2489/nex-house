@@ -14,7 +14,11 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@nex-house/models": ["libs/shared/models/src/index.ts"],
+      "@nex-house/interfaces": ["libs/shared/interfaces/src/index.ts"],
+      "@nex-house/enums": ["libs/shared/enums/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }
