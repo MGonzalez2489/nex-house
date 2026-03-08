@@ -2,7 +2,7 @@ import { DataSourceOptions } from 'typeorm';
 
 import { ConfigService } from '@nestjs/config';
 
-// import * as Entities from './entities';
+import * as Entities from './entities';
 
 export const getDatabaseConfig = (
   configService: ConfigService,
@@ -16,6 +16,6 @@ export const getDatabaseConfig = (
     database: configService.get<string>('DB_NAME'),
     synchronize: true, //TODO: change it for prod
     logging: false,
-    // entities: Object.values(Entities),
+    entities: Object.values(Entities),
   };
 };
