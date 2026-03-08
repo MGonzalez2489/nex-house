@@ -11,6 +11,13 @@
     }
   ],
   "compilerOptions": {
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "baseUrl": ".",
+    "paths": {
+      "@nex-house/models": ["../../libs/shared/models/src/index.ts"],
+      "@nex-house/interfaces": ["../../libs/shared/interfaces/src/index.ts"],
+      "@nex-house/enums": ["../../libs/shared/enums/src/index.ts"],
+      "@database/*": ["src/database/*"]
+    }
   }
 }
