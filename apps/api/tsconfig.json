@@ -17,7 +17,9 @@
       "@nex-house/models": ["../../libs/shared/models/src/index.ts"],
       "@nex-house/interfaces": ["../../libs/shared/interfaces/src/index.ts"],
       "@nex-house/enums": ["../../libs/shared/enums/src/index.ts"],
-      "@database/*": ["src/database/*"]
+      "@database/*": ["src/database/*"],
+      "@modules/*": ["src/modules/*"],
+      "@common/*": ["src/common/*"]
     }
   }
 }

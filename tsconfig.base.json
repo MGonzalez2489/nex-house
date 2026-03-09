@@ -14,6 +14,7 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
+    "strictPropertyInitialization": false,
     "paths": {
       "@nex-house/models": ["libs/shared/models/src/index.ts"],
       "@nex-house/interfaces": ["libs/shared/interfaces/src/index.ts"],
