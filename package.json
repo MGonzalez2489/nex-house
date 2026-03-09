@@ -3,7 +3,10 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "prepare": "husky"
+    "prepare": "husky",
+    "lint": "eslint . --ext .ts,.html",
+    "lint:fix": "eslint . --ext .ts,.html --fix",
+    "doc:db": "npx ts-node -r tsconfig-paths/register -P apps/api/tsconfig.app.json tools/scripts/generate-erd.ts"
   },
   "private": true,
   "devDependencies": {
