@@ -1,10 +1,17 @@
+import { SearchDto } from '@common/dtos';
+import { CryptoService } from '@common/services';
+import { paginate } from '@common/utils';
 import { User } from '@database/entities';
-import { ConflictException, Injectable, Logger } from '@nestjs/common';
+import { NeighborhoodsService } from '@modules/neighborhoods';
+import {
+  ConflictException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dtos';
-import { CryptoService } from '@common/services';
-import { NeighborhoodsService } from '@modules/neighborhoods';
 
 @Injectable()
 export class UsersService {
@@ -16,6 +23,10 @@ export class UsersService {
     private readonly cryptoService: CryptoService,
     private readonly neighborhoodService: NeighborhoodsService,
   ) {}
+
+  async findAll(searchDto: SearchDto) {
+    return await paginate(this.repository, searchDto);
+  }
 
   async findByPublicId(publicId: string): Promise<User | null> {
     const result = await this.repository.findOne({
@@ -58,5 +69,44 @@ export class UsersService {
     await this.repository.save(newUser);
 
     return this.findByPublicId(newUser.publicId);
+  }
+  //
+  async update(
+    publicId: string,
+    dto: CreateUserDto,
+    updater: User,
+  ): Promise<User> {
+    const userToUpdate = await this.findOrThrow(publicId);
+
+    // Si el DTO incluye password, lo hasheamos antes de hacer el merge
+    if (dto.password) {
+      dto.password = await this.cryptoService.hash(dto.password);
+    }
+
+    const updated = this.repository.merge(userToUpdate, {
+      ...dto,
+      updatedBy: updater.id,
+    });
+
+    await this.repository.save(updated);
+    return this.findOrThrow(publicId);
+  }
+
+  async remove(publicId: string, deleter: User): Promise<void> {
+    const userToDelete = await this.findOrThrow(publicId);
+
+    userToDelete.deletedBy = deleter.id;
+
+    await this.repository.softRemove(userToDelete);
+    this.logger.log(`User ${publicId} soft-deleted by admin ${deleter.id}.`);
+  }
+
+  //
+  private async findOrThrow(publicId: string): Promise<User> {
+    const user = await this.repository.findOne({ where: { publicId } });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${publicId} not found.`);
+    }
+    return user;
   }
 }

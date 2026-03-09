@@ -56,7 +56,9 @@ describe('AuthService', () => {
       const decoded = {
         exp: 123,
       };
+      const sign = 'jwt_token';
 
+      jwtService.sign.mockReturnValue(sign as any);
       jwtService.decode.mockReturnValue(decoded as any);
       cryptoService.compare.mockResolvedValue(true);
 
