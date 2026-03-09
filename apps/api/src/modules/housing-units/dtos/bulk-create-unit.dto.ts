@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IBulkCreateHousingUnit } from '@nex-house/interfaces';
-import { IsInt, IsNotEmpty, IsString, Max, Min } from 'class-validator';
+import { IsInt, IsNotEmpty, IsString, Min } from 'class-validator';
 
 export class BulkCreateHousingUnitDto implements IBulkCreateHousingUnit {
   @ApiProperty({
@@ -19,6 +19,6 @@ export class BulkCreateHousingUnitDto implements IBulkCreateHousingUnit {
   @ApiProperty({ example: 60, description: 'The ending house number' })
   @IsInt()
   @Min(1)
-  @Max(500)
+  // @Max(500)
   endNumber: number;
 }

@@ -1,12 +1,12 @@
 import { HousingStatusEnum, HousingTypeEnum } from '@nex-house/enums';
+import { Exclude } from 'class-transformer';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
-import { BaseEntity } from './_base.entity';
+import { TraceableEntity } from './_traceable.entity';
 import { Neighborhood } from './neighborhood.entity';
 import { User } from './user.entity';
-import { Exclude } from 'class-transformer';
 
 @Entity()
-export class HousingUnit extends BaseEntity {
+export class HousingUnit extends TraceableEntity {
   @Column()
   identifier: string; // #11532, #11533, etc
 
@@ -28,15 +28,15 @@ export class HousingUnit extends BaseEntity {
   type: HousingTypeEnum;
 
   @Column()
-  neighborhoodId: string;
+  neighborhoodId: number;
 
   @Column({ nullable: true })
   @Exclude()
-  ownerId: string;
+  ownerId: number;
 
   @Column({ nullable: true })
   @Exclude()
-  occupantId: string;
+  occupantId: number;
 
   @ManyToOne(() => Neighborhood, (n) => n.units)
   @JoinColumn({ name: 'neighborhoodId' })

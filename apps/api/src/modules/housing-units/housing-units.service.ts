@@ -1,6 +1,7 @@
 import { SearchDto } from '@common/dtos';
 import { PaginatedResult, paginate } from '@common/utils';
-import { HousingUnit } from '@database/entities';
+import { HousingUnit, User } from '@database/entities';
+import { NeighborhoodsService } from '@modules/neighborhoods';
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -14,19 +15,27 @@ export class HousingUnitsService {
   constructor(
     @InjectRepository(HousingUnit)
     private readonly repository: Repository<HousingUnit>,
+    private readonly neighborhoodService: NeighborhoodsService,
   ) {}
 
   async bulkCreate(
     neighborhoodId: string,
     dto: BulkCreateHousingUnitDto,
+    user: User,
   ): Promise<HousingUnit[]> {
     const units: Partial<HousingUnit>[] = [];
 
+    const neighborhood = await this.neighborhoodService.findByPublicId(
+      neighborhoodId,
+      true,
+    );
+
     for (let i = dto.startNumber; i <= dto.endNumber; i++) {
       units.push({
-        neighborhoodId,
+        neighborhoodId: neighborhood?.id,
         identifier: i.toString(),
         streetName: dto.streetName,
+        createdBy: user.id,
       });
     }
 
@@ -40,7 +49,7 @@ export class HousingUnitsService {
     searchDto: SearchDto,
   ): Promise<PaginatedResult<HousingUnit>> {
     return await paginate(this.repository, searchDto, {
-      where: { neighborhoodId },
+      where: {},
     });
   }
 
@@ -57,22 +66,33 @@ export class HousingUnitsService {
   async create(
     neighborhoodId: string,
     dto: CreateHousingUnitDto,
+    user: User,
   ): Promise<HousingUnit> {
-    const unit = this.repository.create({ ...dto, neighborhoodId });
+    const neighborhood = await this.neighborhoodService.findByPublicId(
+      neighborhoodId,
+      true,
+    );
+    const unit = this.repository.create({
+      ...dto,
+      neighborhoodId: neighborhood?.id,
+      createdBy: user.id,
+    });
     return await this.repository.save(unit);
   }
 
   async update(
     publicId: string,
     dto: Partial<BulkCreateHousingUnitDto>,
+    user: User,
   ): Promise<HousingUnit> {
     const unit = await this.findByPublicId(publicId);
-    const updated = this.repository.merge(unit, dto);
+    const updated = this.repository.merge({ ...unit, updatedBy: user.id }, dto);
     return await this.repository.save(updated);
   }
 
-  async remove(publicId: string): Promise<void> {
+  async remove(publicId: string, user: User): Promise<void> {
     const unit = await this.findByPublicId(publicId);
-    await this.repository.softDelete(unit.id);
+    unit.deletedBy = user.id;
+    await this.repository.softRemove(unit);
   }
 }

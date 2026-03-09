@@ -1,6 +1,6 @@
 import { SearchDto } from '@common/dtos';
 import { PaginatedResult, paginate } from '@common/utils';
-import { Neighborhood } from '@database/entities';
+import { Neighborhood, User } from '@database/entities';
 import {
   ConflictException,
   Injectable,
@@ -20,7 +20,7 @@ export class NeighborhoodsService {
     private readonly repository: Repository<Neighborhood>,
   ) {}
 
-  async create(dto: CreateNeighborhoodDto): Promise<Neighborhood> {
+  async create(dto: CreateNeighborhoodDto, user: User): Promise<Neighborhood> {
     const exists = await this.repository.findOne({
       where: { slug: dto.slug },
     });
@@ -29,7 +29,7 @@ export class NeighborhoodsService {
         `El fraccionamiento con slug "${dto.slug}" ya existe.`,
       );
     }
-    const neighborhood = this.repository.create(dto);
+    const neighborhood = this.repository.create({ ...dto, createdBy: user.id });
     return await this.repository.save(neighborhood);
   }
 
@@ -39,13 +39,22 @@ export class NeighborhoodsService {
     });
   }
 
-  async findByPublicId(publicId: string): Promise<Neighborhood | null> {
-    return this.repository.findOne({ where: { publicId } });
+  async findByPublicId(
+    publicId: string,
+    validateExists = false,
+  ): Promise<Neighborhood | null> {
+    const response = await this.repository.findOne({ where: { publicId } });
+
+    if (!response && validateExists) {
+      throw new NotFoundException(`Neighborhood ${publicId} not found.`);
+    }
+    return response;
   }
 
   async update(
     publicId: string,
     dto: CreateNeighborhoodDto,
+    user: User,
   ): Promise<Neighborhood> {
     const neighborhood = await this.findByPublicId(publicId);
     if (!neighborhood) {
@@ -53,18 +62,22 @@ export class NeighborhoodsService {
         `El fraccionamiento con ID ${publicId} no existe.`,
       );
     }
-    const updated = this.repository.merge(neighborhood, dto);
+    const updated = this.repository.merge(
+      { ...neighborhood, updatedBy: user.id },
+      dto,
+    );
     return await this.repository.save(updated);
   }
 
-  async remove(publicId: string): Promise<void> {
+  async remove(publicId: string, user: User): Promise<void> {
     const neighborhood = await this.findByPublicId(publicId);
     if (!neighborhood) {
       throw new NotFoundException(
         `El fraccionamiento con ID ${publicId} no existe.`,
       );
     }
-    await this.repository.softDelete(neighborhood.id);
+    neighborhood.deletedBy = user.id;
+    await this.repository.softRemove(neighborhood);
     this.logger.log(`Neighborhood ${publicId} soft-deleted.`);
   }
 }

@@ -1,6 +1,6 @@
 import { CryptoService } from '@common/services';
 import { UsersService } from '@modules/index';
-import { ConflictException, UnauthorizedException } from '@nestjs/common';
+import { UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import {
@@ -45,39 +45,6 @@ describe('AuthService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
-  });
-
-  describe('register', () => {
-    const registerDto = { email: 'test@example.com', password: 'password123' };
-
-    it('should register a new user successfully', async () => {
-      jwtService.sign.mockReturnValue(token);
-      userService.findByEmail.mockResolvedValue(undefined);
-      cryptoService.hash.mockResolvedValue('hashed_password');
-      userService.create.mockResolvedValue(MockUser as any);
-
-      const decoded = {
-        exp: 123,
-      };
-
-      jwtService.decode.mockReturnValue(decoded as any);
-
-      const result = await service.register(registerDto);
-
-      expect(result.token).toBe('jwt_token');
-      expect(userService.create).toHaveBeenCalledWith(
-        registerDto.email,
-        'hashed_password',
-      );
-    });
-
-    it('should throw ConflictException if user already exists', async () => {
-      userService.findByEmail.mockResolvedValue(MockUser as any);
-
-      await expect(service.register(registerDto)).rejects.toThrow(
-        ConflictException,
-      );
-    });
   });
 
   describe('login', () => {

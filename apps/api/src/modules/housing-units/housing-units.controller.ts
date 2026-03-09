@@ -15,6 +15,8 @@ import {
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { BulkCreateHousingUnitDto, CreateHousingUnitDto } from './dtos';
 import { HousingUnitsService } from './housing-units.service';
+import { CurrentUser } from '@common/decorators';
+import { User } from '@database/entities';
 
 @ApiTags('Housing Units')
 @Controller('neighborhoods/:neighborhoodId/units')
@@ -27,8 +29,13 @@ export class HousingUnitsController {
   async bulkCreate(
     @Param('neighborhoodId', ParseUUIDPipe) neighborhoodId: string,
     @Body() bulkDto: BulkCreateHousingUnitDto,
+    @CurrentUser() user: User,
   ) {
-    return await this.housingUnitsService.bulkCreate(neighborhoodId, bulkDto);
+    return await this.housingUnitsService.bulkCreate(
+      neighborhoodId,
+      bulkDto,
+      user,
+    );
   }
 
   @Post()
@@ -36,8 +43,13 @@ export class HousingUnitsController {
   async create(
     @Param('neighborhoodId', ParseUUIDPipe) neighborhoodId: string,
     @Body() createDto: CreateHousingUnitDto,
+    @CurrentUser() user: User,
   ) {
-    return await this.housingUnitsService.create(neighborhoodId, createDto);
+    return await this.housingUnitsService.create(
+      neighborhoodId,
+      createDto,
+      user,
+    );
   }
 
   @Get()
@@ -60,14 +72,18 @@ export class HousingUnitsController {
   async update(
     @Param('publicId', ParseUUIDPipe) publicId: string,
     @Body() updateDto: Partial<CreateHousingUnitDto>,
+    @CurrentUser() user: User,
   ) {
-    return await this.housingUnitsService.update(publicId, updateDto);
+    return await this.housingUnitsService.update(publicId, updateDto, user);
   }
 
   @Delete(':publicId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Soft delete a housing unit' })
-  async remove(@Param('publicId', ParseUUIDPipe) publicId: string) {
-    return await this.housingUnitsService.remove(publicId);
+  async remove(
+    @Param('publicId', ParseUUIDPipe) publicId: string,
+    @CurrentUser() user: User,
+  ) {
+    return await this.housingUnitsService.remove(publicId, user);
   }
 }

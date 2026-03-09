@@ -14,6 +14,8 @@ import {
 import { DatabaseSeederService } from '@database/index';
 import { User } from '@database/entities';
 import { CryptoService } from '@common/services';
+import { JwtAuthGuard } from '@modules/auth/guards';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -33,6 +35,15 @@ import { CryptoService } from '@common/services';
     UsersModule,
   ],
   controllers: [AppController],
-  providers: [AppService, CryptoService, CryptoService, DatabaseSeederService],
+  providers: [
+    AppService,
+    CryptoService,
+    CryptoService,
+    DatabaseSeederService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}

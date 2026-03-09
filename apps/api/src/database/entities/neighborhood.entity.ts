@@ -1,9 +1,9 @@
 import { Column, Entity, OneToMany } from 'typeorm';
-import { BaseEntity } from './_base.entity';
+import { TraceableEntity } from './_traceable.entity';
 import { HousingUnit } from './housing-unit.entity';
 
 @Entity()
-export class Neighborhood extends BaseEntity {
+export class Neighborhood extends TraceableEntity {
   @Column({ unique: true })
   name: string;
 

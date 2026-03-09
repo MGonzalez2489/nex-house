@@ -1,10 +1,11 @@
-import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
-import { BaseEntity } from './_base.entity';
-import { Neighborhood } from './neighborhood.entity';
 import { UserRoleEnum } from '@nex-house/enums';
+import { Exclude } from 'class-transformer';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { TraceableEntity } from './_traceable.entity';
+import { Neighborhood } from './neighborhood.entity';
 
 @Entity('users')
-export class User extends BaseEntity {
+export class User extends TraceableEntity {
   @Column({ unique: true })
   email: string;
 
@@ -25,7 +26,8 @@ export class User extends BaseEntity {
   role: UserRoleEnum;
 
   @Column({ nullable: true })
-  neighborhoodId: string;
+  @Exclude()
+  neighborhoodId: number;
 
   @Column({ default: true })
   isActive: boolean;

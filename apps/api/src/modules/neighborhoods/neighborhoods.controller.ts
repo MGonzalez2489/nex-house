@@ -14,9 +14,10 @@ import {
 import { NeighborhoodsService } from './neighborhoods.service';
 import { SearchDto } from '@common/dtos';
 import { PaginatedResult } from '@common/utils';
-import { Neighborhood } from '@database/entities';
+import { Neighborhood, User } from '@database/entities';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { CreateNeighborhoodDto } from './dtos';
+import { CurrentUser } from '@common/decorators';
 
 @ApiTags('Neighborhoods')
 @Controller('neighborhoods')
@@ -32,8 +33,9 @@ export class NeighborhoodsController {
   })
   async create(
     @Body() createNeighborhoodDto: CreateNeighborhoodDto,
+    @CurrentUser() user: User,
   ): Promise<Neighborhood> {
-    return await this.neighborhoodsService.create(createNeighborhoodDto);
+    return await this.neighborhoodsService.create(createNeighborhoodDto, user);
   }
 
   @Get()
@@ -71,10 +73,12 @@ export class NeighborhoodsController {
   async update(
     @Param('publicId', ParseUUIDPipe) publicId: string,
     @Body() updateNeighborhoodDto: CreateNeighborhoodDto, // O tu UpdateDto si lo separaste
+    @CurrentUser() user: User,
   ): Promise<Neighborhood> {
     return await this.neighborhoodsService.update(
       publicId,
       updateNeighborhoodDto,
+      user,
     );
   }
 
@@ -87,7 +91,8 @@ export class NeighborhoodsController {
   })
   async remove(
     @Param('publicId', ParseUUIDPipe) publicId: string,
+    @CurrentUser() user: User,
   ): Promise<void> {
-    return await this.neighborhoodsService.remove(publicId);
+    return await this.neighborhoodsService.remove(publicId, user);
   }
 }

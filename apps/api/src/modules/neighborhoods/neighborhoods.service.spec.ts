@@ -1,10 +1,10 @@
 import { Neighborhood } from '@database/entities/neighborhood.entity';
+import { ConflictException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { NeighborhoodsService } from './neighborhoods.service';
 import { CreateNeighborhoodDto } from './dtos';
-import { ConflictException, NotFoundException } from '@nestjs/common';
+import { NeighborhoodsService } from './neighborhoods.service';
 
 const mockNeighborhood = {
   id: 1,
