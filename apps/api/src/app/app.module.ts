@@ -11,6 +11,9 @@ import {
   NeighborhoodsModule,
   UsersModule,
 } from '@modules/index';
+import { DatabaseSeederService } from '@database/index';
+import { User } from '@database/entities';
+import { CryptoService } from '@common/services';
 
 @Module({
   imports: [
@@ -22,6 +25,7 @@ import {
       inject: [ConfigService],
       useFactory: (config: ConfigService) => getDatabaseConfig(config),
     }),
+    TypeOrmModule.forFeature([User]),
     AuthModule,
     NeighborhoodsModule,
     FinanceModule,
@@ -29,6 +33,6 @@ import {
     UsersModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, CryptoService, CryptoService, DatabaseSeederService],
 })
 export class AppModule {}

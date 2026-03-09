@@ -1,9 +1,9 @@
-import { UserRole } from '@nex-house/enums';
 import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { BaseEntity } from './_base.entity';
 import { Neighborhood } from './neighborhood.entity';
+import { UserRoleEnum } from '@nex-house/enums';
 
-@Entity()
+@Entity('users')
 export class User extends BaseEntity {
   @Column({ unique: true })
   email: string;
@@ -19,10 +19,10 @@ export class User extends BaseEntity {
 
   @Column({
     type: 'enum',
-    enum: UserRole,
-    default: UserRole.RESIDENT,
+    enum: UserRoleEnum,
+    default: UserRoleEnum.RESIDENT,
   })
-  role: UserRole;
+  role: UserRoleEnum;
 
   @Column({ nullable: true })
   neighborhoodId: string;
