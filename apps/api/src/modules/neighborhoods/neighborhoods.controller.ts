@@ -18,7 +18,7 @@ import { Neighborhood } from '@database/entities';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { CreateNeighborhoodDto } from './dtos';
 
-@ApiTags('neighborhoods')
+@ApiTags('Neighborhoods')
 @Controller('neighborhoods')
 export class NeighborhoodsController {
   constructor(private readonly neighborhoodsService: NeighborhoodsService) {}

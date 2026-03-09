@@ -10,6 +10,9 @@ export class HousingUnit extends BaseEntity {
   @Column()
   identifier: string; // #11532, #11533, etc
 
+  @Column()
+  streetName: string;
+
   @Column({
     type: 'enum',
     enum: HousingStatusEnum,
