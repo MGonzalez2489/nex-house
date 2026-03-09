@@ -3,6 +3,7 @@ import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { BaseEntity } from './_base.entity';
 import { Neighborhood } from './neighborhood.entity';
 import { User } from './user.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class HousingUnit extends BaseEntity {
@@ -27,9 +28,11 @@ export class HousingUnit extends BaseEntity {
   neighborhoodId: string;
 
   @Column({ nullable: true })
+  @Exclude()
   ownerId: string;
 
   @Column({ nullable: true })
+  @Exclude()
   occupantId: string;
 
   @ManyToOne(() => Neighborhood, (n) => n.units)
