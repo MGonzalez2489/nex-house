@@ -19,7 +19,8 @@
       "@nex-house/enums": ["../../libs/shared/enums/src/index.ts"],
       "@database/*": ["src/database/*"],
       "@modules/*": ["src/modules/*"],
-      "@common/*": ["src/common/*"]
+      "@common/*": ["src/common/*"],
+      "@test/*": ["test/*"]
     }
   }
 }

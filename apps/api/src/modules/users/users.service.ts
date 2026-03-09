@@ -25,4 +25,7 @@ export class UsersService {
     });
     return result;
   }
+  async create(newUser: any, password: string) {
+    return { email: 'somehting', publicId: '123' };
+  }
 }

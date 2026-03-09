@@ -33,12 +33,11 @@ export class AuthService {
       const hashedPassword = await this.cryptoService.hash(dto.password);
 
       // TODO: fix this
-      // const newUser = await this.userService.create(dto.email, hashedPassword);
+      const newUser = await this.userService.create(dto.email, hashedPassword);
 
-      // this.logger.log(`User registered successfully: ${newUser.email}`);
-      //
-      // return this.createSession(newUser);
-      return;
+      this.logger.log(`User registered successfully: ${newUser.email}`);
+
+      return this.createSession(newUser as User);
     } catch (error) {
       if (error instanceof ConflictException) throw error;
 

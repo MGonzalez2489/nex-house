@@ -8,7 +8,7 @@ export class User extends BaseEntity {
   @Column({ unique: true })
   email: string;
 
-  @Column({ select: false }) // Por seguridad, el password no se incluye en consultas normales
+  @Column()
   password: string;
 
   @Column()

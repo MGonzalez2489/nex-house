@@ -1,5 +1,5 @@
 import { CryptoService } from '@common/services';
-import { UserService } from '@modules/user';
+import { UsersService } from '@modules/index';
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -7,13 +7,13 @@ import {
   CryptoServiceMock,
   JwtServiceMock,
   MockUser,
-  UserServiceMock,
+  UsersServiceMock,
 } from '@test/mocks';
 import { AuthService } from './auth.service';
 
 describe('AuthService', () => {
   let service: AuthService;
-  let userService: jest.Mocked<UserService>;
+  let userService: jest.Mocked<UsersService>;
   let cryptoService: jest.Mocked<CryptoService>;
   let jwtService: jest.Mocked<JwtService>;
   const token = 'jwt_token';
@@ -23,8 +23,8 @@ describe('AuthService', () => {
       providers: [
         AuthService,
         {
-          provide: UserService,
-          useValue: UserServiceMock,
+          provide: UsersService,
+          useValue: UsersServiceMock,
         },
         {
           provide: CryptoService,
@@ -38,7 +38,7 @@ describe('AuthService', () => {
     }).compile();
 
     service = module.get<AuthService>(AuthService);
-    userService = module.get(UserService);
+    userService = module.get(UsersService);
     cryptoService = module.get(CryptoService);
     jwtService = module.get(JwtService);
   });
