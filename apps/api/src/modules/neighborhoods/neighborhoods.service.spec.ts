@@ -3,6 +3,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { NeighborhoodsService } from './neighborhoods.service';
+import { CreateNeighborhoodDto } from './dtos';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 
 const mockNeighborhood = {
   id: 1,
@@ -44,5 +46,59 @@ describe('NeighborhoodsService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  describe('create', () => {
+    it('should create a new neighborhood', async () => {
+      const dto: CreateNeighborhoodDto = {
+        name: 'Residencial Nex',
+        slug: 'residencial-nex',
+        address: 'Av. Siempre Viva 123',
+      };
+
+      mockRepository.findOne.mockResolvedValue(null); // No existe previo
+
+      const result = await service.create(dto);
+
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        where: { slug: dto.slug },
+      });
+      expect(result).toEqual(mockNeighborhood);
+    });
+
+    it('should throw ConflictException if slug already exists', async () => {
+      mockRepository.findOne.mockResolvedValue(mockNeighborhood);
+
+      await expect(
+        service.create({ slug: 'residencial-nex' } as any),
+      ).rejects.toThrow(ConflictException);
+    });
+  });
+
+  describe('findByPublicId', () => {
+    it('should return a neighborhood if found', async () => {
+      mockRepository.findOne.mockResolvedValue(mockNeighborhood);
+
+      const result = await service.findByPublicId('uuid-123');
+      expect(result).toEqual(mockNeighborhood);
+    });
+
+    it('should return null if user not found', async () => {
+      mockRepository.findOne.mockResolvedValue(null);
+      const response = await service.findByPublicId('non-existent');
+
+      expect(response).toBeNull();
+    });
+  });
+
+  describe('remove', () => {
+    it('should call softDelete if neighborhood exists', async () => {
+      mockRepository.findOne.mockResolvedValue(mockNeighborhood);
+
+      await service.remove('uuid-123');
+      expect(mockRepository.softDelete).toHaveBeenCalledWith(
+        mockNeighborhood.id,
+      );
+    });
   });
 });
