@@ -10,13 +10,14 @@ import {
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import Aura from '@primeuix/themes/aura';
 import { providePrimeNG } from 'primeng/config';
+import { authInterceptor } from './_core/interceptors';
 import { appRoutes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(appRoutes, withComponentInputBinding()),
-    provideHttpClient(withFetch(), withInterceptors([])),
+    provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
     providePrimeNG({
       theme: {
         preset: Aura,

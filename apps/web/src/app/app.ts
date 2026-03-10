@@ -1,11 +1,10 @@
 import { Component } from '@angular/core';
-import { Card } from 'primeng/card';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
-  imports: [Card],
+  imports: [RouterOutlet],
   selector: 'app-root',
-  templateUrl: './app.html',
-  styleUrl: './app.css',
+  template: `<router-outlet />`,
 })
 export class App {
   protected title = 'web';

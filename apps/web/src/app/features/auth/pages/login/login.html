@@ -1,0 +1,93 @@
+<div>
+  <div class="text-center mb-8">
+    <h2 class="text-2xl font-bold text-slate-800 tracking-tight">
+      Bienvenido de vuelta
+    </h2>
+    <p class="text-slate-500 text-sm mt-2">
+      Gestiona tu fraccionamiento de forma inteligente
+    </p>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="doSubmit()" class="space-y-6">
+    <div class="form-control">
+      <label for="email" class="form-label">Correo Electrónico</label>
+      <p-iconfield>
+        <p-inputicon class="pi pi-envelope" />
+        <input
+          pInputText
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="nombre@ejemplo.com"
+          fluid
+          [invalid]="form.controls.email.invalid && form.controls.email.touched"
+          [attr.aria-invalid]="form.controls.email.invalid && form.controls.email.touched"
+          [attr.aria-describedby]="form.controls.email.touched && form.controls.email.errors ? 'email-error' : null"
+        />
+      </p-iconfield>
+      <app-form-validation-error
+        id="email-errors"
+        [touched]="form.controls.email.touched"
+        [errors]="form.controls.email.errors"
+        label="Email"
+      />
+    </div>
+
+    <div class="form-control">
+      <div class="flex justify-between items-center ml-1">
+        <label for="password" class="form-label">Contraseña</label>
+        <a
+          [routerLink]="['/auth/password-recovery']"
+          class="text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
+        >
+          ¿Olvidaste tu contraseña?
+        </a>
+      </div>
+      <p-password
+        id="password"
+        formControlName="password"
+        [feedback]="false"
+        [toggleMask]="true"
+        placeholder="••••••••"
+        fluid
+        autocomplete="off"
+        [invalid]="form.controls.password.invalid && form.controls.password.touched"
+        [attr.aria-invalid]="form.controls.password.invalid && form.controls.password.touched"
+        [attr.aria-describedby]="form.controls.password.touched && form.controls.password.errors ? 'password-error' : null"
+      ></p-password>
+      <app-form-validation-error
+        id="password-error"
+        [touched]="form.controls.password.touched"
+        [errors]="form.controls.password.errors"
+        label="Password"
+      />
+    </div>
+
+    <div class="flex items-center gap-2 ml-1">
+      <p-checkbox [binary]="true" inputId="remember"></p-checkbox>
+      <label for="remember" class="text-sm text-slate-600 cursor-pointer"
+        >Recordar mi sesión</label
+      >
+    </div>
+
+    <p-button
+      label="Iniciar Sesión"
+      type="submit"
+      [loading]="store.loading()"
+      fluid
+      size="large"
+      rounded
+    ></p-button>
+  </form>
+
+  <div class="mt-8 pt-6 border-t border-slate-50 text-center">
+    <p class="text-sm text-slate-500">
+      ¿Problemas con tu acceso?
+      <a
+        href="mailto:soporte@nexhouse.com"
+        class="font-semibold text-slate-700 hover:underline"
+        >Contacta a soporte</a
+      >
+    </p>
+  </div>
+</div>

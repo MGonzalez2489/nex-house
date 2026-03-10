@@ -1,5 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 @import 'tailwindcss';
+@import 'primeicons/primeicons';
 
 @layer base {
   *,
@@ -8,5 +9,22 @@
   ::backdrop,
   ::file-selector-button {
     border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+.form-control {
+  .form-label {
+    --tw-font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-medium);
+    display: block;
+    font-size: var(--text-sm);
+    color: var(--color-slate-700);
+
+    margin-bottom: calc(var(--spacing) * 1);
+  }
+
+  .required:after {
+    content: ' *';
+    color: red;
   }
 }

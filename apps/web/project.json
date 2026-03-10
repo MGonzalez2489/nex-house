@@ -15,8 +15,14 @@
         "tsConfig": "apps/web/tsconfig.app.json",
         "assets": [
           {
+            "glob": "favicon.ico",
+            "input": "apps/web/src",
+            "output": "/"
+          },
+          {
             "glob": "**/*",
-            "input": "apps/web/public"
+            "input": "apps/web/src/assets",
+            "output": "/assets"
           }
         ],
         "styles": ["apps/web/src/styles.css"]
@@ -35,7 +41,13 @@
               "maximumError": "8kb"
             }
           ],
-          "outputHashing": "all"
+          "outputHashing": "all",
+          "fileReplacements": [
+            {
+              "replace": "apps/web-app/src/environments/environment.ts",
+              "with": "apps/web-app/src/environments/environment.prod.ts"
+            }
+          ]
         },
         "development": {
           "optimization": false,
@@ -56,7 +68,10 @@
           "buildTarget": "web:build:development"
         }
       },
-      "defaultConfiguration": "development"
+      "defaultConfiguration": "development",
+      "options": {
+        "proxyConfig": "apps/web/proxy.conf.js"
+      }
     },
     "lint": {
       "executor": "@nx/eslint:lint"
