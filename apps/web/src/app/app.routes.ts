@@ -1,4 +1,5 @@
 import { Route } from '@angular/router';
+import { authGuard } from '@core/guards/auth.guard';
 
 export const appRoutes: Route[] = [
   // Rutas Públicas (Auth)
@@ -15,50 +16,29 @@ export const appRoutes: Route[] = [
       import('./_core/layout/main-layout/main-layout').then(
         (m) => m.MainLayout,
       ),
-    // canActivate: [authGuard],
+    canActivate: [authGuard],
     children: [
-      // {
-      //   path: 'dashboard',
-      //   loadComponent: () =>
-      //     import('./features/dashboard/dashboard.component').then(
-      //       (m) => m.DashboardComponent,
-      //     ),
-      // },
-      // {
-      //   path: 'neighborhoods',
-      //   loadChildren: () =>
-      //     import('./features/neighborhoods/neighborhoods.routes').then(
-      //       (m) => m.NEIGHBORHOOD_ROUTES,
-      //     ),
-      // },
-      // {
-      //   path: 'units',
-      //   loadChildren: () =>
-      //     import('./features/housing-units/units.routes').then(
-      //       (m) => m.UNIT_ROUTES,
-      //     ),
-      // },
-      // {
-      //   path: 'users',
-      //   loadChildren: () =>
-      //     import('./features/users/users.routes').then((m) => m.USER_ROUTES),
-      // },
-      // {
-      //   path: '',
-      //   redirectTo: 'dashboard',
-      //   pathMatch: 'full',
-      // },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+
+      {
+        path: 'dashboard',
+        loadChildren: () =>
+          import('./features/dashboard/dashboard.routes').then(
+            (m) => m.DASHBOARD_ROUTES,
+          ),
+      },
+      {
+        path: 'neighborhoods',
+        loadChildren: () =>
+          import('./features/neighborhoods/neighborhoods.routes').then(
+            (m) => m.NEIGHBORHOODS_ROUTES,
+          ),
+      },
     ],
   },
 
-  // Fallback (404 o redirección)
   {
     path: '**',
     redirectTo: 'auth/login',
   },
-
-  // {
-  //   path: '',
-  //   component: MainLayout,
-  // },
 ];

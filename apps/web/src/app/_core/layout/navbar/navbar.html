@@ -13,14 +13,15 @@
 
   <div class="flex items-center gap-4">
     <div class="hidden md:block text-right">
-      <p class="text-sm font-semibold text-gray-900">{{ fName }}</p>
-      <p class="text-xs text-gray-500">{{ role }}</p>
+      <p class="text-sm font-semibold text-gray-900">{{ user()?.email }}</p>
+      <p class="text-xs text-gray-500">{{ user()?.role }}</p>
     </div>
     <p-button
       icon="pi pi-sign-out"
       severity="danger"
       [rounded]="true"
       [text]="true"
+      (click)="logout.emit()"
     >
     </p-button>
   </div>

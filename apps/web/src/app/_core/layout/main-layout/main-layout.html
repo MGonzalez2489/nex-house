@@ -10,7 +10,11 @@
   </p-drawer>
 
   <div class="flex flex-col flex-1 w-0 overflow-hidden">
-    <app-navbar (toggleSidebar)="sidebarVisible.set(true)"></app-navbar>
+    <app-navbar
+      [user]="sessionService.user()"
+      (toggleSidebar)="sidebarVisible.set(true)"
+      (logout)="sessionService.logout()"
+    ></app-navbar>
 
     <main class="flex-1 relative overflow-y-auto focus:outline-none p-4 lg:p-8">
       <div class="max-w-7xl mx-auto">

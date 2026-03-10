@@ -1,1 +1,19 @@
-<svg width="300" height="300" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="296" height="296" style="fill:#dedede;stroke:#555555;stroke-width:2"/><text x="50%" y="50%" font-size="18" text-anchor="middle" alignment-baseline="middle" font-family="monospace, sans-serif" fill="#555555">nexhouselogo</text></svg>
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="nexGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3498db"/> <stop offset="100%" stop-color="#2ecc71"/> </linearGradient>
+  </defs>
+
+  <rect width="128" height="128" rx="28" fill="white"/>
+
+  <g transform="translate(24, 24)"> <path d="M4 48 C4 48 40 20 40 20 S76 48 76 48 V76 C76 80.4183 72.4183 84 68 84 H12 C7.58172 84 4 80.4183 4 76 V48Z" 
+          stroke="url(#nexGradient)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <path d="M40 20 V84" stroke="url(#nexGradient)" stroke-width="8" stroke-linecap="round"/>
+
+    <rect x="48" y="44" width="20" height="14" rx="4" stroke="url(#nexGradient)" stroke-width="6"/>
+    <rect x="53" y="68" width="10" height="6" rx="3" fill="url(#nexGradient)"/>
+    
+    <rect x="14" y="56" width="14" height="14" rx="4" stroke="url(#nexGradient)" stroke-width="6"/>
+  </g>
+</svg>

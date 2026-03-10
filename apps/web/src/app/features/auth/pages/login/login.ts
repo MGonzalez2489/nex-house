@@ -16,6 +16,7 @@ import { PasswordModule } from 'primeng/password';
 import { FormValidationError } from '@shared/components/ui';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
+import { DASHBOARD_ROUTES_ENUM } from '@features/dashboard/dashboard.routes';
 
 type ILoginForm = {
   email: FormControl<string>;
@@ -55,19 +56,23 @@ export class Login {
 
   constructor() {
     effect(() => {
-      if (this.store.token()) {
-        this.router.navigateByUrl('/app');
+      if (this.store.isAuthenticated()) {
+        this.router.navigateByUrl(`/${DASHBOARD_ROUTES_ENUM.HOME}`);
       }
     });
   }
 
-  doSubmit(): void {
+  async doSubmit() {
     this.form.markAllAsTouched();
     if (this.form.invalid) {
       return;
     }
 
     const request: ILogin = this.form.getRawValue();
-    this.store.login(request);
+    const response = await this.store.login(request);
+
+    if (response) {
+      this.router.navigateByUrl(`/${DASHBOARD_ROUTES_ENUM.HOME}`);
+    }
   }
 }

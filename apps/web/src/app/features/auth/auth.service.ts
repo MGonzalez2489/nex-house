@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { RequestService } from '@core/services';
-import { ILogin, ApiResponse } from '@nex-house/interfaces';
-import { SessionModel } from '@nex-house/models';
+import { ApiResponse, ILogin } from '@nex-house/interfaces';
+import { SessionModel, UserModel } from '@nex-house/models';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -16,5 +16,8 @@ export class AuthService {
       `${this.endpoint}/login`,
       credentials,
     );
+  }
+  me(): Observable<ApiResponse<UserModel>> {
+    return this.request.get<UserModel>(`${this.endpoint}/me`);
   }
 }

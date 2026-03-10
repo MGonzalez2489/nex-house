@@ -35,6 +35,10 @@ export class AuthService {
     return this.createSession(user);
   }
 
+  async me(current: User) {
+    return UserEntityToModel(current);
+  }
+
   /// PRIVATE
   private createSession(user: User): SessionModel {
     const payload = {
