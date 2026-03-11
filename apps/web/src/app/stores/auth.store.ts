@@ -21,8 +21,8 @@ import {
 } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { lastValueFrom, pipe, switchMap, tap } from 'rxjs';
-import { APP_CONSTANTS } from '../_core';
 import { AuthService } from '@features/auth';
+import { APP_CONSTANTS } from '@core/constants';
 
 interface AuthState {
   user: UserModel | undefined;

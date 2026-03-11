@@ -1,5 +1,5 @@
 import { SearchDto } from '@common/dtos';
-import { PaginatedResult, paginate } from '@common/utils';
+import { PaginatedResult, paginateQuery } from '@common/utils';
 import { Neighborhood, User } from '@database/entities';
 import {
   ConflictException,
@@ -8,7 +8,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { CreateNeighborhoodDto } from './dtos';
 
 @Injectable()
@@ -33,10 +33,29 @@ export class NeighborhoodsService {
     return await this.repository.save(neighborhood);
   }
 
-  async findAll(searchDto: SearchDto): Promise<PaginatedResult<Neighborhood>> {
-    return await paginate(this.repository, searchDto, {
-      // Aquí podrías añadir relaciones si fuera necesario, ej: relations: ['units']
-    });
+  async findAll(search: SearchDto): Promise<PaginatedResult<Neighborhood>> {
+    const { globalFilter } = search;
+
+    const query = this.repository.createQueryBuilder('neighborhood');
+
+    if (globalFilter) {
+      query.andWhere(
+        new Brackets((qb) => {
+          qb.where('neighborhood.name LIKE :filter', {
+            filter: `%${globalFilter}%`,
+          })
+            .orWhere('neighborhood.slug LIKE :filter', {
+              filter: `%${globalFilter}%`,
+            })
+            .orWhere('neighborhood.address LIKE :filter', {
+              filter: `%${globalFilter}%`,
+            });
+        }),
+      );
+    }
+
+    const result = await paginateQuery(query, search);
+    return result;
   }
 
   async findByPublicId(

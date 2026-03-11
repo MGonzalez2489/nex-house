@@ -1,13 +1,20 @@
 import {
+  setError,
+  setLoaded,
+  setLoading,
+  withCallState,
   withDevtools,
   withReset,
-  withCallState,
-  setLoading,
-  setLoaded,
 } from '@angular-architects/ngrx-toolkit';
-import { inject, effect } from '@angular/core';
-import { ApiPaginationMeta, Search } from '@nex-house/interfaces';
+import { effect, inject } from '@angular/core';
+import { NeighborhoodService } from '@features/neighborhoods';
+import {
+  ApiPaginationMeta,
+  ICreateNeighborhood,
+  Search,
+} from '@nex-house/interfaces';
 import { NeighborhoodModel } from '@nex-house/models';
+import { tapResponse } from '@ngrx/operators';
 import {
   patchState,
   signalStore,
@@ -18,15 +25,14 @@ import {
   withState,
 } from '@ngrx/signals';
 import {
+  addEntity,
   entityConfig,
   setAllEntities,
   withEntities,
 } from '@ngrx/signals/entities';
-import { AuthStore } from './auth.store';
-import { NeighborhoodService } from '@features/neighborhoods';
-import { tapResponse } from '@ngrx/operators';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { pipe, tap, switchMap } from 'rxjs';
+import { lastValueFrom, pipe, switchMap, tap } from 'rxjs';
+import { AuthStore } from './auth.store';
 
 const config = entityConfig({
   entity: type<NeighborhoodModel>(),
@@ -72,6 +78,20 @@ export const NeighborhoodStore = signalStore(
         ),
       ),
     ),
+    create: async (dto: ICreateNeighborhood): Promise<boolean> => {
+      patchState(store, setLoading());
+
+      try {
+        const res = await lastValueFrom(store._neighService.create(dto));
+
+        patchState(store, addEntity(res.data, config), setLoaded());
+
+        return true;
+      } catch (error) {
+        patchState(store, setError(error));
+        return false;
+      }
+    },
   })),
   withHooks((store) => {
     const authStore = inject(AuthStore);
