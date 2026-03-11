@@ -1,1 +1,90 @@
-<p>neighborhoods-container works!</p>
+<app-page-header
+  class="block pb-4"
+  title="Fraccionamientos"
+  subTitle="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore..."
+/>
+
+<div class="space-y-4">
+  <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <app-neighborhoods-stats />
+    <app-neighborhoods-stats />
+    <app-neighborhoods-stats />
+  </section>
+  <app-neighborhoods-filters class="block" />
+  <app-neighborhoods-table class="block" />
+</div>
+
+<div class="max-w-2xl mx-auto py-8 hidden">
+  <div class="bg-white rounded-2xl shadow-lg border border-slate-100 p-8">
+    <h2 class="text-xl font-bold text-slate-900 mb-6">
+      Configuración del Fraccionamiento
+    </h2>
+    <form class="space-y-5">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-semibold text-slate-700"
+            >Nombre Comercial</label
+          >
+          <input
+            type="text"
+            class="p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+          />
+        </div>
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-semibold text-slate-700">Slug (URL)</label>
+          <input
+            type="text"
+            class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-500 italic"
+            value="nombre-automatico"
+            readonly
+          />
+        </div>
+      </div>
+      <div class="pt-6 flex justify-end gap-3 border-t border-slate-50">
+        <button
+          type="button"
+          class="px-6 py-2.5 text-slate-600 font-medium hover:bg-slate-100 rounded-xl transition-all"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="px-6 py-2.5 bg-blue-600 text-white font-bold rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700 active:scale-95 transition-all"
+        >
+          Guardar Cambios
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div
+  class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden hidden"
+>
+  <div class="p-6 border-b border-slate-50 flex justify-between items-center">
+    <h3 class="font-bold text-slate-800">Fraccionamientos Recientes</h3>
+    <button class="text-blue-600 text-sm font-semibold hover:underline">
+      Ver todos
+    </button>
+  </div>
+  <div class="divide-y divide-slate-50">
+    <div
+      class="p-4 hover:bg-slate-50 flex items-center justify-between transition-colors"
+    >
+      <div class="flex items-center gap-4">
+        <div
+          class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-600 text-xs"
+        >
+          NH
+        </div>
+        <div>
+          <p class="text-sm font-semibold text-slate-900">
+            NexHouse Residencial
+          </p>
+          <p class="text-xs text-slate-500">creado hace 2 días</p>
+        </div>
+      </div>
+      <i class="pi pi-chevron-right text-slate-300"></i>
+    </div>
+  </div>
+</div>

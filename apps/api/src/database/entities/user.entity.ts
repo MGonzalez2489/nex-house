@@ -18,6 +18,9 @@ export class User extends TraceableEntity {
   @Column()
   lastName: string;
 
+  @Column({ nullable: true })
+  phone: string;
+
   @Column({
     type: 'enum',
     enum: UserRoleEnum,

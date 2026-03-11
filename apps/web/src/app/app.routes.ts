@@ -2,14 +2,13 @@ import { Route } from '@angular/router';
 import { authGuard } from '@core/guards/auth.guard';
 
 export const appRoutes: Route[] = [
-  // Rutas Públicas (Auth)
+  //public routes
   {
     path: 'auth',
     loadChildren: () =>
       import('./features/auth/auth.routes').then((m) => m.AUTH_ROUTES),
   },
-  //
-  // Rutas Protegidas (Dentro del Layout)
+  //private routes
   {
     path: '',
     loadComponent: () =>
@@ -39,6 +38,6 @@ export const appRoutes: Route[] = [
 
   {
     path: '**',
-    redirectTo: 'auth/login',
+    redirectTo: '/auth/login',
   },
 ];

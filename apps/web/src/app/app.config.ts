@@ -10,8 +10,8 @@ import {
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import Aura from '@primeuix/themes/aura';
 import { providePrimeNG } from 'primeng/config';
-import { authInterceptor } from './_core/interceptors';
 import { appRoutes } from './app.routes';
+import { authInterceptor } from '@core/interceptors';
 
 export const appConfig: ApplicationConfig = {
   providers: [
