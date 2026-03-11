@@ -4,6 +4,7 @@ import {
   input,
   output,
 } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { ApiPaginationMeta, Search } from '@nex-house/interfaces';
 import { NeighborhoodModel } from '@nex-house/models';
 import { ButtonModule } from 'primeng/button';
@@ -13,7 +14,7 @@ import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 
 @Component({
   selector: 'app-neighborhoods-table',
-  imports: [Card, TableModule, ButtonModule, InputTextModule],
+  imports: [Card, TableModule, ButtonModule, InputTextModule, RouterLink],
   templateUrl: './neighborhoods-table.html',
   styleUrl: './neighborhoods-table.css',
   standalone: true,

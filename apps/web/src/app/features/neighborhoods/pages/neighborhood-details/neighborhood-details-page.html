@@ -1,0 +1,26 @@
+<div class="space-y-6">
+  <app-page-header class="block" [title]="name" [subTitle]="slug" />
+
+  <pre>Active: {{activeItem?.routerLink}}</pre>
+  <p-card>
+    <p-tabs [value]="activeItem?.routerLink">
+      <p-tablist>
+        @for (tab of items; track tab.routerLink) {
+        <p-tab
+          [value]="tab.routerLink"
+          (click)="activeItem = tab"
+          [routerLink]="[tab.routerLink]"
+          class="flex items-center gap-2! text-inherit"
+        >
+          <i class="text-md text-gray-500" [class]="tab.icon"></i>
+          <span class="text-md text-gray-600">{{ tab.label }}</span>
+        </p-tab>
+        }
+      </p-tablist>
+    </p-tabs>
+
+    <div class="p-6">
+      <router-outlet></router-outlet>
+    </div>
+  </p-card>
+</div>

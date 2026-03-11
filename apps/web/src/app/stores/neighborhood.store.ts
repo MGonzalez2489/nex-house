@@ -28,6 +28,7 @@ import {
   addEntity,
   entityConfig,
   setAllEntities,
+  updateEntity,
   withEntities,
 } from '@ngrx/signals/entities';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
@@ -85,6 +86,24 @@ export const NeighborhoodStore = signalStore(
         const res = await lastValueFrom(store._neighService.create(dto));
 
         patchState(store, addEntity(res.data, config), setLoaded());
+
+        return true;
+      } catch (error) {
+        patchState(store, setError(error));
+        return false;
+      }
+    },
+    update: async (id: string, dto: ICreateNeighborhood): Promise<boolean> => {
+      patchState(store, setLoading());
+
+      try {
+        const res = await lastValueFrom(store._neighService.update(id, dto));
+
+        patchState(
+          store,
+          updateEntity({ id, changes: res.data }, config),
+          setLoaded(),
+        );
 
         return true;
       } catch (error) {

@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { NeighborhoodsContainer } from './neighborhoods-container';
+import { NeighborhoodHomePage } from './neighborhood-home-page';
 
-describe('NeighborhoodsContainer', () => {
-  let component: NeighborhoodsContainer;
-  let fixture: ComponentFixture<NeighborhoodsContainer>;
+describe('NeighborhoodHomePage', () => {
+  let component: NeighborhoodHomePage;
+  let fixture: ComponentFixture<NeighborhoodHomePage>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [NeighborhoodsContainer],
+      imports: [NeighborhoodHomePage],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(NeighborhoodsContainer);
+    fixture = TestBed.createComponent(NeighborhoodHomePage);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
