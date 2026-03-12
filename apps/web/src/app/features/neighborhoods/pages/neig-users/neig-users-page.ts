@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  OnInit,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ModalService } from '@core/services';
 import { Search } from '@nex-house/interfaces';
 import { UsersTable } from '@shared/components/data';
@@ -21,17 +16,19 @@ import { TableModule } from 'primeng/table';
   changeDetection: ChangeDetectionStrategy.OnPush,
   // this.store.loadAll(filters);
 })
-export class NeigUsersPage implements OnInit {
+export class NeigUsersPage {
   protected readonly store = inject(UsersStore);
   protected readonly modalService = inject(ModalService);
-
-  ngOnInit(): void {
-    this.addUser();
-  }
 
   addUser() {
     this.modalService.open(UserForm, {
       header: 'Crear Usuario',
+      width: '35vw',
+    });
+  }
+  updateUser() {
+    this.modalService.open(UserForm, {
+      header: 'Actualizar Usuario',
       width: '35vw',
     });
   }

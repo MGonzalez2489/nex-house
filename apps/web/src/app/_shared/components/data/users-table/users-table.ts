@@ -6,12 +6,14 @@ import {
 } from '@angular/core';
 import { ApiPaginationMeta, Search } from '@nex-house/interfaces';
 import { UserModel } from '@nex-house/models';
+import { PhonePipe } from '@shared/pipes';
 import { ButtonModule } from 'primeng/button';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
+import { RoleTag } from '../role-tag/role-tag';
 
 @Component({
   selector: 'app-users-table',
-  imports: [TableModule, ButtonModule],
+  imports: [TableModule, ButtonModule, PhonePipe, RoleTag],
   templateUrl: './users-table.html',
   styleUrl: './users-table.css',
   standalone: true,

@@ -14,7 +14,7 @@ import { ERROR_MESSAGES } from './error-messages';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (shouldShowErrors()) {
-      <div class="flex flex-column gap-1 mt-1">
+      <div class="flex flex-column gap-1 ms-1">
         @for (error of errorMessages(); track $index) {
           <small class="p-error block animate-fade-in text-xs text-red-500">
             {{ error }}

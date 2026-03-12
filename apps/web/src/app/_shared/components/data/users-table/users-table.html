@@ -46,8 +46,10 @@
     <tr class="hover:bg-blue-50/30 transition-colors">
       <td class="text-sm font-semibold text-slate-700">{{ user.fullName }}</td>
       <td class="text-sm text-slate-600">{{ user.email }}</td>
-      <td class="text-sm text-slate-600">{{ user.role }}</td>
-      <td class="text-sm text-slate-600">{{ user.phone }}</td>
+      <td class="text-sm text-slate-600">
+        <app-role-tag [role]="user.role" />
+      </td>
+      <td class="text-sm text-slate-600">{{ user.phone | phone}}</td>
       <td>
         <div class="flex gap-1">
           <p-button
