@@ -1,6 +1,6 @@
 import { SearchDto } from '@common/dtos';
 import { CryptoService } from '@common/services';
-import { paginate } from '@common/utils';
+import { paginateQuery } from '@common/utils';
 import { User } from '@database/entities';
 import { NeighborhoodsService } from '@modules/neighborhoods';
 import {
@@ -10,8 +10,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { CreateUserDto } from './dtos';
+import { UserRoleEnum } from '@nex-house/enums';
 
 @Injectable()
 export class UsersService {
@@ -24,8 +25,37 @@ export class UsersService {
     private readonly neighborhoodService: NeighborhoodsService,
   ) {}
 
-  async findAll(searchDto: SearchDto) {
-    return await paginate(this.repository, searchDto);
+  async findAll(neighborhoodId: string, filters: SearchDto) {
+    const query = this.repository
+      .createQueryBuilder('users')
+      .leftJoinAndSelect('users.neighborhood', 'neighborhood')
+      .where('neighborhood.publicId = :neighborhoodId', {
+        neighborhoodId,
+      });
+
+    const { globalFilter } = filters;
+
+    if (globalFilter) {
+      query.andWhere(
+        new Brackets((qb) => {
+          qb.where('users.firstName LIKE :filter', {
+            filter: `%${globalFilter}%`,
+          })
+            .orWhere('users.lastName LIKE :filter', {
+              filter: `%${globalFilter}%`,
+            })
+            .orWhere('users.email LIKE :filter', {
+              filter: `%${globalFilter}%`,
+            })
+            .orWhere('users.phone LIKE :filter', {
+              filter: `%${globalFilter}%`,
+            });
+        }),
+      );
+    }
+
+    const result = await paginateQuery(query, filters);
+    return result;
   }
 
   async findByPublicId(publicId: string): Promise<User | null> {
@@ -57,13 +87,16 @@ export class UsersService {
       );
     }
 
-    const hashedPassword = await this.cryptoService.hash(dto.password);
+    const role = dto.isAdmin ? UserRoleEnum.ADMIN : UserRoleEnum.RESIDENT;
+
+    const hashedPassword = await this.cryptoService.hash('1234');
 
     const newUser = this.repository.create({
       ...dto,
       password: hashedPassword,
       neighborhoodId: neighborhood?.id,
       createdBy: user.id,
+      role,
     });
 
     await this.repository.save(newUser);
@@ -79,13 +112,14 @@ export class UsersService {
     const userToUpdate = await this.findOrThrow(publicId);
 
     // Si el DTO incluye password, lo hasheamos antes de hacer el merge
-    if (dto.password) {
-      dto.password = await this.cryptoService.hash(dto.password);
-    }
+    // if (dto.password) {
+    const hashedPassword = await this.cryptoService.hash('1234');
+    // }
 
     const updated = this.repository.merge(userToUpdate, {
       ...dto,
       updatedBy: updater.id,
+      password: hashedPassword,
     });
 
     await this.repository.save(updated);

@@ -10,6 +10,7 @@ export class User extends TraceableEntity {
   email: string;
 
   @Column()
+  @Exclude()
   password: string;
 
   @Column()

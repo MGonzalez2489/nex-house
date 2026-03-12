@@ -1,0 +1,63 @@
+<p-table
+  [value]="users()"
+  [lazy]="true"
+  [paginator]="true"
+  [rows]="10"
+  (onLazyLoad)="search($event)"
+  [totalRecords]="pagination()?.total || 0"
+  [loading]="isLoading()"
+  [showCurrentPageReport]="true"
+  currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+  [rowsPerPageOptions]="[10, 20, 50]"
+>
+  <ng-template #header>
+    <tr>
+      <th
+        pSortableColumn="name"
+        class="bg-slate-50 text-xs font-bold uppercase text-slate-600"
+      >
+        Nombre <p-sortIcon field="name" />
+      </th>
+      <th
+        pSortableColumn="address"
+        class="bg-slate-50 text-xs font-bold uppercase text-slate-600"
+      >
+        Email <p-sortIcon field="address" />
+      </th>
+      <th
+        pSortableColumn="totalSlots"
+        class="bg-slate-50 text-xs font-bold uppercase text-slate-600"
+      >
+        Rol <p-sortIcon field="totalSlots" />
+      </th>
+      <th
+        pSortableColumn="totalSlots"
+        class="bg-slate-50 text-xs font-bold uppercase text-slate-600"
+      >
+        Telefono <p-sortIcon field="totalSlots" />
+      </th>
+      <th class="bg-slate-50 text-xs font-bold uppercase text-slate-600">
+        Actions
+      </th>
+    </tr>
+  </ng-template>
+
+  <ng-template #body let-user>
+    <tr class="hover:bg-blue-50/30 transition-colors">
+      <td class="text-sm font-semibold text-slate-700">{{ user.fullName }}</td>
+      <td class="text-sm text-slate-600">{{ user.email }}</td>
+      <td class="text-sm text-slate-600">{{ user.role }}</td>
+      <td class="text-sm text-slate-600">{{ user.phone }}</td>
+      <td>
+        <div class="flex gap-1">
+          <p-button
+            icon="pi pi-search"
+            [text]="true"
+            severity="info"
+            pTooltip="View Details"
+          />
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>

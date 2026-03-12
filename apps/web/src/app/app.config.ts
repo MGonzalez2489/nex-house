@@ -12,6 +12,10 @@ import { authInterceptor } from '@core/interceptors';
 import Aura from '@primeuix/themes/aura';
 import { providePrimeNG } from 'primeng/config';
 import { appRoutes } from './app.routes';
+import { DialogService } from 'primeng/dynamicdialog';
+import { MessageService } from 'primeng/api';
+
+const globalService = [DialogService, MessageService];
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -19,6 +23,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(appRoutes, withComponentInputBinding()),
     provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
 
+    ...globalService,
     // provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
     providePrimeNG({
       theme: {

@@ -1,9 +1,19 @@
-import { Body, Controller, Param, ParseUUIDPipe, Post } from '@nestjs/common';
+import { CurrentUser } from '@common/decorators';
+import { SearchDto } from '@common/dtos';
+import { User } from '@database/entities';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from './dtos';
+import { UserEntityToModel } from './mappers';
 import { UsersService } from './users.service';
-import { CurrentUser } from '@common/decorators';
-import { User } from '@database/entities';
 
 @ApiTags('Users')
 @Controller('neighborhoods/:neighborhoodId/users')
@@ -17,6 +27,26 @@ export class UsersController {
     @Body() createDto: CreateUserDto,
     @CurrentUser() user: User,
   ) {
-    return await this.usersService.create(neighborhoodId, createDto, user);
+    const response = await this.usersService.create(
+      neighborhoodId,
+      createDto,
+      user,
+    );
+    return UserEntityToModel(response!);
+  }
+
+  @Get()
+  async findAll(
+    @Param('neighborhoodId', ParseUUIDPipe) neighborhoodId: string,
+    @Query() searchDto: SearchDto,
+  ) {
+    const searchResult = await this.usersService.findAll(
+      neighborhoodId,
+      searchDto,
+    );
+    return {
+      meta: searchResult.meta,
+      data: searchResult.data.map((user) => UserEntityToModel(user)),
+    };
   }
 }

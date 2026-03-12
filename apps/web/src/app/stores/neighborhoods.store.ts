@@ -37,10 +37,17 @@ import { AuthStore } from './auth.store';
 
 const config = entityConfig({
   entity: type<NeighborhoodModel>(),
-  selectId: (building: NeighborhoodModel) => building.publicId,
+  selectId: (neigh: NeighborhoodModel) => neigh.publicId,
 });
 
-export const NeighborhoodStore = signalStore(
+interface Neighborhoodstate {
+  pagination: ApiPaginationMeta | undefined;
+}
+const initialState: Neighborhoodstate = {
+  pagination: undefined,
+};
+
+export const NeighborhoodsStore = signalStore(
   { providedIn: 'root' },
   withDevtools('neighborhood'),
   withReset(),
@@ -49,9 +56,7 @@ export const NeighborhoodStore = signalStore(
   withProps(() => ({
     _neighService: inject(NeighborhoodService),
   })),
-  withState({
-    pagination: null as ApiPaginationMeta | null,
-  }),
+  withState(initialState),
   withMethods((store) => ({
     loadAll: rxMethod<Search>(
       pipe(

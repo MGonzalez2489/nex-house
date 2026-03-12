@@ -1,1 +1,12 @@
-<p>neig-users-page works!</p>
+<div class="space-y-6">
+  <div class="flex justify-between items-center">
+    <h2 class="text-lg">Usuarios registrados</h2>
+    <p-button label="Nuevo" (click)="addUser()" icon="pi pi-plus" />
+  </div>
+  <app-users-table
+    [isLoading]="store.loading()"
+    [users]="store.entities()"
+    [pagination]="store.pagination() "
+    (filter)="search($event)"
+  />
+</div>

@@ -1,7 +1,7 @@
-import { Component, computed, inject, input, OnInit } from '@angular/core';
+import { Component, inject, input, OnDestroy, OnInit } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { PageHeader } from '@shared/components/ui';
-import { NeighborhoodStore } from '@stores/neighborhood.store';
+import { ContextStore } from '@stores/context.store';
 import { MenuItem } from 'primeng/api';
 import { Card } from 'primeng/card';
 import { TabsModule } from 'primeng/tabs';
@@ -12,10 +12,9 @@ import { TabsModule } from 'primeng/tabs';
   templateUrl: './neighborhood-details-page.html',
   styleUrl: './neighborhood-details-page.css',
 })
-export class NeighborhoodDetailsPage implements OnInit {
-  protected readonly store = inject(NeighborhoodStore);
+export class NeighborhoodDetailsPage implements OnInit, OnDestroy {
+  protected readonly store = inject(ContextStore);
   protected readonly id = input.required<string>();
-  neighborhood = computed(() => this.store.entityMap()[this.id()]);
 
   items: MenuItem[] | undefined;
   activeItem: MenuItem | undefined;
@@ -24,6 +23,8 @@ export class NeighborhoodDetailsPage implements OnInit {
   slug = 'quintas-san-miguel';
 
   ngOnInit(): void {
+    const cId = this.id();
+    this.store.setNeighborhoodId(cId);
     this.items = [
       {
         label: 'General',
@@ -43,5 +44,9 @@ export class NeighborhoodDetailsPage implements OnInit {
     ];
 
     this.activeItem = this.items.find((f) => f.routerLink === 'users');
+  }
+
+  ngOnDestroy(): void {
+    this.store.setNeighborhoodId(null);
   }
 }

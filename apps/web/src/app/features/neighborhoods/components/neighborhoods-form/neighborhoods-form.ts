@@ -5,13 +5,13 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { ICreateNeighborhood } from '@nex-house/interfaces';
 import { FormValidationError } from '@shared/components/ui';
 import { ButtonModule } from 'primeng/button';
+import { DynamicDialogRef } from 'primeng/dynamicdialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { INeighborhoodsForm } from './iNeighborhoods.form';
-import { NeighborhoodStore } from '@stores/neighborhood.store';
-import { ICreateNeighborhood } from '@nex-house/interfaces';
-import { DynamicDialogRef } from 'primeng/dynamicdialog';
+import { NeighborhoodsStore } from '@stores/neighborhoods.store';
 
 @Component({
   selector: 'app-neighborhoods-form',
@@ -25,7 +25,7 @@ import { DynamicDialogRef } from 'primeng/dynamicdialog';
   styleUrl: './neighborhoods-form.css',
 })
 export class NeighborhoodsForm {
-  private readonly store = inject(NeighborhoodStore);
+  private readonly store = inject(NeighborhoodsStore);
   private readonly ref = inject(DynamicDialogRef);
   readonly form = new FormGroup<INeighborhoodsForm>({
     name: new FormControl<string>('', {

@@ -1,4 +1,9 @@
-import { Component, effect, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+} from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -38,6 +43,8 @@ type ILoginForm = {
   ],
   templateUrl: './login.html',
   styleUrl: './login.css',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Login {
   private readonly router = inject(Router);

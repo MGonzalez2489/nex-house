@@ -6,7 +6,7 @@ import {
 } from '@features/neighborhoods/components';
 import { Search } from '@nex-house/interfaces';
 import { PageHeader } from '@shared/components/ui';
-import { NeighborhoodStore } from '@stores/neighborhood.store';
+import { NeighborhoodsStore } from '@stores/neighborhoods.store';
 import { ButtonModule } from 'primeng/button';
 import { DialogService } from 'primeng/dynamicdialog';
 
@@ -20,7 +20,7 @@ import { DialogService } from 'primeng/dynamicdialog';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NeighborhoodHomePage {
-  protected readonly store = inject(NeighborhoodStore);
+  protected readonly store = inject(NeighborhoodsStore);
   protected readonly dialogService = inject(DialogService);
 
   addNeighborhoods() {
