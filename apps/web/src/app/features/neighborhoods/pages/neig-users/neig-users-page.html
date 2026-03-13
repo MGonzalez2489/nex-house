@@ -1,7 +1,24 @@
 <div class="space-y-6">
   <div class="flex justify-between items-center">
-    <h2 class="text-lg">Usuarios registrados</h2>
-    <p-button label="Nuevo" (click)="addUser()" icon="pi pi-plus" />
+    <div class="flex items-center gap-3">
+      <h2 class="text-xl font-bold text-slate-800">Habitantes</h2>
+      <p-badge
+        [value]="store.pagination()?.total || 0"
+        severity="secondary"
+      ></p-badge>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <input
+        pInputText
+        type="text"
+        placeholder="Buscar por nombre, telefono, email..."
+        class="w-full md:w-75"
+        variant="filled"
+      />
+
+      <p-button label="Nuevo" (click)="addUser()" icon="pi pi-plus" />
+    </div>
   </div>
   <app-users-table
     [isLoading]="store.loading()"

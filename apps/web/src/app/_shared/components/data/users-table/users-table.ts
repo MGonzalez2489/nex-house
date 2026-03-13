@@ -10,10 +10,11 @@ import { PhonePipe } from '@shared/pipes';
 import { ButtonModule } from 'primeng/button';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { RoleTag } from '../role-tag/role-tag';
+import { UserAvatar } from '@shared/components/ui';
 
 @Component({
   selector: 'app-users-table',
-  imports: [TableModule, ButtonModule, PhonePipe, RoleTag],
+  imports: [TableModule, ButtonModule, PhonePipe, RoleTag, UserAvatar],
   templateUrl: './users-table.html',
   styleUrl: './users-table.css',
   standalone: true,
