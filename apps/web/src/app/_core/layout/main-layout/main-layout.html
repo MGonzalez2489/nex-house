@@ -1,12 +1,12 @@
 <div class="flex h-screen overflow-hidden bg-gray-50">
   <aside class="hidden lg:flex lg:shrink-0">
     <div class="flex flex-col w-64 border-r bg-white">
-      <app-sidebar></app-sidebar>
+      <app-sidebar [user]="sessionService.user()" class="h-full"></app-sidebar>
     </div>
   </aside>
 
   <p-drawer [(visible)]="sidebarVisible" [baseZIndex]="10000" class="lg:hidden">
-    <app-sidebar></app-sidebar>
+    <app-sidebar [user]="sessionService.user()" class="h-full"></app-sidebar>
   </p-drawer>
 
   <div class="flex flex-col flex-1 w-0 overflow-hidden">
