@@ -17,6 +17,7 @@ import { BulkCreateHousingUnitDto, CreateHousingUnitDto } from './dtos';
 import { HousingUnitsService } from './housing-units.service';
 import { CurrentUser } from '@common/decorators';
 import { User } from '@database/entities';
+import { UnitArrayToModelArray, UnitEntityToModel } from './mappers';
 
 @ApiTags('Housing Units')
 @Controller('neighborhoods/:neighborhoodId/units')
@@ -31,11 +32,13 @@ export class HousingUnitsController {
     @Body() bulkDto: BulkCreateHousingUnitDto,
     @CurrentUser() user: User,
   ) {
-    return await this.housingUnitsService.bulkCreate(
+    const response = await this.housingUnitsService.bulkCreate(
       neighborhoodId,
       bulkDto,
       user,
     );
+
+    return UnitArrayToModelArray(response);
   }
 
   @Post()
@@ -45,11 +48,13 @@ export class HousingUnitsController {
     @Body() createDto: CreateHousingUnitDto,
     @CurrentUser() user: User,
   ) {
-    return await this.housingUnitsService.create(
+    const response = await this.housingUnitsService.create(
       neighborhoodId,
       createDto,
       user,
     );
+
+    return UnitEntityToModel(response);
   }
 
   @Get()
@@ -58,7 +63,15 @@ export class HousingUnitsController {
     @Param('neighborhoodId', ParseUUIDPipe) neighborhoodId: string,
     @Query() searchDto: SearchDto,
   ) {
-    return await this.housingUnitsService.findAll(neighborhoodId, searchDto);
+    const response = await this.housingUnitsService.findAll(
+      neighborhoodId,
+      searchDto,
+    );
+
+    return {
+      meta: response.meta,
+      data: UnitArrayToModelArray(response.data),
+    };
   }
 
   @Get(':publicId')
@@ -74,7 +87,12 @@ export class HousingUnitsController {
     @Body() updateDto: Partial<CreateHousingUnitDto>,
     @CurrentUser() user: User,
   ) {
-    return await this.housingUnitsService.update(publicId, updateDto, user);
+    const response = await this.housingUnitsService.update(
+      publicId,
+      updateDto,
+      user,
+    );
+    return UnitEntityToModel(response);
   }
 
   @Delete(':publicId')

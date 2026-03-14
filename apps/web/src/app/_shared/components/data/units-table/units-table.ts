@@ -5,27 +5,31 @@ import {
   output,
 } from '@angular/core';
 import { ApiPaginationMeta, Search } from '@nex-house/interfaces';
-import { UserModel } from '@nex-house/models';
-import { UserAvatar } from '@shared/components/ui';
-import { PhonePipe } from '@shared/pipes';
-import { ButtonModule } from 'primeng/button';
-import { TableLazyLoadEvent, TableModule } from 'primeng/table';
-import { RoleTag } from '../role-tag/role-tag';
+import { UnitModel } from '@nex-house/models';
+import { TableLazyLoadEvent } from 'primeng/table';
 import { Table, TableColumn } from '../table/table';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
 
 @Component({
-  selector: 'app-users-table',
-  imports: [TableModule, ButtonModule, PhonePipe, UserAvatar, Table, RoleTag],
-  templateUrl: './users-table.html',
-  styleUrl: './users-table.css',
+  selector: 'app-units-table',
+  imports: [Table, ButtonModule, InputTextModule],
+  templateUrl: './units-table.html',
+  styleUrl: './units-table.css',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class UsersTable {
-  users = input.required<UserModel[]>();
+export class UnitsTable {
+  units = input.required<UnitModel[]>();
   isLoading = input.required<boolean>();
   pagination = input<ApiPaginationMeta>();
-
+  cols: TableColumn<UnitModel>[] = [
+    {
+      field: 'identifier',
+      header: 'Propiedad',
+    },
+    { field: 'street', header: 'Calle' },
+  ];
   filter = output<Search>();
 
   search(event: TableLazyLoadEvent): void {
@@ -39,11 +43,4 @@ export class UsersTable {
 
     this.filter.emit(searchParams);
   }
-
-  //
-  cols: TableColumn<UserModel>[] = [
-    { field: 'fullName', header: 'Habitante', sortable: true },
-    { field: 'email', header: 'Contacto' },
-    { field: 'role', header: 'Rol', sortable: true },
-  ];
 }

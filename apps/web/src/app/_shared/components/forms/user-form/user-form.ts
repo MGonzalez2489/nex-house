@@ -45,11 +45,7 @@ export class UserForm {
     }),
     phone: new FormControl('', {
       nonNullable: true,
-      validators: [
-        Validators.required,
-        Validators.minLength(12),
-        Validators.maxLength(12),
-      ],
+      validators: [Validators.required],
     }),
     email: new FormControl('', {
       nonNullable: true,

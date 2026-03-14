@@ -1,10 +1,10 @@
 import { SearchDto } from '@common/dtos';
-import { PaginatedResult, paginate } from '@common/utils';
+import { PaginatedResult, paginate, paginateQuery } from '@common/utils';
 import { HousingUnit, User } from '@database/entities';
 import { NeighborhoodsService } from '@modules/neighborhoods';
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { CreateHousingUnitDto } from './dtos';
 import { BulkCreateHousingUnitDto } from './dtos/bulk-create-unit.dto';
 
@@ -44,25 +44,6 @@ export class HousingUnitsService {
     return await this.repository.save(this.repository.create(units));
   }
 
-  async findAll(
-    neighborhoodId: string,
-    searchDto: SearchDto,
-  ): Promise<PaginatedResult<HousingUnit>> {
-    return await paginate(this.repository, searchDto, {
-      where: {},
-    });
-  }
-
-  async findByPublicId(publicId: string): Promise<HousingUnit> {
-    const unit = await this.repository.findOne({ where: { publicId } });
-    if (!unit) {
-      throw new NotFoundException(
-        `Housing unit with ID ${publicId} not found.`,
-      );
-    }
-    return unit;
-  }
-
   async create(
     neighborhoodId: string,
     dto: CreateHousingUnitDto,
@@ -78,6 +59,45 @@ export class HousingUnitsService {
       createdBy: user.id,
     });
     return await this.repository.save(unit);
+  }
+
+  async findAll(
+    neighborhoodId: string,
+    filters: SearchDto,
+  ): Promise<PaginatedResult<HousingUnit>> {
+    const query = this.repository
+      .createQueryBuilder('unit')
+      .leftJoinAndSelect('unit.neighborhood', 'neighborhood')
+      .where('neighborhood.publicId = :neighborhoodId', {
+        neighborhoodId,
+      });
+
+    const { globalFilter } = filters;
+
+    if (globalFilter) {
+      query.andWhere(
+        new Brackets((qb) => {
+          qb.where('unit.identifier LIKE :filter', {
+            filter: `%${globalFilter}%`,
+          }).orWhere('unit.streetName LIKE :filter', {
+            filter: `%${globalFilter}%`,
+          });
+        }),
+      );
+    }
+
+    const result = await paginateQuery(query, filters);
+    return result;
+  }
+
+  async findByPublicId(publicId: string): Promise<HousingUnit> {
+    const unit = await this.repository.findOne({ where: { publicId } });
+    if (!unit) {
+      throw new NotFoundException(
+        `Housing unit with ID ${publicId} not found.`,
+      );
+    }
+    return unit;
   }
 
   async update(

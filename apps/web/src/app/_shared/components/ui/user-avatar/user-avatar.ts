@@ -4,7 +4,6 @@ import {
   computed,
   input,
 } from '@angular/core';
-import { UserModel } from '@nex-house/models';
 import { AvatarModule } from 'primeng/avatar';
 
 @Component({
@@ -29,26 +28,24 @@ export class UserAvatar {
     '#f1f8e9',
   ];
 
-  user = input.required<UserModel>();
+  // user = input.required<UserModel>();
+  text = input<string>();
 
   avatar = computed(() => {
-    const cUser = this.user();
-    if (!cUser) return;
+    const text = this.text() || '';
+    if (!text || text === '') return 'N/A';
 
     let r = '';
 
-    if (cUser.firstName) {
-      r += cUser.firstName[0];
-    }
-    if (cUser.lastName) {
-      r += cUser.lastName[0];
-    }
+    const textArray = text.split(' ');
+    textArray.forEach((f) => (r += f[0]));
 
     return r.toUpperCase();
   });
 
   bgColor = computed(() => {
-    const text = this.user().fullName;
+    let text = this.text();
+    if (!text || text === '') text = 'N/A';
     let hash = 0;
     for (let i = 0; i < text.length; i++) {
       hash = text.charCodeAt(i) + ((hash << 5) - hash);

@@ -1,64 +1,40 @@
-<p-table
-  [value]="users()"
+<app-table
+  [data]="users()"
+  [columns]="cols"
+  [isLoading]="isLoading()"
   [lazy]="true"
-  [paginator]="true"
-  [rows]="10"
-  (onLazyLoad)="search($event)"
-  [totalRecords]="pagination()?.total || 0"
-  [loading]="isLoading()"
-  [showCurrentPageReport]="true"
-  currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
-  [rowsPerPageOptions]="[10, 20, 50]"
-  paginatorStyleClass="mt-5"
+  [loadOnInit]="true"
+  (filter)="search($event)"
+  [pagination]="pagination()"
 >
-  <ng-template pTemplate="header">
-    <tr class="bg-slate-50/50">
-      <th class="w-12 text-center">Avatar</th>
-      <th>Nombre</th>
-      <th>Contacto</th>
-      <th class="text-center">Rol</th>
-      <th class="text-center">Estatus</th>
-      <th class="w-24">Acciones</th>
-    </tr>
+  <ng-template #body let-user let-field="field">
+    @switch (field) { @case ('fullName') {
+    <div class="flex items-center gap-3">
+      <app-user-avatar [text]="user.fullName" />
+      <div class="flex flex-col">
+        <span class="font-bold text-slate-700">{{ user.fullName }} </span>
+        <small class="text-slate-400 font-mono">ID: {{ user.publicId }}</small>
+      </div>
+    </div>
+    } @case ('email') {
+    <div class="flex flex-col text-sm text-slate-600">
+      <span class="flex items-center gap-1"
+        ><i class="pi pi-envelope text-[10px]"></i> {{ user.email }}</span
+      >
+      <span class="flex items-center gap-1"
+        ><i class="pi pi-phone text-[10px]"></i> {{ user.phone | phone }}</span
+      >
+    </div>
+    } @case ('role') {
+    <app-role-tag [role]="user.role" />
+
+    } @case ('status') { Tag Raro } }
   </ng-template>
 
-  <ng-template #body let-user>
-    <tr class="hover:bg-blue-50/30 transition-colors">
-      <td class="text-center">
-        <app-user-avatar [user]="user" />
-      </td>
-      <td class="text-sm font-semibold text-slate-700 capitalize">
-        {{ user.fullName }}
-      </td>
-      <td>
-        <div class="flex flex-col gap-1">
-          <div class="flex items-center gap-2 text-sm text-slate-600">
-            <i class="pi pi-envelope text-xs"></i> {{ user.email }}
-          </div>
-          <div class="flex items-center gap-2 text-sm text-slate-600">
-            <i class="pi pi-phone text-xs"></i> {{ user.phone | phone }}
-          </div>
-        </div>
-      </td>
-
-      <td class="text-center">
-        <app-role-tag [role]="user.role" />
-      </td>
-      <td class="text-sm text-slate-600 text-center">ACTIVO</td>
-      <td>
-        <div class="flex gap-1">
-          <p-button
-            icon="pi pi-pencil"
-            [text]="true"
-            severity="secondary"
-          ></p-button>
-          <p-button
-            icon="pi pi-trash"
-            [text]="true"
-            severity="danger"
-          ></p-button>
-        </div>
-      </td>
-    </tr>
+  <ng-template #actions let-user>
+    <div class="flex justify-center gap-1">
+      <p-button icon="pi pi-pencil" [text]="true" severity="secondary" />
+      <p-button icon="pi pi-trash" [text]="true" severity="danger" />
+    </div>
   </ng-template>
-</p-table>
+</app-table>

@@ -1,0 +1,85 @@
+<p-table
+  #dt
+  [value]="data()"
+  [rows]=" 10"
+  [paginator]="true"
+  [breakpoint]="'960px'"
+  [lazy]="lazy()"
+  [lazyLoadOnInit]="loadOnInit()"
+  (onLazyLoad)="filter.emit($event)"
+  [paginator]="pagination()"
+  [totalRecords]="pagination()?.total || 0"
+  [loading]="isLoading()"
+  [showCurrentPageReport]="true"
+  currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+  [rowsPerPageOptions]="[10, 20, 50]"
+  paginatorStyleClass="mt-5"
+>
+  @if (captionTemplate()) {
+  <ng-template pTemplate="caption">
+    <ng-container [ngTemplateOutlet]="captionTemplate()!"></ng-container>
+  </ng-template>
+  }
+  <ng-template pTemplate="header">
+    <tr>
+      @for (col of columns(); track col.field) {
+      <th
+        [pSortableColumn]="col.sortable ? col.field : undefined"
+        [style.width]="col.width"
+      >
+        <div
+          class="flex items-center gap-2 uppercase text-xs font-bold text-slate-500"
+        >
+          {{ col.header }} @if (col.sortable) {
+          <p-sortIcon [field]="col.field" />
+          }
+        </div>
+      </th>
+
+      } @if (showActions()) {
+      <th class="w-28 text-center uppercase text-xs font-bold text-slate-500">
+        Acciones
+      </th>
+      }
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-item>
+    <tr class="hover:bg-slate-50/50 transition-colors">
+      @for (col of columns(); track col.field) {
+      <td>
+        <span class="p-column-title font-bold md:hidden">{{ col.header }}</span>
+        <ng-container
+          [ngTemplateOutlet]="bodyTemplate() || defaultTemplate"
+          [ngTemplateOutletContext]="{ $implicit: item, field: col.field }"
+        >
+        </ng-container>
+      </td>
+      } @if (showActions()) {
+      <td class="text-center">
+        <span class="p-column-title font-bold md:hidden">Acciones</span>
+        <ng-container
+          [ngTemplateOutlet]="actionsTemplate() || null"
+          [ngTemplateOutletContext]="{ $implicit: item }"
+        >
+        </ng-container>
+      </td>
+      }
+    </tr>
+  </ng-template>
+
+  <ng-template #defaultTemplate let-item let-field="field">
+    <span class="text-slate-600 text-sm">{{ item[field] }}</span>
+  </ng-template>
+
+  <ng-template pTemplate="emptymessage">
+    <tr>
+      <td
+        [attr.colspan]="columns().length + (showActions() ? 1 : 0)"
+        class="p-8 text-center text-slate-400"
+      >
+        No se encontraron registros.
+      </td>
+    </tr>
+  </ng-template>
+</p-table>

@@ -13,7 +13,7 @@
 
   <div class="flex items-center gap-2">
     @if(user(); as user){
-    <app-user-avatar [user]="user" />
+    <app-user-avatar [text]="user.fullName" />
     }
 
     <p-button
