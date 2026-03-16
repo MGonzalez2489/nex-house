@@ -1,40 +1,125 @@
-<app-table
-  [data]="users()"
-  [columns]="cols"
-  [isLoading]="isLoading()"
-  [lazy]="true"
-  [loadOnInit]="true"
-  (filter)="search($event)"
-  [pagination]="pagination()"
->
-  <ng-template #body let-user let-field="field">
-    @switch (field) { @case ('fullName') {
-    <div class="flex items-center gap-3">
-      <app-user-avatar [text]="user.fullName" />
-      <div class="flex flex-col">
-        <span class="font-bold text-slate-700">{{ user.fullName }} </span>
-        <small class="text-slate-400 font-mono">ID: {{ user.publicId }}</small>
-      </div>
-    </div>
-    } @case ('email') {
-    <div class="flex flex-col text-sm text-slate-600">
-      <span class="flex items-center gap-1"
-        ><i class="pi pi-envelope text-[10px]"></i> {{ user.email }}</span
-      >
-      <span class="flex items-center gap-1"
-        ><i class="pi pi-phone text-[10px]"></i> {{ user.phone | phone }}</span
-      >
-    </div>
-    } @case ('role') {
-    <app-role-tag [role]="user.role" />
-
-    } @case ('status') { Tag Raro } }
-  </ng-template>
-
-  <ng-template #actions let-user>
-    <div class="flex justify-center gap-1">
-      <p-button icon="pi pi-pencil" [text]="true" severity="secondary" />
-      <p-button icon="pi pi-trash" [text]="true" severity="danger" />
-    </div>
-  </ng-template>
-</app-table>
+<div class="overflow-x-auto bg-white rounded-lg border border-slate-200">
+  <table class="w-full text-left border-collapse">
+    <thead class="bg-slate-50 border-b border-slate-200">
+      <tr>
+        <th class="p-4 text-xs font-bold text-slate-500 uppercase">
+          Habitante
+        </th>
+        <th class="p-4 text-xs font-bold text-slate-500 uppercase">Contacto</th>
+        <th class="p-4 text-xs font-bold text-slate-500 uppercase text-center">
+          Ubicaciones
+        </th>
+        <th class="p-4 text-xs font-bold text-slate-500 uppercase text-center">
+          Rol
+        </th>
+        <th class="p-4 text-xs font-bold text-slate-500 uppercase text-right">
+          Acciones
+        </th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-slate-100">
+      <tr class="hover:bg-slate-50 transition-colors">
+        <td class="p-4">
+          <div class="flex items-center gap-3">
+            <div
+              class="w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold"
+            >
+              P
+            </div>
+            <div>
+              <div class="font-bold text-slate-800">Pepe</div>
+              <div class="text-[10px] text-slate-400 font-mono">
+                ID: 9d7ba636...
+              </div>
+            </div>
+          </div>
+        </td>
+        <td class="p-4">
+          <div class="flex items-center gap-2 text-slate-600 text-sm">
+            <i class="pi pi-envelope text-xs"></i>
+            pepe@test.com
+          </div>
+        </td>
+        <td class="p-4 text-center">
+          <div class="flex flex-wrap justify-center gap-1">
+            <span
+              class="px-2 py-1 bg-blue-50 border border-blue-200 text-blue-700 text-[10px] font-bold rounded-md flex items-center gap-1 shadow-sm"
+            >
+              <i class="pi pi-home text-[8px]"></i>
+              CALLE MAPLE #10
+            </span>
+            <span
+              class="px-2 py-1 bg-slate-100 border border-slate-200 text-slate-600 text-[10px] font-bold rounded-md flex items-center gap-1 italic"
+            >
+              +1 más...
+            </span>
+          </div>
+        </td>
+        <td class="p-4 text-center">
+          <span
+            class="px-3 py-1 bg-green-100 text-green-700 text-[11px] font-bold rounded-full uppercase tracking-wider"
+          >
+            Residente
+          </span>
+        </td>
+        <td class="p-4 text-right">
+          <div class="flex justify-end gap-2">
+            <button
+              class="p-2 text-slate-400 hover:text-blue-600 transition-colors"
+            >
+              <i class="pi pi-pencil"></i>
+            </button>
+            <button
+              class="p-2 text-slate-400 hover:text-red-500 transition-colors"
+            >
+              <i class="pi pi-trash"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<!-- <app-table -->
+<!--   [data]="users()" -->
+<!--   [columns]="cols" -->
+<!--   [isLoading]="isLoading()" -->
+<!--   [lazy]="true" -->
+<!--   [loadOnInit]="true" -->
+<!--   (filter)="search($event)" -->
+<!--   [pagination]="pagination()" -->
+<!-- > -->
+<!--   <ng-template #body let-user let-field="field"> -->
+<!--     @switch (field) { @case ('fullName') { -->
+<!--     <div class="flex items-center gap-3"> -->
+<!--       <app-user-avatar [text]="user.fullName" /> -->
+<!--       <div class="flex flex-col"> -->
+<!--         <span class="font-bold text-slate-700">{{ user.fullName }} </span> -->
+<!--         <small class="text-slate-400 font-mono">ID: {{ user.publicId }}</small> -->
+<!--       </div> -->
+<!--     </div> -->
+<!--     } @case ('email') { -->
+<!--     <div class="flex flex-col text-sm text-slate-600"> -->
+<!--       <span class="flex items-center gap-1" -->
+<!--         ><i class="pi pi-envelope text-[10px]"></i> {{ user.email }}</span -->
+<!--       > -->
+<!--       @if(user.phone){ -->
+<!--       <span class="flex items-center gap-1" -->
+<!--         ><i class="pi pi-phone text-[10px]"></i> {{ user.phone | phone }}</span -->
+<!--       > -->
+<!---->
+<!--       } -->
+<!--     </div> -->
+<!--     } @case ('role') { -->
+<!--     <app-role-tag [role]="user.role" /> -->
+<!---->
+<!--     } @case ('status') { Tag Raro } } -->
+<!--   </ng-template> -->
+<!---->
+<!--   <ng-template #actions let-user> -->
+<!--     <div class="flex justify-center gap-1"> -->
+<!--       <p-button icon="pi pi-pencil" [text]="true" severity="secondary" /> -->
+<!--       <p-button icon="pi pi-trash" [text]="true" severity="danger" /> -->
+<!--     </div> -->
+<!--   </ng-template> -->
+<!-- </app-table> -->

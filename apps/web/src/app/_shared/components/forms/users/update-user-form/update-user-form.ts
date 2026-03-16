@@ -1,11 +1,11 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {
   FormControl,
   FormGroup,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { ICreateUser } from '@nex-house/interfaces';
+import { IUpdateUser } from '@nex-house/interfaces';
 import { FormOptions, FormValidationError } from '@shared/components/ui';
 import { UsersStore } from '@stores/users.store';
 import { ButtonModule } from 'primeng/button';
@@ -13,10 +13,9 @@ import { DynamicDialogRef } from 'primeng/dynamicdialog';
 import { InputMaskModule } from 'primeng/inputmask';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { IUserForm } from './IUserForm';
 
 @Component({
-  selector: 'app-user-form',
+  selector: 'app-update-user-form',
   imports: [
     ReactiveFormsModule,
     ButtonModule,
@@ -26,15 +25,13 @@ import { IUserForm } from './IUserForm';
     InputMaskModule,
     ToggleSwitchModule,
   ],
-  templateUrl: './user-form.html',
-  styleUrl: './user-form.css',
-  standalone: true,
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  templateUrl: './update-user-form.html',
+  styleUrl: './update-user-form.css',
 })
-export class UserForm {
+export class UpdateUserForm {
   protected readonly store = inject(UsersStore);
   private readonly ref = inject(DynamicDialogRef);
-  protected readonly form = new FormGroup<IUserForm>({
+  protected readonly form = new FormGroup({
     firstName: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required, Validators.minLength(3)],
@@ -55,17 +52,21 @@ export class UserForm {
       nonNullable: true,
       validators: [Validators.required],
     }),
+    value: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
   });
 
   async doSubmit() {
     this.form.markAllAsTouched();
     if (this.form.invalid) return;
 
-    const payload: ICreateUser = this.form.getRawValue();
+    const payload: IUpdateUser = this.form.getRawValue();
 
     payload.phone = payload.phone.replace(/-/g, '').trim();
 
-    const success = await this.store.create(payload);
+    const success = await this.store.update('', payload);
     if (success) {
       this.ref.close();
     }

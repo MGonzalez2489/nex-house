@@ -5,6 +5,7 @@ import {
   Body,
   Controller,
   Get,
+  InternalServerErrorException,
   Param,
   ParseUUIDPipe,
   Post,
@@ -32,7 +33,10 @@ export class UsersController {
       createDto,
       user,
     );
-    return UserEntityToModel(response!);
+    if (!response) {
+      throw new InternalServerErrorException('Used not created.');
+    }
+    return UserEntityToModel(response);
   }
 
   @Get()

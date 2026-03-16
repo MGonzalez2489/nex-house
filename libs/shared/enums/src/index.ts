@@ -6,3 +6,4 @@ export * from './lib/payment-status.enum';
 export * from './lib/payment-status.enum';
 export * from './lib/payment-method.enum';
 export * from './lib/debt-status.enum';
+export * from './lib/user-status.enum';

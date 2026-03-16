@@ -42,9 +42,11 @@ const config = entityConfig({
 
 interface UsersState {
   pagination: ApiPaginationMeta | undefined;
+  suggestions: UnitModel[];
 }
 const initialState: UsersState = {
   pagination: undefined,
+  suggestions: [],
 };
 
 export const UnitsStore = signalStore(
@@ -80,6 +82,28 @@ export const UnitsStore = signalStore(
               error: (err: Error) => patchState(store, setError(err)),
             }),
           );
+        }),
+      ),
+    ),
+    searchSuggestions: rxMethod<string>(
+      pipe(
+        // debounceTime(300),
+        // distinctUntilChanged(),
+        switchMap((query) => {
+          const nId = store._contextStore.selectedId();
+          if (!nId || query.length < 2)
+            return [patchState(store, { suggestions: [] })];
+
+          // Usamos el mismo service, pero con params de búsqueda mínima
+          return store._unitsService
+            .getAll(nId, { globalFilter: query, first: 0, rows: 10 })
+            .pipe(
+              tapResponse({
+                next: (response) =>
+                  patchState(store, { suggestions: response.data }),
+                error: () => patchState(store, { suggestions: [] }),
+              }),
+            );
         }),
       ),
     ),

@@ -1,5 +1,10 @@
 import { Injectable, inject } from '@angular/core';
-import { ApiResponse, ICreateUser, Search } from '@nex-house/interfaces';
+import {
+  ApiResponse,
+  ICreateUser,
+  IUpdateUser,
+  Search,
+} from '@nex-house/interfaces';
 import { UserModel } from '@nex-house/models';
 import { Observable } from 'rxjs';
 import { RequestService } from './request.service';
@@ -35,7 +40,7 @@ export class UsersService {
   update(
     neighborhood: string,
     id: string,
-    dto: ICreateUser,
+    dto: IUpdateUser,
   ): Observable<ApiResponse<UserModel>> {
     return this.request.patch<UserModel>(
       `${this.buildUrl(neighborhood)}/${id}`,

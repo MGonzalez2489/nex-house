@@ -8,7 +8,12 @@ import {
 } from '@angular-architects/ngrx-toolkit';
 import { effect, inject } from '@angular/core';
 import { UsersService } from '@core/services';
-import { ApiPaginationMeta, ICreateUser, Search } from '@nex-house/interfaces';
+import {
+  ApiPaginationMeta,
+  ICreateUser,
+  IUpdateUser,
+  Search,
+} from '@nex-house/interfaces';
 import { UserModel } from '@nex-house/models';
 import { tapResponse } from '@ngrx/operators';
 import {
@@ -98,7 +103,7 @@ export const UsersStore = signalStore(
         return false;
       }
     },
-    update: async (id: string, dto: ICreateUser): Promise<boolean> => {
+    update: async (id: string, dto: IUpdateUser): Promise<boolean> => {
       const nId = store._contextStore.selectedId();
       if (!nId) return false;
 

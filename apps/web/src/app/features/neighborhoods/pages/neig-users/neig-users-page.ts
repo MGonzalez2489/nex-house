@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ModalService } from '@core/services';
 import { Search } from '@nex-house/interfaces';
 import { UsersTable } from '@shared/components/data';
-import { UserForm } from '@shared/components/forms';
+import { CreateUserForm } from '@shared/components/forms/users';
 import { UsersStore } from '@stores/users.store';
 import { BadgeModule } from 'primeng/badge';
 import { ButtonModule } from 'primeng/button';
@@ -21,13 +21,13 @@ export class NeigUsersPage {
   protected readonly modalService = inject(ModalService);
 
   addUser() {
-    this.modalService.open(UserForm, {
+    this.modalService.open(CreateUserForm, {
       header: 'Crear Usuario',
       width: '35vw',
     });
   }
   updateUser() {
-    this.modalService.open(UserForm, {
+    this.modalService.open(CreateUserForm, {
       header: 'Actualizar Usuario',
       width: '35vw',
     });

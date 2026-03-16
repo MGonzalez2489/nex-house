@@ -1,6 +1,5 @@
-import { UserRoleEnum } from '@nex-house/enums';
 import { ICreateUser } from '@nex-house/interfaces';
-import { IsBoolean, IsEmail, IsString } from 'class-validator';
+import { IsBoolean, IsEmail, IsOptional, IsString } from 'class-validator';
 
 export class CreateUserDto implements ICreateUser {
   @IsEmail()
@@ -8,10 +7,17 @@ export class CreateUserDto implements ICreateUser {
 
   @IsString()
   firstName: string;
-  @IsString()
-  lastName: string;
+
   @IsBoolean()
   isAdmin: boolean;
+
   @IsString()
-  phone: UserRoleEnum;
+  @IsOptional()
+  unitId?: string;
+  @IsString()
+  @IsOptional()
+  streetName?: string;
+  @IsString()
+  @IsOptional()
+  identifier?: string;
 }

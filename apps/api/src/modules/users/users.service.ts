@@ -1,7 +1,7 @@
 import { SearchDto } from '@common/dtos';
 import { CryptoService } from '@common/services';
 import { paginateQuery } from '@common/utils';
-import { User } from '@database/entities';
+import { HousingUnit, Neighborhood, User } from '@database/entities';
 import { NeighborhoodsService } from '@modules/neighborhoods';
 import {
   ConflictException,
@@ -10,9 +10,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, Repository } from 'typeorm';
+import {
+  HousingStatusEnum,
+  UserRoleEnum,
+  UserStatusEnum,
+} from '@nex-house/enums';
+import { Brackets, DataSource, Repository } from 'typeorm';
 import { CreateUserDto } from './dtos';
-import { UserRoleEnum } from '@nex-house/enums';
+import { UnitAssignment } from '@database/entities/housing-assignment.entity';
 
 @Injectable()
 export class UsersService {
@@ -23,12 +28,15 @@ export class UsersService {
     private readonly repository: Repository<User>,
     private readonly cryptoService: CryptoService,
     private readonly neighborhoodService: NeighborhoodsService,
+    private readonly dataSource: DataSource,
   ) {}
 
   async findAll(neighborhoodId: string, filters: SearchDto) {
     const query = this.repository
       .createQueryBuilder('users')
       .leftJoinAndSelect('users.neighborhood', 'neighborhood')
+      .leftJoinAndSelect('users.assignments', 'assignments')
+      .leftJoinAndSelect('assignments.unit', 'unit')
       .where('neighborhood.publicId = :neighborhoodId', {
         neighborhoodId,
       });
@@ -72,37 +80,87 @@ export class UsersService {
     return result;
   }
 
-  async create(neighborhoodId: string, dto: CreateUserDto, user: User) {
-    const neighborhood = await this.neighborhoodService.findByPublicId(
-      neighborhoodId,
-      true,
-    );
+  async create(
+    neighborhoodId: string,
+    createDto: CreateUserDto,
+    currentUser: User,
+  ) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    const exists = await this.repository.findOne({
-      where: { email: dto.email },
-    });
-    if (exists) {
-      throw new ConflictException(
-        `User with email ${dto.email} already exists.`,
-      );
+    try {
+      // 1. Preparación de Seguridad
+      const hashedPassword = await this.cryptoService.hash('1234'); // TODO: Random pass
+
+      const neighborhood = await queryRunner.manager.findOne(Neighborhood, {
+        where: { publicId: neighborhoodId },
+      });
+      if (!neighborhood)
+        throw new NotFoundException('Residencial no encontrado');
+
+      // 2. Crear el Usuario
+      const newUser = queryRunner.manager.create(User, {
+        firstName: createDto.firstName,
+        email: createDto.email,
+        role: createDto.isAdmin ? UserRoleEnum.ADMIN : UserRoleEnum.RESIDENT,
+        status: UserStatusEnum.PENDING_COMPLETION,
+        createdBy: currentUser.id,
+        neighborhoodId: neighborhood.id, // Usamos ID numérico por performance
+        password: hashedPassword,
+      });
+      const savedUser = await queryRunner.manager.save(newUser);
+
+      let targetUnit: HousingUnit | null = null;
+
+      // 3. Gestión de la Unidad (Existente o Nueva)
+      if (createDto.unitId) {
+        targetUnit = await queryRunner.manager.findOne(HousingUnit, {
+          where: { publicId: createDto.unitId },
+        });
+      } else if (createDto.streetName && createDto.identifier) {
+        const newUnit = queryRunner.manager.create(HousingUnit, {
+          streetName: createDto.streetName,
+          identifier: createDto.identifier,
+          neighborhoodId: neighborhood.id,
+          ownerId: savedUser.id, // El creador de la unidad es el dueño inicial
+          status: HousingStatusEnum.OCCUPIED,
+        });
+        targetUnit = await queryRunner.manager.save(newUnit);
+      }
+
+      if (!targetUnit) {
+        throw new NotFoundException('Unidad no encontrada');
+      }
+
+      // 4. CREAR VÍNCULO MULTI-USUARIO (La nueva relación)
+      if (targetUnit) {
+        const assignment = queryRunner.manager.create(UnitAssignment, {
+          unitId: targetUnit.id,
+          userId: savedUser.id,
+          isActive: true,
+          createdBy: currentUser.id,
+          // Aquí podrías usar un enum para distinguir roles internos
+        });
+        await queryRunner.manager.save(assignment);
+      }
+
+      await queryRunner.commitTransaction();
+      return savedUser;
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      // Manejo manual de errores comunes (ej. Email duplicado)
+      if (err.code === '23505') {
+        throw new ConflictException(
+          'El correo electrónico ya está registrado.',
+        );
+      }
+      throw err;
+    } finally {
+      await queryRunner.release();
     }
-
-    const role = dto.isAdmin ? UserRoleEnum.ADMIN : UserRoleEnum.RESIDENT;
-
-    const hashedPassword = await this.cryptoService.hash('1234');
-
-    const newUser = this.repository.create({
-      ...dto,
-      password: hashedPassword,
-      neighborhoodId: neighborhood?.id,
-      createdBy: user.id,
-      role,
-    });
-
-    await this.repository.save(newUser);
-
-    return this.findByPublicId(newUser.publicId);
   }
+
   //
   async update(
     publicId: string,

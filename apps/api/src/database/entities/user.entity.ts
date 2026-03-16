@@ -1,8 +1,9 @@
-import { UserRoleEnum } from '@nex-house/enums';
+import { UserRoleEnum, UserStatusEnum } from '@nex-house/enums';
 import { Exclude } from 'class-transformer';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { TraceableEntity } from './_traceable.entity';
 import { Neighborhood } from './neighborhood.entity';
+import { UnitAssignment } from './housing-assignment.entity';
 
 @Entity('users')
 export class User extends TraceableEntity {
@@ -16,7 +17,7 @@ export class User extends TraceableEntity {
   @Column()
   firstName: string;
 
-  @Column()
+  @Column({ nullable: true })
   lastName: string;
 
   @Column({ nullable: true })
@@ -33,10 +34,17 @@ export class User extends TraceableEntity {
   @Exclude()
   neighborhoodId: number;
 
-  @Column({ default: true })
-  isActive: boolean;
+  @Column({
+    type: 'enum',
+    enum: UserStatusEnum,
+    default: UserStatusEnum.PENDING_COMPLETION,
+  })
+  status: UserStatusEnum;
 
   @ManyToOne(() => Neighborhood)
   @JoinColumn({ name: 'neighborhoodId' })
   neighborhood: Neighborhood;
+
+  @OneToMany(() => UnitAssignment, (assignment) => assignment.user)
+  assignments: UnitAssignment[];
 }

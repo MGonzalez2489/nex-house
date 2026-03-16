@@ -3,7 +3,6 @@ import { Exclude } from 'class-transformer';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { TraceableEntity } from './_traceable.entity';
 import { Neighborhood } from './neighborhood.entity';
-import { User } from './user.entity';
 
 @Entity()
 export class HousingUnit extends TraceableEntity {
@@ -28,25 +27,26 @@ export class HousingUnit extends TraceableEntity {
   type: HousingTypeEnum;
 
   @Column()
+  @Exclude()
   neighborhoodId: number;
 
-  @Column({ nullable: true })
-  @Exclude()
-  ownerId: number;
-
-  @Column({ nullable: true })
-  @Exclude()
-  occupantId: number;
+  // @Column({ nullable: true })
+  // @Exclude()
+  // ownerId: number;
+  //
+  // @Column({ nullable: true })
+  // @Exclude()
+  // occupantId: number;
 
   @ManyToOne(() => Neighborhood, (n) => n.units)
   @JoinColumn({ name: 'neighborhoodId' })
   neighborhood: Neighborhood;
 
-  @ManyToOne(() => User)
-  @JoinColumn({ name: 'ownerId' })
-  owner: User;
-
-  @ManyToOne(() => User)
-  @JoinColumn({ name: 'occupantId' })
-  occupant: User;
+  // @ManyToOne(() => User)
+  // @JoinColumn({ name: 'ownerId' })
+  // owner: User;
+  //
+  // @ManyToOne(() => User)
+  // @JoinColumn({ name: 'occupantId' })
+  // occupant: User;
 }

@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  OnInit,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ModalService } from '@core/services';
 import { Search } from '@nex-house/interfaces';
 import { UnitsTable } from '@shared/components/data';
@@ -18,13 +13,9 @@ import { UnitsStore } from '@stores/units.store';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NeigUnitsPage implements OnInit {
+export class NeigUnitsPage {
   protected readonly store = inject(UnitsStore);
   protected readonly modalService = inject(ModalService);
-
-  ngOnInit(): void {
-    this.addUnit();
-  }
 
   search(value: Search) {
     this.store.loadAll(value);
