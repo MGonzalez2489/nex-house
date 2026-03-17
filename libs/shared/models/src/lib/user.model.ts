@@ -9,4 +9,5 @@ export class UserModel extends BaseModel {
   fullName: string;
   phone: string;
   units: UnitModel[];
+  status: string;
 }

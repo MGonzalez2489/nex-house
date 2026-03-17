@@ -12,10 +12,19 @@ import { ButtonModule } from 'primeng/button';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { RoleTag } from '../role-tag/role-tag';
 import { Table, TableColumn } from '../table/table';
+import { UserStatusTag } from '../user-status-tag/user-status-tag';
 
 @Component({
   selector: 'app-users-table',
-  imports: [TableModule, ButtonModule, PhonePipe, UserAvatar, Table, RoleTag],
+  imports: [
+    TableModule,
+    ButtonModule,
+    PhonePipe,
+    UserAvatar,
+    Table,
+    RoleTag,
+    UserStatusTag,
+  ],
   templateUrl: './users-table.html',
   styleUrl: './users-table.css',
   standalone: true,
@@ -40,10 +49,11 @@ export class UsersTable {
     this.filter.emit(searchParams);
   }
 
-  //
   cols: TableColumn<UserModel>[] = [
-    { field: 'fullName', header: 'Habitante', sortable: true },
+    { field: 'fullName', header: 'Habitante' },
     { field: 'email', header: 'Contacto' },
-    { field: 'role', header: 'Rol', sortable: true },
+    { field: 'units', header: 'Unidad' },
+    { field: 'role', header: 'Rol' },
+    { field: 'status', header: 'Estatus' },
   ];
 }

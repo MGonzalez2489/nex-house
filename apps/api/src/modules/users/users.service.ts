@@ -69,6 +69,7 @@ export class UsersService {
   async findByPublicId(publicId: string): Promise<User | null> {
     const result = await this.repository.findOne({
       where: { publicId },
+      relations: ['neighborhood', 'assignments', 'assignments.unit'],
     });
     return result;
   }
@@ -146,7 +147,7 @@ export class UsersService {
       }
 
       await queryRunner.commitTransaction();
-      return savedUser;
+      return this.findByPublicId(savedUser.publicId);
     } catch (err) {
       await queryRunner.rollbackTransaction();
       // Manejo manual de errores comunes (ej. Email duplicado)

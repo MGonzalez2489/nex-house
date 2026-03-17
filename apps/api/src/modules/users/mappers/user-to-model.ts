@@ -15,5 +15,6 @@ export function UserEntityToModel(user: User): UserModel {
     fullName: `${user.firstName} ${user.lastName ?? ''}`.trim(),
     phone: user.phone,
     units,
+    status: user.status,
   };
 }

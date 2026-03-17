@@ -89,8 +89,14 @@
         text="true"
         label="Crear"
         severity="info"
+        tabIndex="-1"
+        [style]="{ 'tabindex': '-1' }"
+        [attr.tabindex]="-1"
+        [pt]="{
+       root: { class: 'p-0',tabindex: '-1' },
+       host: { tabindex: '-1' }
+  }"
         (click)="isNewUnit.set(true)"
-        [pt]="{root:'p-0'}"
       />
     </div>
     <p-autoComplete
