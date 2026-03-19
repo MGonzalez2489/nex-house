@@ -40,6 +40,13 @@ export const NEIGHBORHOODS_ROUTES: Routes = [
               ),
           },
           {
+            path: 'users/new',
+            loadComponent: () =>
+              import('./pages/users/user-form-page/user-form-page').then(
+                (c) => c.UserFormPage,
+              ),
+          },
+          {
             path: 'units',
             loadComponent: () =>
               import('./pages/neig-units/neig-units-page').then(

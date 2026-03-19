@@ -1,30 +1,55 @@
 <div class="space-y-6">
-  <div class="flex justify-between items-center">
-    <div class="flex items-center gap-3">
-      <h2 class="text-xl font-bold text-slate-800">Habitantes</h2>
-      <p-badge
-        [value]="store.pagination()?.total || 0"
-        severity="secondary"
-      ></p-badge>
-    </div>
+  <p-card>
+    <ng-template #title>
+      <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="block">
+          <h2 class="text-xl font-bold text-slate-800 tracking-tight">
+            Usuarios & Admins
+          </h2>
+          <p class="text-sm text-slate-500">
+            <span class="text-blue-500"
+              >{{store.pagination()?.total}} residentes</span
+            >
+            registrados
+          </p>
+        </div>
 
-    <div class="flex items-center gap-3">
-      <input
-        pInputText
-        type="text"
-        placeholder="Buscar por nombre, telefono, email..."
-        class="w-full md:w-75"
-        variant="filled"
-        autocomplete="off"
-      />
+        <div class="flex items-center gap-3">
+          <span class="p-input-icon-left w-full md:w-80">
+            <input
+              pInputText
+              variant="filled"
+              class="w-full"
+              placeholder="Search by name or address..."
+            />
+          </span>
+          <p-button label="Nuevo" icon="pi pi-plus" [routerLink]="['new']" />
+        </div>
+      </div>
 
-      <p-button label="Nuevo" (click)="addUser()" icon="pi pi-plus" />
-    </div>
-  </div>
-  <app-users-table
-    [isLoading]="store.loading()"
-    [users]="store.entities()"
-    [pagination]="store.pagination() "
-    (filter)="search($event)"
-  />
+      <!-- <div class="flex justify-between items-center w-full"> -->
+      <!--   <div class="block w-full bg-red-100"> -->
+      <!--     <h2 class="text-xl font-bold text-slate-800 tracking-tight"> -->
+      <!--       Usuarios & Admins -->
+      <!--     </h2> -->
+      <!--     <p class="text-sm text-slate-500"> -->
+      <!--       <span class="text-blue-500" -->
+      <!--         >{{store.pagination()?.total}} residentes</span -->
+      <!--       > -->
+      <!--       registrados -->
+      <!--     </p> -->
+      <!--   </div> -->
+      <!--   <p-button icon="pi pi-plus" text [routerLink]="['new']" /> -->
+      <!-- </div> -->
+    </ng-template>
+    <app-users-table
+      [isLoading]="store.loading()"
+      [users]="store.entities()"
+      [pagination]="store.pagination() "
+      (filter)="search($event)"
+      (add)="addUser()"
+      (update)="updateUser($event)"
+      (remove)="removeUser($event)"
+    />
+  </p-card>
 </div>

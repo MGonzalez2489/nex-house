@@ -1,0 +1,283 @@
+<div class="max-w-5xl mx-auto space-y-8">
+  <!-- header -->
+  <div class="flex items-center justify-between border-b border-slate-200 pb-5">
+    <div>
+      <h1 class="text-xl font-bold text-slate-900">
+        Configuración de Residente
+      </h1>
+      <p class="text-xs text-slate-500 text-pretty">
+        Gestiona la información personal y los vínculos de propiedad del
+        habitante.
+      </p>
+    </div>
+  </div>
+
+  <form
+    class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8"
+    [formGroup]="form"
+    (ngSubmit)="doSubmit()"
+  >
+    <div class="space-y-1">
+      <h3 class="font-bold text-slate-900">Datos Personales</h3>
+      <p class="text-sm text-slate-500">
+        Información básica para el acceso a la plataforma.
+      </p>
+    </div>
+
+    <!-- personal data form -->
+    <p-card class="md:col-span-2 md:space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- firstName -->
+        <div class="col-span-1 flex flex-col gap-1.5 form-control">
+          <label for="fName" class="form-label">Nombre</label>
+          <input
+            pInputText
+            id="fName"
+            formControlName="firstName"
+            placeholder="Ej. John"
+            fluid
+            [invalid]="form.controls.firstName.invalid && form.controls.firstName.touched"
+          />
+          <app-form-validation-error
+            [touched]="form.controls.firstName.touched"
+            [errors]="form.controls.firstName.errors"
+            label="Nombre"
+          />
+        </div>
+        <!-- lastName -->
+        <div class="col-span-1 flex flex-col gap-1.5 form-control">
+          <label for="lName" class="form-label">Apellidos</label>
+          <input
+            pInputText
+            id="lName"
+            formControlName="lastName"
+            placeholder="Ej. Doe"
+            fluid
+            [invalid]="form.controls.lastName.invalid && form.controls.lastName.touched"
+          />
+          <app-form-validation-error
+            [touched]="form.controls.lastName.touched"
+            [errors]="form.controls.lastName.errors"
+            label="Apellidos"
+          />
+        </div>
+        <!-- email -->
+        <div class="col-span-1 flex flex-col gap-1.5 form-control">
+          <label for="email" class="form-label">Email</label>
+          <input
+            pInputText
+            id="email"
+            formControlName="email"
+            placeholder="john@doe.com"
+            fluid
+            [invalid]="form.controls.email.invalid && form.controls.email.touched"
+          />
+          <app-form-validation-error
+            [touched]="form.controls.email.touched"
+            [errors]="form.controls.email.errors"
+            label="Email"
+          />
+        </div>
+        <!-- phone -->
+        <div class="col-span-1 flex flex-col gap-1.5 form-control">
+          <label for="phone" class="form-label">Teléfono</label>
+          <p-inputMask
+            id="phone"
+            formControlName="phone"
+            mask="(999) 999-9999"
+            placeholder="(000) 000-0000"
+            fluid
+            [invalid]="form.controls.phone.invalid && form.controls.phone.touched"
+          />
+          <app-form-validation-error
+            [touched]="form.controls.phone.touched"
+            [errors]="form.controls.phone.errors"
+            label="Teléfono"
+          />
+        </div>
+      </div>
+    </p-card>
+
+    <div class="space-y-1">
+      <h3 class="font-bold text-slate-900">Relación con la Unidad</h3>
+      <p class="text-sm text-slate-500">
+        Define el estatus legal y de convivencia del usuario.
+      </p>
+    </div>
+
+    <!-- Unity -->
+    <p-card class="md:col-span-2 space-y-4">
+      @if(isNewUnit()){
+      <div class="flex items-center justify-end mb-4">
+        <p-button
+          text="true"
+          label="Buscar existente"
+          severity="info"
+          (click)="isNewUnit.set(false)"
+        />
+      </div>
+      <div class="grid grid-cols-2 gap-x-6 gap-y-4" formGroupName="unit">
+        <div class="flex flex-col gap-1.5 form-control">
+          <label class="form-label" for="streetName"
+            >Calle / Privada / Torre</label
+          >
+          <input
+            pInputText
+            id="streetName"
+            formControlName="streetName"
+            placeholder="Ej. Privada Maple"
+            fluid
+          />
+          <app-form-validation-error
+            [touched]="form.controls.unit.controls.streetName.touched"
+            [errors]="form.controls.unit.controls.streetName.errors"
+            label="Calle"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1.5 form-control">
+          <label class="form-label" for="identifier"
+            >Número / Identificador</label
+          >
+          <input
+            pInputText
+            id="identifier"
+            formControlName="identifier"
+            placeholder="Ej. Casa 10, Depto 4B"
+            fluid
+          />
+          <app-form-validation-error
+            [touched]="form.controls.unit.controls.identifier.touched"
+            [errors]="form.controls.unit.controls.identifier.errors"
+            label="Identificador"
+          />
+        </div>
+      </div>
+
+      } @else{
+      <div class="col-span-2 flex flex-col gap-1.5 form-control">
+        <div class="flex items-center justify-between">
+          <label for="fName" class="form-label">Unidad</label>
+          <p-button
+            text="true"
+            label="Crear"
+            severity="info"
+            tabIndex="-1"
+            [style]="{ 'tabindex': '-1' }"
+            [attr.tabindex]="-1"
+            [pt]="{
+                    root: { class: 'p-0',tabindex: '-1' },
+                    host: { tabindex: '-1' }
+              }"
+            (click)="isNewUnit.set(true)"
+          />
+        </div>
+        <p-autoComplete
+          formControlName="unitId"
+          [suggestions]="suggestions()"
+          (completeMethod)="searchUnit($event)"
+          forceSelection="true"
+          placeholder="Busca por calle o número..."
+          optionLabel="labelFull"
+          optionValue="publicId"
+          [emptyMessage]="'No se encontró la unidad. Presiona Enter para crearla.'"
+          fluid
+        >
+          <ng-template let-unit pTemplate="item">
+            <div class="flex flex-col">
+              <span class="font-bold text-sm">{{ unit.street }}</span>
+              <small class="text-slate-500"># {{ unit.identifier }}</small>
+            </div>
+          </ng-template>
+          <ng-template let-unit pTemplate="empty">
+            <div class="flex flex-col">
+              <span
+                >No se encontraron resultados.
+                <p-button
+                  text="true"
+                  label="Crear"
+                  (click)="isNewUnit.set(true)"
+              /></span>
+            </div>
+          </ng-template>
+        </p-autoComplete>
+
+        <app-form-validation-error
+          [touched]="form.controls.unitId.touched"
+          [errors]="form.controls.unitId.errors"
+          label="Unidad"
+        />
+      </div>
+      }
+      <div class="col-span-2 mt-6 pt-2">
+        <p class="text-xs font-bold text-slate-500 uppercase block mb-3">
+          Tipo de ocupación
+        </p>
+        <div class="flex gap-6"></div>
+      </div>
+
+      <div class="pb-6 my-3 px-3 flex items-center gap-10 form-control">
+        <!-- <label class="form-label font-bold text-slate-700 text-xs">Tipo</label> -->
+        <div class="flex flex-wrap items-center gap-6">
+          <div class="flex items-center gap-2">
+            <p-checkbox
+              formControlName="isOwner"
+              [binary]="true"
+              inputId="owner"
+              variant="filled"
+              [pt]="{box:'rounded-full'}"
+            ></p-checkbox>
+            <label for="owner" class="text-sm text-slate-600 cursor-pointer"
+              >Dueño</label
+            >
+          </div>
+
+          <div class="flex items-center gap-2">
+            <p-checkbox
+              formControlName="isFamily"
+              [binary]="true"
+              inputId="family"
+              variant="filled"
+              [pt]="{box:'rounded-full'}"
+            ></p-checkbox>
+            <label for="family" class="text-sm text-slate-600 cursor-pointer"
+              >Familiar</label
+            >
+          </div>
+
+          <div class="flex items-center gap-2">
+            <p-checkbox
+              formControlName="isTenant"
+              [binary]="true"
+              inputId="tenant"
+              variant="filled"
+              [pt]="{box:'rounded-full'}"
+            ></p-checkbox>
+            <label for="tenant" class="text-sm text-slate-600 cursor-pointer"
+              >Renta</label
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center flex-col">
+        <div
+          class="form-control flex items-center justify-between gap-4 p-3 bg-slate-50 rounded-md border border-dashed border-slate-200 w-full"
+        >
+          <label for="role" class="text-sm font-medium text-slate-600"
+            >¿Es Administrador?</label
+          >
+          <p-toggleswitch formControlName="isAdmin" size="large" />
+        </div>
+      </div>
+    </p-card>
+
+    <div class="flex justify-end items-center"></div>
+    <div class="flex justify-end items-center md:col-span-2">
+      <app-form-options
+        [callState]="store.callState()"
+        (doCancel)="doCancel()"
+      />
+    </div>
+  </form>
+</div>

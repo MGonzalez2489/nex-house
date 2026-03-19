@@ -57,6 +57,12 @@ export class UsersService {
             })
             .orWhere('users.phone LIKE :filter', {
               filter: `%${globalFilter}%`,
+            })
+            .orWhere('unit.streetName LIKE :filter', {
+              filter: `%${globalFilter}%`,
+            })
+            .orWhere('unit.identifier LIKE :filter', {
+              filter: `%${globalFilter}%`,
             });
         }),
       );
@@ -141,6 +147,10 @@ export class UsersService {
           userId: savedUser.id,
           isActive: true,
           createdBy: currentUser.id,
+          isFamily: createDto.isFamily,
+          isOwner: createDto.isOwner,
+          isTenant: createDto.isTenant,
+
           // Aquí podrías usar un enum para distinguir roles internos
         });
         await queryRunner.manager.save(assignment);

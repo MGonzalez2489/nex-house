@@ -2,16 +2,18 @@ import { FormControl, FormGroup } from '@angular/forms';
 
 export type ICreateUserForm = {
   firstName: FormControl<string>;
-  email: FormControl<string>;
-  isAdmin: FormControl<boolean>;
-  unitId: FormControl<string>;
-  unit: FormGroup<IUserUnitForm>;
-};
-
-export type IUpdateUserForm = {
   lastName: FormControl<string>;
   phone: FormControl<string>;
-} & ICreateUserForm;
+  email: FormControl<string>;
+
+  unitId: FormControl<string>;
+  unit: FormGroup<IUserUnitForm>;
+
+  isAdmin: FormControl<boolean>;
+  isOwner: FormControl<boolean>;
+  isFamily: FormControl<boolean>;
+  isTenant: FormControl<boolean>;
+};
 
 export type IUserUnitForm = {
   streetName: FormControl<string>;

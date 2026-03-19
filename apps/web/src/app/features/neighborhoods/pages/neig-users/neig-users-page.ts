@@ -1,16 +1,16 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import { ModalService } from '@core/services';
 import { Search } from '@nex-house/interfaces';
+import { UserModel } from '@nex-house/models';
 import { UsersTable } from '@shared/components/data';
-import { CreateUserForm } from '@shared/components/forms/users';
 import { UsersStore } from '@stores/users.store';
-import { BadgeModule } from 'primeng/badge';
 import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
+import { Card } from 'primeng/card';
 
 @Component({
   selector: 'app-neig-users-page',
-  imports: [ButtonModule, UsersTable, BadgeModule, InputTextModule],
+  imports: [UsersTable, Card, ButtonModule, RouterLink],
   templateUrl: './neig-users-page.html',
   styleUrl: './neig-users-page.css',
   standalone: true,
@@ -19,18 +19,24 @@ import { InputTextModule } from 'primeng/inputtext';
 export class NeigUsersPage {
   protected readonly store = inject(UsersStore);
   protected readonly modalService = inject(ModalService);
+  private readonly router = inject(Router);
 
   addUser() {
-    this.modalService.open(CreateUserForm, {
-      header: 'Crear Usuario',
-      width: '35vw',
-    });
+    this.router.navigate(['new']);
+    // this.modalService.open(CreateUserForm, {
+    //   header: 'Crear Usuario',
+    //   width: '35vw',
+    // });
   }
-  updateUser() {
-    this.modalService.open(CreateUserForm, {
-      header: 'Actualizar Usuario',
-      width: '35vw',
-    });
+  updateUser(user: UserModel) {
+    // this.modalService.open(UpdateUserForm, {
+    //   header: 'Actualizar Usuario',
+    //   width: '35vw',
+    //   data: { user: user },
+    // });
+  }
+  removeUser(user: UserModel) {
+    alert(`Remove ${user.publicId} `);
   }
 
   search(filters: Search): void {

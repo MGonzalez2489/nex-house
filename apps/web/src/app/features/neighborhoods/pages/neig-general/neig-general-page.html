@@ -1,1 +1,153 @@
-<p>neig-general-page works!</p>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+  <div class="md:col-span-2 space-y-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div
+        class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-start gap-4 hover:border-primary-100 transition-colors"
+      >
+        <div class="p-3 rounded-xl bg-primary-50 text-primary-600">
+          <i class="pi pi-home text-xl"></i>
+        </div>
+        <div>
+          <p class="text-sm font-medium text-slate-500">Total Unidades</p>
+          <p class="text-3xl font-bold text-slate-950 mt-1">1,250</p>
+          <p class="text-xs text-green-600 mt-1 flex items-center gap-1">
+            <i class="pi pi-arrow-up text-[10px]"></i> 12 nuevas este mes
+          </p>
+        </div>
+      </div>
+
+      <div
+        class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-start gap-4"
+      >
+        <div class="p-3 rounded-xl bg-green-50 text-green-600">
+          <i class="pi pi-users text-xl"></i>
+        </div>
+        <div>
+          <p class="text-sm font-medium text-slate-500">Usuarios Activos</p>
+          <p class="text-3xl font-bold text-slate-950 mt-1">980</p>
+          <p class="text-xs text-slate-400 mt-1">~78% de ocupación</p>
+        </div>
+      </div>
+
+      <div
+        class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-start gap-4"
+      >
+        <div class="p-3 rounded-xl bg-red-50 text-red-600">
+          <i class="pi pi-exclamation-triangle text-xl"></i>
+        </div>
+        <div>
+          <p class="text-sm font-medium text-slate-500">Reportes Críticos</p>
+          <p class="text-3xl font-bold text-slate-950 mt-1">15</p>
+          <p class="text-xs text-red-700 mt-1 font-medium">
+            Requieren atención
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden"
+    >
+      <div
+        class="p-6 border-b border-slate-100 flex items-center justify-between"
+      >
+        <h3 class="text-lg font-semibold text-slate-950">Actividad Reciente</h3>
+        <button
+          class="text-sm font-medium text-primary-600 hover:text-primary-700"
+        >
+          Ver todo
+        </button>
+      </div>
+      <div class="p-6 space-y-5">
+        <div
+          class="flex items-center gap-4 pb-4 border-b border-slate-100 last:border-0 last:pb-0"
+        >
+          <div
+            class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-600"
+          >
+            P
+          </div>
+          <div class="grow">
+            <p class="text-sm text-slate-700">
+              <span class="font-semibold text-slate-900">Pepe</span>
+              fue asignado a la unidad
+              <span class="font-medium text-primary-700">Calle Maple #10</span>.
+            </p>
+            <p class="text-xs text-slate-400 mt-0.5">
+              Hace 5 minutos • por Admin
+            </p>
+          </div>
+          <span class="text-xs font-mono text-slate-400">#9d7ba6...</span>
+        </div>
+        <div
+          class="flex items-center gap-4 pb-4 border-b border-slate-100 last:border-0 last:pb-0"
+        >
+          <div
+            class="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold"
+          >
+            R
+          </div>
+          <div class="grow">
+            <p class="text-sm text-slate-700">
+              Nuevo reporte de mantenimiento:
+              <span class="font-semibold text-slate-900"
+                >Fuga de agua en área común</span
+              >.
+            </p>
+            <p class="text-xs text-slate-400 mt-0.5">Hace 2 horas • por Rosa</p>
+          </div>
+          <span
+            class="px-2 py-0.5 rounded bg-red-50 text-red-700 text-[10px] font-bold uppercase"
+            >Urgente</span
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="space-y-6">
+    <div
+      class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4"
+    >
+      <h3 class="text-lg font-semibold text-slate-950">Datos de Contacto</h3>
+      <div class="space-y-3 text-sm text-slate-700">
+        <div class="flex items-center gap-3">
+          <i class="pi pi-phone text-slate-400"></i>
+          (614) 123-4567
+        </div>
+        <div class="flex items-center gap-3">
+          <i class="pi pi-envelope text-slate-400"></i>
+          contacto@quintassanmiguel.com
+        </div>
+        <div class="flex items-center gap-3">
+          <i class="pi pi-clock text-slate-400"></i>
+          Lun - Vie: 9:00 - 18:00
+        </div>
+      </div>
+      <button
+        class="w-full mt-2 px-4 py-2 bg-slate-100 text-slate-800 rounded-lg text-sm font-semibold hover:bg-slate-200 flex items-center justify-center gap-2 transition-all"
+      >
+        <i class="pi pi-pencil text-xs"></i>
+        Editar Datos
+      </button>
+    </div>
+
+    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+      <h3 class="text-lg font-semibold text-slate-950 mb-4">Accesos Rápidos</h3>
+      <div class="grid grid-cols-2 gap-3">
+        <button
+          class="p-4 bg-primary-50 text-primary-700 rounded-xl hover:bg-primary-100 transition-colors flex flex-col items-center gap-2 text-center shadow-inner-sm"
+        >
+          <i class="pi pi-users text-xl mb-1"></i>
+          <span class="text-xs font-semibold">Invitar Vecino</span>
+        </button>
+        <button
+          class="p-4 bg-slate-50 text-slate-700 rounded-xl hover:bg-slate-100 transition-colors flex flex-col items-center gap-2 text-center"
+        >
+          <i class="pi pi-key text-xl mb-1"></i>
+          <span class="text-xs font-semibold">Gestión Accesos</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

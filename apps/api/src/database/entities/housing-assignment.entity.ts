@@ -25,6 +25,15 @@ export class UnitAssignment extends TraceableEntity {
   @Column({ default: true })
   isActive: boolean;
 
+  @Column({ default: true })
+  isOwner: boolean;
+
+  @Column({ default: true })
+  isTenant: boolean;
+
+  @Column({ default: true })
+  isFamily: boolean;
+
   // @Column({ type: 'enum', enum: ResidentRole, default: ResidentRole.RESIDENT })
   // role: ResidentRole; // Propietario, Inquilino, Familiar, etc.
 }

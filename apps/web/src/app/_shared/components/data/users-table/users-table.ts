@@ -9,10 +9,12 @@ import { UserModel } from '@nex-house/models';
 import { UserAvatar } from '@shared/components/ui';
 import { PhonePipe } from '@shared/pipes';
 import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { RoleTag } from '../role-tag/role-tag';
 import { Table, TableColumn } from '../table/table';
 import { UserStatusTag } from '../user-status-tag/user-status-tag';
+import { BadgeModule } from 'primeng/badge';
 
 @Component({
   selector: 'app-users-table',
@@ -24,6 +26,8 @@ import { UserStatusTag } from '../user-status-tag/user-status-tag';
     Table,
     RoleTag,
     UserStatusTag,
+    InputTextModule,
+    BadgeModule,
   ],
   templateUrl: './users-table.html',
   styleUrl: './users-table.css',
@@ -35,7 +39,11 @@ export class UsersTable {
   isLoading = input.required<boolean>();
   pagination = input<ApiPaginationMeta>();
 
+  //outputs
   filter = output<Search>();
+  add = output();
+  update = output<UserModel>();
+  remove = output<UserModel>();
 
   search(event: TableLazyLoadEvent): void {
     const searchParams: Search = {

@@ -4,10 +4,11 @@ import { Search } from '@nex-house/interfaces';
 import { UnitsTable } from '@shared/components/data';
 import { UnitForm } from '@shared/components/forms';
 import { UnitsStore } from '@stores/units.store';
+import { Card } from 'primeng/card';
 
 @Component({
   selector: 'app-neig-units-page',
-  imports: [UnitsTable],
+  imports: [UnitsTable, Card],
   templateUrl: './neig-units-page.html',
   styleUrl: './neig-units-page.css',
   standalone: true,

@@ -1,0 +1,196 @@
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { Router } from '@angular/router';
+import { ICreateUser } from '@nex-house/interfaces';
+
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormOptions, FormValidationError } from '@shared/components/ui';
+import { ContextStore } from '@stores/context.store';
+import { UnitsStore } from '@stores/units.store';
+import { UsersStore } from '@stores/users.store';
+import {
+  AutoCompleteCompleteEvent,
+  AutoCompleteModule,
+} from 'primeng/autocomplete';
+import { ButtonModule } from 'primeng/button';
+import { Card } from 'primeng/card';
+import { CheckboxModule } from 'primeng/checkbox';
+import { InputMaskModule } from 'primeng/inputmask';
+import { InputTextModule } from 'primeng/inputtext';
+import { RadioButtonModule } from 'primeng/radiobutton';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
+import { ICreateUserForm, IUserUnitForm } from './iuser-form';
+
+@Component({
+  selector: 'app-user-form-page',
+  imports: [
+    ReactiveFormsModule,
+    Card,
+    FormValidationError,
+    InputTextModule,
+    InputMaskModule,
+    ButtonModule,
+    FormOptions,
+    AutoCompleteModule,
+    CheckboxModule,
+    RadioButtonModule,
+    ToggleSwitchModule,
+  ],
+  templateUrl: './user-form-page.html',
+  styleUrl: './user-form-page.css',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class UserFormPage {
+  protected readonly store = inject(UsersStore);
+  protected readonly unitStore = inject(UnitsStore);
+  protected readonly contextStore = inject(ContextStore);
+  protected readonly form = new FormGroup<ICreateUserForm>({
+    firstName: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.minLength(3)],
+    }),
+    lastName: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.minLength(3)],
+    }),
+    phone: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.minLength(3)],
+    }),
+    email: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.email],
+    }),
+    unitId: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    unit: new FormGroup<IUserUnitForm>({
+      streetName: new FormControl<string>('', { nonNullable: true }),
+      identifier: new FormControl<string>('', { nonNullable: true }),
+    }),
+    isAdmin: new FormControl(false, {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    isOwner: new FormControl(false, {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    isFamily: new FormControl(false, {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    isTenant: new FormControl(false, {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+  });
+  protected readonly isNewUnit = signal<boolean>(false);
+  private readonly router = inject(Router);
+  private readonly exclusiveFields = [
+    'isOwner',
+    'isFamily',
+    'isTenant',
+  ] as const;
+
+  suggestions = computed(() => {
+    return this.unitStore.suggestions().map((f) => ({
+      ...f,
+      labelFull: `${f.street} #${f.identifier}`,
+    }));
+  });
+
+  constructor() {
+    effect(() => {
+      this.syncUnitValidators(this.isNewUnit());
+    });
+
+    this.setupExclusiveFieldsLogic();
+  }
+
+  searchUnit(event: AutoCompleteCompleteEvent) {
+    //TODO: add debounce
+    this.unitStore.searchSuggestions(event.query);
+  }
+
+  async doSubmit() {
+    this.form.markAllAsTouched();
+    if (this.form.invalid) return;
+
+    const raw = this.form.getRawValue();
+    const payload: ICreateUser = {
+      ...raw,
+      ...(this.isNewUnit()
+        ? { streetName: raw.unit.streetName, identifier: raw.unit.identifier }
+        : { unitId: raw.unitId }),
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    delete (payload as any).unit;
+
+    if (await this.store.create(payload)) {
+      this.navigateBack();
+    }
+  }
+  doCancel() {
+    this.navigateBack();
+  }
+
+  private setupExclusiveFieldsLogic() {
+    this.exclusiveFields.forEach((field) => {
+      this.form
+        .get(field)
+        ?.valueChanges.pipe(takeUntilDestroyed())
+        .subscribe((value) => {
+          if (value) this.clearOtherFields(field);
+        });
+    });
+  }
+  private clearOtherFields(selectedField: string) {
+    this.exclusiveFields
+      .filter((f) => f !== selectedField)
+      .forEach((f) => {
+        this.form.get(f)?.setValue(false, { emitEvent: false });
+      });
+  }
+  private syncUnitValidators(isNew: boolean) {
+    const { unit, unitId } = this.form.controls;
+    const { identifier, streetName } = unit.controls;
+
+    if (isNew) {
+      unitId.setValue('', { emitEvent: false });
+      unitId.clearValidators();
+      identifier.setValidators([Validators.required]);
+      streetName.setValidators([Validators.required]);
+    } else {
+      unit.patchValue({ identifier: '', streetName: '' }, { emitEvent: false });
+      identifier.clearValidators();
+      streetName.clearValidators();
+      unitId.setValidators([Validators.required]);
+    }
+
+    [unitId, identifier, streetName].forEach((c) =>
+      c.updateValueAndValidity({ emitEvent: false }),
+    );
+    this.form.updateValueAndValidity({ emitEvent: false });
+  }
+
+  private navigateBack() {
+    const sel = this.contextStore.selectedId();
+    this.router.navigateByUrl(`/neighborhoods/${sel}/users`);
+  }
+}
