@@ -85,28 +85,48 @@ export const UnitsStore = signalStore(
         }),
       ),
     ),
-    searchSuggestions: rxMethod<string>(
-      pipe(
-        // debounceTime(300),
-        // distinctUntilChanged(),
-        switchMap((query) => {
-          const nId = store._contextStore.selectedId();
-          if (!nId || query.length < 2)
-            return [patchState(store, { suggestions: [] })];
+    searchSuggestions: async (hint: string) => {
+      const nId = store._contextStore.selectedId();
+      if (!nId) return [patchState(store, { suggestions: [] })];
 
-          // Usamos el mismo service, pero con params de búsqueda mínima
-          return store._unitsService
-            .getAll(nId, { globalFilter: query, first: 0, rows: 10 })
-            .pipe(
-              tapResponse({
-                next: (response) =>
-                  patchState(store, { suggestions: response.data }),
-                error: () => patchState(store, { suggestions: [] }),
-              }),
-            );
-        }),
-      ),
-    ),
+      try {
+        patchState(store, setLoading());
+        const response = await lastValueFrom(
+          store._unitsService.getAll(nId, {
+            globalFilter: hint,
+            first: 0,
+            rows: 10,
+          }),
+        );
+        patchState(store, { suggestions: response.data }, setLoaded());
+        return true;
+      } catch (err) {
+        patchState(store, { suggestions: [] });
+        return false;
+      }
+    },
+    // searchSuggestions: rxMethod<string>(
+    //   pipe(
+    //     debounceTime(300),
+    //     distinctUntilChanged(),
+    //     switchMap((query) => {
+    //       const nId = store._contextStore.selectedId();
+    //       if (!nId || query.length < 2)
+    //         return [patchState(store, { suggestions: [] })];
+    //
+    //       // Usamos el mismo service, pero con params de búsqueda mínima
+    //       return store._unitsService
+    //         .getAll(nId, { globalFilter: query, first: 0, rows: 10 })
+    //         .pipe(
+    //           tapResponse({
+    //             next: (response) =>
+    //               patchState(store, { suggestions: response.data }),
+    //             error: () => patchState(store, { suggestions: [] }),
+    //           }),
+    //         );
+    //     }),
+    //   ),
+    // ),
     create: async (dto: ICreateHousingUnit): Promise<boolean> => {
       const nId = store._contextStore.selectedId();
       if (!nId) return false;

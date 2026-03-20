@@ -8,12 +8,7 @@ import {
 } from '@angular-architects/ngrx-toolkit';
 import { effect, inject } from '@angular/core';
 import { UsersService } from '@core/services';
-import {
-  ApiPaginationMeta,
-  ICreateUser,
-  IUpdateUser,
-  Search,
-} from '@nex-house/interfaces';
+import { ApiPaginationMeta, ICreateUser, Search } from '@nex-house/interfaces';
 import { UserModel } from '@nex-house/models';
 import { tapResponse } from '@ngrx/operators';
 import {
@@ -86,6 +81,23 @@ export const UsersStore = signalStore(
         }),
       ),
     ),
+    findById: async (id: string) => {
+      const nId = store._contextStore.selectedId();
+      if (!nId) return null;
+
+      try {
+        patchState(store, setLoading());
+        const response = await lastValueFrom(
+          store._userService.getById(nId, id),
+        );
+        patchState(store, setLoaded());
+        return response.data;
+      } catch (err) {
+        patchState(store, setError(err));
+        return null;
+      }
+    },
+
     create: async (dto: ICreateUser): Promise<boolean> => {
       const nId = store._contextStore.selectedId();
       if (!nId) return false;
@@ -103,7 +115,7 @@ export const UsersStore = signalStore(
         return false;
       }
     },
-    update: async (id: string, dto: IUpdateUser): Promise<boolean> => {
+    update: async (id: string, dto: ICreateUser): Promise<boolean> => {
       const nId = store._contextStore.selectedId();
       if (!nId) return false;
 

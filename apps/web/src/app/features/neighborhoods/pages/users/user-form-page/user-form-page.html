@@ -3,7 +3,7 @@
   <div class="flex items-center justify-between border-b border-slate-200 pb-5">
     <div>
       <h1 class="text-xl font-bold text-slate-900">
-        Configuración de Residente
+        {{ isEdit() ? 'Editar Residente' : 'Configuración de Residente' }}
       </h1>
       <p class="text-xs text-slate-500 text-pretty">
         Gestiona la información personal y los vínculos de propiedad del
@@ -29,7 +29,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <!-- firstName -->
         <div class="col-span-1 flex flex-col gap-1.5 form-control">
-          <label for="fName" class="form-label">Nombre</label>
+          <label for="fName" class="form-label required">Nombre</label>
           <input
             pInputText
             id="fName"
@@ -63,7 +63,7 @@
         </div>
         <!-- email -->
         <div class="col-span-1 flex flex-col gap-1.5 form-control">
-          <label for="email" class="form-label">Email</label>
+          <label for="email" class="form-label required">Email</label>
           <input
             pInputText
             id="email"
@@ -129,8 +129,8 @@
             fluid
           />
           <app-form-validation-error
-            [touched]="form.controls.unit.controls.streetName.touched"
-            [errors]="form.controls.unit.controls.streetName.errors"
+            [touched]="form.controls.newUnit.controls.streetName.touched"
+            [errors]="form.controls.newUnit.controls.streetName.errors"
             label="Calle"
           />
         </div>
@@ -147,8 +147,8 @@
             fluid
           />
           <app-form-validation-error
-            [touched]="form.controls.unit.controls.identifier.touched"
-            [errors]="form.controls.unit.controls.identifier.errors"
+            [touched]="form.controls.newUnit.controls.identifier.touched"
+            [errors]="form.controls.newUnit.controls.identifier.errors"
             label="Identificador"
           />
         </div>
@@ -173,13 +173,13 @@
           />
         </div>
         <p-autoComplete
-          formControlName="unitId"
+          formControlName="unit"
           [suggestions]="suggestions()"
           (completeMethod)="searchUnit($event)"
           forceSelection="true"
           placeholder="Busca por calle o número..."
           optionLabel="labelFull"
-          optionValue="publicId"
+          [invalid]="form.controls.unit.invalid && form.controls.unit.touched"
           [emptyMessage]="'No se encontró la unidad. Presiona Enter para crearla.'"
           fluid
         >
@@ -203,8 +203,8 @@
         </p-autoComplete>
 
         <app-form-validation-error
-          [touched]="form.controls.unitId.touched"
-          [errors]="form.controls.unitId.errors"
+          [touched]="form.controls.unit.touched"
+          [errors]="form.controls.unit.errors"
           label="Unidad"
         />
       </div>
@@ -217,7 +217,6 @@
       </div>
 
       <div class="pb-6 my-3 px-3 flex items-center gap-10 form-control">
-        <!-- <label class="form-label font-bold text-slate-700 text-xs">Tipo</label> -->
         <div class="flex flex-wrap items-center gap-6">
           <div class="flex items-center gap-2">
             <p-checkbox
@@ -275,6 +274,7 @@
     <div class="flex justify-end items-center"></div>
     <div class="flex justify-end items-center md:col-span-2">
       <app-form-options
+        [submitLabel]="isEdit() ? 'Actualizar' : 'Guardar'"
         [callState]="store.callState()"
         (doCancel)="doCancel()"
       />

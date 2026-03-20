@@ -3,7 +3,7 @@ import { UnitEntityToModel } from '@modules/housing-units/mappers';
 import { UserModel } from '@nex-house/models';
 
 export function UserEntityToModel(user: User): UserModel {
-  const units = user.assignments?.map((f) => UnitEntityToModel(f.unit));
+  const units = user.assignments?.map((f) => UnitEntityToModel(f.unit, f));
 
   return {
     publicId: user.publicId,

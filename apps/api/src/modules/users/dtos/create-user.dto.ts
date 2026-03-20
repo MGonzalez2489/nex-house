@@ -27,4 +27,10 @@ export class CreateUserDto implements ICreateUser {
   isFamily: boolean;
   @IsBoolean()
   isTenant: boolean;
+
+  @IsString()
+  @IsOptional()
+  lastName: string;
+  @IsOptional()
+  phone: string;
 }

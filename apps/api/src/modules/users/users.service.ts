@@ -97,7 +97,6 @@ export class UsersService {
     await queryRunner.startTransaction();
 
     try {
-      // 1. Preparación de Seguridad
       const hashedPassword = await this.cryptoService.hash('1234'); // TODO: Random pass
 
       const neighborhood = await queryRunner.manager.findOne(Neighborhood, {
@@ -109,7 +108,7 @@ export class UsersService {
       // 2. Crear el Usuario
       const newUser = queryRunner.manager.create(User, {
         firstName: createDto.firstName,
-        email: createDto.email,
+        email: createDto.email.toLowerCase().trim(),
         role: createDto.isAdmin ? UserRoleEnum.ADMIN : UserRoleEnum.RESIDENT,
         status: UserStatusEnum.PENDING_COMPLETION,
         createdBy: currentUser.id,
@@ -172,28 +171,129 @@ export class UsersService {
     }
   }
 
-  //
   async update(
-    publicId: string,
-    dto: CreateUserDto,
-    updater: User,
-  ): Promise<User> {
-    const userToUpdate = await this.findOrThrow(publicId);
+    userPublicId: string,
+    updateDto: CreateUserDto,
+    currentUser: User,
+  ) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    // Si el DTO incluye password, lo hasheamos antes de hacer el merge
-    // if (dto.password) {
-    const hashedPassword = await this.cryptoService.hash('1234');
-    // }
+    try {
+      // 1. Buscar el usuario existente
+      const user = await queryRunner.manager.findOne(User, {
+        where: { publicId: userPublicId },
+        relations: ['neighborhood'], // Necesario para validar IDs numéricos
+      });
 
-    const updated = this.repository.merge(userToUpdate, {
-      ...dto,
-      updatedBy: updater.id,
-      password: hashedPassword,
-    });
+      if (!user) throw new NotFoundException('Usuario no encontrado');
 
-    await this.repository.save(updated);
-    return this.findOrThrow(publicId);
+      // 2. Actualizar datos básicos del Usuario
+      user.firstName = updateDto.firstName;
+      user.lastName = updateDto.lastName; // Asumiendo que agregaste este campo
+      user.phone = updateDto.phone;
+      user.role = updateDto.isAdmin
+        ? UserRoleEnum.ADMIN
+        : UserRoleEnum.RESIDENT;
+
+      // Si el email cambia, TypeORM lanzará error de duplicado (manejado en el catch)
+      user.email = updateDto.email.toLowerCase().trim();
+
+      await queryRunner.manager.save(user);
+
+      // 3. Gestión de la Unidad y Vínculos (UnitAssignment)
+      // Buscamos el vínculo actual para actualizarlo o reemplazarlo
+      const currentAssignment = await queryRunner.manager.findOne(
+        UnitAssignment,
+        {
+          where: { userId: user.id, isActive: true },
+        },
+      );
+
+      let targetUnitId = currentAssignment?.unitId;
+
+      // Caso A: Se envió una unidad existente por publicId
+      if (updateDto.unitId) {
+        const targetUnit = await queryRunner.manager.findOne(HousingUnit, {
+          where: { publicId: updateDto.unitId },
+        });
+        if (!targetUnit)
+          throw new NotFoundException('Unidad destino no encontrada');
+        targetUnitId = targetUnit.id;
+      }
+      // Caso B: Se solicita crear una nueva unidad
+      else if (updateDto.streetName && updateDto.identifier) {
+        const newUnit = queryRunner.manager.create(HousingUnit, {
+          streetName: updateDto.streetName,
+          identifier: updateDto.identifier,
+          neighborhoodId: user.neighborhoodId,
+          status: HousingStatusEnum.OCCUPIED,
+        });
+        const savedUnit = await queryRunner.manager.save(newUnit);
+        targetUnitId = savedUnit.id;
+      }
+
+      // 4. Sincronizar el Vínculo (UnitAssignment)
+      if (currentAssignment) {
+        // Actualizamos el vínculo existente
+        currentAssignment.unitId = targetUnitId!;
+        currentAssignment.isFamily = updateDto.isFamily;
+        currentAssignment.isOwner = updateDto.isOwner;
+        currentAssignment.isTenant = updateDto.isTenant;
+        currentAssignment.updatedBy = currentUser.id; // Auditoría
+        await queryRunner.manager.save(currentAssignment);
+      } else {
+        // Si por alguna razón no tenía vínculo activo, creamos uno nuevo
+        const newAssignment = queryRunner.manager.create(UnitAssignment, {
+          unitId: targetUnitId,
+          userId: user.id,
+          isActive: true,
+          isFamily: updateDto.isFamily,
+          isOwner: updateDto.isOwner,
+          isTenant: updateDto.isTenant,
+          createdBy: currentUser.id,
+        });
+        await queryRunner.manager.save(newAssignment);
+      }
+
+      await queryRunner.commitTransaction();
+      return this.findByPublicId(user.publicId);
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      if (err.code === '23505') {
+        throw new ConflictException(
+          'El correo electrónico ya está registrado por otro usuario.',
+        );
+      }
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
   }
+
+  //
+  // async update(
+  //   publicId: string,
+  //   dto: CreateUserDto,
+  //   updater: User,
+  // ): Promise<User> {
+  //   const userToUpdate = await this.findOrThrow(publicId);
+  //
+  //   // Si el DTO incluye password, lo hasheamos antes de hacer el merge
+  //   // if (dto.password) {
+  //   const hashedPassword = await this.cryptoService.hash('1234');
+  //   // }
+  //
+  //   const updated = this.repository.merge(userToUpdate, {
+  //     ...dto,
+  //     updatedBy: updater.id,
+  //     password: hashedPassword,
+  //   });
+  //
+  //   await this.repository.save(updated);
+  //   return this.findOrThrow(publicId);
+  // }
 
   async remove(publicId: string, deleter: User): Promise<void> {
     const userToDelete = await this.findOrThrow(publicId);

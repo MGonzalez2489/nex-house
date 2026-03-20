@@ -4,6 +4,7 @@ import {
   computed,
   effect,
   inject,
+  input,
   signal,
 } from '@angular/core';
 import {
@@ -32,6 +33,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { ICreateUserForm, IUserUnitForm } from './iuser-form';
+import { UserRoleEnum } from '@nex-house/enums';
 
 @Component({
   selector: 'app-user-form-page',
@@ -62,23 +64,20 @@ export class UserFormPage {
       nonNullable: true,
       validators: [Validators.required, Validators.minLength(3)],
     }),
-    lastName: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.minLength(3)],
+    lastName: new FormControl(null, {
+      validators: [Validators.minLength(3)],
     }),
-    phone: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.minLength(3)],
+    phone: new FormControl(null, {
+      validators: [Validators.minLength(3)],
     }),
     email: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required, Validators.email],
     }),
-    unitId: new FormControl('', {
-      nonNullable: true,
+    unit: new FormControl(null, {
       validators: [Validators.required],
     }),
-    unit: new FormGroup<IUserUnitForm>({
+    newUnit: new FormGroup<IUserUnitForm>({
       streetName: new FormControl<string>('', { nonNullable: true }),
       identifier: new FormControl<string>('', { nonNullable: true }),
     }),
@@ -106,6 +105,8 @@ export class UserFormPage {
     'isFamily',
     'isTenant',
   ] as const;
+  id = input<string | undefined>();
+  isEdit = computed(() => !!this.id());
 
   suggestions = computed(() => {
     return this.unitStore.suggestions().map((f) => ({
@@ -115,6 +116,42 @@ export class UserFormPage {
   });
 
   constructor() {
+    effect(async () => {
+      const userId = this.id();
+      if (userId) {
+        const user = await this.store.findById(userId);
+
+        if (!user) return;
+        const unit = user.units ? user.units[0] : null;
+
+        if (unit) {
+          this.isNewUnit.set(false);
+
+          const unitForAutocomplete = {
+            ...unit,
+            labelFull: `${unit.street} #${unit.identifier}`,
+          };
+
+          this.form.patchValue({
+            isOwner: unit?.isOwner,
+            isFamily: unit?.isFamily,
+            isTenant: unit?.isTenant,
+            unit: unitForAutocomplete,
+          });
+        }
+
+        this.form.patchValue({
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          phone: user.phone,
+          isAdmin: user.role === UserRoleEnum.ADMIN,
+        });
+      } else {
+        this.form.reset();
+      }
+    });
+
     effect(() => {
       this.syncUnitValidators(this.isNewUnit());
     });
@@ -132,17 +169,34 @@ export class UserFormPage {
     if (this.form.invalid) return;
 
     const raw = this.form.getRawValue();
+
+    const userId = this.id();
     const payload: ICreateUser = {
-      ...raw,
-      ...(this.isNewUnit()
-        ? { streetName: raw.unit.streetName, identifier: raw.unit.identifier }
-        : { unitId: raw.unitId }),
+      firstName: raw.firstName,
+      lastName: raw.lastName ? raw.lastName : null,
+      email: raw.email,
+      phone: raw.phone,
+
+      isAdmin: raw.isAdmin,
+      isOwner: raw.isOwner,
+      isFamily: raw.isFamily,
+      isTenant: raw.isTenant,
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    delete (payload as any).unit;
+    if (raw.unit) {
+      payload.unitId = raw.unit.publicId;
+    } else if (raw.newUnit) {
+      payload.streetName = raw.newUnit.streetName;
+      payload.identifier = raw.newUnit.identifier;
+    } else {
+      alert("there's something wrong");
+    }
 
-    if (await this.store.create(payload)) {
+    const success = userId
+      ? await this.store.update(userId, payload)
+      : await this.store.create(payload);
+
+    if (success) {
       this.navigateBack();
     }
   }
@@ -168,22 +222,22 @@ export class UserFormPage {
       });
   }
   private syncUnitValidators(isNew: boolean) {
-    const { unit, unitId } = this.form.controls;
-    const { identifier, streetName } = unit.controls;
+    const { newUnit, unit } = this.form.controls;
+    const { identifier, streetName } = newUnit.controls;
 
     if (isNew) {
-      unitId.setValue('', { emitEvent: false });
-      unitId.clearValidators();
+      unit.setValue(null, { emitEvent: false });
+      unit.clearValidators();
       identifier.setValidators([Validators.required]);
       streetName.setValidators([Validators.required]);
     } else {
-      unit.patchValue({ identifier: '', streetName: '' }, { emitEvent: false });
+      unit.patchValue(null, { emitEvent: false });
       identifier.clearValidators();
       streetName.clearValidators();
-      unitId.setValidators([Validators.required]);
+      unit.setValidators([Validators.required]);
     }
 
-    [unitId, identifier, streetName].forEach((c) =>
+    [unit, identifier, streetName].forEach((c) =>
       c.updateValueAndValidity({ emitEvent: false }),
     );
     this.form.updateValueAndValidity({ emitEvent: false });

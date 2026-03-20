@@ -1,6 +1,9 @@
 export class ICreateUser {
-  email: string;
   firstName: string;
+  lastName: string | null;
+  email: string;
+  phone: string | null;
+
   unitId?: string;
   streetName?: string;
   identifier?: string;

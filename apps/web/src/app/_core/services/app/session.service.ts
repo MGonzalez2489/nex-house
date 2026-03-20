@@ -26,4 +26,8 @@ export class SessionService {
     this.authStore.logout();
     this.router.navigateByUrl(AUTH_ROUTES_ENUM.LOGIN);
   }
+  //
+  navigateTo() {
+    console.log('navigate');
+  }
 }

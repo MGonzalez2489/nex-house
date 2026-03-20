@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ModalService } from '@core/services';
 import { Search } from '@nex-house/interfaces';
 import { UserModel } from '@nex-house/models';
@@ -20,6 +20,7 @@ export class NeigUsersPage {
   protected readonly store = inject(UsersStore);
   protected readonly modalService = inject(ModalService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   addUser() {
     this.router.navigate(['new']);
@@ -29,11 +30,9 @@ export class NeigUsersPage {
     // });
   }
   updateUser(user: UserModel) {
-    // this.modalService.open(UpdateUserForm, {
-    //   header: 'Actualizar Usuario',
-    //   width: '35vw',
-    //   data: { user: user },
-    // });
+    this.router.navigate([user.publicId, 'update'], {
+      relativeTo: this.route,
+    });
   }
   removeUser(user: UserModel) {
     alert(`Remove ${user.publicId} `);
