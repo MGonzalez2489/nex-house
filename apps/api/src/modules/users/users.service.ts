@@ -272,29 +272,6 @@ export class UsersService {
     }
   }
 
-  //
-  // async update(
-  //   publicId: string,
-  //   dto: CreateUserDto,
-  //   updater: User,
-  // ): Promise<User> {
-  //   const userToUpdate = await this.findOrThrow(publicId);
-  //
-  //   // Si el DTO incluye password, lo hasheamos antes de hacer el merge
-  //   // if (dto.password) {
-  //   const hashedPassword = await this.cryptoService.hash('1234');
-  //   // }
-  //
-  //   const updated = this.repository.merge(userToUpdate, {
-  //     ...dto,
-  //     updatedBy: updater.id,
-  //     password: hashedPassword,
-  //   });
-  //
-  //   await this.repository.save(updated);
-  //   return this.findOrThrow(publicId);
-  // }
-
   async remove(publicId: string, deleter: User): Promise<void> {
     const userToDelete = await this.findOrThrow(publicId);
 

@@ -28,7 +28,6 @@ export class UserAvatar {
     '#f1f8e9',
   ];
 
-  // user = input.required<UserModel>();
   text = input<string>();
 
   avatar = computed(() => {

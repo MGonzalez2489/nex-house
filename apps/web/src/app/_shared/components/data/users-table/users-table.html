@@ -62,11 +62,9 @@
     } @case ('role') {
     <app-role-tag [role]="user.role" />
 
-    } @case ('units') {
-    <p class="font-semibold text-slate-700">{{ user.units[0]?.street }}</p>
-    <small class="text-slate-400 font-mono">
-      #{{ user.units[0]?.identifier }}</small
-    >
+    } @case ('assignments') { @let unit = user.assignments[0]?.unit;
+    <p class="font-semibold text-slate-700">{{ unit?.street }}</p>
+    <small class="text-slate-400 font-mono"> #{{ unit?.identifier }}</small>
 
     } @case ('status') {
 

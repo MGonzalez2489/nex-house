@@ -60,7 +60,7 @@ export class UsersTable {
   cols: TableColumn<UserModel>[] = [
     { field: 'fullName', header: 'Habitante' },
     { field: 'email', header: 'Contacto' },
-    { field: 'units', header: 'Unidad' },
+    { field: 'assignments', header: 'Unidad' },
     { field: 'role', header: 'Rol' },
     { field: 'status', header: 'Estatus' },
   ];

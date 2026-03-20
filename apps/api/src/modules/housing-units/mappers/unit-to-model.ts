@@ -1,19 +1,19 @@
-import { HousingUnit, UnitAssignment } from '@database/entities';
+import { HousingUnit } from '@database/entities';
 import { UnitModel } from '@nex-house/models';
+import { AssignmentArrayToModelArray } from './assignment-to-model';
 
-export function UnitEntityToModel(
-  unit: HousingUnit,
-  assignment?: UnitAssignment,
-): UnitModel {
+export function UnitEntityToModel(unit: HousingUnit): UnitModel {
   return {
     publicId: unit.publicId,
     street: unit.streetName,
     identifier: unit.identifier,
     status: unit.status,
-
-    isAssigned: !!assignment,
-    isFamily: !!assignment?.isFamily,
-    isOwner: !!assignment?.isOwner,
-    isTenant: !!assignment?.isTenant,
+    assignations: unit.assignments
+      ? AssignmentArrayToModelArray(unit.assignments)
+      : [],
   };
+}
+
+export function UnitArrayToModelArray(units: HousingUnit[]): UnitModel[] {
+  return units.map((u) => UnitEntityToModel(u));
 }

@@ -1,8 +1,9 @@
 import { HousingStatusEnum, HousingTypeEnum } from '@nex-house/enums';
 import { Exclude } from 'class-transformer';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { TraceableEntity } from './_traceable.entity';
 import { Neighborhood } from './neighborhood.entity';
+import { UnitAssignment } from './housing-assignment.entity';
 
 @Entity()
 export class HousingUnit extends TraceableEntity {
@@ -30,23 +31,10 @@ export class HousingUnit extends TraceableEntity {
   @Exclude()
   neighborhoodId: number;
 
-  // @Column({ nullable: true })
-  // @Exclude()
-  // ownerId: number;
-  //
-  // @Column({ nullable: true })
-  // @Exclude()
-  // occupantId: number;
-
   @ManyToOne(() => Neighborhood, (n) => n.units)
   @JoinColumn({ name: 'neighborhoodId' })
   neighborhood: Neighborhood;
 
-  // @ManyToOne(() => User)
-  // @JoinColumn({ name: 'ownerId' })
-  // owner: User;
-  //
-  // @ManyToOne(() => User)
-  // @JoinColumn({ name: 'occupantId' })
-  // occupant: User;
+  @OneToMany(() => UnitAssignment, (assignment) => assignment.unit)
+  assignments: UnitAssignment[];
 }

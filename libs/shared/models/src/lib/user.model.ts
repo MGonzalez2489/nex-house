@@ -1,5 +1,5 @@
 import { BaseModel } from './_base.model';
-import { UnitModel } from './unit.model';
+import { UnitAssignmentModel } from './unit-assignment.model';
 
 export class UserModel extends BaseModel {
   email: string;
@@ -8,6 +8,6 @@ export class UserModel extends BaseModel {
   lastName: string;
   fullName: string;
   phone: string;
-  units: UnitModel[];
+  assignments: UnitAssignmentModel[];
   status: string;
 }

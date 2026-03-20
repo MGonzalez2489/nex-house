@@ -10,10 +10,11 @@ import { TableLazyLoadEvent } from 'primeng/table';
 import { Table, TableColumn } from '../table/table';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
+import { UserAvatarGroup } from '@shared/components/ui';
 
 @Component({
   selector: 'app-units-table',
-  imports: [Table, ButtonModule, InputTextModule],
+  imports: [Table, ButtonModule, InputTextModule, UserAvatarGroup],
   templateUrl: './units-table.html',
   styleUrl: './units-table.css',
   standalone: true,
@@ -28,7 +29,7 @@ export class UnitsTable {
       field: 'identifier',
       header: 'Propiedad',
     },
-    { field: 'street', header: 'Calle' },
+    { field: 'assignations', header: 'Habitantes' },
   ];
   filter = output<Search>();
 

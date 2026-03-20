@@ -1,5 +1,5 @@
 import { SearchDto } from '@common/dtos';
-import { PaginatedResult, paginate, paginateQuery } from '@common/utils';
+import { PaginatedResult, paginateQuery } from '@common/utils';
 import { HousingUnit, User } from '@database/entities';
 import { NeighborhoodsService } from '@modules/neighborhoods';
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
@@ -68,6 +68,8 @@ export class HousingUnitsService {
     const query = this.repository
       .createQueryBuilder('unit')
       .leftJoinAndSelect('unit.neighborhood', 'neighborhood')
+      .leftJoinAndSelect('unit.assignments', 'assignments')
+      .leftJoinAndSelect('assignments.user', 'user')
       .where('neighborhood.publicId = :neighborhoodId', {
         neighborhoodId,
       });

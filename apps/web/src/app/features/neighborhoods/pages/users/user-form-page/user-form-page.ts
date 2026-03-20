@@ -122,20 +122,21 @@ export class UserFormPage {
         const user = await this.store.findById(userId);
 
         if (!user) return;
-        const unit = user.units ? user.units[0] : null;
+        const assignment = user.assignments ? user.assignments[0] : null;
+        const unit = user.assignments ? user.assignments[0].unit : null;
 
         if (unit) {
           this.isNewUnit.set(false);
 
           const unitForAutocomplete = {
             ...unit,
-            labelFull: `${unit.street} #${unit.identifier}`,
+            labelFull: `${assignment?.unit?.street} #${assignment?.unit?.identifier}`,
           };
 
           this.form.patchValue({
-            isOwner: unit?.isOwner,
-            isFamily: unit?.isFamily,
-            isTenant: unit?.isTenant,
+            isOwner: assignment?.isOwner,
+            isFamily: assignment?.isFamily,
+            isTenant: assignment?.isTenant,
             unit: unitForAutocomplete,
           });
         }
