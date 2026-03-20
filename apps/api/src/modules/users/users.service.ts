@@ -199,6 +199,7 @@ export class UsersService {
 
       // Si el email cambia, TypeORM lanzará error de duplicado (manejado en el catch)
       user.email = updateDto.email.toLowerCase().trim();
+      user.updatedBy = currentUser.id;
 
       await queryRunner.manager.save(user);
 
@@ -273,15 +274,45 @@ export class UsersService {
   }
 
   async remove(publicId: string, deleter: User): Promise<void> {
-    const userToDelete = await this.findOrThrow(publicId);
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    userToDelete.deletedBy = deleter.id;
+    try {
+      const userToDelete = await queryRunner.manager.findOne(User, {
+        where: { publicId },
+        relations: ['assignments'],
+      });
 
-    await this.repository.softRemove(userToDelete);
-    this.logger.log(`User ${publicId} soft-deleted by admin ${deleter.id}.`);
+      if (!userToDelete) {
+        throw new NotFoundException('Usuario no encontrado');
+      }
+
+      userToDelete.deletedBy = deleter.id;
+      await queryRunner.manager.softRemove(userToDelete);
+
+      await queryRunner.manager.update(
+        UnitAssignment,
+        { userId: userToDelete.id, isActive: true },
+        {
+          isActive: false,
+          updatedBy: deleter.id,
+        },
+      );
+
+      await queryRunner.commitTransaction();
+      this.logger.log(
+        `User ${publicId} and its assignments were deactivated by ${deleter.id}.`,
+      );
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      this.logger.error(`Failed to delete user ${publicId}`, err.stack);
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
-  //
   private async findOrThrow(publicId: string): Promise<User> {
     const user = await this.repository.findOne({ where: { publicId } });
     if (!user) {

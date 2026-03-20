@@ -1,47 +1,5 @@
 <div class="space-y-6">
   <p-card>
-    <ng-template #title>
-      <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-        <div class="block">
-          <h2 class="text-xl font-bold text-slate-800 tracking-tight">
-            Usuarios & Admins
-          </h2>
-          <p class="text-sm text-slate-500">
-            <span class="text-blue-500"
-              >{{store.pagination()?.total}} residentes</span
-            >
-            registrados
-          </p>
-        </div>
-
-        <div class="flex items-center gap-3">
-          <span class="p-input-icon-left w-full md:w-80">
-            <input
-              pInputText
-              variant="filled"
-              class="w-full"
-              placeholder="Search by name or address..."
-            />
-          </span>
-          <p-button label="Nuevo" icon="pi pi-plus" [routerLink]="['new']" />
-        </div>
-      </div>
-
-      <!-- <div class="flex justify-between items-center w-full"> -->
-      <!--   <div class="block w-full bg-red-100"> -->
-      <!--     <h2 class="text-xl font-bold text-slate-800 tracking-tight"> -->
-      <!--       Usuarios & Admins -->
-      <!--     </h2> -->
-      <!--     <p class="text-sm text-slate-500"> -->
-      <!--       <span class="text-blue-500" -->
-      <!--         >{{store.pagination()?.total}} residentes</span -->
-      <!--       > -->
-      <!--       registrados -->
-      <!--     </p> -->
-      <!--   </div> -->
-      <!--   <p-button icon="pi pi-plus" text [routerLink]="['new']" /> -->
-      <!-- </div> -->
-    </ng-template>
     <app-users-table
       [isLoading]="store.loading()"
       [users]="store.entities()"
