@@ -4,6 +4,7 @@ import { User } from '@database/entities';
 import {
   Body,
   Controller,
+  Delete,
   Get,
   InternalServerErrorException,
   NotFoundException,
@@ -83,5 +84,14 @@ export class UsersController {
     }
 
     return UserEntityToModel(result);
+  }
+
+  @Delete(':publicId')
+  async delete(
+    @Param('neighborhoodId', ParseUUIDPipe) neighborhoodId: string,
+    @Param('publicId', ParseUUIDPipe) publicId: string,
+    @CurrentUser() user: User,
+  ) {
+    return await this.usersService.remove(publicId, user);
   }
 }

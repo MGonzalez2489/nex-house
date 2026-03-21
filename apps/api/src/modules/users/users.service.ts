@@ -291,14 +291,18 @@ export class UsersService {
       userToDelete.deletedBy = deleter.id;
       await queryRunner.manager.softRemove(userToDelete);
 
-      await queryRunner.manager.update(
-        UnitAssignment,
-        { userId: userToDelete.id, isActive: true },
-        {
-          isActive: false,
-          updatedBy: deleter.id,
-        },
-      );
+      if (userToDelete.assignments?.length > 0) {
+        const activeAssignments = userToDelete.assignments.filter(
+          (a) => a.isActive,
+        );
+
+        for (const assignment of activeAssignments) {
+          assignment.isActive = false;
+          assignment.deletedBy = deleter.id;
+        }
+
+        await queryRunner.manager.softRemove(activeAssignments);
+      }
 
       await queryRunner.commitTransaction();
       this.logger.log(

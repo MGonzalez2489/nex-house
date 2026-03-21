@@ -1,14 +1,12 @@
 import { Component, inject, input, OnDestroy, OnInit } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
-import { PageHeader } from '@shared/components/ui';
 import { ContextStore } from '@stores/context.store';
 import { MenuItem } from 'primeng/api';
-import { Card } from 'primeng/card';
 import { TabsModule } from 'primeng/tabs';
 
 @Component({
   selector: 'app-neighborhood-details-page',
-  imports: [PageHeader, TabsModule, Card, RouterOutlet, RouterLink],
+  imports: [TabsModule, RouterOutlet, RouterLink],
   templateUrl: './neighborhood-details-page.html',
   styleUrl: './neighborhood-details-page.css',
 })

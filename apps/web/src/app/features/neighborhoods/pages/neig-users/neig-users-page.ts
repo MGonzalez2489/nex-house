@@ -6,20 +6,24 @@ import { UserModel } from '@nex-house/models';
 import { UsersTable } from '@shared/components/data';
 import { UsersStore } from '@stores/users.store';
 import { Card } from 'primeng/card';
+import { ConfirmationService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @Component({
   selector: 'app-neig-users-page',
-  imports: [UsersTable, Card],
+  imports: [UsersTable, Card, ConfirmDialogModule],
   templateUrl: './neig-users-page.html',
   styleUrl: './neig-users-page.css',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [ConfirmationService],
 })
 export class NeigUsersPage {
   protected readonly store = inject(UsersStore);
   protected readonly modalService = inject(ModalService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly confirmationService = inject(ConfirmationService);
 
   addUser() {
     this.router.navigate(['new'], {
@@ -32,7 +36,18 @@ export class NeigUsersPage {
     });
   }
   removeUser(user: UserModel) {
-    alert(`Remove ${user.publicId} `);
+    this.confirmationService.confirm({
+      header: 'Confirmar Eliminación',
+      message: `¿Estás seguro de que deseas eliminar a ${user.fullName}? Esta acción desactivará sus accesos a la unidad.`,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Eliminar',
+      rejectLabel: 'Cancelar',
+      acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: 'p-button-text',
+      accept: async () => {
+        await this.store.delete(user.publicId);
+      },
+    });
   }
 
   search(filters: Search): void {
