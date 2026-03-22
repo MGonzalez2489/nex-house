@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -12,6 +12,7 @@ import { DynamicDialogRef } from 'primeng/dynamicdialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { INeighborhoodsForm } from './iNeighborhoods.form';
 import { NeighborhoodsStore } from '@stores/neighborhoods.store';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-neighborhoods-form',
@@ -32,15 +33,30 @@ export class NeighborhoodsForm {
       nonNullable: true,
       validators: [Validators.required],
     }),
-    slug: new FormControl<string>('', {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
+    slug: new FormControl<string>(
+      { value: '', disabled: true },
+      {
+        nonNullable: true,
+        validators: [Validators.required],
+      },
+    ),
     address: new FormControl<string>('', {
       nonNullable: true,
       validators: [Validators.required],
     }),
   });
+
+  fName = toSignal(this.form.controls.name.valueChanges);
+
+  constructor() {
+    effect(() => {
+      const v = this.fName();
+      if (!v || v === '') return;
+
+      const n = v.replace(/\s+/g, '-');
+      this.form.controls.slug.patchValue(n);
+    });
+  }
 
   async doSubmit() {
     this.form.markAllAsTouched();
