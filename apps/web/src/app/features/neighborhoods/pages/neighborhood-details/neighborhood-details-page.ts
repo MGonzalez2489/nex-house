@@ -1,6 +1,7 @@
 import { Component, inject, input, OnDestroy, OnInit } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { UNITS_ROUTES_ENUM } from '@features/housing-unit';
+import { NEIGHBORHOODS_ROUTES_ENUM } from '@features/neighborhoods';
 import { USERS_ROUTES_ENUM } from '@features/users';
 import { ContextStore } from '@stores/context.store';
 import { MenuItem } from 'primeng/api';
@@ -19,9 +20,6 @@ export class NeighborhoodDetailsPage implements OnInit, OnDestroy {
   items: MenuItem[] | undefined;
   activeItem: MenuItem | undefined;
 
-  name = 'Quintas San Miguel';
-  slug = 'quintas-san-miguel';
-
   ngOnInit(): void {
     const cId = this.id();
     this.store.setNeighborhoodId(cId);
@@ -29,7 +27,7 @@ export class NeighborhoodDetailsPage implements OnInit, OnDestroy {
       {
         label: 'General',
         icon: 'pi pi-info-circle',
-        routerLink: 'general',
+        routerLink: NEIGHBORHOODS_ROUTES_ENUM.OVERVIEW,
       },
       {
         label: 'Casas (Unidades)',
