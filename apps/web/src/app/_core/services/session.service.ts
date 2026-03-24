@@ -1,8 +1,7 @@
 import { Injectable, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { AUTH_ROUTES_ENUM, AuthStore } from '@features/auth';
 import { UserRoleEnum } from '@nex-house/enums';
-import { AuthStore } from '@stores/auth.store';
-import { AUTH_ROUTES_ENUM } from 'src/app/features/auth/auth.routes';
 
 @Injectable({
   providedIn: 'root',

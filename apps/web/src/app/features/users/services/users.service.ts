@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
+import { RequestService } from '@core/services';
 import { ApiResponse, ICreateUser, Search } from '@nex-house/interfaces';
 import { UserModel } from '@nex-house/models';
 import { Observable } from 'rxjs';
-import { RequestService } from './request.service';
 
 @Injectable({
   providedIn: 'root',

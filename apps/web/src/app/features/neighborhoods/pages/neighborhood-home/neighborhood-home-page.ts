@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ModalService } from '@core/services';
+import { NeighborhoodsStore } from '@features/neighborhoods';
 import {
   NeighborhoodsForm,
   NeighborhoodsStats,
@@ -7,7 +8,6 @@ import {
 } from '@features/neighborhoods/components';
 import { Search } from '@nex-house/interfaces';
 import { PageHeader } from '@shared/components/ui';
-import { NeighborhoodsStore } from '@stores/neighborhoods.store';
 import { ButtonModule } from 'primeng/button';
 
 @Component({

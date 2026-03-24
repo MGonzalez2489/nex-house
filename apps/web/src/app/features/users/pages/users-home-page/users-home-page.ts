@@ -4,7 +4,7 @@ import { ModalService } from '@core/services';
 import { UsersTable } from '@features/users/components/users-table/users-table';
 import { Search } from '@nex-house/interfaces';
 import { UserModel } from '@nex-house/models';
-import { UsersStore } from '@stores/users.store';
+import { UsersStore } from '@features/users/users.store';
 import { ConfirmationService } from 'primeng/api';
 import { CardModule } from 'primeng/card';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';

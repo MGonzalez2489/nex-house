@@ -11,7 +11,7 @@ import { ButtonModule } from 'primeng/button';
 import { DynamicDialogRef } from 'primeng/dynamicdialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { INeighborhoodsForm } from './iNeighborhoods.form';
-import { NeighborhoodsStore } from '@stores/neighborhoods.store';
+import { NeighborhoodsStore } from '@features/neighborhoods/neighborhoods.store';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({

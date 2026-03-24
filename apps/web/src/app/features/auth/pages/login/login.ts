@@ -12,7 +12,6 @@ import {
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { ILogin } from '@nex-house/interfaces';
-import { AuthStore } from '@stores/auth.store';
 import { ButtonModule } from 'primeng/button';
 import { Checkbox } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
@@ -22,6 +21,7 @@ import { FormValidationError } from '@shared/components/ui';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { DASHBOARD_ROUTES_ENUM } from '@features/dashboard/dashboard.routes';
+import { AuthStore } from '@features/auth';
 
 type ILoginForm = {
   email: FormControl<string>;

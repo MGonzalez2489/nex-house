@@ -7,7 +7,6 @@ import {
   withReset,
 } from '@angular-architects/ngrx-toolkit';
 import { effect, inject } from '@angular/core';
-import { UsersService } from '@core/services';
 import { ApiPaginationMeta, ICreateUser, Search } from '@nex-house/interfaces';
 import { UserModel } from '@nex-house/models';
 import { tapResponse } from '@ngrx/operators';
@@ -29,9 +28,10 @@ import {
   withEntities,
 } from '@ngrx/signals/entities';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
+import { ContextStore } from '@stores/context.store';
 import { lastValueFrom, pipe, switchMap, tap } from 'rxjs';
-import { AuthStore } from './auth.store';
-import { ContextStore } from './context.store';
+import { UsersService } from './services';
+import { AuthStore } from '@features/auth';
 
 const config = entityConfig({
   entity: type<UserModel>(),

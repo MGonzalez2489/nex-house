@@ -33,7 +33,7 @@ import {
 } from '@ngrx/signals/entities';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { lastValueFrom, pipe, switchMap, tap } from 'rxjs';
-import { AuthStore } from './auth.store';
+import { AuthStore } from '../auth/auth.store';
 
 const config = entityConfig({
   entity: type<NeighborhoodModel>(),

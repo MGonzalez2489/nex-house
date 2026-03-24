@@ -20,7 +20,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormOptions, FormValidationError } from '@shared/components/ui';
 import { ContextStore } from '@stores/context.store';
 import { UnitsStore } from '@stores/units.store';
-import { UsersStore } from '@stores/users.store';
+import { UsersStore } from '@features/users/users.store';
 import {
   AutoCompleteCompleteEvent,
   AutoCompleteModule,
