@@ -1,20 +1,29 @@
-<div class="flex justify-between items-center pb-4">
+<div
+  class="flex flex-col md:flex-row gap-3 justify-between md:items-center pb-4"
+>
   <app-page-header
-    title="Fraccionamientos"
+    title="Areas Residenciales"
     subTitle="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore..."
   />
 
-  <p-button label="Nuevo" icon="pi pi-plus" (click)="addNeighborhoods()" />
+  <p-button
+    label="Nueva area residencial"
+    fluid
+    icon="pi pi-plus"
+    (click)="addNeighborhoods()"
+  />
 </div>
 
-<div class="space-y-4">
-  <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    <app-neighborhoods-stats />
-    <app-neighborhoods-stats />
-    <app-neighborhoods-stats />
-  </section>
+<div class="space-y-6">
+  <app-neighborhoods-stats class="block" />
+
+  <app-neighborhoods-list
+    class="block md:hidden"
+    [isLoading]="store.loading()"
+    [data]="store.entities()"
+  />
   <app-neighborhoods-table
-    class="block"
+    class="hidden md:block"
     (filter)="search($event)"
     [isLoading]="store.loading()"
     [data]="store.entities()"

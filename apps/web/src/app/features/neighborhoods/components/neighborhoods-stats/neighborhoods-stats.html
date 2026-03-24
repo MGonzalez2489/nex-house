@@ -1,11 +1,49 @@
-<p-card>
-  <div class="flex items-center gap-4">
-    <div class="p-3 bg-blue-50 text-blue-600 rounded-xl">
-      <i class="pi pi-map text-xl"></i>
+<section class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
+  <!-- Total Residents -->
+  <p-card class="bg-transparent">
+    <ng-template #header>
+      <div class="px-4 pt-4">
+        <p class="text-sm">Residentes totales</p>
+      </div>
+    </ng-template>
+    <div class="flex justify-between md:items-center">
+      <h3
+        class="text-lg md:text-4xl font-extrabold text-blue-800 tracking-tight"
+      >
+        2,482
+      </h3>
+      <div class="text-blue-600/5">
+        <span class="pi pi-users md:text-9xl" data-icon="groups"></span>
+      </div>
     </div>
-    <div>
-      <p class="text-sm text-slate-500 font-medium">Fraccionamientos</p>
-      <h3 class="text-2xl font-bold text-slate-900">24</h3>
+  </p-card>
+  <!--  -->
+  <p-card class="bg-transparent">
+    <ng-template #header>
+      <div class="px-4 pt-4">
+        <p class="text-sm">Residentes totales</p>
+      </div>
+    </ng-template>
+    <div class="flex justify-between md:items-center">
+      <h3
+        class="text-lg md:text-4xl font-extrabold text-blue-800 tracking-tight"
+      >
+        2,482
+      </h3>
+      <div class="text-blue-600/5">
+        <span class="pi pi-users md:text-9xl" data-icon="groups"></span>
+      </div>
     </div>
-  </div>
-</p-card>
+  </p-card>
+  <!-- Otros-->
+  <p-card header="Residentes totales" class="hidden md:block bg-transparent">
+    <div class="flex justify-between items-center">
+      <h3 class="text-4xl font-extrabold text-blue-800 tracking-tight">
+        2,482
+      </h3>
+      <div class="text-blue-600/5">
+        <span class="pi pi-users text-9xl" data-icon="groups"></span>
+      </div>
+    </div>
+  </p-card>
+</section>

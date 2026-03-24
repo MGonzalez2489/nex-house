@@ -1,28 +1,27 @@
 <header
-  class="bg-white border-b h-16 flex items-center justify-between px-4 lg:px-8"
+  class="bg-white/80 border-b border-slate-200 h-16 flex items-center justify-between lg:justify-end px-4 lg:px-8"
 >
-  <div class="flex items-center">
-    <p-button
-      icon="pi pi-bars"
-      class="lg:hidden"
-      [text]="true"
-      (onClick)="toggleSidebar.emit()"
-    >
-    </p-button>
-  </div>
+  <p-button
+    icon="pi pi-bars"
+    severity="secondary"
+    text
+    class="lg:hidden"
+    (click)="toggleSidebar.emit()"
+  />
 
-  <div class="flex items-center gap-2">
-    @if(user(); as user){
-    <app-user-avatar [text]="user.fullName" />
-    }
+  <div class="flex items-center gap-4">
+    <div class="hidden md:block">
+      <p-button icon="pi pi-bell" severity="secondary" text />
+      <p-button icon="pi pi-question-circle" severity="secondary" text />
+    </div>
 
-    <p-button
-      icon="pi pi-sign-out"
-      severity="danger"
-      [rounded]="true"
-      [text]="true"
-      (click)="logout.emit()"
-    >
-    </p-button>
+    <div class="h-8 w-px bg-slate-200 mx-2 hidden md:block"></div>
+    <div class="flex items-center gap-3 pl-2">
+      @if(user(); as user){
+      <app-user-avatar [text]="user.fullName" />
+
+      <span class="text-sm hidden lg:block">{{user.email}}</span>
+      }
+    </div>
   </div>
 </header>

@@ -3,6 +3,7 @@ import { ModalService } from '@core/services';
 import { NeighborhoodsStore } from '@features/neighborhoods';
 import {
   NeighborhoodsForm,
+  NeighborhoodsList,
   NeighborhoodsStats,
   NeighborhoodsTable,
 } from '@features/neighborhoods/components';
@@ -12,7 +13,13 @@ import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'app-neighborhood-home-page',
-  imports: [PageHeader, NeighborhoodsStats, NeighborhoodsTable, ButtonModule],
+  imports: [
+    PageHeader,
+    NeighborhoodsStats,
+    ButtonModule,
+    NeighborhoodsTable,
+    NeighborhoodsList,
+  ],
   templateUrl: './neighborhood-home-page.html',
   styleUrl: './neighborhood-home-page.css',
   standalone: true,

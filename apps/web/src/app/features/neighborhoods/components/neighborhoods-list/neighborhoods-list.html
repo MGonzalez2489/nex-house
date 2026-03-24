@@ -1,0 +1,22 @@
+@for(n of data(); track n.publicId){
+<p-card [routerLink]="[n.publicId]">
+  <div class="flex justify-between">
+    <div class="flex items-center gap-2">
+      <div
+        class="w-12 h-12 rounded-lg bg-blue-600/10 flex items-center justify-center shrink-0"
+      >
+        <span class="text-blue-600 text-xl pi pi-building font-semibold"></span>
+      </div>
+      <div class="flex flex-col justify-center">
+        <h3 class="font-semibold text-slate-500 capitalize">{{n.name}}</h3>
+        <p class="text-xs font-medium capitalize text-slate-500">
+          {{n.address}}
+        </p>
+      </div>
+    </div>
+    <div class="flex flex-col justify-center">
+      <i class="pi pi-chevron-right text-slate-400"></i>
+    </div>
+  </div>
+</p-card>
+}

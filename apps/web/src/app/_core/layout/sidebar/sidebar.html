@@ -18,11 +18,6 @@
       }
     </nav>
 
-    <div
-      class="p-4 bg-slate-50 border border-dashed border-slate-200 rounded-md m-2"
-    >
-      <p class="text-sm font-semibold text-gray-900">{{ user()?.email }}</p>
-      <p class="text-xs text-gray-500">{{ user()?.role }}</p>
-    </div>
+    <p-panelMenu [model]="footerItems()" [pt]="{ root: '',panel:'border-0' }" />
   </div>
 </div>

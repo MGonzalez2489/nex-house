@@ -1,10 +1,10 @@
 import { CryptoService } from '@common/services';
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserRoleEnum } from '@nex-house/enums';
 import { Repository } from 'typeorm';
-import { User } from './entities';
-import { ConfigService } from '@nestjs/config';
+import { Neighborhood, User } from './entities';
 
 @Injectable()
 export class DatabaseSeederService implements OnApplicationBootstrap {
@@ -13,6 +13,8 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Neighborhood)
+    private readonly neighRepository: Repository<Neighborhood>,
     private readonly cryptoService: CryptoService,
     private readonly configService: ConfigService,
   ) {}
@@ -21,6 +23,8 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
     try {
       this.seedSuperAdmin();
       this.logger.log('Sembrado completado exitosamente.');
+
+      this.seedTestData();
     } catch (error) {
       this.logger.error('Error durante el sembrado:', error.message);
     }
@@ -54,5 +58,23 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
     } else {
       this.logger.log('Super Admin ya existe en la base de datos.');
     }
+  }
+
+  private async seedTestData() {
+    const testNeigh = {
+      name: 'Fraccionamiento Prueba',
+      slug: 'fraccionamiento-prueba',
+      address: 'av siempre viva',
+    };
+    if (
+      await this.neighRepository.exists({ where: { name: testNeigh.name } })
+    ) {
+      this.logger.log('Test data already exists.');
+      return;
+    }
+
+    this.logger.log('Setting up test data.');
+    const neighborhood = this.neighRepository.create(testNeigh);
+    await this.neighRepository.save(neighborhood);
   }
 }
