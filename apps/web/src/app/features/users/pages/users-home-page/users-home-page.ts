@@ -1,24 +1,24 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { ModalService } from '@core/services';
+import { UsersTable } from '@features/users/components/users-table/users-table';
 import { Search } from '@nex-house/interfaces';
 import { UserModel } from '@nex-house/models';
-import { UsersTable } from '@shared/components/data';
 import { UsersStore } from '@stores/users.store';
-import { Card } from 'primeng/card';
 import { ConfirmationService } from 'primeng/api';
+import { CardModule } from 'primeng/card';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @Component({
-  selector: 'app-neig-users-page',
-  imports: [UsersTable, Card, ConfirmDialogModule],
-  templateUrl: './neig-users-page.html',
-  styleUrl: './neig-users-page.css',
+  selector: 'app-users-home-page',
+  imports: [UsersTable, ConfirmDialogModule, CardModule],
+  templateUrl: './users-home-page.html',
+  styleUrl: './users-home-page.css',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [ConfirmationService],
 })
-export class NeigUsersPage {
+export class UsersHomePage {
   protected readonly store = inject(UsersStore);
   protected readonly modalService = inject(ModalService);
   private readonly router = inject(Router);

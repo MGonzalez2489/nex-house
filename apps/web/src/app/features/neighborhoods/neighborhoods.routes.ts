@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { USERS_ROUTES_ENUM } from '@features/users';
 
 export enum NEIGHBORHOODS_ROUTES_ENUM {
   HOME = '',
@@ -33,26 +34,13 @@ export const NEIGHBORHOODS_ROUTES: Routes = [
               ),
           },
           {
-            path: 'users',
-            loadComponent: () =>
-              import('./pages/neig-users/neig-users-page').then(
-                (c) => c.NeigUsersPage,
+            path: USERS_ROUTES_ENUM.HOME,
+            loadChildren: () =>
+              import('@features/users/users.routes').then(
+                (c) => c.USERS_ROUTES,
               ),
           },
-          {
-            path: 'users/new',
-            loadComponent: () =>
-              import('./pages/users/user-form-page/user-form-page').then(
-                (c) => c.UserFormPage,
-              ),
-          },
-          {
-            path: 'users/:id/update',
-            loadComponent: () =>
-              import('./pages/users/user-form-page/user-form-page').then(
-                (c) => c.UserFormPage,
-              ),
-          },
+
           {
             path: 'units',
             loadComponent: () =>
@@ -67,7 +55,11 @@ export const NEIGHBORHOODS_ROUTES: Routes = [
           },
         ],
       },
-      { path: '', redirectTo: 'login', pathMatch: 'full' },
+      {
+        path: '',
+        redirectTo: NEIGHBORHOODS_ROUTES_ENUM.HOME,
+        pathMatch: 'full',
+      },
     ],
   },
 ];

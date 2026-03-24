@@ -1,5 +1,6 @@
 import { Route } from '@angular/router';
 import { authGuard } from '@core/guards/auth.guard';
+import { USERS_ROUTES_ENUM } from '@features/users';
 
 export const appRoutes: Route[] = [
   //public routes
@@ -18,7 +19,11 @@ export const appRoutes: Route[] = [
     canActivate: [authGuard],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-
+      {
+        path: USERS_ROUTES_ENUM.HOME,
+        loadChildren: () =>
+          import('./features/users/users.routes').then((r) => r.USERS_ROUTES),
+      },
       {
         path: 'dashboard',
         loadChildren: () =>

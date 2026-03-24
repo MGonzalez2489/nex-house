@@ -12,7 +12,10 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { RoleTag } from '../role-tag/role-tag';
-import { Table, TableColumn } from '../table/table';
+import {
+  Table,
+  TableColumn,
+} from '../../../../_shared/components/data/table/table';
 import { UserStatusTag } from '../user-status-tag/user-status-tag';
 import { BadgeModule } from 'primeng/badge';
 
