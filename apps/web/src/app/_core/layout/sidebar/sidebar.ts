@@ -13,7 +13,7 @@ export class Sidebar {
   menuItems = signal([
     { label: 'Dashboard', path: '/dashboard', icon: 'pi pi-chart-bar' },
     { label: 'Neighborhoods', path: '/neighborhoods', icon: 'pi pi-map' },
-    { label: 'Housing Units', path: '/units', icon: 'pi pi-home' },
+    // { label: 'Housing Units', path: '/units', icon: 'pi pi-home' },
     // { label: 'Users', path: '/users', icon: 'pi pi-users' },
   ]);
 }

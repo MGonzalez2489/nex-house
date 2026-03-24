@@ -7,7 +7,10 @@ import {
 import { ApiPaginationMeta, Search } from '@nex-house/interfaces';
 import { UnitModel } from '@nex-house/models';
 import { TableLazyLoadEvent } from 'primeng/table';
-import { Table, TableColumn } from '../table/table';
+import {
+  Table,
+  TableColumn,
+} from '../../../../_shared/components/data/table/table';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { UserAvatarGroup } from '@shared/components/ui';

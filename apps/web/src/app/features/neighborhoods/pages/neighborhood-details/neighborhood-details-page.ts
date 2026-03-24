@@ -1,5 +1,6 @@
 import { Component, inject, input, OnDestroy, OnInit } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
+import { UNITS_ROUTES_ENUM } from '@features/housing-unit';
 import { USERS_ROUTES_ENUM } from '@features/users';
 import { ContextStore } from '@stores/context.store';
 import { MenuItem } from 'primeng/api';
@@ -33,7 +34,7 @@ export class NeighborhoodDetailsPage implements OnInit, OnDestroy {
       {
         label: 'Casas (Unidades)',
         icon: 'pi pi-home',
-        routerLink: 'units',
+        routerLink: UNITS_ROUTES_ENUM.HOME,
       },
       {
         label: 'Usuarios & Admins',

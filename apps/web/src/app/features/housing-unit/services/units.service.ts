@@ -7,7 +7,7 @@ import {
 } from '@nex-house/interfaces';
 import { UnitModel } from '@nex-house/models';
 import { Observable } from 'rxjs';
-import { RequestService } from './request.service';
+import { RequestService } from '../../../_core/services/request.service';
 
 @Injectable({
   providedIn: 'root',

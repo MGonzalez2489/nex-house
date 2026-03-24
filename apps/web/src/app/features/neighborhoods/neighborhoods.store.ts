@@ -7,7 +7,6 @@ import {
   withReset,
 } from '@angular-architects/ngrx-toolkit';
 import { effect, inject } from '@angular/core';
-import { NeighborhoodService } from '@features/neighborhoods';
 import {
   ApiPaginationMeta,
   ICreateNeighborhood,
@@ -34,6 +33,7 @@ import {
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { lastValueFrom, pipe, switchMap, tap } from 'rxjs';
 import { AuthStore } from '../auth/auth.store';
+import { NeighborhoodService } from './services';
 
 const config = entityConfig({
   entity: type<NeighborhoodModel>(),

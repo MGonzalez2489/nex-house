@@ -29,11 +29,11 @@ import {
   setAllEntities,
   withEntities,
 } from '@ngrx/signals/entities';
-import { ContextStore } from './context.store';
-import { UnitsService } from '@core/services';
+import { ContextStore } from '../../stores/context.store';
 import { tapResponse } from '@ngrx/operators';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { pipe, tap, switchMap, lastValueFrom } from 'rxjs';
+import { UnitsService } from './services';
 
 const config = entityConfig({
   entity: type<UnitModel>(),

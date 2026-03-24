@@ -18,7 +18,7 @@ import {
   ICreateHousingUnit,
 } from '@nex-house/interfaces';
 import { FormOptions, FormValidationError } from '@shared/components/ui';
-import { UnitsStore } from '@stores/units.store';
+import { UnitsStore } from '@features/housing-unit/units.store';
 import { DynamicDialogRef } from 'primeng/dynamicdialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';

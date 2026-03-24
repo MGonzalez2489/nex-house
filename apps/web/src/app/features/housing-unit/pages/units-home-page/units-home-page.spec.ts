@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { NeigUnitsPage } from './neig-units-page';
+import { UnitsHomePage } from './units-home-page';
 
-describe('NeigUnitsPage', () => {
-  let component: NeigUnitsPage;
-  let fixture: ComponentFixture<NeigUnitsPage>;
+describe('UnitsHomePage', () => {
+  let component: UnitsHomePage;
+  let fixture: ComponentFixture<UnitsHomePage>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [NeigUnitsPage],
+      imports: [UnitsHomePage],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(NeigUnitsPage);
+    fixture = TestBed.createComponent(UnitsHomePage);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

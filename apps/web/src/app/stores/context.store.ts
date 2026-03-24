@@ -6,7 +6,7 @@ import {
   withReset,
 } from '@angular-architects/ngrx-toolkit';
 import { effect, inject } from '@angular/core';
-import { NeighborhoodService } from '@features/neighborhoods';
+import { NeighborhoodService } from '@features/neighborhoods/services';
 import { NeighborhoodModel } from '@nex-house/models';
 import { tapResponse } from '@ngrx/operators';
 import {

@@ -19,7 +19,7 @@ import { ICreateUser } from '@nex-house/interfaces';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormOptions, FormValidationError } from '@shared/components/ui';
 import { ContextStore } from '@stores/context.store';
-import { UnitsStore } from '@stores/units.store';
+import { UnitsStore } from '@features/housing-unit/units.store';
 import { UsersStore } from '@features/users/users.store';
 import {
   AutoCompleteCompleteEvent,
