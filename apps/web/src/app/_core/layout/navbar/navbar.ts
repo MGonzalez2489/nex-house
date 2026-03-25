@@ -4,7 +4,7 @@ import {
   input,
   output,
 } from '@angular/core';
-import { UserModel } from '@nex-house/models';
+import { NeighborhoodModel, UserModel } from '@nex-house/models';
 import { ButtonModule } from 'primeng/button';
 import { MenuModule } from 'primeng/menu';
 
@@ -21,6 +21,7 @@ import { RolePipe } from '@shared/pipes';
 })
 export class Navbar {
   user = input<UserModel>();
+  neighborhood = input<NeighborhoodModel>();
   toggleSidebar = output();
   logout = output();
 }

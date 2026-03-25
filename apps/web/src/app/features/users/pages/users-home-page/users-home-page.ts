@@ -8,10 +8,11 @@ import { UsersStore } from '@features/users/users.store';
 import { ConfirmationService } from 'primeng/api';
 import { CardModule } from 'primeng/card';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { PageHeader } from '@shared/components/ui';
 
 @Component({
   selector: 'app-users-home-page',
-  imports: [UsersTable, ConfirmDialogModule, CardModule],
+  imports: [UsersTable, ConfirmDialogModule, CardModule, PageHeader],
   templateUrl: './users-home-page.html',
   styleUrl: './users-home-page.css',
   standalone: true,

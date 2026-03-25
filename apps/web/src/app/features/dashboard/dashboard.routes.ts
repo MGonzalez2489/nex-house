@@ -6,8 +6,12 @@ export enum DASHBOARD_ROUTES_ENUM {
 
 export const DASHBOARD_ROUTES: Routes = [
   {
-    path: DASHBOARD_ROUTES_ENUM.HOME,
+    path: '',
     loadComponent: () =>
       import('./dashboard-container').then((c) => c.DashboardContainer),
+  },
+  {
+    path: '**',
+    redirectTo: '',
   },
 ];
