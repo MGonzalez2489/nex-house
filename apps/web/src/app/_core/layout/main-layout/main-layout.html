@@ -25,7 +25,15 @@
 
     <main class="flex-1 relative overflow-y-auto focus:outline-none p-4 lg:p-8">
       <div class="max-w-7xl mx-auto">
+        @if(loadingContext()){
+        <div class="h-[80vh] flex flex-col justify-center items-center gap-5">
+          <p-progress-spinner ariaLabel="loading" />
+          <p class="text-slate-700">Loading...</p>
+        </div>
+        } @else{
+
         <router-outlet></router-outlet>
+        }
       </div>
     </main>
   </div>

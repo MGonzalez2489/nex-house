@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 
 export enum DASHBOARD_ROUTES_ENUM {
-  HOME = '',
+  HOME = 'dashboard',
 }
 
 export const DASHBOARD_ROUTES: Routes = [

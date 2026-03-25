@@ -1,34 +1,87 @@
-import { Component, input, output, signal } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, effect, input, output, signal } from '@angular/core';
+import { DASHBOARD_ROUTES_ENUM } from '@features/dashboard';
+import { NEIGHBORHOODS_ROUTES_ENUM } from '@features/neighborhoods';
+import { USERS_ROUTES_ENUM } from '@features/users';
+import { UserRoleEnum } from '@nex-house/enums';
 import { UserModel } from '@nex-house/models';
+import { MenuItem } from 'primeng/api';
 import { PanelMenuModule } from 'primeng/panelmenu';
 
 @Component({
   selector: 'app-sidebar',
-  imports: [RouterLink, RouterLinkActive, PanelMenuModule],
+  imports: [PanelMenuModule],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',
 })
 export class Sidebar {
   user = input<UserModel>();
   logout = output();
-  menuItems = signal([
-    { label: 'Dashboard', path: '/dashboard', icon: 'pi pi-chart-bar' },
-    {
-      label: 'Areas Residenciales',
-      path: '/neighborhoods',
-      icon: 'pi pi-building',
-    },
-    // { label: 'Housing Units', path: '/units', icon: 'pi pi-home' },
-    // { label: 'Users', path: '/users', icon: 'pi pi-users' },
-  ]);
+  menuItems = signal<MenuItem[]>([]);
+
+  constructor() {
+    effect(() => {
+      const cUser = this.user();
+      if (!cUser) return;
+
+      const menuItems =
+        cUser.role === UserRoleEnum.SUPER_ADMIN
+          ? this.createRootUserMenu()
+          : cUser.role === UserRoleEnum.ADMIN
+            ? this.createAdminUserMenu()
+            : [];
+
+      this.menuItems.set(menuItems);
+    });
+  }
 
   footerItems = signal([
     { label: 'Centro de Ayuda', path: '', icon: 'pi pi-question-circle' },
     {
       label: 'Cerrar Sesion',
       icon: 'pi pi-sign-out',
+      routerLinkActiveOptions: {
+        exact: true,
+      },
       command: (): void => this.logout.emit(),
     },
   ]);
+
+  private createRootUserMenu(): MenuItem[] {
+    return [
+      {
+        label: 'Dashboard',
+        routerLink: `/${DASHBOARD_ROUTES_ENUM.HOME}`,
+        routerLinkActiveOptions: {
+          exact: true,
+        },
+        icon: 'pi pi-chart-bar',
+      },
+      {
+        label: 'Areas Residenciales',
+        routerLink: NEIGHBORHOODS_ROUTES_ENUM.HOME,
+        routerLinkActiveOptions: {
+          exact: true,
+        },
+        path: '/neighborhoods',
+        icon: 'pi pi-building',
+      },
+    ];
+  }
+  private createAdminUserMenu() {
+    return [
+      {
+        label: 'Dashboard',
+        routerLink: `/${DASHBOARD_ROUTES_ENUM.HOME}`,
+        icon: 'pi pi-chart-bar',
+      },
+      {
+        label: 'Usuarios',
+        routerLink: USERS_ROUTES_ENUM.HOME,
+        icon: 'pi pi-users',
+        routerLinkActiveOptions: {
+          exact: true,
+        },
+      },
+    ];
+  }
 }

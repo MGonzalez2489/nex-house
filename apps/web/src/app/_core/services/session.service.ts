@@ -1,13 +1,15 @@
-import { Injectable, computed, inject } from '@angular/core';
+import { Injectable, computed, effect, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AUTH_ROUTES_ENUM, AuthStore } from '@features/auth';
 import { UserRoleEnum } from '@nex-house/enums';
+import { ContextStore } from '@stores/context.store';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SessionService {
-  private authStore = inject(AuthStore);
+  private readonly authStore = inject(AuthStore);
+  private readonly contextStore = inject(ContextStore);
   private router = inject(Router);
 
   readonly user = computed(() => this.authStore.user());
@@ -20,6 +22,16 @@ export class SessionService {
   readonly isResident = computed(
     () => this.user()?.role === UserRoleEnum.RESIDENT,
   );
+
+  constructor() {
+    effect(() => {
+      const cUser = this.user();
+      const cSelContext = this.contextStore.selectedId();
+      if (cUser && cUser.neighborhoodId && !cSelContext) {
+        this.contextStore.setNeighborhoodId(cUser.neighborhoodId);
+      }
+    });
+  }
 
   logout() {
     this.authStore.logout();

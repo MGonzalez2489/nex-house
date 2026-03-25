@@ -10,4 +10,5 @@ export class UserModel extends BaseModel {
   phone: string;
   assignments: UnitAssignmentModel[];
   status: string;
+  neighborhoodId?: string;
 }

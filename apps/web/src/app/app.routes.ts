@@ -1,5 +1,6 @@
 import { Route } from '@angular/router';
 import { authGuard } from '@core/guards/auth.guard';
+import { DASHBOARD_ROUTES_ENUM } from '@features/dashboard';
 import { UNITS_ROUTES_ENUM } from '@features/housing-unit';
 import { NEIGHBORHOODS_ROUTES_ENUM } from '@features/neighborhoods';
 import { USERS_ROUTES_ENUM } from '@features/users';
@@ -23,7 +24,7 @@ export const appRoutes: Route[] = [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
 
       {
-        path: 'dashboard',
+        path: DASHBOARD_ROUTES_ENUM.HOME,
         loadChildren: () =>
           import('./features/dashboard/dashboard.routes').then(
             (m) => m.DASHBOARD_ROUTES,

@@ -83,6 +83,7 @@ export class UsersService {
   async findByEmail(email: string): Promise<User | null> {
     const result = await this.repository.findOne({
       where: { email },
+      relations: ['neighborhood', 'assignments', 'assignments.unit'],
     });
     return result;
   }

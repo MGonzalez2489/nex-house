@@ -31,6 +31,7 @@ export class CreateUserDto implements ICreateUser {
   @IsString()
   @IsOptional()
   lastName: string;
+
   @IsOptional()
   phone: string;
 }

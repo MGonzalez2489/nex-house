@@ -12,7 +12,7 @@ import {
   UsersModule,
 } from '@modules/index';
 import { DatabaseSeederService } from '@database/index';
-import { Neighborhood, User } from '@database/entities';
+import { HousingUnit, Neighborhood, User } from '@database/entities';
 import { CryptoService } from '@common/services';
 import { JwtAuthGuard } from '@modules/auth/guards';
 import { APP_GUARD } from '@nestjs/core';
@@ -27,7 +27,7 @@ import { APP_GUARD } from '@nestjs/core';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => getDatabaseConfig(config),
     }),
-    TypeOrmModule.forFeature([User, Neighborhood]),
+    TypeOrmModule.forFeature([User, Neighborhood, HousingUnit]),
     AuthModule,
     NeighborhoodsModule,
     FinanceModule,

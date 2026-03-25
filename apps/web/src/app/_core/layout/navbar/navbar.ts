@@ -9,10 +9,11 @@ import { ButtonModule } from 'primeng/button';
 import { MenuModule } from 'primeng/menu';
 
 import { UserAvatar } from '@shared/components/ui';
+import { RolePipe } from '@shared/pipes';
 
 @Component({
   selector: 'app-navbar',
-  imports: [ButtonModule, MenuModule, UserAvatar],
+  imports: [ButtonModule, MenuModule, UserAvatar, RolePipe],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
   standalone: true,

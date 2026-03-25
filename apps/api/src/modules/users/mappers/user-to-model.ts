@@ -15,5 +15,6 @@ export function UserEntityToModel(user: User): UserModel {
     phone: user.phone,
     assignments: AssignmentArrayToModelArray(assignments),
     status: user.status,
+    neighborhoodId: user.neighborhood?.publicId,
   };
 }
