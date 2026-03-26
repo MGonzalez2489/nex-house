@@ -1,10 +1,11 @@
 import { Component, computed, input } from '@angular/core';
 import { UserModel } from '@nex-house/models';
+import { ButtonModule } from 'primeng/button';
 import { Card } from 'primeng/card';
 
 @Component({
   selector: 'app-user-unit-card',
-  imports: [Card],
+  imports: [Card, ButtonModule],
   templateUrl: './user-unit-card.html',
   styleUrl: './user-unit-card.css',
 })

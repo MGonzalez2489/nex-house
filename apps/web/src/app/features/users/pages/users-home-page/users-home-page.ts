@@ -8,6 +8,7 @@ import { SearchUser } from '@nex-house/interfaces';
 import { UserModel } from '@nex-house/models';
 import { PageHeader } from '@shared/components/ui';
 import { ConfirmationService } from 'primeng/api';
+import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
@@ -20,6 +21,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
     UsersFilters,
     UsersTable,
     UsersList,
+    ButtonModule,
   ],
   templateUrl: './users-home-page.html',
   styleUrl: './users-home-page.css',

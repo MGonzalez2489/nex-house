@@ -1,10 +1,18 @@
 <p-confirmDialog />
-<div class="space-y-6">
-  <app-page-header
-    class="block"
-    title="Usuarios & Admins"
-    subTitle=" Gestión centralizada de residentes y administradores del fraccionamiento, permitiendo el control de roles y estados de registro."
-  />
+<div class="space-y-6 pb-25 md:pb-0">
+  <div class="flex items-center justify-between">
+    <app-page-header
+      class="block"
+      title="Usuarios & Admins"
+      subTitle=" Gestión centralizada de residentes y administradores del fraccionamiento, permitiendo el control de roles y estados de registro."
+    />
+    <p-button
+      label="Nuevo Usuario"
+      icon="pi pi-plus"
+      class="hidden md:block"
+      (click)="addUser()"
+    />
+  </div>
   <app-users-filters class="block" (filter)="search($event)" />
 
   <app-users-list
@@ -22,4 +30,12 @@
       (inspect)="inspect($event)"
     />
   </p-card>
+
+  <p-button
+    icon="pi pi-plus"
+    (click)="addUser()"
+    rounded
+    size="large"
+    class="fixed z-1000 bottom-15 right-10 md:hidden"
+  />
 </div>

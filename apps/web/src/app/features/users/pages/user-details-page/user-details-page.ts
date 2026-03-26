@@ -1,4 +1,5 @@
 import { Component, inject, input, OnInit, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { UserCard, UserUnitCard } from '@features/users/components';
 import { UsersStore } from '@features/users/users.store';
 import { UserModel } from '@nex-house/models';
@@ -6,7 +7,7 @@ import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'app-user-details-page',
-  imports: [ButtonModule, UserUnitCard, UserCard],
+  imports: [ButtonModule, UserUnitCard, UserCard, RouterLink],
   templateUrl: './user-details-page.html',
   styleUrl: './user-details-page.css',
 })
