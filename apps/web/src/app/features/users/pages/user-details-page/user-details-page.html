@@ -1,1 +1,29 @@
-<p>user-details-page works!</p>
+<!-- Header Actions -->
+<div class="flex items-end justify-between mb-12">
+  <div>
+    <nav
+      class="flex items-center space-x-2 text-on-surface-variant text-sm mb-2"
+    >
+      <span>Residentes</span>
+      <span class="pi pi-chevron-right text-xs"></span>
+      <span class="font-semibold text-blue-600">Detalle</span>
+    </nav>
+    <h1
+      class="text-4xl font-extrabold tracking-tight text-on-surface font-headline"
+    >
+      {{user()?.fullName}}
+    </h1>
+  </div>
+  <div class="flex items-center space-x-3">
+    <p-button label="Editar" variant="outlined" />
+    <p-button label="Borrar Usuario" severity="danger" variant="outlined" />
+  </div>
+</div>
+<!-- Bento Grid Content -->
+<div class="grid grid-cols-12 gap-6">
+  <!-- Profile Section -->
+  @if(user(); as user){
+  <app-user-card [user]="user" class="col-span-12 lg:col-span-8" />
+  <app-user-unit-card class="col-span-12 lg:col-span-4" [user]="user" />
+  }
+</div>

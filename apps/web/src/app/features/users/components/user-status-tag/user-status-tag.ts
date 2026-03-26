@@ -19,6 +19,8 @@ export class UserStatusTag {
   status = input.required<string>();
   mode = input<'tag' | 'label'>('tag');
 
+  size = input<'small' | 'normal' | 'large'>('normal');
+
   label = computed(() => {
     const cStatus = this.status();
     let label = 'Desconocido';

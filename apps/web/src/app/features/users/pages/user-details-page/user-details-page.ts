@@ -1,9 +1,27 @@
-import { Component } from '@angular/core';
+import { Component, inject, input, OnInit, signal } from '@angular/core';
+import { UserCard, UserUnitCard } from '@features/users/components';
+import { UsersStore } from '@features/users/users.store';
+import { UserModel } from '@nex-house/models';
+import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'app-user-details-page',
-  imports: [],
+  imports: [ButtonModule, UserUnitCard, UserCard],
   templateUrl: './user-details-page.html',
   styleUrl: './user-details-page.css',
 })
-export class UserDetailsPage {}
+export class UserDetailsPage implements OnInit {
+  protected readonly id = input.required<string>();
+  protected readonly store = inject(UsersStore);
+  protected readonly user = signal<UserModel | null>(null);
+
+  ngOnInit(): void {
+    this.getUserById(this.id());
+  }
+
+  private async getUserById(id: string) {
+    const cUser = await this.store.findById(id);
+
+    this.user.set(cUser);
+  }
+}

@@ -89,6 +89,11 @@ export const UsersStore = signalStore(
       const nId = store._contextStore.selectedId();
       if (!nId) return null;
 
+      const existingUser = store.entities().find((f) => f.publicId === id);
+      if (existingUser) {
+        return existingUser;
+      }
+
       try {
         patchState(store, setLoading());
         const response = await lastValueFrom(
