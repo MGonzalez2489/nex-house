@@ -17,6 +17,8 @@ import { TagModule } from 'primeng/tag';
 })
 export class RoleTag {
   role = input.required<string>();
+  size = input<'small' | 'normal' | 'large'>('normal');
+  rounded = input<boolean>(false);
 
   severity = computed(() => {
     if (this.role() === UserRoleEnum.ADMIN) return 'info';

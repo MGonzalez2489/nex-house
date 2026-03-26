@@ -30,6 +30,8 @@ export class UserAvatar {
 
   text = input<string>();
 
+  size = input<'normal' | 'large' | 'xlarge' | undefined>('normal');
+
   avatar = computed(() => {
     const text = this.text() || '';
     if (!text || text === '') return 'N/A';

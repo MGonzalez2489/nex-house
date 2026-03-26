@@ -17,6 +17,7 @@ import { TagModule } from 'primeng/tag';
 })
 export class UserStatusTag {
   status = input.required<string>();
+  mode = input<'tag' | 'label'>('tag');
 
   label = computed(() => {
     const cStatus = this.status();

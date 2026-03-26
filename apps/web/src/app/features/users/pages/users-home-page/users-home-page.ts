@@ -1,18 +1,26 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ModalService } from '@core/services';
+import { UsersFilters, UsersList } from '@features/users/components';
 import { UsersTable } from '@features/users/components/users-table/users-table';
-import { Search } from '@nex-house/interfaces';
-import { UserModel } from '@nex-house/models';
 import { UsersStore } from '@features/users/users.store';
+import { SearchUser } from '@nex-house/interfaces';
+import { UserModel } from '@nex-house/models';
+import { PageHeader } from '@shared/components/ui';
 import { ConfirmationService } from 'primeng/api';
 import { CardModule } from 'primeng/card';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { PageHeader } from '@shared/components/ui';
 
 @Component({
   selector: 'app-users-home-page',
-  imports: [UsersTable, ConfirmDialogModule, CardModule, PageHeader],
+  imports: [
+    ConfirmDialogModule,
+    CardModule,
+    PageHeader,
+    UsersFilters,
+    UsersTable,
+    UsersList,
+  ],
   templateUrl: './users-home-page.html',
   styleUrl: './users-home-page.css',
   standalone: true,
@@ -50,8 +58,13 @@ export class UsersHomePage {
       },
     });
   }
+  inspect(user: UserModel) {
+    this.router.navigate([user.publicId], {
+      relativeTo: this.route,
+    });
+  }
 
-  search(filters: Search): void {
+  search(filters: SearchUser): void {
     this.store.loadAll(filters);
   }
 }

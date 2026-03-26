@@ -8,33 +8,6 @@
   (filter)="search($event)"
   [pagination]="pagination()"
 >
-  <ng-template #caption>
-    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-      <div class="block">
-        <h2 class="text-xl font-bold text-slate-800 tracking-tight">
-          Usuarios & Admins
-        </h2>
-        <p class="text-sm text-slate-500">
-          <span class="text-blue-500">{{pagination()?.total}} residentes</span>
-          registrados
-        </p>
-      </div>
-
-      <div class="flex items-center gap-3">
-        <span class="p-input-icon-left w-full md:w-80">
-          <input
-            pInputText
-            variant="filled"
-            class="w-full"
-            placeholder="Search by name or address..."
-            (input)="tb.filterGlobal($any($event.target).value, 'contains')"
-          />
-        </span>
-        <p-button label="Nuevo" icon="pi pi-plus" (click)="add.emit()" />
-      </div>
-    </div>
-  </ng-template>
-
   <ng-template #body let-user let-field="field">
     @switch (field) { @case ('fullName') {
     <div class="flex items-center gap-2">
@@ -73,18 +46,7 @@
 
   <ng-template #actions let-user>
     <div class="flex justify-center gap-1">
-      <p-button
-        icon="pi pi-pencil"
-        (click)="update.emit(user)"
-        [text]="true"
-        severity="secondary"
-      />
-      <p-button
-        icon="pi pi-trash"
-        [text]="true"
-        severity="danger"
-        (click)="remove.emit(user)"
-      />
+      <p-button label="Ver" text (click)="inspect.emit(user)" />
     </div>
   </ng-template>
 </app-table>

@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { RequestService } from '@core/services';
-import { ApiResponse, ICreateUser, Search } from '@nex-house/interfaces';
+import { ApiResponse, ICreateUser, SearchUser } from '@nex-house/interfaces';
 import { UserModel } from '@nex-house/models';
 import { Observable } from 'rxjs';
 
@@ -13,7 +13,7 @@ export class UsersService {
 
   getAll(
     neighborhood: string,
-    dto: Search,
+    dto: SearchUser,
   ): Observable<ApiResponse<UserModel[]>> {
     return this.request.get<UserModel[]>(`${this.buildUrl(neighborhood)}`, dto);
   }

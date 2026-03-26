@@ -1,1 +1,14 @@
+@if(mode() === 'tag'){
 <p-tag [value]="label()" [severity]="severity()" />
+} @else{
+<div class="flex items-center gap-1 text-xs uppercase">
+  <div
+    class="size-3 rounded-full"
+    [class.bg-orange-400]="severity() === 'warn'"
+    [class.bg-blue-400]="severity() === 'info'"
+    [class.bg-gray-400]="severity() === 'secondary'"
+  ></div>
+  <p class="text-[10px]">{{label()}}</p>
+</div>
+
+}

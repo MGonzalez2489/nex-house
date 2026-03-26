@@ -1,0 +1,41 @@
+<div class="md:bg-white md:p-5 rounded-xl md:shadow-sm">
+  <form
+    [formGroup]="form"
+    (ngSubmit)="search()"
+    class="flex items-center gap-3"
+  >
+    <input
+      pInputText
+      variant="filled"
+      fluid
+      class="md:w-[60%]"
+      formControlName="globalFilter"
+      placeholder="Buscar por nombre, email, telefono..."
+    />
+    <p-select
+      [options]="roles()"
+      optionLabel="key"
+      optionValue="value"
+      fluid
+      class="w-[20%] hidden md:flex"
+      formControlName="role"
+      variant="filled"
+    />
+    <p-select
+      fluid
+      class="w-[20%] hidden md:flex"
+      variant="filled"
+      [options]="status()"
+      optionLabel="key"
+      optionValue="value"
+      formControlName="status"
+      fluid
+    />
+    <p-button
+      severity="secondary"
+      fluid
+      icon="pi pi-sliders-h"
+      type="submite"
+    />
+  </form>
+</div>

@@ -12,12 +12,10 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { RoleTag } from '../role-tag/role-tag';
-import {
-  Table,
-  TableColumn,
-} from '../../../../_shared/components/data/table/table';
-import { UserStatusTag } from '../user-status-tag/user-status-tag';
+
+import { Table, TableColumn } from '@shared/components/data';
 import { BadgeModule } from 'primeng/badge';
+import { UserStatusTag } from '../user-status-tag/user-status-tag';
 
 @Component({
   selector: 'app-users-table',
@@ -44,9 +42,7 @@ export class UsersTable {
 
   //outputs
   filter = output<Search>();
-  add = output();
-  update = output<UserModel>();
-  remove = output<UserModel>();
+  inspect = output<UserModel>();
 
   search(event: TableLazyLoadEvent): void {
     const searchParams: Search = {
@@ -54,7 +50,6 @@ export class UsersTable {
       rows: event.rows ?? 10,
       sortField: (event.sortField as string) ?? 'createdAt',
       sortOrder: event.sortOrder ?? -1,
-      globalFilter: (event.globalFilter as string) ?? '',
     };
 
     this.filter.emit(searchParams);

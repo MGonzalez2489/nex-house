@@ -1,5 +1,5 @@
 import { CurrentUser } from '@common/decorators';
-import { SearchDto } from '@common/dtos';
+import { SearchDto, SearchUserDto } from '@common/dtos';
 import { User } from '@database/entities';
 import {
   Body,
@@ -45,7 +45,7 @@ export class UsersController {
   @Get()
   async findAll(
     @Param('neighborhoodId', ParseUUIDPipe) neighborhoodId: string,
-    @Query() searchDto: SearchDto,
+    @Query() searchDto: SearchUserDto,
   ) {
     const searchResult = await this.usersService.findAll(
       neighborhoodId,

@@ -1,7 +1,8 @@
-import { SearchDto } from '@common/dtos';
+import { SearchUserDto } from '@common/dtos';
 import { CryptoService } from '@common/services';
 import { paginateQuery } from '@common/utils';
 import { HousingUnit, Neighborhood, User } from '@database/entities';
+import { UnitAssignment } from '@database/entities/housing-assignment.entity';
 import { NeighborhoodsService } from '@modules/neighborhoods';
 import {
   ConflictException,
@@ -17,7 +18,6 @@ import {
 } from '@nex-house/enums';
 import { Brackets, DataSource, Repository } from 'typeorm';
 import { CreateUserDto } from './dtos';
-import { UnitAssignment } from '@database/entities/housing-assignment.entity';
 
 @Injectable()
 export class UsersService {
@@ -31,7 +31,7 @@ export class UsersService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async findAll(neighborhoodId: string, filters: SearchDto) {
+  async findAll(neighborhoodId: string, filters: SearchUserDto) {
     const query = this.repository
       .createQueryBuilder('users')
       .leftJoinAndSelect('users.neighborhood', 'neighborhood')
@@ -41,7 +41,18 @@ export class UsersService {
         neighborhoodId,
       });
 
-    const { globalFilter } = filters;
+    const { globalFilter, role, status } = filters;
+
+    if (role) {
+      query.andWhere('users.role LIKE :filter', {
+        filter: `%${role}%`,
+      });
+    }
+    if (status) {
+      query.andWhere('users.status LIKE :filter', {
+        filter: `%${status}%`,
+      });
+    }
 
     if (globalFilter) {
       query.andWhere(

@@ -1,1 +1,8 @@
-<p-tag [severity]="severity()" [value]="label()" />
+<p-tag
+  [class.text-sm]="size() === 'small'"
+  [class.text-base]="size() === 'normal'"
+  [class.text-lg]="size() === 'large'"
+  [severity]="severity()"
+  [rounded]="rounded()"
+  [value]="label()"
+/>

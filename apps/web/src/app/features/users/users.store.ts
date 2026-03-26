@@ -7,7 +7,12 @@ import {
   withReset,
 } from '@angular-architects/ngrx-toolkit';
 import { effect, inject } from '@angular/core';
-import { ApiPaginationMeta, ICreateUser, Search } from '@nex-house/interfaces';
+import { AuthStore } from '@features/auth';
+import {
+  ApiPaginationMeta,
+  ICreateUser,
+  SearchUser,
+} from '@nex-house/interfaces';
 import { UserModel } from '@nex-house/models';
 import { tapResponse } from '@ngrx/operators';
 import {
@@ -31,7 +36,6 @@ import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { ContextStore } from '@stores/context.store';
 import { lastValueFrom, pipe, switchMap, tap } from 'rxjs';
 import { UsersService } from './services';
-import { AuthStore } from '@features/auth';
 
 const config = entityConfig({
   entity: type<UserModel>(),
@@ -57,7 +61,7 @@ export const UsersStore = signalStore(
   })),
   withState(initialState),
   withMethods((store) => ({
-    loadAll: rxMethod<Search>(
+    loadAll: rxMethod<SearchUser>(
       pipe(
         tap(() => patchState(store, setLoading())),
         switchMap((params) => {

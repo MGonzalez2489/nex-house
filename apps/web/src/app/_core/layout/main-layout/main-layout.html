@@ -21,6 +21,7 @@
     <app-navbar
       [user]="sessionService.user()"
       [neighborhood]="contextStore.neighborhood()"
+      [exp]="authStore.exp()"
       (toggleSidebar)="sidebarVisible.set(true)"
     ></app-navbar>
 

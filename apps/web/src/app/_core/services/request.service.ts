@@ -35,10 +35,10 @@ export class RequestService {
     for (const key in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {
         const element = obj[key];
-        if (element !== undefined) {
+        if (element !== undefined && element !== null && element !== '') {
           if (Array.isArray(element)) {
             element.forEach((item: any) => {
-              if (item !== undefined) {
+              if (item !== undefined && item !== null) {
                 params = params.append(key, item);
               }
             });
@@ -50,4 +50,25 @@ export class RequestService {
     }
     return params;
   }
+
+  // private objectToQueryParameter(obj: any): HttpParams {
+  //   let params: HttpParams = new HttpParams();
+  //   for (const key in obj) {
+  //     if (Object.prototype.hasOwnProperty.call(obj, key)) {
+  //       const element = obj[key];
+  //       if (element !== undefined) {
+  //         if (Array.isArray(element)) {
+  //           element.forEach((item: any) => {
+  //             if (item !== undefined) {
+  //               params = params.append(key, item);
+  //             }
+  //           });
+  //         } else {
+  //           params = params.set(key, element);
+  //         }
+  //       }
+  //     }
+  //   }
+  //   return params;
+  // }
 }
