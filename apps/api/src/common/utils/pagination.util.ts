@@ -54,7 +54,7 @@ export async function paginateQuery<T extends ObjectLiteral>(
       ? sortField
       : `${query.alias}.${sortField}`;
 
-    query.orderBy(orderColumn, sortOrder);
+    query.addOrderBy(orderColumn, sortOrder);
   }
 
   const [entities, count] = await query

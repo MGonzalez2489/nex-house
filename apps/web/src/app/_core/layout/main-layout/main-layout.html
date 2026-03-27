@@ -9,11 +9,17 @@
     </div>
   </aside>
 
-  <p-drawer [(visible)]="sidebarVisible" [baseZIndex]="10000" class="lg:hidden">
+  <p-drawer
+    [visible]="sidebarVisible()"
+    class="lg:hidden"
+    blockScroll="true"
+    [closeOnEscape]="true"
+  >
     <app-sidebar
       [user]="sessionService.user()"
       class="h-full"
       (logout)="sessionService.logout()"
+      (navigate)="sidebarVisible.set(false)"
     />
   </p-drawer>
 

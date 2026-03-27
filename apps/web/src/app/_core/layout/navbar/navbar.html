@@ -9,11 +9,14 @@
       class="lg:hidden"
       (click)="toggleSidebar.emit()"
     />
+    @if(user()?.role !=='super_admin'){
+
     <p
       class="capitalize font-semibold font-sans text-lg text-slate-700 w-64 md:w-80 truncate"
     >
       {{neighborhood()?.name}}
     </p>
+    }
   </div>
 
   <div class="flex items-center gap-4">

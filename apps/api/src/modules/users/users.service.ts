@@ -79,6 +79,14 @@ export class UsersService {
       );
     }
 
+    query.addSelect(
+      `CASE users.role WHEN '${UserRoleEnum.ADMIN}' THEN 1 WHEN '${UserRoleEnum.RESIDENT}' THEN 2 ELSE 3 END`,
+      'roleOrder',
+    );
+    query.addOrderBy('roleOrder', 'ASC');
+    query.addOrderBy('users.firstName', 'ASC');
+    query.addOrderBy('users.lastName', 'ASC');
+
     const result = await paginateQuery(query, filters);
     return result;
   }

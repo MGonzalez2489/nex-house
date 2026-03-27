@@ -16,6 +16,7 @@ import { PanelMenuModule } from 'primeng/panelmenu';
 export class Sidebar {
   user = input<UserModel>();
   logout = output();
+  navigate = output();
   menuItems = signal<MenuItem[]>([]);
 
   constructor() {
@@ -55,6 +56,7 @@ export class Sidebar {
           exact: true,
         },
         icon: 'pi pi-chart-bar',
+        command: (): void => this.navigate.emit(),
       },
       {
         label: 'Areas Residenciales',
@@ -62,17 +64,18 @@ export class Sidebar {
         routerLinkActiveOptions: {
           exact: true,
         },
-        path: '/neighborhoods',
         icon: 'pi pi-building',
+        command: (): void => this.navigate.emit(),
       },
     ];
   }
-  private createAdminUserMenu() {
+  private createAdminUserMenu(): MenuItem[] {
     return [
       {
         label: 'Dashboard',
         routerLink: `/${DASHBOARD_ROUTES_ENUM.HOME}`,
         icon: 'pi pi-chart-bar',
+        command: (): void => this.navigate.emit(),
       },
       {
         label: 'Usuarios',
@@ -81,6 +84,7 @@ export class Sidebar {
         routerLinkActiveOptions: {
           exact: true,
         },
+        command: (): void => this.navigate.emit(),
       },
     ];
   }
