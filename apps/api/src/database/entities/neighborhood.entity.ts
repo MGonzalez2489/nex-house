@@ -3,7 +3,7 @@ import { TraceableEntity } from './_traceable.entity';
 import { HousingUnit } from './housing-unit.entity';
 import { NeighborhoodStatusEnum } from '@nex-house/enums';
 
-@Entity()
+@Entity('neighborhoods')
 export class Neighborhood extends TraceableEntity {
   @Column({ unique: true })
   name: string;

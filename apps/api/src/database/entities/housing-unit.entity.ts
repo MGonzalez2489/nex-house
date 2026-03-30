@@ -5,7 +5,7 @@ import { TraceableEntity } from './_traceable.entity';
 import { Neighborhood } from './neighborhood.entity';
 import { UnitAssignment } from './housing-assignment.entity';
 
-@Entity()
+@Entity('housing-units')
 export class HousingUnit extends TraceableEntity {
   @Column()
   identifier: string; // #11532, #11533, etc
