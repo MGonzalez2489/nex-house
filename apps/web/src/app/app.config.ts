@@ -8,18 +8,25 @@ import {
   provideBrowserGlobalErrorListeners,
 } from '@angular/core';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
-import Aura from '@primeuix/themes/aura';
+import { authInterceptor } from '@core/interceptors';
 import { providePrimeNG } from 'primeng/config';
 import { appRoutes } from './app.routes';
+import { DialogService } from 'primeng/dynamicdialog';
+import { MessageService } from 'primeng/api';
+import { NxPreset } from './theme/preset';
+
+const globalService = [DialogService, MessageService];
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(appRoutes, withComponentInputBinding()),
-    provideHttpClient(withFetch(), withInterceptors([])),
+    provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
+
+    ...globalService,
     providePrimeNG({
       theme: {
-        preset: Aura,
+        preset: NxPreset,
         options: {
           darkModeSelector: 'none',
           cssLayer: {

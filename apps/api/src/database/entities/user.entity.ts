@@ -1,36 +1,50 @@
-import { UserRole } from '@nex-house/enums';
-import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
-import { BaseEntity } from './_base.entity';
+import { UserRoleEnum, UserStatusEnum } from '@nex-house/enums';
+import { Exclude } from 'class-transformer';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { TraceableEntity } from './_traceable.entity';
 import { Neighborhood } from './neighborhood.entity';
+import { UnitAssignment } from './housing-assignment.entity';
 
-@Entity()
-export class User extends BaseEntity {
+@Entity('users')
+export class User extends TraceableEntity {
   @Column({ unique: true })
   email: string;
 
-  @Column({ select: false }) // Por seguridad, el password no se incluye en consultas normales
+  @Column()
+  @Exclude()
   password: string;
 
   @Column()
   firstName: string;
 
-  @Column()
+  @Column({ nullable: true })
   lastName: string;
+
+  @Column({ nullable: true })
+  phone: string;
 
   @Column({
     type: 'enum',
-    enum: UserRole,
-    default: UserRole.RESIDENT,
+    enum: UserRoleEnum,
+    default: UserRoleEnum.RESIDENT,
   })
-  role: UserRole;
+  role: UserRoleEnum;
 
   @Column({ nullable: true })
-  neighborhoodId: string;
+  @Exclude()
+  neighborhoodId: number;
 
-  @Column({ default: true })
-  isActive: boolean;
+  @Column({
+    type: 'enum',
+    enum: UserStatusEnum,
+    default: UserStatusEnum.PENDING_COMPLETION,
+  })
+  status: UserStatusEnum;
 
   @ManyToOne(() => Neighborhood)
   @JoinColumn({ name: 'neighborhoodId' })
   neighborhood: Neighborhood;
+
+  @OneToMany(() => UnitAssignment, (assignment) => assignment.user)
+  assignments: UnitAssignment[];
 }

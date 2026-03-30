@@ -1,0 +1,27 @@
+<app-form-feedback [callState]="callState()" />
+
+<div
+  class="flex flex-col-reverse sm:flex-row justify-end items-center gap-3 w-full pb-2 pt-4"
+>
+  @if (showCancel()) {
+  <p-button
+    class="hidden md:block w-full md:w-30 bg-white rounded-lg"
+    severity="secondary"
+    [disabled]="isLoading()"
+    [fluid]="true"
+    [label]="cancelLabel()"
+    [variant]="cancelVariant()"
+    (click)="doCancel.emit(true)"
+  />
+  }
+  <p-button
+    class="w-full md:w-40"
+    fluid
+    type="submit"
+    [fluid]="true"
+    [label]="submitLabel()"
+    [loading]="isLoading()"
+    [severity]="submitSeverity()"
+    [variant]="submitVariant()"
+  />
+</div>

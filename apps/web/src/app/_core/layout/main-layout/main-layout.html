@@ -1,0 +1,48 @@
+<div class="flex h-screen overflow-hidden bg-gray-50">
+  <aside class="hidden lg:flex lg:shrink-0">
+    <div class="flex flex-col w-64 border-r bg-white">
+      <app-sidebar
+        [user]="sessionService.user()"
+        class="h-full"
+        (logout)="sessionService.logout()"
+      />
+    </div>
+  </aside>
+
+  <p-drawer
+    [visible]="sidebarVisible()"
+    class="lg:hidden"
+    blockScroll="true"
+    [closeOnEscape]="true"
+  >
+    <app-sidebar
+      [user]="sessionService.user()"
+      class="h-full"
+      (logout)="sessionService.logout()"
+      (navigate)="sidebarVisible.set(false)"
+    />
+  </p-drawer>
+
+  <div class="flex flex-col flex-1 w-0 overflow-hidden">
+    <app-navbar
+      [user]="sessionService.user()"
+      [neighborhood]="contextStore.neighborhood()"
+      [exp]="authStore.exp()"
+      (toggleSidebar)="sidebarVisible.set(true)"
+    ></app-navbar>
+
+    <main class="flex-1 relative overflow-y-auto focus:outline-none p-4 lg:p-8">
+      <div class="max-w-7xl mx-auto">
+        @if(loadingContext()){
+        <div class="h-[80vh] flex flex-col justify-center items-center gap-5">
+          <p-progress-spinner ariaLabel="loading" />
+          <p class="text-slate-700">Loading...</p>
+        </div>
+        } @else{
+
+        <router-outlet></router-outlet>
+        }
+      </div>
+    </main>
+  </div>
+</div>

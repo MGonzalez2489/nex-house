@@ -1,14 +1,17 @@
 import { HousingStatusEnum, HousingTypeEnum } from '@nex-house/enums';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
-import { BaseEntity } from './_base.entity';
-import { Neighborhood } from './neighborhood.entity';
-import { User } from './user.entity';
 import { Exclude } from 'class-transformer';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { TraceableEntity } from './_traceable.entity';
+import { Neighborhood } from './neighborhood.entity';
+import { UnitAssignment } from './housing-assignment.entity';
 
 @Entity()
-export class HousingUnit extends BaseEntity {
+export class HousingUnit extends TraceableEntity {
   @Column()
   identifier: string; // #11532, #11533, etc
+
+  @Column()
+  streetName: string;
 
   @Column({
     type: 'enum',
@@ -25,25 +28,13 @@ export class HousingUnit extends BaseEntity {
   type: HousingTypeEnum;
 
   @Column()
-  neighborhoodId: string;
-
-  @Column({ nullable: true })
   @Exclude()
-  ownerId: string;
-
-  @Column({ nullable: true })
-  @Exclude()
-  occupantId: string;
+  neighborhoodId: number;
 
   @ManyToOne(() => Neighborhood, (n) => n.units)
   @JoinColumn({ name: 'neighborhoodId' })
   neighborhood: Neighborhood;
 
-  @ManyToOne(() => User)
-  @JoinColumn({ name: 'ownerId' })
-  owner: User;
-
-  @ManyToOne(() => User)
-  @JoinColumn({ name: 'occupantId' })
-  occupant: User;
+  @OneToMany(() => UnitAssignment, (assignment) => assignment.unit)
+  assignments: UnitAssignment[];
 }

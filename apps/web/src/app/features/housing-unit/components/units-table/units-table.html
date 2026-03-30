@@ -1,0 +1,70 @@
+<app-table
+  #tb
+  [data]="units()"
+  [columns]="cols"
+  [isLoading]="isLoading()"
+  [lazy]="true"
+  [loadOnInit]="true"
+  (filter)="search($event)"
+  [pagination]="pagination()"
+>
+  <ng-template #caption>
+    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="block">
+        <h2 class="text-xl font-bold text-slate-800 tracking-tight">
+          Inventario de Unidades
+        </h2>
+        <p class="text-sm text-slate-500">
+          Gestiona las propiedades y sus habitantes vinculados.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <span class="p-input-icon-left w-full md:w-80">
+          <input
+            pInputText
+            variant="filled"
+            class="w-full"
+            placeholder="Search by name or address..."
+            (input)="tb.filterGlobal($any($event.target).value, 'contains')"
+          />
+        </span>
+        <p-button label="Nuevo" icon="pi pi-plus" />
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #body let-unit let-field="field">
+    @switch (field) { @case ('identifier') {
+    <div class="flex items-center gap-3">
+      <div class="relative">
+        <div
+          class="h-10 w-10 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center border border-indigo-100"
+        >
+          <i class="pi pi-home"></i>
+        </div>
+      </div>
+      <div class="flex flex-col">
+        <span class="font-bold text-slate-700"
+          >#{{unit.identifier}} - {{unit.street}}</span
+        >
+        <span
+          class="text-[10px] text-amber-600 font-semibold uppercase tracking-wider"
+          >{{unit.status}}</span
+        >
+      </div>
+    </div>
+    } @case ('assignations') { @let userNames = unit.assignations.map(f=>
+    f.user?.fullName);
+    <app-user-avatar-group [list]="userNames" />
+
+    }}
+  </ng-template>
+
+  <ng-template #actions let-user>
+    <div class="flex justify-center gap-1">
+      <p-button icon="pi pi-pencil" [text]="true" severity="secondary" />
+      <p-button icon="pi pi-trash" [text]="true" severity="danger" />
+    </div>
+  </ng-template>
+</app-table>

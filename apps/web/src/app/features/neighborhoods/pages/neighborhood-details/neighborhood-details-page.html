@@ -1,0 +1,41 @@
+<div
+  class="flex items-center justify-between gap-6 pb-6 border-b border-slate-200"
+>
+  <div>
+    <div class="flex items-center gap-3">
+      <h1 class="text-3xl font-extrabold text-slate-950 tracking-tight">
+        {{store.neighborhood()?.name}}
+      </h1>
+      <p
+        class="hidden md:block bg-blue-500 px-2 rounded-md text-gray-50 py-0.5"
+      >
+        {{store.neighborhood()?.slug}}
+      </p>
+    </div>
+    <p class="text-slate-600 flex items-center gap-2 capitalize">
+      <i class="pi pi-map-marker text-danger-500"></i>
+      {{store.neighborhood()?.address}}
+    </p>
+  </div>
+</div>
+
+<div class="space-y-6">
+  <div class="border-b border-slate-200">
+    <p-tabs [value]="activeItem?.routerLink">
+      <p-tablist [pt]="{root:'bg-transparent'}">
+        @for (tab of items; track tab.routerLink) {
+        <p-tab
+          [value]="tab.routerLink"
+          (click)="activeItem = tab"
+          [routerLink]="[tab.routerLink]"
+          class="flex items-center gap-2! text-inherit"
+        >
+          <i class="text-sm text-gray-500" [class]="tab.icon"></i>
+          <span class="text-sm text-gray-500">{{ tab.label }}</span>
+        </p-tab>
+        }
+      </p-tablist>
+    </p-tabs>
+  </div>
+  <router-outlet></router-outlet>
+</div>

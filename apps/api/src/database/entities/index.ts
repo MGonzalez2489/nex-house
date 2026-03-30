@@ -5,3 +5,4 @@ export * from './user.entity';
 export * from './payment-concept.entity';
 export * from './resident-payment.entity';
 export * from './resident-debt.entity';
+export * from './housing-assignment.entity';

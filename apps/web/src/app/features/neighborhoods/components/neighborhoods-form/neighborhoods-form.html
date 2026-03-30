@@ -1,0 +1,71 @@
+<form (submit)="doSubmit()" [formGroup]="form" class="space-y-4">
+  <div class="form-control">
+    <label for="name" class="form-label">Nombre</label>
+    <input
+      pInputText
+      id="name"
+      type="text"
+      formControlName="name"
+      placeholder="Bosques del real"
+      fluid
+      [invalid]="form.controls.name.invalid && form.controls.name.touched"
+      [attr.aria-invalid]="form.controls.name.invalid && form.controls.name.touched"
+      [attr.aria-describedby]="form.controls.name.touched && form.controls.name.errors ? 'name-error' : null"
+    />
+    <app-form-validation-error
+      id="name-error"
+      [touched]="form.controls.name.touched"
+      [errors]="form.controls.name.errors"
+      label="Nombre"
+    />
+  </div>
+  <div class="form-control">
+    <label for="slug" class="form-label">Ficha</label>
+    <input
+      pInputText
+      id="slug"
+      type="text"
+      formControlName="slug"
+      fluid
+      [invalid]="form.controls.slug.invalid && form.controls.slug.touched"
+      [attr.aria-invalid]="form.controls.slug.invalid && form.controls.slug.touched"
+      [attr.aria-describedby]="form.controls.slug.touched && form.controls.slug.errors ? 'slug-error' : null"
+    />
+    <app-form-validation-error
+      id="slug-error"
+      [touched]="form.controls.slug.touched"
+      [errors]="form.controls.slug.errors"
+      label="Ficha"
+    />
+  </div>
+  <div class="form-control">
+    <label for="address" class="form-label">Direccion</label>
+    <input
+      pInputText
+      id="address"
+      type="text"
+      formControlName="address"
+      placeholder="Av. siempre viva"
+      fluid
+      [invalid]="form.controls.address.invalid && form.controls.address.touched"
+      [attr.aria-invalid]="form.controls.address.invalid && form.controls.address.touched"
+      [attr.aria-describedby]="form.controls.address.touched && form.controls.address.errors ? 'address-error' : null"
+    />
+    <app-form-validation-error
+      id="address-error"
+      [touched]="form.controls.address.touched"
+      [errors]="form.controls.address.errors"
+      label="Direccion"
+    />
+  </div>
+  <div class="flex items-center justify-end gap-2 pt-4">
+    <p-button
+      label="Cancelar"
+      text
+      severity="secondary"
+      type="reset"
+      (click)="doCancel()"
+    />
+    <p-button label="Guardar" type="submit" />
+  </div>
+</form>

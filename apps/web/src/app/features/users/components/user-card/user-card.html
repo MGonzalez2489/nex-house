@@ -1,0 +1,79 @@
+<section class="md:hidden relative">
+  <div class="bg-gray-100 rounded-xl p-6 relative overflow-hidden">
+    <!-- Abstract Texture Decor -->
+    <div class="flex flex-col items-center text-center space-y-4">
+      <div class="relative">
+        <app-user-avatar size="xlarge" [text]="user().fullName" />
+
+        <span class="absolute bottom-0 right-0 text-[10px] shadow-md">
+          <app-user-status-tag [status]="user().status" />
+        </span>
+      </div>
+      <div>
+        <h2 class="text-2xl font-extrabold tracking-tight text-on-surface">
+          {{user().fullName}}
+        </h2>
+        <span
+          class="inline-block mt-1 px-3 py-1 rounded-full bg-secondary-container/40 text-on-secondary-container text-xs font-bold uppercase tracking-widest"
+        >
+          <app-role-tag [rounded]="true" [role]="user().role" />
+        </span>
+      </div>
+      <div class="w-full pt-4 space-y-3">
+        <div class="flex items-center justify-center gap-3 text-gray-600">
+          <span class="pi pi-envelope text-sm"></span>
+          <span class="text-sm font-medium">{{user().email}}</span>
+        </div>
+        @if(user().phone){
+        <div class="flex items-center justify-center gap-3 text-gray-600">
+          <span class="pi pi-phone text-sm"></span>
+          <span class="text-sm font-medium">{{user().phone}}</span>
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<p-card class="hidden md:block">
+  <div class="flex items-center space-x-8 relative z-10">
+    <!-- avatar -->
+    <div class="flex flex-col items-center gap-3">
+      <app-user-avatar size="xlarge" [text]="user().fullName" />
+
+      <app-role-tag [role]="user().role" />
+    </div>
+
+    <div class="flex-1 grid grid-cols-2 gap-y-6 gap-x-12">
+      <div>
+        <p class="block text-xs text-gray-400 uppercase tracking-widest mb-1">
+          Nombre Completo
+        </p>
+        <p class="text-lg">{{user().fullName}}</p>
+      </div>
+      <div>
+        <p class="block text-xs text-gray-400 uppercase tracking-widest mb-2">
+          Estatus
+        </p>
+        <app-user-status-tag
+          [status]="user().status"
+          mode="label"
+          size="small"
+        />
+      </div>
+      <div>
+        <p class="block text-xs text-gray-400 uppercase tracking-widest mb-1">
+          Correo Electrónico
+        </p>
+        <p class="text-on-surface/80">{{user().email}}</p>
+      </div>
+      <div>
+        <p class="block text-xs text-gray-400 uppercase tracking-widest mb-1">
+          Teléfono
+        </p>
+        <p class="text-on-surface/80">{{user().phone || '--'}}</p>
+      </div>
+      <div></div>
+    </div>
+  </div>
+</p-card>

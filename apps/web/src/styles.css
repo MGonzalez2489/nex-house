@@ -1,5 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 @import 'tailwindcss';
+@import 'primeicons/primeicons';
 
 @layer base {
   *,
@@ -9,4 +10,42 @@
   ::file-selector-button {
     border-color: var(--color-gray-200, currentcolor);
   }
+}
+
+.form-control {
+  .form-label {
+    --tw-font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-medium);
+    display: block;
+    font-size: var(--text-sm);
+    color: var(--color-slate-700);
+
+    margin-bottom: calc(var(--spacing) * 0.1);
+
+    font-size: var(--text-sm);
+    line-height: var(--tw-leading, var(--text-sm--line-height));
+  }
+
+  .required:after {
+    content: ' *';
+    color: red;
+  }
+}
+
+.p-panelmenu-header-label {
+  color: var(--p-gray-600);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-lg);
+}
+
+.p-panelmenu-header-link.p-panelmenu-item-link-active {
+  background: var(--p-blue-50);
+  color: var(--p-blue-700);
+  font-weight: 600;
+  border-radius: var(--radius-lg);
+}
+
+.p-panelmenu-header-link.p-panelmenu-item-link-active .p-panelmenu-header-icon {
+  color: var(--cyan-700);
 }

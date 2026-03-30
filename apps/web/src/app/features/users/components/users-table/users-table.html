@@ -1,0 +1,52 @@
+<app-table
+  #tb
+  [data]="users()"
+  [columns]="cols"
+  [isLoading]="isLoading()"
+  [lazy]="true"
+  [loadOnInit]="true"
+  (filter)="search($event)"
+  [pagination]="pagination()"
+>
+  <ng-template #body let-user let-field="field">
+    @switch (field) { @case ('fullName') {
+    <div class="flex items-center gap-2">
+      <app-user-avatar [text]="user.fullName" />
+      <div class="flex flex-col">
+        <span class="font-bold text-slate-700 capitalize"
+          >{{ user.fullName }}
+        </span>
+      </div>
+    </div>
+    } @case ('email') {
+    <div class="flex flex-col text-sm text-slate-600">
+      <span class="flex items-center gap-1"
+        ><i class="pi pi-envelope text-[10px]"></i> {{ user.email }}</span
+      >
+      @if(user.phone){
+      <span class="flex items-center gap-1"
+        ><i class="pi pi-phone text-[10px]"></i> {{ user.phone | phone }}</span
+      >
+
+      }
+    </div>
+    } @case ('role') {
+    <app-role-tag [role]="user.role" />
+
+    } @case ('assignments') { @let unit = user.assignments[0]?.unit;
+    <p class="font-semibold text-slate-700">{{ unit?.street }}</p>
+    <small class="text-slate-400 font-mono"> #{{ unit?.identifier }}</small>
+
+    } @case ('status') {
+
+    <app-user-status-tag [status]="user.status" />
+
+    } }
+  </ng-template>
+
+  <ng-template #actions let-user>
+    <div class="flex justify-center gap-1">
+      <p-button label="Ver" text (click)="inspect.emit(user)" />
+    </div>
+  </ng-template>
+</app-table>

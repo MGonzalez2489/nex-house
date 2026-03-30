@@ -1,0 +1,103 @@
+<form [formGroup]="form" (ngSubmit)="doSubmit()" class="flex flex-col gap-6">
+  <div class="flex justify-center">
+    <p-selectButton
+      [options]="modeOptions"
+      formControlName="mode"
+      optionLabel="label"
+      optionValue="value"
+    />
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+    <div class="flex flex-col gap-2 md:col-span-2 form-control">
+      <label class="form-label" for="streetName">Calle / Privada / Torre</label>
+      <input
+        pInputText
+        id="streetName"
+        formControlName="streetName"
+        placeholder="Ej. Privada Maple"
+        fluid
+      />
+      <app-form-validation-error
+        [touched]="f.streetName.touched"
+        [errors]="f.streetName.errors"
+        label="Calle"
+      />
+    </div>
+
+    @if (form.get('mode')?.value === 'single') {
+    <div class="flex flex-col gap-2 md:col-span-2 animate-fade-in form-control">
+      <label class="form-label" for="identifier">Número / Identificador</label>
+      <input
+        pInputText
+        id="identifier"
+        formControlName="identifier"
+        placeholder="Ej. Casa 10, Depto 4B"
+        fluid
+      />
+      <app-form-validation-error
+        [touched]="f.identifier.touched"
+        [errors]="f.identifier.errors"
+        label="Identificador"
+      />
+    </div>
+    } @else {
+    <div class="flex flex-col gap-2 animate-fade-in form-control">
+      <label
+        class="font-semibold text-sm text-slate-700 form-label"
+        for="startNumber"
+        >Número Inicial</label
+      >
+      <p-inputNumber
+        id="startNumber"
+        formControlName="startNumber"
+        [min]="1"
+        placeholder="1"
+        fluid
+      />
+      <app-form-validation-error
+        [touched]="f.startNumber.touched"
+        [errors]="f.startNumber.errors"
+        label="Inicio"
+      />
+    </div>
+
+    <div class="flex flex-col gap-2 animate-fade-in form-control">
+      <label
+        for="endNumber"
+        class="font-semibold text-sm text-slate-700 form-label"
+        >Número Final</label
+      >
+      <p-inputNumber
+        id="endNumber"
+        formControlName="endNumber"
+        [min]="1"
+        placeholder="60"
+        fluid
+      />
+      <app-form-validation-error
+        [touched]="f.endNumber.touched"
+        [errors]="f.endNumber.errors"
+        label="Fin"
+      />
+    </div>
+
+    <div class="md:col-span-2 p-3 bg-blue-50 rounded-lg border border-blue-100">
+      <p class="text-xs text-blue-700 flex items-center gap-2">
+        <i class="pi pi-info-circle"></i>
+        Se crearán
+        <strong>{{ (f.endNumber.value - f.startNumber.value) || 0 }}</strong>
+        unidades automáticamente.
+      </p>
+    </div>
+    }
+  </div>
+
+  <div class="pt-4 border-t border-slate-100">
+    <app-form-options
+      [isLoading]="store.loading()"
+      [callState]="store.callState()"
+      (doCancel)="doCancel()"
+    />
+  </div>
+</form>

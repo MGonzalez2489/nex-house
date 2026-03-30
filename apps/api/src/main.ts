@@ -11,6 +11,8 @@ import {
 import { NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app/app.module';
+import { GlobalExceptionFilter } from '@common/filters';
+import { TransformInterceptor } from '@common/interceptors';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,8 +20,8 @@ async function bootstrap() {
   app.setGlobalPrefix(globalPrefix);
 
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
-  // app.useGlobalInterceptors(new TransformInterceptor());
-  // app.useGlobalFilters(new GlobalExceptionFilter());
+  app.useGlobalInterceptors(new TransformInterceptor());
+  app.useGlobalFilters(new GlobalExceptionFilter());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

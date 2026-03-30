@@ -1,0 +1,12 @@
+<p-avatar-group>
+  @for(avatar of avatars(); track avatar.label){
+
+  <p-avatar
+    [pTooltip]="avatar.fullLabel"
+    [label]="avatar.label"
+    class="mr-2 hover:cursor-pointer"
+    shape="circle"
+    [style]="{ 'background-color': avatar.color, 'color': '#334155' }"
+  />
+  }
+</p-avatar-group>

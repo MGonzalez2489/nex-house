@@ -4,6 +4,18 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { getDatabaseConfig } from '@database/data-source';
+import {
+  AuthModule,
+  FinanceModule,
+  HousingUnitsModule,
+  NeighborhoodsModule,
+  UsersModule,
+} from '@modules/index';
+import { DatabaseSeederService } from '@database/index';
+import { HousingUnit, Neighborhood, User } from '@database/entities';
+import { CryptoService } from '@common/services';
+import { JwtAuthGuard } from '@modules/auth/guards';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -15,8 +27,22 @@ import { getDatabaseConfig } from '@database/data-source';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => getDatabaseConfig(config),
     }),
+    TypeOrmModule.forFeature([User, Neighborhood, HousingUnit]),
+    AuthModule,
+    NeighborhoodsModule,
+    FinanceModule,
+    HousingUnitsModule,
+    UsersModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    CryptoService,
+    DatabaseSeederService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}

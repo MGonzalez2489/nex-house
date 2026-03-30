@@ -1,0 +1,43 @@
+<p-card
+  class="md:bg-linear-to-r from-blue-600 to-blue-700 text-gray-700 md:text-white"
+>
+  <div>
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-xl font-bold font-headline">Sección de Vivienda</h3>
+      <span class="pi pi-home text-3xl"></span>
+    </div>
+    <div class="space-y-4">
+      <div>
+        <p class="md:text-white/60 text-xs font-bold uppercase tracking-widest">
+          Unidad
+        </p>
+        <p class="text-3xl font-extrabold tracking-tight">
+          {{unit()?.identifier}}
+        </p>
+      </div>
+      <div>
+        <p class="md:text-white/60 text-xs font-bold uppercase tracking-widest">
+          Dirección
+        </p>
+        <p class="text-lg leading-snug">{{unit()?.street}}</p>
+      </div>
+    </div>
+  </div>
+  <div class="py-3 pt-5">
+    <p-button
+      label="Ver detalles de vivienda"
+      fluid
+      icon="pi pi-arrow-right"
+      iconPos="right"
+      class="hidden md:block"
+    />
+    <p-button
+      label="Ver detalles de vivienda"
+      fluid
+      icon="pi pi-arrow-right"
+      iconPos="right"
+      variant="outlined"
+      class="md:hidden"
+    />
+  </div>
+</p-card>

@@ -1,0 +1,42 @@
+<div class="pb-25 md:pb-0">
+  <div
+    class="flex flex-col md:flex-row gap-3 justify-between md:items-center pb-4"
+  >
+    <app-page-header
+      title="Areas Residenciales"
+      subTitle="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore..."
+    />
+
+    <p-button
+      label="Nueva area residencial"
+      fluid
+      icon="pi pi-plus"
+      class="hidden md:block"
+      (click)="addNeighborhoods()"
+    />
+  </div>
+
+  <div class="space-y-6">
+    <app-neighborhoods-stats class="block" />
+
+    <app-neighborhoods-list
+      class="block md:hidden"
+      [isLoading]="store.loading()"
+      [data]="store.entities()"
+    />
+    <app-neighborhoods-table
+      class="hidden md:block"
+      (filter)="search($event)"
+      [isLoading]="store.loading()"
+      [data]="store.entities()"
+    />
+  </div>
+
+  <p-button
+    icon="pi pi-plus"
+    rounded
+    size="large"
+    (click)="addNeighborhoods()"
+    class="fixed z-1000 bottom-15 right-10 md:hidden"
+  />
+</div>
