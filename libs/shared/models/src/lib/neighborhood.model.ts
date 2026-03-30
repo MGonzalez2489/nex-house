@@ -4,4 +4,5 @@ export class NeighborhoodModel extends BaseModel {
   name: string;
   slug: string;
   address: string;
+  status: string;
 }

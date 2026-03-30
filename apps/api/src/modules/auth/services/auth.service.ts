@@ -2,10 +2,20 @@ import { CryptoService } from '@common/services';
 import { User } from '@database/entities';
 import { UsersService } from '@modules/users';
 import { UserEntityToModel } from '@modules/users/mappers';
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { SessionModel } from '@nex-house/models';
 import { LoginDto } from '../dtos';
+import {
+  NeighborhoodStatusEnum,
+  UserRoleEnum,
+  UserStatusEnum,
+} from '@nex-house/enums';
 
 @Injectable()
 export class AuthService {
@@ -22,6 +32,23 @@ export class AuthService {
 
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
+    }
+
+    //non root user validations
+    if (user.role !== UserRoleEnum.SUPER_ADMIN) {
+      if (!user.neighborhood) {
+        throw new ForbiddenException('Invalid neighborhood assignation.');
+      }
+
+      if (user.neighborhood.status !== NeighborhoodStatusEnum.ACTIVE) {
+        throw new ForbiddenException('Neighborhood not available.');
+      }
+
+      if (user.status === UserStatusEnum.INACTIVE) {
+        throw new ForbiddenException(
+          'Authentication disabled. Contact your administrator.',
+        );
+      }
     }
 
     const isMatch = await this.cryptoService.compare(

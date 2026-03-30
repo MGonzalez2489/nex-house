@@ -1,6 +1,7 @@
 import { Column, Entity, OneToMany } from 'typeorm';
 import { TraceableEntity } from './_traceable.entity';
 import { HousingUnit } from './housing-unit.entity';
+import { NeighborhoodStatusEnum } from '@nex-house/enums';
 
 @Entity()
 export class Neighborhood extends TraceableEntity {
@@ -13,10 +14,13 @@ export class Neighborhood extends TraceableEntity {
   @Column({ type: 'text' })
   address: string;
 
-  //TODO:
-  // @Column({ type: 'json' })
-  // settings: INeighborhoodSettings;
-  //
+  @Column({
+    type: 'enum',
+    enum: NeighborhoodStatusEnum,
+    default: NeighborhoodStatusEnum.ACTIVE,
+  })
+  status: NeighborhoodStatusEnum;
+
   @OneToMany(() => HousingUnit, (unit) => unit.neighborhood)
   units: HousingUnit[];
 }
