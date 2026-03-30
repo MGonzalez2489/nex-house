@@ -12,9 +12,13 @@ erDiagram
         timestamp createdAt
         timestamp updatedAt
         timestamp deletedAt
+        number createdBy
+        number updatedBy
+        number deletedBy
         string name
         string slug
         text address
+        enum status
     }
     Neighborhood ||--|{ HousingUnit : "units"
     User {
@@ -23,31 +27,55 @@ erDiagram
         timestamp createdAt
         timestamp updatedAt
         timestamp deletedAt
+        number createdBy
+        number updatedBy
+        number deletedBy
         string email
         string password
         string firstName
         string lastName
+        string phone
         enum role
         number neighborhoodId
-        boolean isActive
+        enum status
     }
     User }|--|| Neighborhood : "neighborhood"
+    User ||--|{ UnitAssignment : "assignments"
+    UnitAssignment {
+        int id
+        uuid publicId
+        timestamp createdAt
+        timestamp updatedAt
+        timestamp deletedAt
+        number createdBy
+        number updatedBy
+        number deletedBy
+        number unitId
+        number userId
+        boolean isActive
+        boolean isOwner
+        boolean isTenant
+        boolean isFamily
+    }
+    UnitAssignment }|--|| HousingUnit : "unit"
+    UnitAssignment }|--|| User : "user"
     HousingUnit {
         int id
         uuid publicId
         timestamp createdAt
         timestamp updatedAt
         timestamp deletedAt
+        number createdBy
+        number updatedBy
+        number deletedBy
         string identifier
+        string streetName
         enum status
         enum type
         number neighborhoodId
-        number ownerId
-        number occupantId
     }
     HousingUnit }|--|| Neighborhood : "neighborhood"
-    HousingUnit }|--|| User : "owner"
-    HousingUnit }|--|| User : "occupant"
+    HousingUnit ||--|{ UnitAssignment : "assignments"
     PaymentConcept {
         int id
         uuid publicId
