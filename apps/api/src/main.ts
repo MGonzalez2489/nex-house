@@ -3,6 +3,8 @@
  * This is only a minimal backend to get started.
  */
 
+import { GlobalExceptionFilter } from '@common/filters';
+import { TransformInterceptor } from '@common/interceptors';
 import {
   ClassSerializerInterceptor,
   Logger,
@@ -11,8 +13,6 @@ import {
 import { NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app/app.module';
-import { GlobalExceptionFilter } from '@common/filters';
-import { TransformInterceptor } from '@common/interceptors';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

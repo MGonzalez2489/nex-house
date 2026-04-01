@@ -1,5 +1,6 @@
 import { Component, effect, input, output, signal } from '@angular/core';
 import { DASHBOARD_ROUTES_ENUM } from '@features/dashboard';
+import { FINANCE_ROUTES_ENUM } from '@features/finance';
 import { NEIGHBORHOODS_ROUTES_ENUM } from '@features/neighborhoods';
 import { USERS_ROUTES_ENUM } from '@features/users';
 import { UserRoleEnum } from '@nex-house/enums';
@@ -84,6 +85,22 @@ export class Sidebar {
         routerLinkActiveOptions: {
           exact: true,
         },
+        command: (): void => this.navigate.emit(),
+      },
+      {
+        label: 'Finance',
+        // routerLink: FINANCE_ROUTES_ENUM.HOME,
+        icon: 'pi pi-money-bill',
+        routerLinkActiveOptions: {
+          exact: true,
+        },
+        items: [
+          {
+            label: 'Agenda de cobros',
+            routerLink: FINANCE_ROUTES_ENUM.HOME,
+            icon: 'pi pi-calendar',
+          },
+        ],
         command: (): void => this.navigate.emit(),
       },
     ];

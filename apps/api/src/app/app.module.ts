@@ -9,13 +9,15 @@ import {
   FinanceModule,
   HousingUnitsModule,
   NeighborhoodsModule,
+  NeighFinanceModule,
   UsersModule,
 } from '@modules/index';
 import { DatabaseSeederService } from '@database/index';
 import { HousingUnit, Neighborhood, User } from '@database/entities';
 import { CryptoService } from '@common/services';
 import { JwtAuthGuard } from '@modules/auth/guards';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { NeighborhoodContextInterceptor } from '@common/interceptors';
 
 @Module({
   imports: [
@@ -33,6 +35,7 @@ import { APP_GUARD } from '@nestjs/core';
     FinanceModule,
     HousingUnitsModule,
     UsersModule,
+    NeighFinanceModule,
   ],
   controllers: [AppController],
   providers: [
@@ -42,6 +45,10 @@ import { APP_GUARD } from '@nestjs/core';
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: NeighborhoodContextInterceptor,
     },
   ],
 })

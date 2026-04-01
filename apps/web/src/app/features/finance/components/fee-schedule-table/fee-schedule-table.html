@@ -1,0 +1,30 @@
+<app-table
+  #tb
+  [data]="data()"
+  [columns]="cols"
+  [isLoading]="isLoading()"
+  [lazy]="true"
+  [loadOnInit]="true"
+  (filter)="search($event)"
+  [pagination]="pagination()"
+>
+  <ng-template #body let-fee let-field="field">
+    @switch (field) { @case ('name') {
+    <p>{{fee.name}}</p>
+
+    } @case ('description') {
+    <p>{{fee.description}}</p>
+    } @case ('startDate') {
+    <p>{{fee.startDate | date}}</p>
+
+    } @case ('amount') {
+    <p>{{fee.amount | currency}}</p>
+    } }
+  </ng-template>
+
+  <ng-template #actions let-user>
+    <div class="flex justify-center gap-1">
+      <p-button label="Ver" text (click)="inspect.emit(user)" />
+    </div>
+  </ng-template>
+</app-table>

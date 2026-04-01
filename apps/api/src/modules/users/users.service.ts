@@ -3,9 +3,9 @@ import { CryptoService } from '@common/services';
 import { paginateQuery } from '@common/utils';
 import { HousingUnit, Neighborhood, User } from '@database/entities';
 import { UnitAssignment } from '@database/entities/housing-assignment.entity';
-import { NeighborhoodsService } from '@modules/neighborhoods';
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   Logger,
   NotFoundException,
@@ -27,17 +27,16 @@ export class UsersService {
     @InjectRepository(User)
     private readonly repository: Repository<User>,
     private readonly cryptoService: CryptoService,
-    private readonly neighborhoodService: NeighborhoodsService,
     private readonly dataSource: DataSource,
   ) {}
 
-  async findAll(neighborhoodId: string, filters: SearchUserDto) {
+  async findAll(neighborhoodId: number, filters: SearchUserDto) {
     const query = this.repository
       .createQueryBuilder('users')
       .leftJoinAndSelect('users.neighborhood', 'neighborhood')
       .leftJoinAndSelect('users.assignments', 'assignments')
       .leftJoinAndSelect('assignments.unit', 'unit')
-      .where('neighborhood.publicId = :neighborhoodId', {
+      .where('neighborhood.id = :neighborhoodId', {
         neighborhoodId,
       });
 
@@ -91,24 +90,39 @@ export class UsersService {
     return result;
   }
 
-  async findByPublicId(publicId: string): Promise<User | null> {
+  async findByPublicId(
+    publicId: string,
+    neighborhoodId?: number,
+  ): Promise<User | null> {
+    const whereCondition: any = { publicId };
+    if (neighborhoodId !== undefined) {
+      whereCondition.neighborhood = { id: neighborhoodId };
+    }
+
     const result = await this.repository.findOne({
-      where: { publicId },
+      where: whereCondition,
       relations: ['neighborhood', 'assignments', 'assignments.unit'],
     });
     return result;
   }
 
-  async findByEmail(email: string): Promise<User | null> {
+  async findByEmail(
+    email: string,
+    neighborhoodId?: number,
+  ): Promise<User | null> {
+    const whereCondition: any = { email };
+    if (neighborhoodId !== undefined) {
+      whereCondition.neighborhood = { id: neighborhoodId };
+    }
     const result = await this.repository.findOne({
-      where: { email },
+      where: whereCondition,
       relations: ['neighborhood', 'assignments', 'assignments.unit'],
     });
     return result;
   }
 
   async create(
-    neighborhoodId: string,
+    neighborhood: Neighborhood,
     createDto: CreateUserDto,
     currentUser: User,
   ) {
@@ -119,12 +133,6 @@ export class UsersService {
     try {
       const hashedPassword = await this.cryptoService.hash('1234'); // TODO: Random pass
 
-      const neighborhood = await queryRunner.manager.findOne(Neighborhood, {
-        where: { publicId: neighborhoodId },
-      });
-      if (!neighborhood)
-        throw new NotFoundException('Residencial no encontrado');
-
       // 2. Crear el Usuario
       const newUser = queryRunner.manager.create(User, {
         firstName: createDto.firstName,
@@ -132,7 +140,7 @@ export class UsersService {
         role: createDto.isAdmin ? UserRoleEnum.ADMIN : UserRoleEnum.RESIDENT,
         status: UserStatusEnum.PENDING_COMPLETION,
         createdBy: currentUser.id,
-        neighborhoodId: neighborhood.id, // Usamos ID numérico por performance
+        neighborhoodId: neighborhood.id,
         password: hashedPassword,
       });
       const savedUser = await queryRunner.manager.save(newUser);
@@ -149,7 +157,7 @@ export class UsersService {
           streetName: createDto.streetName,
           identifier: createDto.identifier,
           neighborhoodId: neighborhood.id,
-          ownerId: savedUser.id, // El creador de la unidad es el dueño inicial
+          ownerId: savedUser.id,
           status: HousingStatusEnum.OCCUPIED,
         });
         targetUnit = await queryRunner.manager.save(newUnit);
@@ -273,7 +281,7 @@ export class UsersService {
           isFamily: updateDto.isFamily,
           isOwner: updateDto.isOwner,
           isTenant: updateDto.isTenant,
-          createdBy: currentUser.id,
+          updatedBy: currentUser.id,
         });
         await queryRunner.manager.save(newAssignment);
       }
@@ -293,19 +301,32 @@ export class UsersService {
     }
   }
 
-  async remove(publicId: string, deleter: User): Promise<void> {
+  async remove(
+    publicId: string,
+    deleter: User,
+    neighborhood: Neighborhood,
+  ): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
       const userToDelete = await queryRunner.manager.findOne(User, {
-        where: { publicId },
-        relations: ['assignments'],
+        where: {
+          publicId,
+          neighborhood: {
+            id: neighborhood.id,
+          },
+        },
+        relations: ['assignments', 'neighborhood'],
       });
 
       if (!userToDelete) {
         throw new NotFoundException('Usuario no encontrado');
+      }
+
+      if (userToDelete.neighborhoodId !== deleter.neighborhoodId) {
+        throw new ForbiddenException('Accion no permitida por scope.');
       }
 
       userToDelete.deletedBy = deleter.id;

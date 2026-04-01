@@ -30,15 +30,14 @@ export class FeeSchedule extends TraceableEntity {
   })
   type: FeeScheduleTypeEnum;
 
-  //TODO: REVIEW THIS
-  @Column()
+  @Column({ nullable: true })
   cronSchedule: string; // Ej: "0 0 1 * *"
 
-  @Column({ type: 'date', nullable: true })
-  startDate: Date;
+  @Column({ nullable: true })
+  startDate: string;
 
-  @Column({ type: 'date', nullable: true })
-  endDate: Date; // Si es null, es infinita
+  @Column({ nullable: true })
+  endDate: string;
 
   @Column({
     type: 'enum',

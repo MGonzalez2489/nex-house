@@ -273,7 +273,7 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
 
     for (const u of initUsers) {
       try {
-        await this.userService.create(neighborhood.publicId, u, rUser);
+        await this.userService.create(neighborhood, u, rUser);
         this.logger.log(`User ${u.email} seeded successfully.`);
       } catch (error) {
         this.logger.error(`Failed to seed user ${u.email}: ${error.message}`);
@@ -296,14 +296,10 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
     for (const u of nextUsers) {
       const unitKey = `${u.streetName}#${u.identifier}`.toLowerCase().trim();
 
-      // console.log('Llaves disponibles en el Map:', Array.from(unitMap.keys()));
-      // console.log('Buscando llave:', unitKey);
-
-      //`${u.streetName}#${u.identifier}`;
       const existingUnitId = unitMap.get(unitKey);
       try {
         const savedUser = await this.userService.create(
-          neighborhood.publicId,
+          neighborhood,
           { ...u, unitId: existingUnitId },
           rUser,
         );

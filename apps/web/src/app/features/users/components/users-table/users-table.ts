@@ -44,6 +44,13 @@ export class UsersTable {
   filter = output<Search>();
   inspect = output<UserModel>();
 
+  cols: TableColumn<UserModel>[] = [
+    { field: 'fullName', header: 'Habitante' },
+    { field: 'email', header: 'Contacto' },
+    { field: 'assignments', header: 'Unidad' },
+    { field: 'role', header: 'Rol' },
+    { field: 'status', header: 'Estatus' },
+  ];
   search(event: TableLazyLoadEvent): void {
     const searchParams: Search = {
       first: event.first ?? 0,
@@ -54,12 +61,4 @@ export class UsersTable {
 
     this.filter.emit(searchParams);
   }
-
-  cols: TableColumn<UserModel>[] = [
-    { field: 'fullName', header: 'Habitante' },
-    { field: 'email', header: 'Contacto' },
-    { field: 'assignments', header: 'Unidad' },
-    { field: 'role', header: 'Rol' },
-    { field: 'status', header: 'Estatus' },
-  ];
 }
