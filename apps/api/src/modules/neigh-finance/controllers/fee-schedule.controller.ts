@@ -11,12 +11,17 @@ export class FeeScheduleController {
   constructor(private readonly feeScheduleService: FeeScheduleService) {}
 
   @Post()
-  createSchedule(
+  async createSchedule(
     @Body() dto: CreateFeeScheduleDto,
     @CurrentNeigh() neigh: Neighborhood,
     @CurrentUser() user: User,
   ) {
-    return this.feeScheduleService.create(dto, neigh.id, user.id);
+    const response = await this.feeScheduleService.create(
+      dto,
+      neigh.id,
+      user.id,
+    );
+    return FeeScheduleToModel(response);
   }
 
   @Get()
@@ -30,7 +35,8 @@ export class FeeScheduleController {
   }
 
   @Get(':publicId')
-  findOne(@Param('publicId') publicId: string) {
-    return this.feeScheduleService.findOne(publicId);
+  async findOne(@Param('publicId') publicId: string) {
+    const response = await this.feeScheduleService.findOne(publicId);
+    return FeeScheduleToModel(response);
   }
 }

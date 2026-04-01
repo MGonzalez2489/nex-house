@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import {
   FeeScheduleForm,
+  FeeScheduleList,
   FeeScheduleTable,
 } from '@features/finance/components';
 import { FinanceStore } from '@features/finance/stores';
@@ -15,6 +16,7 @@ import { DrawerModule } from 'primeng/drawer';
     PageHeader,
     ButtonModule,
     FeeScheduleTable,
+    FeeScheduleList,
     DrawerModule,
     FeeScheduleForm,
     Card,

@@ -12,5 +12,8 @@ export function FeeScheduleToModel(fee: FeeSchedule): FeeScheduleModel {
     startDate: fee.startDate,
     endDate: fee.endDate,
     status: fee.status,
+
+    cronSchedule: fee.cronSchedule,
+    cronDescription: fee.cronDescription,
   };
 }

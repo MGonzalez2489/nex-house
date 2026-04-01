@@ -5,7 +5,7 @@ import { Neighborhood } from './neighborhood.entity';
 import { FeeScheduleStatusEnum, FeeScheduleTypeEnum } from '@nex-house/enums';
 import { Charge } from './charge.entity';
 
-@Entity('fee-schedules')
+@Entity('fee_schedules')
 export class FeeSchedule extends TraceableEntity {
   @Column({ nullable: true })
   @Exclude()
@@ -34,6 +34,9 @@ export class FeeSchedule extends TraceableEntity {
   cronSchedule: string; // Ej: "0 0 1 * *"
 
   @Column({ nullable: true })
+  cronDescription: string;
+
+  @Column({ nullable: true })
   startDate: string;
 
   @Column({ nullable: true })
@@ -42,7 +45,7 @@ export class FeeSchedule extends TraceableEntity {
   @Column({
     type: 'enum',
     enum: FeeScheduleStatusEnum,
-    default: FeeScheduleStatusEnum.ACTIVE,
+    default: FeeScheduleStatusEnum.SCHEDULED,
   })
   status: FeeScheduleStatusEnum;
 

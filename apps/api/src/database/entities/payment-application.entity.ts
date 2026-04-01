@@ -4,7 +4,7 @@ import { Exclude } from 'class-transformer';
 import { Payment } from './payment.entity';
 import { Charge } from './charge.entity';
 
-@Entity('payment-applications')
+@Entity('payment_applications')
 export class PaymentApplication extends TraceableEntity {
   @Column()
   @Exclude()

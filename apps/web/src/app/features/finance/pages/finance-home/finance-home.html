@@ -57,7 +57,7 @@ comerciales. Visualiza el estado actual de tus flujos de efectivo."
   </div>
 </div>
 <!-- Fees Ledger (Table Section) -->
-<p-card>
+<p-card class="hidden md:block">
   <app-fee-schedule-table
     [data]="store.feeScheduleEntities()"
     [isLoading]="store.loading()"
@@ -65,6 +65,7 @@ comerciales. Visualiza el estado actual de tus flujos de efectivo."
     (filter)="store.feeScheduleLoadAll($event)"
   />
 </p-card>
+<app-fee-schedule-list class="md:hidden" />
 <section
   class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0px_20px_50px_rgba(11,28,48,0.04)] hidden"
 >

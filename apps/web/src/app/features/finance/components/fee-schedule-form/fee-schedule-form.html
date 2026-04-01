@@ -2,6 +2,7 @@
   <!-- name -->
   <div class="form-control">
     <label for="name" class="form-label">Nombre del Cobro</label>
+
     <input
       pInputText
       id="name"
@@ -102,8 +103,62 @@
       label="Fecha de Inicio"
     />
   </div>
-  <!-- endDate -->
+  <!-- RECURRENCE -->
   @if(isRecurrent()){
+  <!-- frecuency -->
+  <div class="form-control">
+    <label for="frecuency" class="form-label">Frecuencia</label>
+
+    <p-select
+      formControlName="frecuency"
+      [options]="frecuency"
+      optionLabel="key"
+      optionValue="value"
+      fluid
+    />
+
+    <app-form-validation-error
+      id="frecuency-errors"
+      [touched]="form.controls.frecuency.touched"
+      [errors]="form.controls.frecuency.errors"
+      label="Fecha de Fin"
+    />
+  </div>
+  @switch(form.controls.frecuency.value) { @case('weekly'){
+
+  <div class="form-control">
+    <label for="dayOfweek" class="form-label">Cada dia de la semana</label>
+    <p-select
+      formControlName="dayOfWeek"
+      [options]="daysOfWeek"
+      optionLabel="key"
+      optionValue="value"
+      fluid
+    />
+    <app-form-validation-error
+      id="frecuency-errors"
+      [touched]="form.controls.dayOfWeek.touched"
+      [errors]="form.controls.dayOfWeek.errors"
+      label="Dia de la semana"
+    />
+  </div>
+
+  } @case('monthly'){
+  <div class="form-control">
+    <label for="dayOfMonth" class="form-label">Cada dia de mes</label>
+    <p-select formControlName="dayOfMonth" [options]="daysOfMonth" fluid />
+    <app-form-validation-error
+      id="frecuency-errors"
+      [touched]="form.controls.dayOfMonth.touched"
+      [errors]="form.controls.dayOfMonth.errors"
+      label="Dia de la semana"
+    />
+  </div>
+  } @case('yearly'){
+  <p>yearly</p>
+  } }
+
+  <!-- EndDate -->
   <div class="form-control">
     <label for="endDate" class="form-label">Fecha de Fin</label>
     <p-datepicker

@@ -8,4 +8,7 @@ export class FeeScheduleModel extends BaseModel {
   startDate: string;
   endDate: string;
   status: string;
+
+  cronSchedule: string;
+  cronDescription: string;
 }

@@ -12,7 +12,7 @@ import { CreateFeeScheduleDto } from '../dtos';
 
 import { SearchDto } from '@common/dtos';
 import { paginateQuery } from '@common/utils';
-import { startOfDay } from 'date-fns';
+import { isToday, startOfDay } from 'date-fns';
 
 @Injectable()
 export class FeeScheduleService {
@@ -37,6 +37,19 @@ export class FeeScheduleService {
       newEntity.createdBy = userId;
 
       newEntity.startDate = startOfDay(dto.startDate).toISOString();
+
+      if (isToday(newEntity.startDate)) {
+        newEntity.status = FeeScheduleStatusEnum.ACTIVE;
+      }
+
+      const cronValue = this.calculateFeeCronJob(dto);
+      if (!cronValue || !cronValue.description) {
+        throw new BadRequestException('Valores de recurrencia no validos');
+      }
+
+      newEntity.cronSchedule = cronValue.cron ? cronValue.cron : undefined;
+      newEntity.cronDescription = cronValue.description;
+
       const schedule = queryRunner.manager.create(FeeSchedule, newEntity);
 
       const savedSchedule = await queryRunner.manager.save(schedule);
@@ -106,5 +119,74 @@ export class FeeScheduleService {
     feeScheduleRecord.status = FeeScheduleStatusEnum.CANCELLED;
 
     this.feeScheduleRepo.softRemove(feeScheduleRecord);
+  }
+
+  private calculateFeeCronJob(dto: CreateFeeScheduleDto) {
+    const { frecuency, dayOfMonth, dayOfWeek, startDate } = dto;
+    const start = new Date(startDate);
+
+    // Mapeo de nombres para días de la semana
+    const weekDays: Record<string, string> = {
+      '0': 'domingo',
+      '1': 'lunes',
+      '2': 'martes',
+      '3': 'miércoles',
+      '4': 'jueves',
+      '5': 'viernes',
+      '6': 'sábado',
+      sunday: 'domingo',
+      monday: 'lunes',
+      tuesday: 'martes',
+      wednesday: 'miércoles',
+      thursday: 'jueves',
+      friday: 'viernes',
+      saturday: 'sábado',
+    };
+
+    let cron;
+    let description;
+
+    switch (frecuency) {
+      case 'weekly': {
+        const dw = dayOfWeek ?? start.getDay().toString();
+        cron = `0 0 * * ${dw}`;
+        description = `Se ejecutará cada ${weekDays[dw]} de cada semana`;
+        break;
+      }
+
+      case 'monthly': {
+        const dm = dayOfMonth ?? start.getDate();
+        cron = `0 0 ${dm} * *`;
+        description = `Se ejecutará el día ${dm} de cada mes`;
+        break;
+      }
+
+      case 'yearly': {
+        const day = start.getDate();
+        const month = start.getMonth() + 1;
+        const monthNames = [
+          'enero',
+          'febrero',
+          'marzo',
+          'abril',
+          'mayo',
+          'junio',
+          'julio',
+          'agosto',
+          'septiembre',
+          'octubre',
+          'noviembre',
+          'diciembre',
+        ];
+        cron = `0 0 ${day} ${month} *`;
+        description = `Se ejecutará cada ${day} de ${monthNames[month - 1]} cada año`;
+        break;
+      }
+
+      default:
+        return { cron: null, description: 'Pago único' };
+    }
+
+    return { cron, description };
   }
 }

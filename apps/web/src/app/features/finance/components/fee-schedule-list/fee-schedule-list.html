@@ -1,1 +1,157 @@
-<p>fee-schedule-list works!</p>
+<div class="space-y-4 p-4 bg-slate-50 min-h-screen">
+  <div
+    class="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm space-y-4 active:bg-slate-50/50 transition-colors"
+  >
+    <div class="flex items-start justify-between gap-3">
+      <div class="flex flex-col flex-1">
+        <span class="font-bold text-lg text-slate-900 leading-tight"
+          >Pago Unico 100</span
+        >
+        <span class="text-xs text-slate-500 italic mt-0.5"
+          >pago unico de 100</span
+        >
+      </div>
+      <div class="flex flex-col items-end gap-2 shrink-0">
+        <span
+          class="px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 ring-1 ring-inset ring-amber-600/20"
+          >Pendiente</span
+        >
+        <button
+          class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
+        >
+          Ver
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5l7 7-7 7"
+            ></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div
+      class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100"
+    >
+      <span class="p-2.5 bg-slate-100 text-slate-500 rounded-lg shrink-0">
+        <svg
+          class="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+          ></path>
+        </svg>
+      </span>
+      <div class="flex flex-col flex-1">
+        <span class="text-xs text-slate-500">Programación</span>
+        <span class="text-sm text-slate-700 font-medium">Pago único</span>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 pt-2">
+      <div class="flex flex-col">
+        <span class="text-xs text-slate-500">Monto</span>
+        <span class="text-xl font-extrabold text-slate-950 font-mono"
+          >$100.00</span
+        >
+      </div>
+      <div class="flex flex-col items-end text-right">
+        <span class="text-xs text-slate-500">Ejecución</span>
+        <span class="text-sm text-slate-700 font-semibold">Apr 21, 2026</span>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm space-y-4"
+  >
+    <div class="flex items-start justify-between gap-3">
+      <div class="flex flex-col flex-1">
+        <span class="font-bold text-lg text-slate-900 leading-tight"
+          >Pago Recurrente de 200</span
+        >
+        <span class="text-xs text-slate-500 italic mt-0.5"
+          >200 mensuales cada dia 15</span
+        >
+      </div>
+      <div class="flex flex-col items-end gap-2 shrink-0">
+        <span
+          class="px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 ring-1 ring-inset ring-amber-600/20"
+          >Pendiente</span
+        >
+        <button
+          class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
+        >
+          Ver
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5l7 7-7 7"
+            ></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div
+      class="flex items-center gap-3 p-3 bg-blue-50/50 rounded-xl border border-blue-100"
+    >
+      <span class="p-2.5 bg-blue-100 text-blue-600 rounded-lg shrink-0">
+        <svg
+          class="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+          ></path>
+        </svg>
+      </span>
+      <div class="flex flex-col flex-1">
+        <span class="text-xs text-blue-700">Programación (Recurrente)</span>
+        <span class="text-sm text-slate-700 font-medium"
+          >Se ejecutará el día 15 de cada mes</span
+        >
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 pt-2">
+      <div class="flex flex-col">
+        <span class="text-xs text-slate-500">Monto</span>
+        <span class="text-xl font-extrabold text-slate-950 font-mono"
+          >$200.00</span
+        >
+      </div>
+      <div
+        class="flex flex-col items-end text-right text-[11px] text-slate-500"
+      >
+        <span>Inicia: Apr 30, 2026</span>
+        <span>Termina: Apr 30, 2027</span>
+      </div>
+    </div>
+  </div>
+</div>

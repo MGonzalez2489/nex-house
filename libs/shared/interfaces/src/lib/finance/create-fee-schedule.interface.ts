@@ -3,8 +3,11 @@ export interface ICreateFeeSchedule {
   description?: string;
   amount: number;
   type: string;
-  status?: string;
-  cronSchedule?: string;
-  startDate?: string;
+  startDate: string;
+
+  //recurrence
+  frecuency?: string; //weekly, monthly, yearly
+  dayOfMonth?: number; // for monthly
+  dayOfWeek?: number; // for weekly
   endDate?: string;
 }
