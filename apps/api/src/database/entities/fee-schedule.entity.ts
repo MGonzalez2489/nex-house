@@ -37,10 +37,13 @@ export class FeeSchedule extends TraceableEntity {
   cronDescription: string;
 
   @Column({ nullable: true })
-  startDate: string;
+  startDate: Date;
 
   @Column({ nullable: true })
-  endDate: string;
+  lastExecutionDate: Date;
+
+  @Column({ nullable: true })
+  endDate: Date;
 
   @Column({
     type: 'enum',

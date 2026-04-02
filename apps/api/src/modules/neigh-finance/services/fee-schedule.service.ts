@@ -12,7 +12,8 @@ import { CreateFeeScheduleDto } from '../dtos';
 
 import { SearchDto } from '@common/dtos';
 import { paginateQuery } from '@common/utils';
-import { isToday, startOfDay } from 'date-fns';
+import { isToday, startOfDay, toDate } from 'date-fns';
+import { ChargeService } from './charge.service';
 
 @Injectable()
 export class FeeScheduleService {
@@ -20,6 +21,7 @@ export class FeeScheduleService {
     @InjectRepository(FeeSchedule)
     private readonly feeScheduleRepo: Repository<FeeSchedule>,
     private readonly dataSource: DataSource,
+    private readonly chargesService: ChargeService,
   ) {}
 
   async create(
@@ -32,14 +34,23 @@ export class FeeScheduleService {
     await queryRunner.startTransaction();
 
     try {
-      const newEntity: Partial<FeeSchedule> = { ...dto };
+      const newEntity: Partial<FeeSchedule> = {
+        ...dto,
+        startDate: new Date(),
+        endDate: undefined,
+      };
       newEntity.neighborhoodId = neighborhoodId;
       newEntity.createdBy = userId;
 
-      newEntity.startDate = startOfDay(dto.startDate).toISOString();
+      newEntity.startDate = startOfDay(dto.startDate);
+      const startFeeToday = isToday(newEntity.startDate);
 
-      if (isToday(newEntity.startDate)) {
+      if (startFeeToday) {
         newEntity.status = FeeScheduleStatusEnum.ACTIVE;
+      }
+
+      if (dto.endDate) {
+        newEntity.endDate = toDate(dto.endDate);
       }
 
       const cronValue = this.calculateFeeCronJob(dto);
@@ -54,8 +65,11 @@ export class FeeScheduleService {
 
       const savedSchedule = await queryRunner.manager.save(schedule);
 
-      // LÓGICA OPCIONAL: Si es ONE_TIME e inmediata, podrías disparar
-      // la creación de Charges aquí mismo dentro de la transacción.
+      await this.chargesService.generateChargesForResidents(
+        queryRunner,
+        savedSchedule,
+        neighborhoodId,
+      );
 
       await queryRunner.commitTransaction();
       return savedSchedule;
@@ -105,6 +119,18 @@ export class FeeScheduleService {
     // Implementar lógica similar con transacción si el cambio de monto
     // afecta cargos pendientes.
     return this.feeScheduleRepo.update(id, { ...dto, updatedBy: userId });
+  }
+
+  async activateScheduledFees(): Promise<FeeSchedule[]> {
+    const result = await this.feeScheduleRepo
+      .createQueryBuilder()
+      .update(FeeSchedule)
+      .set({ status: FeeScheduleStatusEnum.ACTIVE })
+      .where('status = :status', { status: FeeScheduleStatusEnum.SCHEDULED })
+      .andWhere('startDate <= :today', { today: new Date() })
+      .execute();
+
+    return (result.generatedMaps as FeeSchedule[]) || [];
   }
 
   async remove(id: number, userId: number) {

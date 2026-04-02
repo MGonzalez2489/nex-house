@@ -2,6 +2,7 @@ import { FeeScheduleTypeEnum } from '@nex-house/enums';
 import { ICreateFeeSchedule } from '@nex-house/interfaces';
 import { Transform } from 'class-transformer';
 import {
+  IsDateString,
   IsEnum,
   IsInt,
   IsNotEmpty,
@@ -28,7 +29,7 @@ export class CreateFeeScheduleDto implements ICreateFeeSchedule {
   @IsEnum(FeeScheduleTypeEnum)
   type: FeeScheduleTypeEnum;
 
-  @IsString()
+  @IsDateString()
   startDate: string;
 
   //recurrent
@@ -45,7 +46,7 @@ export class CreateFeeScheduleDto implements ICreateFeeSchedule {
   @IsOptional()
   dayOfWeek?: number;
 
-  @IsString()
+  @IsDateString()
   @IsOptional()
   endDate?: string;
 }

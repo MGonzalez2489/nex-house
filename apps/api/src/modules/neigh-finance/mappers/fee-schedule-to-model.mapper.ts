@@ -9,8 +9,8 @@ export function FeeScheduleToModel(fee: FeeSchedule): FeeScheduleModel {
     description: fee.description,
     amount: fee.amount / 1000,
     type: fee.type,
-    startDate: fee.startDate,
-    endDate: fee.endDate,
+    startDate: fee.startDate?.toString(),
+    endDate: fee.endDate?.toString(),
     status: fee.status,
 
     cronSchedule: fee.cronSchedule,

@@ -1,6 +1,3 @@
-import { Module } from '@nestjs/common';
-import { FeeScheduleController, NeighFinanceController } from './controllers';
-import { FeeScheduleService, NeighFinanceService } from './services';
 import {
   Charge,
   Expense,
@@ -9,10 +6,21 @@ import {
   PaymentApplication,
   Transaction,
 } from '@database/entities';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { FeeScheduleController, NeighFinanceController } from './controllers';
+import {
+  ChargeService,
+  FeeScheduleService,
+  NeighFinanceService,
+} from './services';
+import { HousingUnitsModule } from '@modules/housing-units';
+import { TaskService } from './services/task.service';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     TypeOrmModule.forFeature([
       FeeSchedule,
       Expense,
@@ -21,8 +29,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       PaymentApplication,
       Transaction,
     ]),
+    HousingUnitsModule,
   ],
   controllers: [NeighFinanceController, FeeScheduleController],
-  providers: [NeighFinanceService, FeeScheduleService],
+  providers: [
+    NeighFinanceService,
+    FeeScheduleService,
+    ChargeService,
+    TaskService,
+  ],
 })
 export class NeighFinanceModule {}

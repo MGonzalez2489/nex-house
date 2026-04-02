@@ -15,8 +15,8 @@ import {
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { BulkCreateHousingUnitDto, CreateHousingUnitDto } from './dtos';
 import { HousingUnitsService } from './housing-units.service';
-import { CurrentUser } from '@common/decorators';
-import { User } from '@database/entities';
+import { CurrentNeigh, CurrentUser } from '@common/decorators';
+import { Neighborhood, User } from '@database/entities';
 import { UnitArrayToModelArray, UnitEntityToModel } from './mappers';
 
 @ApiTags('Housing Units')
@@ -60,11 +60,11 @@ export class HousingUnitsController {
   @Get()
   @ApiOperation({ summary: 'Get all units for a specific neighborhood' })
   async findAll(
-    @Param('neighborhoodId', ParseUUIDPipe) neighborhoodId: string,
     @Query() searchDto: SearchDto,
+    @CurrentNeigh() neigh: Neighborhood,
   ) {
     const response = await this.housingUnitsService.findAll(
-      neighborhoodId,
+      neigh.id,
       searchDto,
     );
 

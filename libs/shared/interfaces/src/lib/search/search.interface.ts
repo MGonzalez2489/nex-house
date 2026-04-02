@@ -4,4 +4,5 @@ export interface Search {
   sortField?: string;
   sortOrder?: number;
   globalFilter?: string;
+  showAll?: boolean;
 }
