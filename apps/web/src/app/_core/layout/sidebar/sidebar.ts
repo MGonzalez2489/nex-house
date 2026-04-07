@@ -94,10 +94,21 @@ export class Sidebar {
         routerLinkActiveOptions: {
           exact: true,
         },
+        expanded: true,
         items: [
           {
-            label: 'Agenda de cobros',
+            label: 'General',
             routerLink: FINANCE_ROUTES_ENUM.HOME,
+            icon: 'pi pi-calendar',
+          },
+          {
+            label: 'Planes de Cobro',
+            routerLink: `${FINANCE_ROUTES_ENUM.HOME}/${FINANCE_ROUTES_ENUM.PAYMENT_PLANS}`,
+            icon: 'pi pi-calendar',
+          },
+          {
+            label: 'Monitor de Cobranza',
+            routerLink: `${FINANCE_ROUTES_ENUM.HOME}/${FINANCE_ROUTES_ENUM.PAYMENT_MONITOR}`,
             icon: 'pi pi-calendar',
           },
         ],

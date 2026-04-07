@@ -33,9 +33,6 @@ export class Transaction extends TraceableEntity {
   })
   sourceType: TransactionSourceTypeEnum;
 
-  @Column()
-  sourceId: number;
-
   @Column({ type: 'date' })
   transactionDate: Date; // Para reportes mensuales precisos
 

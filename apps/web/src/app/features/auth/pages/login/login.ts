@@ -20,8 +20,8 @@ import { PasswordModule } from 'primeng/password';
 import { FormValidationError } from '@shared/components/ui';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
-import { DASHBOARD_ROUTES_ENUM } from '@features/dashboard/dashboard.routes';
 import { AuthStore } from '@features/auth';
+import { DASHBOARD_ROUTES_ENUM } from '@features/dashboard';
 
 type ILoginForm = {
   email: FormControl<string>;
@@ -51,7 +51,7 @@ export class Login {
   protected readonly store = inject(AuthStore);
 
   protected readonly form = new FormGroup<ILoginForm>({
-    email: new FormControl('root@test.com', {
+    email: new FormControl('admin@test.com', {
       nonNullable: true,
       validators: [Validators.required, Validators.email],
     }),

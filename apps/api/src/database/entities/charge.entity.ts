@@ -37,8 +37,17 @@ export class Charge extends TraceableEntity {
   })
   status: ChargeStatusEnum;
 
-  @Column()
-  dueDate: string;
+  @Column({ type: 'timestamp', nullable: true })
+  dueDate: Date;
+
+  //notes exclusive to handle charges (crud)
+  //not use it to cancel a resident charge
+  @Column({ nullable: true })
+  cancelationReason: string;
+
+  @Column({ nullable: true })
+  @Exclude()
+  canceledByUserId: number;
 
   //relationships
   @ManyToOne(() => HousingUnit)
@@ -55,4 +64,8 @@ export class Charge extends TraceableEntity {
 
   @OneToMany(() => PaymentApplication, (app) => app.charge)
   applications: PaymentApplication[];
+
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'canceledByUserId' })
+  canceledByUser: User;
 }

@@ -28,9 +28,9 @@ export class Payment extends TraceableEntity {
   })
   status: PaymentStatusEnum;
 
-  @Column()
-  @Exclude()
-  validatedByUserId: number;
+  // @Column()
+  // @Exclude()
+  // validatedByUserId: number;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   paymentDate: Date; // La fecha real de la transferencia
@@ -47,9 +47,9 @@ export class Payment extends TraceableEntity {
   @JoinColumn({ name: 'unitId' })
   unit: HousingUnit;
 
-  @ManyToOne(() => User)
-  @JoinColumn({ name: 'validatedByUserId' })
-  validatedByUser: User;
+  // @ManyToOne(() => User)
+  // @JoinColumn({ name: 'validatedByUserId' })
+  // validatedByUser: User;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'reportedByUserId' })

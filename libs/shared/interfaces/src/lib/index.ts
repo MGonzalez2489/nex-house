@@ -6,3 +6,4 @@ export * from './housing-unit';
 export * from './users';
 
 export * from './finance';
+export * from './key-value-item.interface';

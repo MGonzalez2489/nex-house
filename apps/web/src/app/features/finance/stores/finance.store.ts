@@ -1,6 +1,7 @@
 import { withDevtools, withReset } from '@angular-architects/ngrx-toolkit';
 import { signalStore } from '@ngrx/signals';
 import { withFeeScheduleFeature } from './_fee-schedule.store';
+import { withChargeFeature } from './_charge.store';
 
 // interface FinanceState {
 //   neighborhoodId: string | null;
@@ -17,4 +18,5 @@ export const FinanceStore = signalStore(
   withReset(),
   // withCallState(),
   withFeeScheduleFeature(),
+  withChargeFeature(),
 );

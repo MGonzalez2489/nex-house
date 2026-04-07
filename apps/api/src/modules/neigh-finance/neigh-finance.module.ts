@@ -8,7 +8,11 @@ import {
 } from '@database/entities';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { FeeScheduleController, NeighFinanceController } from './controllers';
+import {
+  ChargesController,
+  FeeScheduleController,
+  NeighFinanceController,
+} from './controllers';
 import {
   ChargeService,
   FeeScheduleService,
@@ -31,7 +35,11 @@ import { ScheduleModule } from '@nestjs/schedule';
     ]),
     HousingUnitsModule,
   ],
-  controllers: [NeighFinanceController, FeeScheduleController],
+  controllers: [
+    NeighFinanceController,
+    FeeScheduleController,
+    ChargesController,
+  ],
   providers: [
     NeighFinanceService,
     FeeScheduleService,

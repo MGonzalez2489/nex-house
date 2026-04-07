@@ -33,17 +33,17 @@ import { pipe, tap, switchMap, lastValueFrom } from 'rxjs';
 
 const config = entityConfig({
   entity: type<FeeScheduleModel>(),
-  collection: 'feeSchedule',
+  collection: 'feeSchedules',
   selectId: (fee: FeeScheduleModel) => fee.publicId,
 });
 
 interface FeeScheduleState {
-  feeFilters: Search | undefined;
-  feeSchedulePagination: ApiPaginationMeta | undefined;
+  feesFilters: Search | undefined;
+  feesSchedulePagination: ApiPaginationMeta | undefined;
 }
 const initialState: FeeScheduleState = {
-  feeFilters: undefined,
-  feeSchedulePagination: undefined,
+  feesFilters: undefined,
+  feesSchedulePagination: undefined,
 };
 
 export function withFeeScheduleFeature() {
@@ -70,8 +70,8 @@ export function withFeeScheduleFeature() {
                     store,
                     setAllEntities(response.data, config),
                     {
-                      feeFilters: params,
-                      feeSchedulePagination: response.meta,
+                      feesFilters: params,
+                      feesSchedulePagination: response.meta,
                     },
                     setLoaded(),
                   ),

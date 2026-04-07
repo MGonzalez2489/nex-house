@@ -19,7 +19,7 @@ export class TaskService {
     private readonly dataSource: DataSource,
   ) {}
 
-  @Cron(CronExpression.EVERY_MINUTE)
+  @Cron(CronExpression.EVERY_5_MINUTES)
   // @Cron('1 0 * * *', {
   //   name: 'daily-finance-automation',
   //   // timeZone: 'America/Mexico_City', // Ajusta a tu zona horaria local
@@ -113,7 +113,9 @@ export class TaskService {
       const interval = CronExpressionParser.parse(fee.cronSchedule, options);
 
       return interval.hasNext();
-    } catch (e) {
+    } catch (err) {
+      console.log('err:', err);
+
       return false;
     }
   }
