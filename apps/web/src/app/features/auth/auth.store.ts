@@ -72,6 +72,7 @@ export const AuthStore = signalStore(
         );
         return true;
       } catch (error) {
+        console.log('error', error);
         patchState(store, setError(error));
         return false;
       }

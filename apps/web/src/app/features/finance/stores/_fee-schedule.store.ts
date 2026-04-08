@@ -3,8 +3,9 @@ import {
   setLoaded,
   setLoading,
   withCallState,
+  withReset,
 } from '@angular-architects/ngrx-toolkit';
-import { inject } from '@angular/core';
+import { effect, inject } from '@angular/core';
 import {
   ApiPaginationMeta,
   ICreateFeeSchedule,
@@ -15,6 +16,7 @@ import {
   patchState,
   signalStoreFeature,
   type,
+  withHooks,
   withMethods,
   withProps,
   withState,
@@ -30,6 +32,7 @@ import { FeeScheduleService } from '../services';
 import { tapResponse } from '@ngrx/operators';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { pipe, tap, switchMap, lastValueFrom } from 'rxjs';
+import { AuthStore } from '@features/auth';
 
 const config = entityConfig({
   entity: type<FeeScheduleModel>(),
@@ -51,6 +54,7 @@ export function withFeeScheduleFeature() {
     withState(initialState),
     withEntities(config),
     withCallState(),
+    withReset(),
     withProps(() => ({
       _contextStore: inject(ContextStore),
       _feeScheduleService: inject(FeeScheduleService),
@@ -99,5 +103,20 @@ export function withFeeScheduleFeature() {
         }
       },
     })),
+    withHooks((store) => {
+      const authStore = inject(AuthStore);
+      return {
+        onInit: (): void => {
+          effect(() => {
+            const isAuth = authStore.isAuthenticated();
+
+            if (!isAuth) {
+              store.resetState();
+              return;
+            }
+          });
+        },
+      };
+    }),
   );
 }

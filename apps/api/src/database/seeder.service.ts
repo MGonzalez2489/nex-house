@@ -348,7 +348,7 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
       'Gonzalez',
     ];
 
-    for (let i = 11; i <= 150; i++) {
+    for (let i = 11; i <= 50; i++) {
       const street = streets[i % streets.length];
       const houseNum = 100 + Math.floor(i / 5); // Distribuye casas de 100 en adelante
 

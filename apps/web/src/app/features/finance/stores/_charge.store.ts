@@ -3,8 +3,10 @@ import {
   setLoaded,
   setLoading,
   withCallState,
+  withReset,
 } from '@angular-architects/ngrx-toolkit';
-import { inject } from '@angular/core';
+import { effect, inject } from '@angular/core';
+import { AuthStore } from '@features/auth';
 import {
   ApiPaginationMeta,
   Search,
@@ -21,6 +23,7 @@ import {
   patchState,
   signalStoreFeature,
   type,
+  withHooks,
   withMethods,
   withProps,
   withState,
@@ -57,6 +60,7 @@ export function withChargeFeature() {
   return signalStoreFeature(
     withState(initialState),
     withEntities(config),
+    withReset(),
     withCallState(),
     withProps(() => ({
       _contextStore: inject(ContextStore),
@@ -130,6 +134,7 @@ export function withChargeFeature() {
           return false;
         }
       },
+
       cancel: async (publicId: string, dto: ChargeCancelModel) => {
         const nId = store._contextStore.selectedId();
         if (!nId) return false;
@@ -152,5 +157,18 @@ export function withChargeFeature() {
         }
       },
     })),
+    withHooks((store) => {
+      const authStore = inject(AuthStore);
+      return {
+        onInit: (): void => {
+          effect(() => {
+            const isAuth = authStore.isAuthenticated();
+            if (!isAuth) {
+              store.resetState();
+            }
+          });
+        },
+      };
+    }),
   );
 }

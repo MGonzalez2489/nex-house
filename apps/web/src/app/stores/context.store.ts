@@ -1,4 +1,5 @@
 import {
+  setError,
   setLoaded,
   setLoading,
   withCallState,
@@ -6,6 +7,7 @@ import {
   withReset,
 } from '@angular-architects/ngrx-toolkit';
 import { effect, inject } from '@angular/core';
+import { AuthStore } from '@features/auth';
 import { NeighborhoodService } from '@features/neighborhoods/services';
 import { NeighborhoodModel } from '@nex-house/models';
 import { tapResponse } from '@ngrx/operators';
@@ -36,7 +38,7 @@ export const ContextStore = signalStore(
   withReset(),
   withCallState(),
   withState(initialState),
-  withProps((store) => ({
+  withProps(() => ({
     _neighService: inject(NeighborhoodService),
   })),
   withMethods((store) => ({
@@ -49,25 +51,24 @@ export const ContextStore = signalStore(
     getNeighborhood: rxMethod<void>(
       pipe(
         tap(() => patchState(store, setLoading())),
-        switchMap(() =>
-          store._neighService.getById(store.selectedId()!).pipe(
+        switchMap(() => {
+          const nId = store.selectedId();
+          if (!nId) return [];
+
+          return store._neighService.getById(nId).pipe(
             tapResponse({
               next: (response) =>
                 patchState(store, { neighborhood: response.data }, setLoaded()),
-              error: (err: any) =>
-                patchState(store, {
-                  callState: {
-                    error: err.error?.message || 'Load buildings failed',
-                  },
-                }),
+              error: (err: Error) => patchState(store, setError(err)),
             }),
-          ),
-        ),
+          );
+        }),
       ),
     ),
   })),
 
   withHooks((store) => {
+    const authStore = inject(AuthStore);
     return {
       onInit: (): void => {
         effect(() => {
@@ -81,6 +82,15 @@ export const ContextStore = signalStore(
 
           if (!cNeigh) {
             store.getNeighborhood();
+          }
+        });
+
+        effect(() => {
+          const isAuth = authStore.isAuthenticated();
+
+          if (!isAuth) {
+            store.resetState();
+            return;
           }
         });
       },

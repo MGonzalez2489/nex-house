@@ -8,8 +8,10 @@ import { ContextStore } from '@stores/context.store';
   providedIn: 'root',
 })
 export class SessionService {
+  //////////////////////stores
   private readonly authStore = inject(AuthStore);
   private readonly contextStore = inject(ContextStore);
+
   private router = inject(Router);
 
   readonly user = computed(() => this.authStore.user());
@@ -35,6 +37,7 @@ export class SessionService {
 
   logout() {
     this.authStore.logout();
+    this.contextStore.resetState();
     this.router.navigateByUrl(AUTH_ROUTES_ENUM.LOGIN);
   }
   //
