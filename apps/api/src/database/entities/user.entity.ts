@@ -42,6 +42,15 @@ export class User extends TraceableEntity {
   })
   status: UserStatusEnum;
 
+  @Column({ type: 'int', nullable: true })
+  @Exclude()
+  pwdResetCode: number | null;
+
+  @Column({ type: 'text', nullable: true })
+  @Exclude()
+  pwdResetToken: string | null;
+
+  //relationshipts
   @ManyToOne(() => Neighborhood)
   @JoinColumn({ name: 'neighborhoodId' })
   neighborhood: Neighborhood;

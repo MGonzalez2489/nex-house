@@ -20,7 +20,7 @@
     font-size: var(--text-sm);
     color: var(--color-slate-700);
 
-    margin-bottom: calc(var(--spacing) * 0.1);
+    margin-bottom: calc(var(--spacing) * 0.3);
 
     font-size: var(--text-sm);
     line-height: var(--tw-leading, var(--text-sm--line-height));

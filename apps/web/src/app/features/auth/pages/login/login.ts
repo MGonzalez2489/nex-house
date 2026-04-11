@@ -22,11 +22,7 @@ import { DASHBOARD_ROUTES_ENUM } from '@features/dashboard';
 import { FormFeedback, FormValidationError } from '@shared/components/ui';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
-
-type ILoginForm = {
-  email: FormControl<string>;
-  password: FormControl<string>;
-};
+import { ILoginForm } from './login-form';
 
 @Component({
   selector: 'app-login',

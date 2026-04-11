@@ -121,6 +121,13 @@ export class UsersService {
     return result;
   }
 
+  async findByResetPasswordCode(code: number) {
+    return this.repository.findOne({
+      where: { pwdResetCode: code },
+      relations: ['neighborhood', 'assignments', 'assignments.unit'],
+    });
+  }
+
   async create(
     neighborhood: Neighborhood,
     createDto: CreateUserDto,
@@ -299,6 +306,22 @@ export class UsersService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async update_internal(id: number, data: Partial<User>): Promise<User> {
+    const user = await this.repository.findOneBy({ id });
+    if (!user) {
+      throw new NotFoundException(
+        `User with ID ${id} not found for internal update`,
+      );
+    }
+
+    const updatedUser = this.repository.merge(user, data);
+
+    this.logger.log(`Internal update executed for user: ${user.email}`);
+    await this.repository.save(updatedUser);
+    const savedUser = await this.findByPublicId(user.publicId);
+    return savedUser!;
   }
 
   async remove(
