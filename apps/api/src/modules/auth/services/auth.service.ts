@@ -94,10 +94,9 @@ export class AuthService {
 
     //TODO: send code by email
 
-    return '';
-    // if (isProd) return '';
-    //
-    // return recoveryCode.toString();
+    if (isProd) return '';
+
+    return recoveryCode.toString();
   }
 
   async validatePwdRecoveryCode(code: string) {

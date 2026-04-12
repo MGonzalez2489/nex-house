@@ -7,6 +7,7 @@
   [loadOnInit]="true"
   (filter)="search($event)"
   [pagination]="pagination()"
+  [loadOnInit]="false"
 >
   <ng-template #body let-fee let-field="field">
     @switch (field) { @case ('name') {

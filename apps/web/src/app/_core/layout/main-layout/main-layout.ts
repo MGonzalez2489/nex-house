@@ -8,6 +8,7 @@ import { ContextStore } from '@stores/context.store';
 import { UserRoleEnum } from '@nex-house/enums';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { AuthStore } from '@features/auth';
+import { FinanceStore } from '@features/finance/stores';
 
 @Component({
   selector: 'app-main-layout',
@@ -19,6 +20,7 @@ export class MainLayout {
   protected readonly sessionService = inject(SessionService);
   protected readonly contextStore = inject(ContextStore);
   protected readonly authStore = inject(AuthStore);
+  protected readonly financeStore = inject(FinanceStore);
   sidebarVisible = signal(false);
 
   loadingContext = computed(() => {

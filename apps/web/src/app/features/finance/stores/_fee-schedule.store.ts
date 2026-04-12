@@ -5,17 +5,20 @@ import {
   withCallState,
   withReset,
 } from '@angular-architects/ngrx-toolkit';
-import { effect, inject } from '@angular/core';
+import { computed, effect, inject } from '@angular/core';
+import { AuthStore } from '@features/auth';
 import {
   ApiPaginationMeta,
   ICreateFeeSchedule,
   Search,
 } from '@nex-house/interfaces';
 import { FeeScheduleModel } from '@nex-house/models';
+import { tapResponse } from '@ngrx/operators';
 import {
   patchState,
   signalStoreFeature,
   type,
+  withComputed,
   withHooks,
   withMethods,
   withProps,
@@ -27,12 +30,10 @@ import {
   setAllEntities,
   withEntities,
 } from '@ngrx/signals/entities';
-import { ContextStore } from '@stores/context.store';
-import { FeeScheduleService } from '../services';
-import { tapResponse } from '@ngrx/operators';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { pipe, tap, switchMap, lastValueFrom } from 'rxjs';
-import { AuthStore } from '@features/auth';
+import { ContextStore } from '@stores/context.store';
+import { lastValueFrom, pipe, switchMap, tap } from 'rxjs';
+import { FeeScheduleService } from '../services';
 
 const config = entityConfig({
   entity: type<FeeScheduleModel>(),
@@ -58,6 +59,15 @@ export function withFeeScheduleFeature() {
     withProps(() => ({
       _contextStore: inject(ContextStore),
       _feeScheduleService: inject(FeeScheduleService),
+    })),
+    withComputed((store) => ({
+      feeScheduleExists: computed(() => {
+        if (store.loading()) {
+          return false;
+        }
+
+        return (store.feesSchedulePagination()?.total || 0) > 0;
+      }),
     })),
     withMethods((store) => ({
       feeScheduleLoadAll: rxMethod<Search>(
@@ -85,6 +95,8 @@ export function withFeeScheduleFeature() {
           }),
         ),
       ),
+    })),
+    withMethods((store) => ({
       feeScheduleCreate: async (dto: ICreateFeeSchedule): Promise<boolean> => {
         const nId = store._contextStore.selectedId();
         if (!nId) return false;
@@ -95,7 +107,7 @@ export function withFeeScheduleFeature() {
             store._feeScheduleService.create(nId, dto),
           );
           patchState(store, addEntity(response.data, config), setLoaded());
-
+          store.feeScheduleLoadAll(store.feesFilters()!);
           return true;
         } catch (err) {
           patchState(store, setError(err));
@@ -113,6 +125,13 @@ export function withFeeScheduleFeature() {
             if (!isAuth) {
               store.resetState();
               return;
+            }
+
+            if (!store.feesSchedulePagination()) {
+              store.feeScheduleLoadAll({
+                first: 0,
+                rows: 10,
+              });
             }
           });
         },

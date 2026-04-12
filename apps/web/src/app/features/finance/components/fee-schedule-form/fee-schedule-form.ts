@@ -105,7 +105,6 @@ export class FeeScheduleForm {
     },
   ];
   protected readonly save = output();
-
   private readonly formValue = toSignal(this.form.valueChanges, {
     initialValue: this.form.value,
   });

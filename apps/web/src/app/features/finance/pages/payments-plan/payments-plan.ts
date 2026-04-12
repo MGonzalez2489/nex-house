@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import {
-  FeeScheduleTable,
-  FeeScheduleList,
   FeeScheduleForm,
+  FeeScheduleInit,
+  FeeScheduleList,
+  FeeScheduleTable,
 } from '@features/finance/components';
 import { FinanceStore } from '@features/finance/stores';
 import { PageHeader } from '@shared/components/ui';
@@ -20,6 +21,7 @@ import { DrawerModule } from 'primeng/drawer';
     DrawerModule,
     FeeScheduleForm,
     Card,
+    FeeScheduleInit,
   ],
   templateUrl: './payments-plan.html',
   styleUrl: './payments-plan.css',
