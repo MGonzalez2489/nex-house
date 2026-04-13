@@ -168,8 +168,7 @@ export const AuthStore = signalStore(
       localStorage.clear();
       localStorage.removeItem(APP_CONSTANTS.TOKEN_STORAGE_KEY);
       localStorage.removeItem(APP_CONSTANTS.TOKEN_EXP);
-
-      patchState(store, initialState, setLoaded());
+      store.resetState();
     },
   })),
 

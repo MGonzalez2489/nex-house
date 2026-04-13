@@ -54,7 +54,7 @@ export function withFeeScheduleFeature() {
   return signalStoreFeature(
     withState(initialState),
     withEntities(config),
-    withCallState(),
+    withCallState({ collection: 'feeSchedules' }),
     withReset(),
     withProps(() => ({
       _contextStore: inject(ContextStore),
@@ -62,20 +62,22 @@ export function withFeeScheduleFeature() {
     })),
     withComputed((store) => ({
       feeScheduleExists: computed(() => {
-        if (store.loading()) {
+        if (store.feeSchedulesLoading()) {
           return false;
         }
-
         return (store.feesSchedulePagination()?.total || 0) > 0;
       }),
     })),
     withMethods((store) => ({
       feeScheduleLoadAll: rxMethod<Search>(
         pipe(
-          tap(() => patchState(store, setLoading())),
+          tap(() => patchState(store, setLoading('feeSchedules'))),
           switchMap((params) => {
             const nId = store._contextStore.selectedId();
-            if (!nId) return [];
+            if (!nId) {
+              patchState(store, setLoading('feeSchedules'));
+              return [];
+            }
 
             return store._feeScheduleService.getAll(nId, params).pipe(
               tapResponse({
@@ -87,9 +89,10 @@ export function withFeeScheduleFeature() {
                       feesFilters: params,
                       feesSchedulePagination: response.meta,
                     },
-                    setLoaded(),
+                    setLoaded('feeSchedules'),
                   ),
-                error: (err: Error) => patchState(store, setError(err)),
+                error: (err: Error) =>
+                  patchState(store, setError(err, 'feeSchedules')),
               }),
             );
           }),
@@ -101,16 +104,20 @@ export function withFeeScheduleFeature() {
         const nId = store._contextStore.selectedId();
         if (!nId) return false;
 
-        patchState(store, setLoading());
+        patchState(store, setLoading('feeSchedules'));
         try {
           const response = await lastValueFrom(
             store._feeScheduleService.create(nId, dto),
           );
-          patchState(store, addEntity(response.data, config), setLoaded());
+          patchState(
+            store,
+            addEntity(response.data, config),
+            setLoaded('feeSchedules'),
+          );
           store.feeScheduleLoadAll(store.feesFilters()!);
           return true;
         } catch (err) {
-          patchState(store, setError(err));
+          patchState(store, setError(err, 'feeSchedules'));
           return false;
         }
       },
