@@ -1,14 +1,7 @@
 <header class="mb-8 animate-fadein">
+  <app-breadcrumbs />
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
     <div class="space-y-1.5 flex-1 min-w-0">
-      <!-- <nav -->
-      <!--   class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2" -->
-      <!-- > -->
-      <!--   <span>NexHouse</span> -->
-      <!--   <i class="pi pi-chevron-right text-[8px]"></i> -->
-      <!--   <span class="text-blue-500">Gestión</span> -->
-      <!-- </nav> -->
-      <!---->
       <h1
         class="text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight truncate"
       >
@@ -22,9 +15,16 @@
       }
     </div>
 
+    @if(actionsContainer.children.length > 0){
+
     <div
       class="flex items-center gap-3 w-full md:w-auto overflow-x-auto pb-2 md:pb-0"
     >
+      <ng-content select="[actions]"></ng-content>
+    </div>
+    }
+
+    <div #actionsContainer>
       <ng-content select="[actions]"></ng-content>
     </div>
   </div>

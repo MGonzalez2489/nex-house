@@ -13,14 +13,19 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { Router } from '@angular/router';
 import { ICreateUser } from '@nex-house/interfaces';
 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormOptions, FormValidationError } from '@shared/components/ui';
-import { ContextStore } from '@stores/context.store';
+import { SessionService } from '@core/services';
 import { UnitsStore } from '@features/housing-unit/units.store';
 import { UsersStore } from '@features/users/users.store';
+import { UserRoleEnum } from '@nex-house/enums';
+import {
+  FormOptions,
+  FormValidationError,
+  PageHeader,
+} from '@shared/components/ui';
+import { ContextStore } from '@stores/context.store';
 import {
   AutoCompleteCompleteEvent,
   AutoCompleteModule,
@@ -33,7 +38,6 @@ import { InputTextModule } from 'primeng/inputtext';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { ICreateUserForm, IUserUnitForm } from './iuser-form';
-import { UserRoleEnum } from '@nex-house/enums';
 
 @Component({
   selector: 'app-user-form-page',
@@ -49,6 +53,7 @@ import { UserRoleEnum } from '@nex-house/enums';
     CheckboxModule,
     RadioButtonModule,
     ToggleSwitchModule,
+    PageHeader,
   ],
   templateUrl: './user-form-page.html',
   styleUrl: './user-form-page.css',
@@ -56,6 +61,7 @@ import { UserRoleEnum } from '@nex-house/enums';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserFormPage {
+  private readonly sessionService = inject(SessionService);
   protected readonly store = inject(UsersStore);
   protected readonly unitStore = inject(UnitsStore);
   protected readonly contextStore = inject(ContextStore);
@@ -99,7 +105,6 @@ export class UserFormPage {
     }),
   });
   protected readonly isNewUnit = signal<boolean>(false);
-  private readonly router = inject(Router);
   private readonly exclusiveFields = [
     'isOwner',
     'isFamily',
@@ -245,7 +250,6 @@ export class UserFormPage {
   }
 
   private navigateBack() {
-    const sel = this.contextStore.selectedId();
-    this.router.navigateByUrl(`/neighborhoods/${sel}/users`);
+    this.sessionService.goBack();
   }
 }

@@ -1,10 +1,10 @@
 import { APP_CONSTANTS } from '@core/constants';
-import { PrimeIcons } from 'primeng/api';
-import { SidebarConfigModel } from './nav.model';
 import { DASHBOARD_ROUTES_ENUM } from '@features/dashboard';
 import { FINANCE_ROUTES_ENUM } from '@features/finance';
-
-// SVG path data (el contenido interno del <svg>, sin el tag raíz)
+import { NEIGHBORHOODS_ROUTES_ENUM } from '@features/neighborhoods';
+import { USERS_ROUTES_ENUM } from '@features/users';
+import { PrimeIcons } from 'primeng/api';
+import { SidebarConfigModel } from '../layout/sidebar/nav.model';
 
 export const SIDEBAR_CONFIG: SidebarConfigModel = {
   header: {
@@ -35,6 +35,18 @@ export const SIDEBAR_CONFIG: SidebarConfigModel = {
     {
       label: 'Gestión',
       items: [
+        {
+          id: NEIGHBORHOODS_ROUTES_ENUM.HOME,
+          label: 'Fraccionamientos',
+          icon: 'pi pi-building',
+          route: NEIGHBORHOODS_ROUTES_ENUM.HOME,
+        },
+        {
+          id: USERS_ROUTES_ENUM.HOME,
+          label: 'Usuarios',
+          icon: 'pi pi-users',
+          route: USERS_ROUTES_ENUM.HOME,
+        },
         {
           id: FINANCE_ROUTES_ENUM.HOME,
           label: 'Finanzas',

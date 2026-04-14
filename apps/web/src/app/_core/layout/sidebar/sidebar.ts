@@ -10,7 +10,7 @@ import { UserAvatar } from '@shared/components/ui';
 import { ButtonModule } from 'primeng/button';
 import { NavItem } from './nav-item/nav-item';
 import { SidebarConfigModel } from './nav.model';
-import { SIDEBAR_CONFIG } from './sidebar.config';
+import { SIDEBAR_CONFIG } from '../../configs/sidebar.config';
 import { RolePipe } from '@shared/pipes';
 
 @Component({

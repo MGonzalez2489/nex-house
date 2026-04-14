@@ -1,0 +1,18 @@
+<nav
+  class="flex items-center text-[10px] font-bold uppercase tracking-widest mb-2"
+>
+  <span class="text-slate-400">NexHouse</span>
+
+  @for (crumb of bcService.breadcrumbs(); track crumb.url; let last = $last) {
+  <i class="pi pi-chevron-right text-[7px] mx-2 text-slate-300"></i>
+  <a
+    [routerLink]="crumb.url"
+    class="transition-colors"
+    [class.text-blue-600]="last"
+    [class.text-slate-400]="!last"
+    [class.pointer-events-none]="last"
+  >
+    {{ crumb.label }}
+  </a>
+  }
+</nav>
