@@ -1,0 +1,26 @@
+<div class="submenu" [class.submenu--open]="open()">
+  @for (child of items(); track child.id) { @if (child.route) {
+  <a
+    class="submenu-item"
+    [class.active]="sidebarService.isActive(child.id)"
+    [routerLink]="child.route"
+    (click)="activate(child.id)"
+  >
+    <span class="submenu-dot" aria-hidden="true"></span>
+    {{ child.label }} @if (child.badge) {
+    <span class="nav-badge nav-badge--primary ms-auto">{{ child.badge }}</span>
+    }
+  </a>
+  } @else {
+  <button
+    class="submenu-item"
+    [class.active]="sidebarService.isActive(child.id)"
+    (click)="activate(child.id)"
+  >
+    <span class="submenu-dot" aria-hidden="true"></span>
+    {{ child.label }} @if (child.badge) {
+    <span class="nav-badge nav-badge--primary ms-auto">{{ child.badge }}</span>
+    }
+  </button>
+  } }
+</div>

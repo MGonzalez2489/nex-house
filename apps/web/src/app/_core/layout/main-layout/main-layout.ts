@@ -1,14 +1,14 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { DrawerModule } from 'primeng/drawer';
-import { Navbar } from '../navbar/navbar';
-import { Sidebar } from '../sidebar/sidebar';
 import { SessionService } from '@core/services';
-import { ContextStore } from '@stores/context.store';
-import { UserRoleEnum } from '@nex-house/enums';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { AuthStore } from '@features/auth';
 import { FinanceStore } from '@features/finance/stores';
+import { UserRoleEnum } from '@nex-house/enums';
+import { ContextStore } from '@stores/context.store';
+import { DrawerModule } from 'primeng/drawer';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { Navbar } from '../navbar/navbar';
+import { Sidebar } from '../sidebar/sidebar';
 
 @Component({
   selector: 'app-main-layout',

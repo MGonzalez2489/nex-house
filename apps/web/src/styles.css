@@ -2,6 +2,8 @@
 @import 'tailwindcss';
 @import 'primeicons/primeicons';
 
+@import './theme/sidebar.css';
+
 @layer base {
   *,
   ::after,

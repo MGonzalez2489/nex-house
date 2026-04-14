@@ -5,7 +5,7 @@ import { UserRoleEnum } from '@nex-house/enums';
   name: 'role',
 })
 export class RolePipe implements PipeTransform {
-  transform(value: string) {
+  transform(value: string | undefined) {
     if (value === UserRoleEnum.ADMIN) return 'Administrador';
     if (value === UserRoleEnum.RESIDENT) return 'Residente';
     if (value === UserRoleEnum.SUPER_ADMIN) return 'ROOT';

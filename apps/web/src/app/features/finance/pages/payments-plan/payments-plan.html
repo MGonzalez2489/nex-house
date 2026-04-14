@@ -1,20 +1,21 @@
 <div class="space-y-6">
   @if(store.feeScheduleExists()){
   <!-- Header Section -->
-  <div class="flex items-center justify-between gap-3">
-    <app-page-header
-      class="max-w-[50%]"
-      title="Calendario de cobros"
-      subTitle="Administra y programa los ciclos de facturación para residentes y áreas
+  <app-page-header
+    class="max-w-[50%]"
+    title="Calendario de cobros"
+    subTitle="Administra y programa los ciclos de facturación para residentes y áreas
 comerciales. Visualiza el estado actual de tus flujos de efectivo."
-    />
+  >
+    <div actions class="flex gap-2">
+      <p-button
+        label="Crear Nuevo"
+        icon="pi pi-plus"
+        (click)="isFormVisible = true"
+      />
+    </div>
+  </app-page-header>
 
-    <p-button
-      label="Crear Nuevo"
-      icon="pi pi-plus"
-      (click)="isFormVisible = true"
-    />
-  </div>
   } @if(!store.feeScheduleExists()){
   <app-fee-schedule-init class="block" (addCharge)="isFormVisible = true" />
   } @else{
