@@ -29,6 +29,7 @@ import { ContextStore } from '@stores/context.store';
 import {
   AutoCompleteCompleteEvent,
   AutoCompleteModule,
+  AutoCompleteSelectEvent,
 } from 'primeng/autocomplete';
 import { ButtonModule } from 'primeng/button';
 import { Card } from 'primeng/card';
@@ -38,6 +39,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { ICreateUserForm, IUserUnitForm } from './iuser-form';
+import { UnitModel } from '@nex-house/models';
 
 @Component({
   selector: 'app-user-form-page',
@@ -210,6 +212,18 @@ export class UserFormPage {
     this.navigateBack();
   }
 
+  protected selectUnit(event: AutoCompleteSelectEvent) {
+    const unit = event.value as UnitModel;
+    if (!unit) return;
+
+    const existsOwner = unit.assignations.some((f) => f.isOwner);
+
+    if (existsOwner) this.form.controls.isOwner.disable();
+    else {
+      this.form.controls.isOwner.enable();
+    }
+  }
+
   private setupExclusiveFieldsLogic() {
     this.exclusiveFields.forEach((field) => {
       this.form
@@ -228,7 +242,7 @@ export class UserFormPage {
       });
   }
   private syncUnitValidators(isNew: boolean) {
-    const { newUnit, unit } = this.form.controls;
+    const { newUnit, unit, isOwner } = this.form.controls;
     const { identifier, streetName } = newUnit.controls;
 
     if (isNew) {
@@ -236,6 +250,8 @@ export class UserFormPage {
       unit.clearValidators();
       identifier.setValidators([Validators.required]);
       streetName.setValidators([Validators.required]);
+      isOwner.enable();
+      isOwner.patchValue(false);
     } else {
       unit.patchValue(null, { emitEvent: false });
       identifier.clearValidators();

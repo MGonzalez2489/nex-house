@@ -102,10 +102,12 @@
     <!-- Unity -->
     <p-card class="md:col-span-2 space-y-4">
       @if(isNewUnit()){
-      <div class="flex items-center justify-end mb-4">
+      <div class="flex items-center justify-between mb-4">
+        <p class="text-slate-500">Registrar nueva unidad</p>
         <p-button
           text="true"
           label="Buscar existente"
+          type="button"
           severity="info"
           (click)="isNewUnit.set(false)"
         />
@@ -173,6 +175,7 @@
           forceSelection="true"
           placeholder="Busca por calle o número..."
           optionLabel="labelFull"
+          (onSelect)="selectUnit($event)"
           [invalid]="form.controls.unit.invalid && form.controls.unit.touched"
           [emptyMessage]="'No se encontró la unidad. Presiona Enter para crearla.'"
           fluid
