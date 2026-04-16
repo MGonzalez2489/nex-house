@@ -1,8 +1,8 @@
 import { APP_CONSTANTS } from '@core/constants';
 import { DASHBOARD_ROUTES_ENUM } from '@features/dashboard';
 import { FINANCE_ROUTES_ENUM } from '@features/finance';
-import { NEIGHBORHOODS_ROUTES_ENUM } from '@features/neighborhoods';
 import { USERS_ROUTES_ENUM } from '@features/users';
+import { UserRoleEnum } from '@nex-house/enums';
 import { PrimeIcons } from 'primeng/api';
 import { SidebarConfigModel } from '../layout/sidebar/nav.model';
 
@@ -36,21 +36,24 @@ export const SIDEBAR_CONFIG: SidebarConfigModel = {
       label: 'Gestión',
       items: [
         {
-          id: NEIGHBORHOODS_ROUTES_ENUM.HOME,
+          id: 'neighborhoods',
           label: 'Fraccionamientos',
           icon: 'pi pi-building',
-          route: NEIGHBORHOODS_ROUTES_ENUM.HOME,
+          roles: [UserRoleEnum.SUPER_ADMIN],
+          route: '/neighborhoods', //'neighborhoods', //NEIGHBORHOODS_ROUTES_ENUM.HOME,
         },
         {
           id: USERS_ROUTES_ENUM.HOME,
           label: 'Usuarios',
           icon: 'pi pi-users',
           route: USERS_ROUTES_ENUM.HOME,
+          roles: [UserRoleEnum.ADMIN],
         },
         {
           id: FINANCE_ROUTES_ENUM.HOME,
           label: 'Finanzas',
           icon: PrimeIcons.WALLET,
+          roles: [UserRoleEnum.ADMIN],
           children: [
             {
               id: 'finance-general',

@@ -1,4 +1,5 @@
 import { FINANCE_ROUTES_ENUM } from '@features/finance';
+import { NEIGHBORHOODS_ROUTES_ENUM } from '@features/neighborhoods';
 import { USERS_ROUTES_ENUM } from '@features/users';
 
 export const BREADCRUMB_MAP: Record<string, string> = {
@@ -13,6 +14,8 @@ export const BREADCRUMB_MAP: Record<string, string> = {
   // Global & Dashboard
   dashboard: 'Panel Principal',
   neighborhoods: 'Fraccionamientos',
+
+  // [NEIGHBORHOODS_ROUTES_ENUM.HOME]: 'Fraccionamientos',
 
   // Finanzas (Usando el enum para evitar errores de typo)
   [FINANCE_ROUTES_ENUM.HOME]: 'Finanzas',

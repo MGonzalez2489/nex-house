@@ -4,13 +4,13 @@ import {
   inject,
   input,
 } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
-import { NavItemModel } from '../nav.model';
+import { RouterLink } from '@angular/router';
 import { SidebarService } from '@core/services';
+import { NavItemModel } from '../nav.model';
 
 @Component({
   selector: 'app-nav-submenu',
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink],
   templateUrl: './nav-submenu.html',
   styleUrl: './nav-submenu.css',
   standalone: true,

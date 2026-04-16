@@ -75,7 +75,7 @@ export function withFeeScheduleFeature() {
           switchMap((params) => {
             const nId = store._contextStore.selectedId();
             if (!nId) {
-              patchState(store, setLoading('feeSchedules'));
+              patchState(store, setLoaded('feeSchedules'));
               return [];
             }
 

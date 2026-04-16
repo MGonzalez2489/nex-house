@@ -1,3 +1,5 @@
+import { UserRoleEnum } from '@nex-house/enums';
+
 export interface NavItemModel {
   id: string;
   label: string;
@@ -7,6 +9,7 @@ export interface NavItemModel {
   badgeVariant?: 'primary' | 'accent';
   children?: NavItemModel[];
   isDisabled?: boolean;
+  roles?: UserRoleEnum[]; //roles permitidos
 }
 
 export interface NavSectionModel {

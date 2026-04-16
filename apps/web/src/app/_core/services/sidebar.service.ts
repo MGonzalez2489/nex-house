@@ -1,9 +1,28 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { SessionService } from './session.service';
+import { SIDEBAR_CONFIG } from '@core/configs';
+import { NavItemModel } from '@core/layout/sidebar/nav.model';
 
 @Injectable({ providedIn: 'root' })
 export class SidebarService {
   private readonly router = inject(Router);
+  private readonly sessionService = inject(SessionService);
+
+  readonly filteredConfig = computed(() => {
+    const role = this.sessionService.user()?.role || 'unknown';
+    const fullConfig = SIDEBAR_CONFIG;
+
+    return {
+      ...fullConfig,
+      sections: fullConfig.sections
+        .map((section) => ({
+          ...section,
+          items: this.filterItems(section.items, role),
+        }))
+        .filter((section) => section.items.length > 0),
+    };
+  });
 
   // Collapsed state
   readonly collapsed = signal(false);
@@ -72,5 +91,16 @@ export class SidebarService {
         }
       }
     }
+  }
+
+  private filterItems(items: NavItemModel[], role: string): NavItemModel[] {
+    return items
+      .filter((item) => !item.roles || item.roles.includes(role as any))
+      .map((item) => ({
+        ...item,
+        children: item.children
+          ? this.filterItems(item.children, role)
+          : undefined,
+      }));
   }
 }
