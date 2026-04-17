@@ -56,13 +56,13 @@ export const SIDEBAR_CONFIG: SidebarConfigModel = {
           roles: [UserRoleEnum.ADMIN],
           children: [
             {
-              id: 'finance-general',
+              id: 'finance',
               label: 'General',
               route: `/${FINANCE_ROUTES_ENUM.HOME}`,
             },
             {
               id: FINANCE_ROUTES_ENUM.PAYMENT_PLANS,
-              label: 'Planes de Cobro',
+              label: 'Calendario de Cobros',
               route: `${FINANCE_ROUTES_ENUM.HOME}/${FINANCE_ROUTES_ENUM.PAYMENT_PLANS}`,
             },
             {

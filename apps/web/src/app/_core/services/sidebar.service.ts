@@ -1,8 +1,9 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { SessionService } from './session.service';
 import { SIDEBAR_CONFIG } from '@core/configs';
 import { NavItemModel } from '@core/layout/sidebar/nav.model';
+import { filter } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class SidebarService {
@@ -36,6 +37,11 @@ export class SidebarService {
 
   constructor() {
     this.syncWithRoute();
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.syncWithRoute();
+      });
   }
 
   toggleCollapsed(): void {
