@@ -5,6 +5,7 @@ import {
   effect,
   inject,
   output,
+  signal,
 } from '@angular/core';
 import {
   FormControl,
@@ -15,7 +16,6 @@ import {
 import { FormOptions, FormValidationError } from '@shared/components/ui';
 import { InputTextModule } from 'primeng/inputtext';
 
-import { JsonPipe } from '@angular/common';
 import { FinanceStore } from '@features/finance/stores';
 import { FeeScheduleTypeEnum, FrecuencyEnum } from '@nex-house/enums';
 import { DatePickerModule } from 'primeng/datepicker';
@@ -51,7 +51,6 @@ type CreateFeeScheduleForm = {
     SelectModule,
     DatePickerModule,
     FormOptions,
-    JsonPipe,
     SelectButtonModule,
     SelectModule,
   ],
@@ -71,7 +70,7 @@ export class FeeScheduleForm {
       nonNullable: true,
       validators: [Validators.required, Validators.min(1)],
     }),
-    type: new FormControl(FeeScheduleTypeEnum.RECURRENT, {
+    type: new FormControl(FeeScheduleTypeEnum.ONE_TIME, {
       nonNullable: true,
       validators: [Validators.required],
     }),
@@ -87,8 +86,8 @@ export class FeeScheduleForm {
   });
   protected readonly store = inject(FinanceStore);
   protected readonly types = [
-    { key: 'Recurrente', value: FeeScheduleTypeEnum.RECURRENT },
     { key: 'Unico', value: FeeScheduleTypeEnum.ONE_TIME },
+    { key: 'Recurrente', value: FeeScheduleTypeEnum.RECURRENT },
   ];
   protected readonly frecuency = [
     {
@@ -111,6 +110,8 @@ export class FeeScheduleForm {
   protected readonly isRecurrent = computed(
     () => this.formValue()?.type === FeeScheduleTypeEnum.RECURRENT,
   );
+
+  protected readonly today = signal<Date>(new Date());
 
   protected readonly fFrecuency = toSignal(
     this.form.controls.frecuency.valueChanges,

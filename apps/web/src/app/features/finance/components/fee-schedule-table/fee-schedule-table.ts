@@ -39,7 +39,7 @@ export class FeeScheduleTable {
   inspect = output<FeeScheduleModel>();
 
   protected readonly cols: TableColumn<FeeScheduleModel>[] = [
-    { field: 'name', header: 'Concepto y tipo' },
+    { field: 'name', header: 'Cobro y descripcion' },
     { field: 'description', header: 'Programación' },
     { field: 'amount', header: 'Monto' },
     { field: 'status', header: 'Estado' },

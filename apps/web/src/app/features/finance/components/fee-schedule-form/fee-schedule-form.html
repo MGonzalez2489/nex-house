@@ -67,6 +67,8 @@
   <div class="form-control">
     <p-selectbutton
       [options]="types"
+      [unselectable]="false"
+      [allowEmpty]="false"
       formControlName="type"
       optionLabel="key"
       optionValue="value"
@@ -92,6 +94,7 @@
       placeholder="Selecciona una fecha"
       [showIcon]="true"
       fluid
+      [minDate]="today()"
       [invalid]="form.controls.startDate.invalid && form.controls.startDate.touched"
       [attr.aria-invalid]="form.controls.startDate.invalid && form.controls.startDate.touched"
       [attr.aria-describedby]="form.controls.startDate.touched && form.controls.startDate.errors ? 'startDate-error' : null"
@@ -184,7 +187,4 @@
   <div class="py-5">
     <app-form-options [callState]="store.callState()" (doCancel)="doCancel()" />
   </div>
-  <pre>
-    {{form.value | json}}
-  </pre>
 </form>

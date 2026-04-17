@@ -30,7 +30,7 @@ import { DrawerModule } from 'primeng/drawer';
 })
 export class PaymentsPlan {
   protected readonly store = inject(FinanceStore);
-  isFormVisible = false;
+  isFormVisible = true;
 
   async save() {
     this.isFormVisible = false;
