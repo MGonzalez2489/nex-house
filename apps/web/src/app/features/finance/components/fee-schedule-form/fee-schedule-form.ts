@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  effect,
   inject,
   output,
   signal,
@@ -23,7 +22,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ICreateFeeSchedule } from '@nex-house/interfaces';
 import { SelectButtonModule } from 'primeng/selectbutton';
 
@@ -104,11 +103,14 @@ export class FeeScheduleForm {
     },
   ];
   protected readonly save = output();
-  private readonly formValue = toSignal(this.form.valueChanges, {
+  protected readonly formState = toSignal(this.form.valueChanges, {
     initialValue: this.form.value,
   });
   protected readonly isRecurrent = computed(
-    () => this.formValue()?.type === FeeScheduleTypeEnum.RECURRENT,
+    () => this.formState()?.type === FeeScheduleTypeEnum.RECURRENT,
+  );
+  protected readonly currentFrecuency = computed(
+    () => this.formState()?.frecuency,
   );
 
   protected readonly today = signal<Date>(new Date());
@@ -128,36 +130,14 @@ export class FeeScheduleForm {
   protected readonly daysOfMonth = Array.from({ length: 31 }, (_, i) => i + 1);
 
   constructor() {
-    effect(() => {
-      const cIsRecurrent = this.isRecurrent();
-      if (cIsRecurrent) {
-        this.setupRecurrentForm();
-        return;
-      }
-
-      this.cleanRecurrentForm();
-    });
-
-    effect(() => {
-      const cFrecuency = this.fFrecuency();
-      if (!cFrecuency) return;
-
-      switch (cFrecuency) {
-        case FrecuencyEnum.WEEKLY:
-          this.setupWeeklyRecurrence();
-          break;
-        case FrecuencyEnum.MONTHLY:
-          this.setupMonthlyRecurrence();
-          break;
-        case FrecuencyEnum.YEARLY:
-          this.setupYearlyRecurrence();
-          break;
-        default:
-          console.log(`Frecuency ${cFrecuency} not implemented`);
-      }
-
-      this.form.updateValueAndValidity();
-    });
+    this.form.controls.type.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe((type) =>
+        this.syncRecurrenceState(type as FeeScheduleTypeEnum),
+      );
+    this.form.controls.frecuency.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe((frec) => this.syncFrecuencyValidators(frec as FrecuencyEnum));
   }
 
   async doSubmit() {
@@ -175,70 +155,58 @@ export class FeeScheduleForm {
 
   doCancel(): void {
     this.form.reset();
-
     this.save.emit();
   }
 
-  private setupRecurrentForm(): void {
-    this.form.patchValue({
-      frecuency: FrecuencyEnum.WEEKLY,
-      dayOfWeek: this.daysOfWeek[0].value,
-    });
+  /**
+   * Sets or clears validators based on whether the fee is recurrent.
+   */
+  private syncRecurrenceState(type: FeeScheduleTypeEnum | null): void {
+    const isRec = type === FeeScheduleTypeEnum.RECURRENT;
+    const freqControl = this.form.controls.frecuency;
 
+    if (isRec) {
+      freqControl.setValidators([Validators.required]);
+      freqControl.setValue(FrecuencyEnum.WEEKLY);
+    } else {
+      freqControl.clearValidators();
+      this.resetRecurrenceFields();
+    }
     this.form.updateValueAndValidity();
   }
-  private cleanRecurrentForm(): void {
+
+  /**
+   * Adjusts specific validators based on the frequency (Weekly vs Monthly).
+   */
+  private syncFrecuencyValidators(
+    frec: FrecuencyEnum | null | undefined,
+  ): void {
+    const dow = this.form.controls.dayOfWeek;
+    const dom = this.form.controls.dayOfMonth;
+
+    dow.clearValidators();
+    dom.clearValidators();
+
+    if (frec === FrecuencyEnum.WEEKLY) {
+      dow.setValidators([Validators.required]);
+      dow.setValue(new Date().getDay());
+      dom.setValue(undefined);
+    } else if (frec === FrecuencyEnum.MONTHLY) {
+      dom.setValidators([Validators.required]);
+      dom.setValue(1);
+      dow.setValue(undefined);
+    }
+
+    dow.updateValueAndValidity();
+    dom.updateValueAndValidity();
+  }
+
+  private resetRecurrenceFields(): void {
     this.form.patchValue({
       frecuency: undefined,
       dayOfWeek: undefined,
       dayOfMonth: undefined,
       endDate: undefined,
     });
-
-    this.form.controls.dayOfWeek.clearValidators();
-    this.form.controls.dayOfWeek.markAsPristine();
-    this.form.controls.dayOfWeek.markAsUntouched();
-    this.form.controls.dayOfMonth.clearValidators();
-    this.form.controls.dayOfMonth.markAsPristine();
-    this.form.controls.dayOfMonth.markAsUntouched();
-  }
-  private setupWeeklyRecurrence(): void {
-    const start = this.form.controls.startDate.value;
-    const defaultDay = start ? new Date(start).getDay() : 0;
-
-    this.form.patchValue({
-      dayOfMonth: undefined,
-      dayOfWeek: defaultDay,
-    });
-
-    this.form.controls.dayOfWeek.addValidators([Validators.required]);
-    this.form.controls.dayOfMonth.clearValidators();
-
-    this.form.controls.dayOfWeek.updateValueAndValidity();
-    this.form.controls.dayOfMonth.updateValueAndValidity();
-  }
-  private setupMonthlyRecurrence(): void {
-    this.form.patchValue({
-      dayOfWeek: undefined,
-      dayOfMonth: 1,
-    });
-
-    this.form.controls.dayOfMonth.addValidators([Validators.required]);
-    this.form.controls.dayOfWeek.clearValidators();
-
-    this.form.controls.dayOfWeek.updateValueAndValidity();
-    this.form.controls.dayOfMonth.updateValueAndValidity();
-  }
-  private setupYearlyRecurrence(): void {
-    this.form.patchValue({
-      dayOfWeek: undefined,
-      dayOfMonth: undefined,
-    });
-
-    this.form.controls.dayOfWeek.clearValidators();
-    this.form.controls.dayOfMonth.clearValidators();
-
-    this.form.controls.dayOfWeek.updateValueAndValidity();
-    this.form.controls.dayOfMonth.updateValueAndValidity();
   }
 }

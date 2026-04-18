@@ -2,6 +2,7 @@ export * from './fee-schedule-list/fee-schedule-list';
 export * from './fee-schedule-table/fee-schedule-table';
 export * from './fee-schedule-form/fee-schedule-form';
 export * from './fee-schedule-init/fee-schedule-init';
+export * from './fee-schedule-details/fee-schedule-details';
 
 export * from './charges-table/charges-table';
 

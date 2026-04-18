@@ -26,12 +26,12 @@ export class FeeScheduleController {
 
   @Get()
   async findAll(@CurrentNeigh() neigh: Neighborhood, @Query() dto: SearchDto) {
-    const result = await this.feeScheduleService.findAll(neigh.id, dto);
+    return this.feeScheduleService.findAll(neigh.id, dto);
 
-    return {
-      meta: result.meta,
-      data: result.data.map((fee) => FeeScheduleToModel(fee)),
-    };
+    // return {
+    //   meta: result.meta,
+    //   data: result.data.map((fee) => FeeScheduleToModel(fee)),
+    // };
   }
 
   @Get(':publicId')

@@ -1,0 +1,223 @@
+@if(record(); as fee){
+<!-- Content -->
+<div class="flex-1 overflow-y-auto space-y-8">
+  <!-- Info Principal -->
+  <section class="space-y-4">
+    <div class="flex items-start gap-4">
+      <div
+        class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center shrink-0"
+      >
+        <i class="pi pi-calendar text-xl"></i>
+      </div>
+      <div>
+        <h3 class="text-lg font-bold text-slate-800">{{fee.name}}</h3>
+        <p class="text-sm text-slate-500 italic">"{{fee.description}}"</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <!-- amount -->
+      <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+        <span class="text-[10px] uppercase font-bold text-slate-400 block mb-1"
+          >Monto Fijo</span
+        >
+        <span class="text-xl font-black text-slate-900"
+          >{{fee.amount | currency}}</span
+        >
+      </div>
+      <!-- state (mock) -->
+      <div class="p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
+        <span
+          class="text-[10px] uppercase font-bold text-emerald-600/70 block mb-1"
+          >Estado</span
+        >
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span class="font-bold text-emerald-700">Activo</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  @if(isRecurrent()){
+  <!-- Métricas Rápidas -->
+  <section class="space-y-3">
+    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">
+      Progreso de Recaudación
+    </h4>
+    <div class="p-5 border border-slate-100 rounded-3xl space-y-4">
+      <div class="flex justify-between items-end">
+        <div>
+          <p class="text-2xl font-black text-slate-900">
+            {{fee.totalCollected | currency }}
+          </p>
+          <p class="text-[10px] text-slate-400 font-medium">
+            TOTAL RECABADO A LA FECHA
+          </p>
+        </div>
+        <div class="text-right">
+          <p class="text-sm font-bold text-slate-700">
+            {{paidCount()}} de {{fee.executionCount}}
+          </p>
+          <p class="text-[10px] text-slate-400 font-medium">Pagos</p>
+        </div>
+      </div>
+      <!-- Progress Bar -->
+      <p-progressbar [value]="paidCount()" />
+    </div>
+  </section>
+  <!-- Configuración de Programación -->
+  <section class="space-y-3">
+    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">
+      Planificación
+    </h4>
+    <div class="space-y-3">
+      <div
+        class="flex items-center justify-between p-3 bg-slate-50/50 rounded-xl"
+      >
+        <div class="flex items-center gap-3">
+          <i class="pi pi-sync text-slate-400 text-sm"></i>
+          <span class="text-sm text-slate-600">Frecuencia</span>
+        </div>
+        <span class="text-sm font-bold text-slate-900"
+          >{{fee.cronSchedule | cronToHuman:'frequency'}}</span
+        >
+      </div>
+      <div
+        class="flex items-center justify-between p-3 bg-slate-50/50 rounded-xl"
+      >
+        <div class="flex items-center gap-3">
+          <i class="pi pi-clock text-slate-400 text-sm"></i>
+          <span class="text-sm text-slate-600">Día de Cobro</span>
+        </div>
+        <span class="text-sm font-bold text-slate-900"
+          >{{fee.cronSchedule | cronToHuman:'detail'}}</span
+        >
+      </div>
+      <div
+        class="flex items-center justify-between p-3 bg-slate-50/50 rounded-xl"
+      >
+        <div class="flex items-center gap-3">
+          <i class="pi pi-calendar-plus text-slate-400 text-sm"></i>
+          <span class="text-sm text-slate-600">Inicio</span>
+        </div>
+        <span class="text-sm font-bold text-slate-900"
+          >{{fee.startDate | date}}</span
+        >
+      </div>
+    </div>
+  </section>
+  <!-- Próximas Fechas -->
+  <section class="space-y-3 pb-6">
+    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">
+      Próximas Ejecuciones
+    </h4>
+    <div class="border-l-2 border-slate-100 ml-2 space-y-4">
+      @for(next of nextOcurrences(); track next; let idx = $index){
+
+      <div class="relative pl-6">
+        <span
+          [class.bg-blue-500]="idx === 0"
+          [class.bg-slate-200]="idx > 0"
+          class="absolute -left-1.25 top-1.5 w-2 h-2 rounded-full"
+        ></span>
+        <p class="text-sm font-bold text-slate-800">{{next | date}}</p>
+        @if(idx === 0){
+        <p class="text-[11px] text-slate-400 tracking-tight">
+          SIGUIENTE CARGO PROGRAMADO
+        </p>
+        }
+      </div>
+      }
+    </div>
+  </section>
+  } @else{
+
+  <!-- Información de Programación Individual -->
+  <section class="space-y-3">
+    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">
+      Información de Cobro
+    </h4>
+    <div
+      class="p-5 border border-slate-100 rounded-3xl space-y-4 bg-slate-50/30"
+    >
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="p-2 bg-white rounded-lg shadow-sm">
+            <i class="pi pi-calendar text-blue-500 text-sm"></i>
+          </div>
+          <div>
+            <p class="text-[10px] text-slate-400 font-bold uppercase">
+              Fecha de Ejecución
+            </p>
+            <p class="text-sm font-bold text-slate-700">
+              {{fee.startDate | date}}
+            </p>
+          </div>
+        </div>
+        <span
+          class="px-2 py-1 bg-blue-100 text-blue-700 text-[10px] font-bold rounded-md"
+          >PROGRAMADO</span
+        >
+      </div>
+    </div>
+  </section>
+
+  <!-- Detalle de Distribución (Opcional pero útil) -->
+  <section class="space-y-3">
+    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">
+      Alcance
+    </h4>
+    <div class="p-4 bg-slate-900 rounded-2xl text-white">
+      <div class="flex justify-between items-center mb-3">
+        <span class="text-xs font-medium text-slate-400"
+          >Población objetivo</span
+        >
+        <span class="text-xs font-bold bg-slate-800 px-2 py-1 rounded"
+          >Todos los Residentes</span
+        >
+      </div>
+      <div class="flex justify-between items-center text-sm">
+        <span class="text-slate-300">Total de cargos a generar:</span>
+        <span class="font-black text-blue-400">{{fee.executionCount}}</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Nota Informativa -->
+  <div class="p-4 bg-blue-50 rounded-2xl flex gap-3 border border-blue-100">
+    <i class="pi pi-info-circle text-blue-500 mt-1"></i>
+    <p class="text-xs text-blue-700 leading-relaxed">
+      Este es un cargo de una sola exhibición. Una vez ejecutado el
+      {{fee.startDate | date:'longDate'}}, pasará al historial de cobros
+      realizados.
+    </p>
+  </div>
+
+  }
+</div>
+
+<!-- Footer / Acciones (mock) -->
+<div
+  class="p-6 border-t border-slate-100 bg-slate-50/30 grid grid-cols-2 gap-3"
+>
+  <button
+    class="flex items-center justify-center gap-2 py-3 px-4 border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-white transition-all shadow-sm"
+  >
+    <i class="pi pi-pause"></i>
+    Pausar
+  </button>
+  <button
+    class="flex items-center justify-center gap-2 py-3 px-4 bg-red-50 border border-red-100 rounded-xl text-sm font-bold text-red-600 hover:bg-red-100 transition-all shadow-sm"
+  >
+    <i class="pi pi-trash"></i>
+    Eliminar
+  </button>
+  <!-- <button -->
+  <!--   class="col-span-2 py-3 px-4 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200" -->
+  <!-- > -->
+  <!--   <i class="pi pi-pencil mr-1"></i> Editar Plan -->
+  <!-- </button> -->
+</div>
+
+}

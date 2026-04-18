@@ -11,4 +11,7 @@ export class FeeScheduleModel extends BaseModel {
 
   cronSchedule: string;
   cronDescription: string;
+
+  totalCollected: number;
+  executionCount: number;
 }

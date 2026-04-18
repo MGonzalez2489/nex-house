@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FeeScheduleStatusEnum } from '@nex-house/enums';
+import { ChargeStatusEnum, FeeScheduleStatusEnum } from '@nex-house/enums';
 import { Brackets, DataSource, Repository } from 'typeorm';
 import { CreateFeeScheduleDto } from '../dtos';
 
@@ -14,6 +14,7 @@ import { SearchDto } from '@common/dtos';
 import { paginateQuery } from '@common/utils';
 import { isToday, startOfDay, toDate } from 'date-fns';
 import { ChargeService } from './charge.service';
+import { FeeScheduleToModel } from '../mappers';
 
 @Injectable()
 export class FeeScheduleService {
@@ -91,6 +92,23 @@ export class FeeScheduleService {
         neighborhoodId,
       });
 
+    // 1. Subconsulta para Total Recaudado (Solo con status 'applied')
+    query.addSelect((subQuery) => {
+      return subQuery
+        .select('COALESCE(SUM(c.amount), 0)', 'total')
+        .from('charges', 'c')
+        .where('c.feeScheduleId = fee.id')
+        .andWhere('c.status = :status', { status: ChargeStatusEnum.PAID });
+    }, 'fee_totalCollected');
+
+    // 2. Subconsulta para Conteo de Ejecuciones totales
+    query.addSelect((subQuery) => {
+      return subQuery
+        .select('COUNT(c.id)', 'count')
+        .from('charges', 'c')
+        .where('c.feeScheduleId = fee.id');
+    }, 'fee_executionCount');
+
     const { globalFilter } = filters;
 
     if (globalFilter) {
@@ -105,8 +123,39 @@ export class FeeScheduleService {
       );
     }
 
-    const result = await paginateQuery(query, filters);
-    return result;
+    // const resssss = await query.getRawAndEntities();
+    // const result = await paginateQuery(query, filters);
+    // return result;
+
+    const first = filters.first || 0;
+    const rows = filters.rows || 10;
+
+    // Ordenamiento y Paginación manual para no perder los RAW fields
+    query.orderBy('fee.createdAt', 'DESC');
+
+    if (!filters.showAll) {
+      query.skip(first).take(rows);
+    }
+
+    const { entities, raw } = await query.getRawAndEntities();
+    const count = await query.getCount();
+
+    // Mapeo de resultados
+    const data = entities.map((entity, index) => ({
+      ...FeeScheduleToModel(entity),
+      totalCollected: Number(raw[index].fee_totalCollected || 0) / 1000,
+      executionCount: Number(raw[index].fee_executionCount || 0),
+    }));
+
+    return {
+      data,
+      meta: {
+        total: count,
+        page: Math.floor(first / rows) + 1,
+        lastPage: Math.ceil(count / rows) || 1,
+        limit: rows,
+      },
+    };
   }
 
   async findOne(publicId: string) {
