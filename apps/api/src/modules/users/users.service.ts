@@ -133,6 +133,7 @@ export class UsersService {
     createDto: CreateUserDto,
     currentUser: User,
   ) {
+    //TODO: validate : phone format, email format
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -143,7 +144,9 @@ export class UsersService {
       // 2. Crear el Usuario
       const newUser = queryRunner.manager.create(User, {
         firstName: createDto.firstName,
+        lastName: createDto.lastName,
         email: createDto.email.toLowerCase().trim(),
+        phone: createDto.phone,
         role: createDto.isAdmin ? UserRoleEnum.ADMIN : UserRoleEnum.RESIDENT,
         status: UserStatusEnum.PENDING_COMPLETION,
         createdBy: currentUser.id,

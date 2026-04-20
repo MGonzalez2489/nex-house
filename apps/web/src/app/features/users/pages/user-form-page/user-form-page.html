@@ -107,7 +107,6 @@
         <p-button
           text="true"
           label="Buscar existente"
-          type="button"
           severity="info"
           (click)="isNewUnit.set(false)"
         />
@@ -213,7 +212,7 @@
         <div class="flex gap-6"></div>
       </div>
 
-      <div class="pb-6 my-3 px-3 flex items-center gap-10 form-control">
+      <div class="pb-6 my-3 px-3 form-control">
         <div class="flex flex-wrap items-center gap-6">
           <div class="flex items-center gap-2">
             <p-checkbox
@@ -221,6 +220,7 @@
               [binary]="true"
               inputId="owner"
               variant="filled"
+              [invalid]="form.errors?.['atLeastOneRoleRequired'] && form.touched"
               [pt]="{box:'rounded-full'}"
             ></p-checkbox>
             <label for="owner" class="text-sm text-slate-600 cursor-pointer"
@@ -234,6 +234,7 @@
               [binary]="true"
               inputId="family"
               variant="filled"
+              [invalid]="form.errors?.['atLeastOneRoleRequired'] && form.touched"
               [pt]="{box:'rounded-full'}"
             ></p-checkbox>
             <label for="family" class="text-sm text-slate-600 cursor-pointer"
@@ -246,6 +247,7 @@
               formControlName="isTenant"
               [binary]="true"
               inputId="tenant"
+              [invalid]="form.errors?.['atLeastOneRoleRequired'] && form.touched"
               variant="filled"
               [pt]="{box:'rounded-full'}"
             ></p-checkbox>
@@ -254,6 +256,12 @@
             >
           </div>
         </div>
+        @if(form.errors?.['atLeastOneRoleRequired'] && form.touched){
+
+        <p class="p-error pt-3 block animate-fade-in text-xs text-red-500">
+          Un rol es requerido
+        </p>
+        }
       </div>
 
       <div class="flex items-center flex-col">
@@ -274,6 +282,7 @@
         [submitLabel]="isEdit() ? 'Actualizar' : 'Guardar'"
         [callState]="store.callState()"
         (doCancel)="doCancel()"
+        [isLoading]="store.loading()"
       />
     </div>
   </form>

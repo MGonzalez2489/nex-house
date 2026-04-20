@@ -8,9 +8,11 @@ import {
   signal,
 } from '@angular/core';
 import {
+  AbstractControl,
   FormControl,
   FormGroup,
   ReactiveFormsModule,
+  ValidationErrors,
   Validators,
 } from '@angular/forms';
 import { ICreateUser } from '@nex-house/interfaces';
@@ -67,45 +69,48 @@ export class UserFormPage {
   protected readonly store = inject(UsersStore);
   protected readonly unitStore = inject(UnitsStore);
   protected readonly contextStore = inject(ContextStore);
-  protected readonly form = new FormGroup<ICreateUserForm>({
-    firstName: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.minLength(3)],
-    }),
-    lastName: new FormControl(null, {
-      validators: [Validators.minLength(3)],
-    }),
-    phone: new FormControl(null, {
-      validators: [Validators.minLength(3)],
-    }),
-    email: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.email],
-    }),
-    unit: new FormControl(null, {
-      validators: [Validators.required],
-    }),
-    newUnit: new FormGroup<IUserUnitForm>({
-      streetName: new FormControl<string>('', { nonNullable: true }),
-      identifier: new FormControl<string>('', { nonNullable: true }),
-    }),
-    isAdmin: new FormControl(false, {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    isOwner: new FormControl(false, {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    isFamily: new FormControl(false, {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    isTenant: new FormControl(false, {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-  });
+  protected readonly form = new FormGroup<ICreateUserForm>(
+    {
+      firstName: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.required, Validators.minLength(3)],
+      }),
+      lastName: new FormControl(null, {
+        validators: [Validators.minLength(3)],
+      }),
+      phone: new FormControl(null, {
+        validators: [Validators.minLength(3)],
+      }),
+      email: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.required, Validators.email],
+      }),
+      unit: new FormControl(null, {
+        validators: [Validators.required],
+      }),
+      newUnit: new FormGroup<IUserUnitForm>({
+        streetName: new FormControl<string>('', { nonNullable: true }),
+        identifier: new FormControl<string>('', { nonNullable: true }),
+      }),
+      isAdmin: new FormControl(false, {
+        nonNullable: true,
+        validators: [Validators.required],
+      }),
+      isOwner: new FormControl(false, {
+        nonNullable: true,
+        validators: [Validators.required],
+      }),
+      isFamily: new FormControl(false, {
+        nonNullable: true,
+        validators: [Validators.required],
+      }),
+      isTenant: new FormControl(false, {
+        nonNullable: true,
+        validators: [Validators.required],
+      }),
+    },
+    { validators: [atLeastOneRoleRequired] },
+  );
   protected readonly isNewUnit = signal<boolean>(false);
   private readonly exclusiveFields = [
     'isOwner',
@@ -269,3 +274,28 @@ export class UserFormPage {
     this.sessionService.goBack();
   }
 }
+
+function atLeastOneRoleRequired(
+  control: AbstractControl,
+): ValidationErrors | null {
+  const group = control as FormGroup; // Castea a FormGroup para acceder a los controles
+
+  const isOwner = group.get('isOwner')?.value;
+  const isFamily = group.get('isFamily')?.value;
+  const isTenant = group.get('isTenant')?.value;
+
+  if (!isOwner && !isFamily && !isTenant) {
+    return { atLeastOneRoleRequired: true };
+  }
+  return null;
+}
+// function atLeastOneRoleRequired(group: FormGroup): ValidationErrors | null {
+//   const isOwner = group.get('isOwner')?.value;
+//   const isFamily = group.get('isFamily')?.value;
+//   const isTenant = group.get('isTenant')?.value;
+//
+//   if (!isOwner && !isFamily && !isTenant) {
+//     return { atLeastOneRoleRequired: true };
+//   }
+//   return null;
+// }

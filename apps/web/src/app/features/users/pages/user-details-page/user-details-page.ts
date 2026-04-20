@@ -3,11 +3,12 @@ import { RouterLink } from '@angular/router';
 import { UserCard, UserUnitCard } from '@features/users/components';
 import { UsersStore } from '@features/users/users.store';
 import { UserModel } from '@nex-house/models';
+import { PageHeader } from '@shared/components/ui';
 import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'app-user-details-page',
-  imports: [ButtonModule, UserUnitCard, UserCard, RouterLink],
+  imports: [ButtonModule, UserUnitCard, UserCard, RouterLink, PageHeader],
   templateUrl: './user-details-page.html',
   styleUrl: './user-details-page.css',
 })
