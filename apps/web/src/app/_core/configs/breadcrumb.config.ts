@@ -11,6 +11,7 @@ export const BREADCRUMB_MAP: Record<string, string> = {
 
   // Finanzas (Usando el enum para evitar errores de typo)
   [FINANCE_ROUTES_ENUM.HOME]: 'Finanzas',
+  [FINANCE_ROUTES_ENUM.CASH_CONTROL]: 'Control Financiero',
   [FINANCE_ROUTES_ENUM.PAYMENT_PLANS]: 'Planes de Cobro',
   [FINANCE_ROUTES_ENUM.PAYMENT_MONITOR]: 'Monitor de Cobranza',
   'finance-general': 'General',

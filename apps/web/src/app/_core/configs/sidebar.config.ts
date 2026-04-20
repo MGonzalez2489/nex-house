@@ -62,6 +62,11 @@ export const SIDEBAR_CONFIG: SidebarConfigModel = {
               route: `/${FINANCE_ROUTES_ENUM.HOME}`,
             },
             {
+              id: FINANCE_ROUTES_ENUM.CASH_CONTROL,
+              label: 'Control financiero',
+              route: `${FINANCE_ROUTES_ENUM.HOME}/${FINANCE_ROUTES_ENUM.CASH_CONTROL}`,
+            },
+            {
               id: FINANCE_ROUTES_ENUM.PAYMENT_PLANS,
               label: 'Calendario de Cobros',
               route: `${FINANCE_ROUTES_ENUM.HOME}/${FINANCE_ROUTES_ENUM.PAYMENT_PLANS}`,

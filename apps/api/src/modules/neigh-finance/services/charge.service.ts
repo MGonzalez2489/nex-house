@@ -180,9 +180,6 @@ export class ChargeService {
     query.addOrderBy('user.firstName', 'ASC');
     query.addOrderBy('user.lastName', 'ASC');
 
-    console.log('SQL:', query.getSql());
-    console.log('Params:', query.getParameters());
-
     const result = await paginateQuery(query, filters);
     return result;
   }

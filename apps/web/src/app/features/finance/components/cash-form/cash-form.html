@@ -1,0 +1,73 @@
+<form class="space-y-6" [formGroup]="form" (ngSubmit)="doSubmit()">
+  <!-- type -->
+  <p-selectbutton
+    [options]="movementOptions"
+    optionLabel="key"
+    fluid
+    optionValue="value"
+    aria-labelledby="basic"
+    formControlName="type"
+  />
+
+  <!-- Amount -->
+  <div class="form-control">
+    <label for="amount" class="form-label required">Monto total</label>
+    <input
+      formControlName="amount"
+      variant="filled"
+      pInputText
+      id="amount"
+      type="text"
+      fluid
+    />
+  </div>
+  <!-- Category -->
+  <!-- <div class="form-control"> -->
+  <!--   <label for="category" class="form-label">Categoria</label> -->
+  <!--   <p-select -->
+  <!--     formControlName="category" -->
+  <!--     variant="filled" -->
+  <!--     id="category" -->
+  <!--     appendTo="body" -->
+  <!--     fluid -->
+  <!--   /> -->
+  <!-- </div> -->
+  <!-- Date -->
+  <div class="form-control">
+    <label for="date" class="form-label">Fecha efectiva</label>
+    <p-datepicker
+      [showIcon]="true"
+      formControlName="date"
+      inputId="date"
+      variant="filled"
+      [showOnFocus]="false"
+      fluid
+    />
+  </div>
+  <!-- Evidence -->
+  <div class="form-control">
+    <label for="evidence" class="form-label">Comprobante</label>
+    <input
+      formControlName="evidenceUrl"
+      variant="filled"
+      pInputText
+      id="evidence"
+      type="text"
+      fluid
+    />
+  </div>
+  <!-- Description -->
+  <div class="form-control">
+    <label for="description" class="form-label">Concepto / Descripción</label>
+    <textarea
+      variant="filled"
+      formControlName="description"
+      rows="5"
+      fluid
+      pTextarea
+    ></textarea>
+  </div>
+
+  <!-- options -->
+</form>
+<pre>{{form.value|json}}</pre>
