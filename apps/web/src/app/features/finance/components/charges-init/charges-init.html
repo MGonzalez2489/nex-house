@@ -12,18 +12,18 @@
       <div
         class="relative w-24 h-24 bg-white shadow-sm border border-slate-100 rounded-3xl flex items-center justify-center text-blue-500 transform rotate-3"
       >
-        <i class="pi pi-calendar-plus text-5xl"></i>
+        <i class="pi pi-wallet text-5xl"></i>
       </div>
 
       <div
         class="absolute -bottom-2 -right-2 w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center shadow-lg border-4 border-white"
       >
-        <i class="pi pi-dollar text-sm"></i>
+        <i class="pi pi-credit-card text-sm"></i>
       </div>
     </div>
 
     <h2 class="text-2xl font-black text-slate-800 mb-3 tracking-tight">
-      Tu calendario de cobros está vacío
+      Tu monitor de cobros está vacío
     </h2>
 
     <p class="text-slate-500 leading-relaxed mb-8 px-4">
@@ -32,16 +32,6 @@
         Crea tu primer cobro para que los residentes puedan verlo en su agenda.
       </span>
     </p>
-
-    <div class="w-full sm:w-auto">
-      <p-button
-        label="Programar Nuevo Cobro"
-        icon="pi pi-plus"
-        styleClass="p-button-lg rounded-xl shadow-indigo-200 shadow-xl border-none bg-slate-900 hover:bg-slate-800 transition-all w-full sm:w-auto"
-        (click)="addCharge.emit()"
-      >
-      </p-button>
-    </div>
 
     <p
       class="mt-8 text-[11px] text-slate-400 uppercase tracking-widest font-bold"

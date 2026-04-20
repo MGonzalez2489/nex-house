@@ -4,8 +4,8 @@
     subTitle="Control centralizado de cuotas, vencimientos y estatus de pago."
   />
 
-  @if(store.chargesSummary(); as summary){
-
+  @if((store.chargesPagination()?.total || 0) > 0){ @if(store.chargesSummary();
+  as summary){
   <app-charges-summary class="block" [summary]="summary" />
   }
 
@@ -22,4 +22,8 @@
       (view)="view($event)"
     />
   </p-card>
+
+  } @else{
+  <app-charges-init />
+  }
 </div>

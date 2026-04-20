@@ -12,11 +12,11 @@ import {
   ChargesCancel,
   ChargesDetails,
   ChargesFilters,
+  ChargesInit,
   ChargesSummary,
   ChargesTable,
 } from '@features/finance/components';
 import { FinanceStore } from '@features/finance/stores';
-import { ChargeStatusEnum } from '@nex-house/enums';
 import { SearchCharges } from '@nex-house/interfaces';
 import { ChargeModel } from '@nex-house/models';
 import { PageHeader } from '@shared/components/ui';
@@ -24,7 +24,14 @@ import { Card } from 'primeng/card';
 
 @Component({
   selector: 'app-payments-monitor',
-  imports: [Card, ChargesTable, ChargesFilters, PageHeader, ChargesSummary],
+  imports: [
+    Card,
+    ChargesTable,
+    ChargesFilters,
+    PageHeader,
+    ChargesSummary,
+    ChargesInit,
+  ],
   templateUrl: './payments-monitor.html',
   styleUrl: './payments-monitor.css',
   standalone: true,
@@ -43,15 +50,6 @@ export class PaymentsMonitor implements OnInit {
     effect(() => {
       const cFilters = this.filters();
       this.store.chargesLoadAll(cFilters);
-    });
-
-    effect(() => {
-      const allCharges = this.store.chargesEntities();
-      if (allCharges.length === 0) return;
-
-      const c = allCharges.filter((f) => f.status !== ChargeStatusEnum.PENDING);
-
-      // this.view(c[0]);
     });
   }
 

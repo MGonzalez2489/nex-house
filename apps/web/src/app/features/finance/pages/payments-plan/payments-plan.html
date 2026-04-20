@@ -1,5 +1,4 @@
 <div class="space-y-6">
-  @if(store.feeScheduleExists()){
   <!-- Header Section -->
   <app-page-header
     class="max-w-[50%]"
@@ -7,15 +6,16 @@
     subTitle="Administra y programa los ciclos de facturación para residentes y áreas
 comerciales. Visualiza el estado actual de tus flujos de efectivo."
   >
+    @if(store.feeScheduleExists()){
     <div actions class="flex gap-2">
       <p-button label="Crear Nuevo" icon="pi pi-plus" (click)="openForm()" />
     </div>
+    }
   </app-page-header>
 
-  } @if(!store.feeScheduleExists()){
+  @if(!store.feeScheduleExists()){
   <app-fee-schedule-init class="block" (addCharge)="openForm()" />
   } @else{
-
   <!-- Fees Ledger (Table Section) -->
   <p-card class="hidden md:block">
     <app-fee-schedule-table
@@ -29,38 +29,6 @@ comerciales. Visualiza el estado actual de tus flujos de efectivo."
   </p-card>
   <app-fee-schedule-list class="md:hidden" />
 
-  <!-- Secondary Context Grid -->
-  <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 hidden">
-    <div
-      class="p-6 bg-white rounded-xl shadow-sm border-l-4 border-emerald-500"
-    >
-      <h4 class="text-sm font-bold text-on-surface mb-2">
-        Próximo Cierre Fiscal
-      </h4>
-      <p class="text-xs text-on-surface-variant leading-relaxed">
-        El periodo actual finaliza en
-        <span class="text-on-surface font-semibold">9 días</span>. Asegúrate de
-        que todos los cobros recurrentes estén activos.
-      </p>
-    </div>
-    <div class="p-6 bg-white rounded-xl shadow-sm border-l-4 border-amber-400">
-      <h4 class="text-sm font-bold text-on-surface mb-2">Acción Requerida</h4>
-      <p class="text-xs text-on-surface-variant leading-relaxed">
-        Hay
-        <span class="text-on-surface font-semibold">2 cobros pausados</span> que
-        excedieron la fecha de reanudación automática.
-      </p>
-    </div>
-    <div class="p-6 bg-white rounded-xl shadow-sm border-l-4 border-blue-500">
-      <h4 class="text-sm font-bold text-on-surface mb-2">Soporte NexHouse</h4>
-      <p class="text-xs text-on-surface-variant leading-relaxed">
-        ¿Necesitas ayuda con la facturación masiva? Consulta nuestra
-        <span class="text-emerald-600 font-semibold cursor-pointer"
-          >guía de gestión financiera</span
-        >.
-      </p>
-    </div>
-  </div>
   }
 </div>
 
@@ -78,6 +46,37 @@ comerciales. Visualiza el estado actual de tus flujos de efectivo."
   <app-fee-schedule-details [record]="selected()" />
   } }
 </p-drawer>
+
+<!-- Secondary Context Grid -->
+<div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 hidden">
+  <div class="p-6 bg-white rounded-xl shadow-sm border-l-4 border-emerald-500">
+    <h4 class="text-sm font-bold text-on-surface mb-2">
+      Próximo Cierre Fiscal
+    </h4>
+    <p class="text-xs text-on-surface-variant leading-relaxed">
+      El periodo actual finaliza en
+      <span class="text-on-surface font-semibold">9 días</span>. Asegúrate de
+      que todos los cobros recurrentes estén activos.
+    </p>
+  </div>
+  <div class="p-6 bg-white rounded-xl shadow-sm border-l-4 border-amber-400">
+    <h4 class="text-sm font-bold text-on-surface mb-2">Acción Requerida</h4>
+    <p class="text-xs text-on-surface-variant leading-relaxed">
+      Hay
+      <span class="text-on-surface font-semibold">2 cobros pausados</span> que
+      excedieron la fecha de reanudación automática.
+    </p>
+  </div>
+  <div class="p-6 bg-white rounded-xl shadow-sm border-l-4 border-blue-500">
+    <h4 class="text-sm font-bold text-on-surface mb-2">Soporte NexHouse</h4>
+    <p class="text-xs text-on-surface-variant leading-relaxed">
+      ¿Necesitas ayuda con la facturación masiva? Consulta nuestra
+      <span class="text-emerald-600 font-semibold cursor-pointer"
+        >guía de gestión financiera</span
+      >.
+    </p>
+  </div>
+</div>
 
 <!-- Stats Overview (Asymmetric Grid) -->
 <div class="grid grid-cols-1 md:grid-cols-12 gap-6 my-12 bg-cyan-100 hidden">

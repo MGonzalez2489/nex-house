@@ -1,4 +1,11 @@
-import { Component, inject, input, OnInit, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  input,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { UserCard, UserUnitCard } from '@features/users/components';
 import { UsersStore } from '@features/users/users.store';
@@ -11,6 +18,8 @@ import { ButtonModule } from 'primeng/button';
   imports: [ButtonModule, UserUnitCard, UserCard, RouterLink, PageHeader],
   templateUrl: './user-details-page.html',
   styleUrl: './user-details-page.css',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserDetailsPage implements OnInit {
   protected readonly id = input.required<string>();
