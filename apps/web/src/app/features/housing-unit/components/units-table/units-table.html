@@ -8,31 +8,24 @@
   (filter)="search($event)"
   [pagination]="pagination()"
 >
-  <ng-template #caption>
-    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-      <div class="block">
-        <h2 class="text-xl font-bold text-slate-800 tracking-tight">
-          Inventario de Unidades
-        </h2>
-        <p class="text-sm text-slate-500">
-          Gestiona las propiedades y sus habitantes vinculados.
-        </p>
-      </div>
-
-      <div class="flex items-center gap-3">
-        <span class="p-input-icon-left w-full md:w-80">
-          <input
-            pInputText
-            variant="filled"
-            class="w-full"
-            placeholder="Search by name or address..."
-            (input)="tb.filterGlobal($any($event.target).value, 'contains')"
-          />
-        </span>
-        <p-button label="Nuevo" icon="pi pi-plus" />
-      </div>
-    </div>
-  </ng-template>
+  <!-- <ng-template #caption> -->
+  <!--   <div class="flex flex-col md:flex-row justify-between items-center gap-4"> -->
+  <!--     <div class="block"></div> -->
+  <!---->
+  <!--     <div class="flex items-center gap-3"> -->
+  <!--       <span class="p-input-icon-left w-full md:w-80"> -->
+  <!--         <input -->
+  <!--           pInputText -->
+  <!--           variant="filled" -->
+  <!--           class="w-full" -->
+  <!--           placeholder="Search by name or address..." -->
+  <!--           (input)="tb.filterGlobal($any($event.target).value, 'contains')" -->
+  <!--         /> -->
+  <!--       </span> -->
+  <!--       <p-button label="Nuevo" icon="pi pi-plus" /> -->
+  <!--     </div> -->
+  <!--   </div> -->
+  <!-- </ng-template> -->
 
   <ng-template #body let-unit let-field="field">
     @switch (field) { @case ('identifier') {

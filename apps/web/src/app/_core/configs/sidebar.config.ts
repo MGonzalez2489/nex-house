@@ -5,6 +5,7 @@ import { USERS_ROUTES_ENUM } from '@features/users';
 import { UserRoleEnum } from '@nex-house/enums';
 import { PrimeIcons } from 'primeng/api';
 import { SidebarConfigModel } from '../layout/sidebar/nav.model';
+import { UNITS_ROUTES_ENUM } from '@features/housing-unit';
 
 export const SIDEBAR_CONFIG: SidebarConfigModel = {
   header: {
@@ -71,6 +72,13 @@ export const SIDEBAR_CONFIG: SidebarConfigModel = {
               route: `${FINANCE_ROUTES_ENUM.HOME}/${FINANCE_ROUTES_ENUM.PAYMENT_MONITOR}`,
             },
           ],
+        },
+        {
+          id: 'units',
+          label: 'Unidades',
+          icon: 'pi pi-building',
+          roles: [UserRoleEnum.ADMIN],
+          route: UNITS_ROUTES_ENUM.HOME,
         },
         {
           id: 'tasks',

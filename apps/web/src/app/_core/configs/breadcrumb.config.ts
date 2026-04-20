@@ -1,16 +1,8 @@
 import { FINANCE_ROUTES_ENUM } from '@features/finance';
-import { NEIGHBORHOODS_ROUTES_ENUM } from '@features/neighborhoods';
+import { UNITS_ROUTES_ENUM } from '@features/housing-unit';
 import { USERS_ROUTES_ENUM } from '@features/users';
 
 export const BREADCRUMB_MAP: Record<string, string> = {
-  // finance: 'Finanzas',
-  // 'payment-plans': 'Planes de Cobro',
-  // 'payment-monitor': 'Monitor de Cobranza',
-  // users: 'Usuarios',
-  // neighborhoods: 'Fraccionamientos',
-  // dashboard: 'Panel Principal',
-  // Aquí irán mapeados tus Enums
-
   // Global & Dashboard
   dashboard: 'Panel Principal',
   neighborhoods: 'Fraccionamientos',
@@ -27,4 +19,7 @@ export const BREADCRUMB_MAP: Record<string, string> = {
   [USERS_ROUTES_ENUM.HOME]: 'Usuarios',
   [USERS_ROUTES_ENUM.NEW]: 'Nuevo Usuario',
   update: 'Editar',
+
+  //Units
+  [UNITS_ROUTES_ENUM.HOME]: 'Unidades',
 };

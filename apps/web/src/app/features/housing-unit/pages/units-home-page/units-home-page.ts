@@ -1,13 +1,18 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ModalService } from '@core/services';
 import { UnitsStore } from '@features/housing-unit';
-import { UnitsTable, UnitForm } from '@features/housing-unit/components';
+import {
+  UnitsTable,
+  UnitForm,
+  UnitFilters,
+} from '@features/housing-unit/components';
 import { Search } from '@nex-house/interfaces';
+import { PageHeader } from '@shared/components/ui';
 import { Card } from 'primeng/card';
 
 @Component({
   selector: 'app-units-home-page',
-  imports: [Card, UnitsTable],
+  imports: [Card, UnitsTable, PageHeader, UnitFilters],
   templateUrl: './units-home-page.html',
   styleUrl: './units-home-page.css',
   standalone: true,

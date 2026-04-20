@@ -51,7 +51,7 @@ export class PaymentsMonitor implements OnInit {
 
       const c = allCharges.filter((f) => f.status !== ChargeStatusEnum.PENDING);
 
-      this.view(c[0]);
+      // this.view(c[0]);
     });
   }
 
