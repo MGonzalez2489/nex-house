@@ -11,10 +11,9 @@ import { Brackets, DataSource, Repository } from 'typeorm';
 import { CreateFeeScheduleDto } from '../dtos';
 
 import { SearchDto } from '@common/dtos';
-import { paginateQuery } from '@common/utils';
 import { isToday, startOfDay, toDate } from 'date-fns';
-import { ChargeService } from './charge.service';
 import { FeeScheduleToModel } from '../mappers';
+import { ChargeService } from './charge.service';
 
 @Injectable()
 export class FeeScheduleService {

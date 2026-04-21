@@ -4,6 +4,7 @@
     title="Control Financiero"
     subTitle="Seguimiento de todos los movimientos del fraccionamiento."
   >
+    @if(existsRecords()){
     <div actions>
       <p-button
         label="Nuevo Movimiento"
@@ -11,22 +12,29 @@
         (click)="addMovement()"
       />
     </div>
+    }
   </app-page-header>
+
+  @if(!existsRecords()){
+  <app-cash-transaction-init (add)="addMovement()" />
+  } @else{
 
   <!-- MOCK -->
   <!-- Quick Stats Cards -->
-  <app-cash-summary class="block" />
-
+  <app-cash-summary class="block" [summary]="store.transactionsSummary()" />
   <!-- Filters & Search -->
-  <app-cash-filters class="block" />
+  <app-cash-filters
+    class="block"
+    [filters]="store.transactionsFilters()"
+    [initDate]="contextStore.neighborhood()?.createdAt"
+    (doSearch)="search($event)"
+  />
 
   <!-- Timeline Journal -->
-  <app-cash-movement-list class="block" />
-
-  <!-- Empty State (Optional Hint) -->
-  <div class="text-center py-12">
-    <p class="text-[10px] font-bold text-slate-300 uppercase tracking-[0.3em]">
-      Fin del historial reciente
-    </p>
-  </div>
+  <app-cash-movement-list
+    class="block"
+    [records]="store.transactionsByDate()"
+    [isLoading]="store.transactionsLoading()"
+  />
+  }
 </div>

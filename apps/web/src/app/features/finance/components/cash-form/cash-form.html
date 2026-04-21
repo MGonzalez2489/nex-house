@@ -1,47 +1,105 @@
-<form class="space-y-6" [formGroup]="form" (ngSubmit)="doSubmit()">
+<form class="space-y-6 mt-1" [formGroup]="form" (ngSubmit)="doSubmit()">
   <!-- type -->
   <p-selectbutton
     [options]="movementOptions"
-    optionLabel="key"
-    fluid
-    optionValue="value"
-    aria-labelledby="basic"
+    [unselectable]="false"
+    [allowEmpty]="false"
     formControlName="type"
+    optionLabel="key"
+    optionValue="value"
+    fluid
   />
 
-  <!-- Amount -->
+  <!-- Title -->
   <div class="form-control">
-    <label for="amount" class="form-label required">Monto total</label>
+    <label for="title" class="form-label required">Titulo</label>
     <input
-      formControlName="amount"
+      formControlName="title"
       variant="filled"
       pInputText
-      id="amount"
+      id="title"
+      placeholder="Ej. Pago de luz"
       type="text"
       fluid
+      [invalid]="form.controls.title.invalid && form.controls.title.touched"
+      [attr.aria-invalid]="form.controls.title.invalid && form.controls.title.touched"
+      [attr.aria-describedby]="form.controls.title.touched && form.controls.title.errors ? 'title-error' : null"
+    />
+
+    <app-form-validation-error
+      id="title-errors"
+      [touched]="form.controls.title.touched"
+      [errors]="form.controls.title.errors"
+      label="Titulo"
     />
   </div>
-  <!-- Category -->
-  <!-- <div class="form-control"> -->
-  <!--   <label for="category" class="form-label">Categoria</label> -->
-  <!--   <p-select -->
-  <!--     formControlName="category" -->
-  <!--     variant="filled" -->
-  <!--     id="category" -->
-  <!--     appendTo="body" -->
-  <!--     fluid -->
-  <!--   /> -->
-  <!-- </div> -->
-  <!-- Date -->
+  <!-- amount / date -->
+  <div class="grid grid-cols-2 gap-4">
+    <!-- Amount -->
+    <div class="form-control">
+      <label for="amount" class="form-label required">Monto total</label>
+      <p-inputnumber
+        formControlName="amount"
+        [min]="0"
+        fluid
+        variant="filled"
+        mode="currency"
+        currency="MXN"
+        [invalid]="form.controls.amount.invalid && form.controls.amount.touched"
+        [attr.aria-invalid]="form.controls.amount.invalid && form.controls.amount.touched"
+        [attr.aria-describedby]="form.controls.amount.touched && form.controls.amount.errors ? 'amount-error' : null"
+      />
+      <app-form-validation-error
+        id="amount-errors"
+        [touched]="form.controls.amount.touched"
+        [errors]="form.controls.amount.errors"
+        label="Monto"
+      />
+    </div>
+
+    <!-- Date -->
+    <div class="form-control">
+      <label for="date" class="form-label">Fecha efectiva</label>
+      <p-datepicker
+        [showIcon]="true"
+        formControlName="transactionDate"
+        inputId="date"
+        variant="filled"
+        [showOnFocus]="false"
+        fluid
+        [invalid]="form.controls.transactionDate.invalid && form.controls.transactionDate.touched"
+        [attr.aria-invalid]="form.controls.transactionDate.invalid && form.controls.transactionDate.touched"
+        [attr.aria-describedby]="form.controls.transactionDate.touched && form.controls.transactionDate.errors ? 'date-error' : null"
+      />
+      <app-form-validation-error
+        id="date-errors"
+        [touched]="form.controls.transactionDate.touched"
+        [errors]="form.controls.transactionDate.errors"
+        label="Fecha efectiva"
+      />
+    </div>
+  </div>
+  <!-- Description -->
   <div class="form-control">
-    <label for="date" class="form-label">Fecha efectiva</label>
-    <p-datepicker
-      [showIcon]="true"
-      formControlName="date"
-      inputId="date"
+    <label for="description" class="form-label required"
+      >Concepto / Descripción</label
+    >
+    <textarea
       variant="filled"
-      [showOnFocus]="false"
+      formControlName="description"
+      rows="5"
       fluid
+      pTextarea
+      placeholder="Ej. Pago de servicio de limpieza para calles principales"
+      [invalid]="form.controls.description.invalid && form.controls.description.touched"
+      [attr.aria-invalid]="form.controls.description.invalid && form.controls.description.touched"
+      [attr.aria-describedby]="form.controls.description.touched && form.controls.description.errors ? 'description-error' : null"
+    ></textarea>
+    <app-form-validation-error
+      id="description-errors"
+      [touched]="form.controls.description.touched"
+      [errors]="form.controls.description.errors"
+      label="Descripción"
     />
   </div>
   <!-- Evidence -->
@@ -56,18 +114,19 @@
       fluid
     />
   </div>
-  <!-- Description -->
-  <div class="form-control">
-    <label for="description" class="form-label">Concepto / Descripción</label>
-    <textarea
-      variant="filled"
-      formControlName="description"
-      rows="5"
-      fluid
-      pTextarea
-    ></textarea>
-  </div>
 
   <!-- options -->
+  <app-form-options [callState]="store.callState()" />
 </form>
-<pre>{{form.value|json}}</pre>
+
+<!-- Category -->
+<!-- <div class="form-control"> -->
+<!--   <label for="category" class="form-label">Categoria</label> -->
+<!--   <p-select -->
+<!--     formControlName="category" -->
+<!--     variant="filled" -->
+<!--     id="category" -->
+<!--     appendTo="body" -->
+<!--     fluid -->
+<!--   /> -->
+<!-- </div> -->

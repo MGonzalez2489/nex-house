@@ -8,12 +8,16 @@
       </div>
       <span
         class="text-[10px] font-bold text-slate-400 uppercase tracking-widest"
-        >Balance General</span
+        >Balance General (mock)</span
       >
     </div>
-    <h3 class="text-2xl font-black text-slate-900">$42,500.00</h3>
+    <h3 class="text-2xl font-black text-slate-900">
+      {{summary()?.balance | currency}}
+    </h3>
+
+    <!-- TODO: fix this -->
     <p
-      class="text-[10px] text-emerald-500 font-bold mt-2 flex items-center gap-1"
+      class="text-[10px] text-emerald-500 font-bold mt-2 flex items-center gap-1 hidden"
     >
       <i class="pi pi-arrow-up-right"></i> +12% este mes
     </p>
@@ -31,7 +35,9 @@
         >Ingresos (Mes)</span
       >
     </div>
-    <h3 class="text-2xl font-black text-slate-900">$12,400.00</h3>
+    <h3 class="text-2xl font-black text-slate-900">
+      {{summary()?.income | currency}}
+    </h3>
   </p-card>
 
   <p-card>
@@ -46,6 +52,8 @@
         >Egresos (Mes)</span
       >
     </div>
-    <h3 class="text-2xl font-black text-slate-900">$5,120.00</h3>
+    <h3 class="text-2xl font-black text-slate-900">
+      {{summary()?.expense | currency}}
+    </h3>
   </p-card>
 </div>

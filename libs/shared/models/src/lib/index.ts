@@ -10,3 +10,6 @@ export * from './charge-summary.model';
 
 export * from './charge-cancel.model';
 export * from './charge-confirm.model';
+
+export * from './transaction.model';
+export * from './transaction-kpi.model';

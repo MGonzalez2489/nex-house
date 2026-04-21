@@ -65,6 +65,7 @@ export class ChargeService {
 
     const units = unitsResponse.data;
 
+    //create charge by units
     const charges = units
       .filter((f) => f.assignments && f.assignments.length > 0)
       .map((unit) => {
@@ -281,7 +282,7 @@ export class ChargeService {
       // 1. Obtener el cargo con su relación de unidad (para saber a qué fraccionamiento pertenece)
       const charge = await queryRunner.manager.findOne(Charge, {
         where: { publicId: chargeId, unit: { neighborhoodId } },
-        relations: ['unit'],
+        relations: ['unit', 'feeSchedule'],
         lock: { mode: 'pessimistic_write' },
       });
 
@@ -307,12 +308,14 @@ export class ChargeService {
 
       // 3. Crear la Transacción Contable (El "Ingreso")
       // Aquí es donde el fraccionamiento recibe el saldo a favor
+      //TODO: improve title and description
       const transaction = queryRunner.manager.create(Transaction, {
         neighborhoodId,
         amount: charge.amount,
         type: TransactionTypeEnum.INCOME, // Ingreso
+        title: charge.feeSchedule?.name,
         description: `Pago recibido: ${charge.description} - Unidad ${charge.unit.streetName} - ${charge.unit.identifier}`,
-        transactionDate: new Date(),
+        transactionDate: new Date().toISOString(),
         source: TransactionSourceTypeEnum.PAYMENT,
         createdBy: confirmedByUser.id,
       });

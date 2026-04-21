@@ -1,11 +1,11 @@
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
-import { TraceableEntity } from './_traceable.entity';
-import { Exclude } from 'class-transformer';
-import { Neighborhood } from './neighborhood.entity';
 import {
   TransactionSourceTypeEnum,
   TransactionTypeEnum,
 } from '@nex-house/enums';
+import { Exclude } from 'class-transformer';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { TraceableEntity } from './_traceable.entity';
+import { Neighborhood } from './neighborhood.entity';
 
 @Entity('transactions')
 export class Transaction extends TraceableEntity {
@@ -33,8 +33,11 @@ export class Transaction extends TraceableEntity {
   })
   sourceType: TransactionSourceTypeEnum;
 
-  @Column({ type: 'date' })
-  transactionDate: Date; // Para reportes mensuales precisos
+  @Column({ type: 'timestamp' })
+  transactionDate: string; // Para reportes mensuales precisos
+
+  @Column({ type: 'text' })
+  title: string; // "Pago Cuota Mantenimiento - Casa A1" o "Compra Escobas"
 
   @Column({ type: 'text', nullable: true })
   description: string; // "Pago Cuota Mantenimiento - Casa A1" o "Compra Escobas"

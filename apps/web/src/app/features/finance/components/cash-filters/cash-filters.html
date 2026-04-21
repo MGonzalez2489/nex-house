@@ -1,16 +1,30 @@
 <p-card>
-  <div class="flex gap-2">
-    <p-iconfield>
-      <p-inputicon class="pi pi-search" />
-      <input
-        pInputText
-        id="search"
-        placeholder="nombre@ejemplo.com"
-        fluid
-        variant="filled"
+  <form [formGroup]="form" class="flex items-center justify-between gap-2">
+    <p>Filtros</p>
+    <div class="flex gap-2">
+      <p-iconfield>
+        <p-inputicon class="pi pi-search" />
+        <input
+          pInputText
+          id="search"
+          placeholder="nombre@ejemplo.com"
+          fluid
+          class="w-100"
+          formControlName="hint"
+          variant="filled"
+        />
+      </p-iconfield>
+      <!-- <p-button label="Categoría" icon="pi pi-filter" severity="secondary" /> -->
+      <!-- <p-button label="Abril 2026" icon="pi pi-calendar" severity="secondary" /> -->
+      <p-datepicker
+        view="month"
+        dateFormat="mm/yy"
+        [readonlyInput]="true"
+        [showIcon]="true"
+        formControlName="date"
+        [maxDate]="maxDate"
+        [minDate]="formatedInitDate()"
       />
-    </p-iconfield>
-    <p-button label="Categoría" icon="pi pi-filter" severity="secondary" />
-    <p-button label="Abril 2026" icon="pi pi-calendar" severity="secondary" />
-  </div>
+    </div>
+  </form>
 </p-card>
