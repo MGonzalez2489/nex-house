@@ -3,10 +3,12 @@ import {
   Component,
   computed,
   inject,
+  OnInit,
 } from '@angular/core';
 import { ModalService } from '@core/services';
 import {
   CashFilters,
+  CashFiltersChips,
   CashForm,
   CashMovementList,
   CashSummary,
@@ -17,6 +19,7 @@ import { SearchTransaction } from '@nex-house/interfaces';
 import { PageHeader } from '@shared/components/ui';
 import { ContextStore } from '@stores/context.store';
 import { ButtonModule } from 'primeng/button';
+import { OverlayBadgeModule } from 'primeng/overlaybadge';
 
 @Component({
   selector: 'app-cash-control',
@@ -24,16 +27,17 @@ import { ButtonModule } from 'primeng/button';
     PageHeader,
     ButtonModule,
     CashSummary,
-    CashFilters,
     CashMovementList,
     CashTransactionInit,
+    OverlayBadgeModule,
+    CashFiltersChips,
   ],
   templateUrl: './cash-control.html',
   styleUrl: './cash-control.css',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CashControl {
+export class CashControl implements OnInit {
   protected readonly modalService = inject(ModalService);
   protected readonly store = inject(FinanceStore);
   protected readonly contextStore = inject(ContextStore);
@@ -50,8 +54,53 @@ export class CashControl {
     // return true;
   });
 
+  protected readonly filterCount = computed(() => {
+    const cFilters = this.store.transactionsFilters();
+    if (!cFilters) return 0;
+
+    let count = 0;
+    if (cFilters.globalFilter) count++;
+    if (cFilters.month && cFilters.year) count++;
+
+    return count;
+  });
+
+  ngOnInit(): void {
+    let filters = this.store.transactionsFilters();
+    if (!filters) {
+      const today = new Date();
+      filters = {
+        rows: 10,
+        first: 0,
+        month: today.getMonth(),
+        year: today.getFullYear(),
+      };
+      this.search(filters);
+    }
+  }
+
   addMovement(): void {
     this.modalService.open(CashForm, { header: 'Registrar Movimiento' });
+  }
+
+  changeFilters(): void {
+    this.modalService.open(CashFilters, {
+      header: 'Filtrar transacciones',
+      width: '25vw',
+      inputValues: {
+        filters: this.store.transactionsFilters(),
+      },
+    });
+  }
+
+  removeFilter(key: string) {
+    const cFilters = Object.assign({}, this.store.transactionsFilters());
+    if (!cFilters) return;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    delete (cFilters as any)[key];
+
+    this.search(cFilters);
   }
 
   search(newFilters: SearchTransaction) {

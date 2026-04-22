@@ -20,3 +20,5 @@ export * from './cash-movement-list/cash-movement-list';
 export * from './cash-movement/cash-movement';
 export * from './cash-form/cash-form';
 export * from './cash-transaction-init/cash-transaction-init';
+
+export * from './cash-filters-chips/cash-filters-chips';

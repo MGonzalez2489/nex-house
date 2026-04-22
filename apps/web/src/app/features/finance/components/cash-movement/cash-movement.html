@@ -23,10 +23,10 @@
             class="text-[10px] font-bold px-2 py-0.5 rounded"
             >{{transaction().type === 'income' ? 'Ingreso' : 'Gasto'}}</span
           >
-          <span
-            class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter"
-            >{{transaction().transactionDate | date:'time'}}</span
-          >
+          <!-- <span -->
+          <!--   class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter" -->
+          <!--   >{{transaction().transactionDate | date:'time'}}</span -->
+          <!-- > -->
         </div>
         <h4 class="text-base font-bold text-slate-800 capitalize">
           {{transaction().title}}

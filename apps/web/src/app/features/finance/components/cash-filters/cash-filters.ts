@@ -2,26 +2,24 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  effect,
+  inject,
   input,
   OnInit,
   output,
 } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FinanceStore } from '@features/finance/stores';
 import { SearchTransaction } from '@nex-house/interfaces';
 import { ButtonModule } from 'primeng/button';
-import { Card } from 'primeng/card';
 import { DatePickerModule } from 'primeng/datepicker';
+import { DynamicDialogRef } from 'primeng/dynamicdialog';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
-import { debounceTime, distinctUntilChanged } from 'rxjs';
 
 @Component({
   selector: 'app-cash-filters',
   imports: [
-    Card,
     InputTextModule,
     InputIconModule,
     IconFieldModule,
@@ -35,11 +33,12 @@ import { debounceTime, distinctUntilChanged } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CashFilters implements OnInit {
-  private readonly debounceTime = 300;
   readonly filters = input<SearchTransaction>();
   protected readonly doSearch = output<SearchTransaction>();
   protected readonly maxDate = new Date();
+  protected readonly store = inject(FinanceStore);
   readonly initDate = input<string>();
+  private readonly ref = inject(DynamicDialogRef);
 
   formatedInitDate = computed(() => {
     const cInitDate = this.initDate();
@@ -57,36 +56,39 @@ export class CashFilters implements OnInit {
     date: new FormControl(new Date(), { nonNullable: true }),
   });
 
-  protected readonly fChanges = toSignal(
-    this.form.valueChanges.pipe(
-      debounceTime(this.debounceTime),
-      distinctUntilChanged((prev, curr) => {
-        return (
-          prev.hint === curr.hint &&
-          prev.category === curr.category &&
-          prev.date === curr.date
-        );
-      }),
-    ),
-  );
+  ngOnInit(): void {
+    const cFilters = this.filters();
 
-  constructor() {
-    effect(() => {
-      const formValue = this.fChanges();
-      if (formValue && formValue.date) {
-        const searchTransaction: SearchTransaction = {
-          globalFilter: formValue.hint,
-          category: formValue.category,
-          year: new Date(formValue.date).getFullYear(),
-          month: new Date(formValue.date).getMonth(),
-        };
-        this.doSearch.emit(searchTransaction);
-      }
+    if (!cFilters) return;
+
+    this.form.patchValue({
+      hint: cFilters.globalFilter,
+      date:
+        cFilters.month && cFilters.year
+          ? new Date(cFilters.year, cFilters.month)
+          : new Date(),
     });
   }
-  ngOnInit(): void {
+
+  search() {
+    const cFilters = Object.assign({}, this.filters());
+    const { hint, date } = this.form.value;
+
+    cFilters.globalFilter = hint ? hint : undefined;
+    if (date) {
+      cFilters.month = date.getMonth();
+      cFilters.year = date.getFullYear();
+    }
+
+    this.store.transactionsLoadAll(cFilters);
+
+    this.ref.close();
+  }
+  protected resetForm() {
     this.form.patchValue({
       hint: '',
+      date: new Date(),
     });
+    this.search();
   }
 }

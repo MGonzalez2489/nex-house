@@ -5,7 +5,14 @@
     subTitle="Seguimiento de todos los movimientos del fraccionamiento."
   >
     @if(existsRecords()){
-    <div actions>
+    <div actions class="flex items-center gap-4">
+      <p-overlaybadge [value]="filterCount()">
+        <p-button
+          icon="pi pi-filter"
+          severity="secondary"
+          (click)="changeFilters()"
+        />
+      </p-overlaybadge>
       <p-button
         label="Nuevo Movimiento"
         icon="pi pi-plus"
@@ -22,14 +29,12 @@
   <!-- MOCK -->
   <!-- Quick Stats Cards -->
   <app-cash-summary class="block" [summary]="store.transactionsSummary()" />
-  <!-- Filters & Search -->
-  <app-cash-filters
+
+  <app-cash-filters-chips
     class="block"
     [filters]="store.transactionsFilters()"
-    [initDate]="contextStore.neighborhood()?.createdAt"
-    (doSearch)="search($event)"
+    (removeFilter)="removeFilter($event)"
   />
-
   <!-- Timeline Journal -->
   <app-cash-movement-list
     class="block"

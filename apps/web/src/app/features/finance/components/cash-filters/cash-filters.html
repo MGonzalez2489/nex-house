@@ -1,30 +1,43 @@
-<p-card>
-  <form [formGroup]="form" class="flex items-center justify-between gap-2">
-    <p>Filtros</p>
-    <div class="flex gap-2">
-      <p-iconfield>
-        <p-inputicon class="pi pi-search" />
-        <input
-          pInputText
-          id="search"
-          placeholder="nombre@ejemplo.com"
-          fluid
-          class="w-100"
-          formControlName="hint"
-          variant="filled"
-        />
-      </p-iconfield>
-      <!-- <p-button label="Categoría" icon="pi pi-filter" severity="secondary" /> -->
-      <!-- <p-button label="Abril 2026" icon="pi pi-calendar" severity="secondary" /> -->
-      <p-datepicker
-        view="month"
-        dateFormat="mm/yy"
-        [readonlyInput]="true"
-        [showIcon]="true"
-        formControlName="date"
-        [maxDate]="maxDate"
-        [minDate]="formatedInitDate()"
+<!-- TODO: add transaction category filter -->
+<form [formGroup]="form" class="space-y-6" (ngSubmit)="search()">
+  <!-- description -->
+  <div class="form-control">
+    <label for="search" class="form-label">Descripcion</label>
+    <p-iconfield>
+      <p-inputicon class="pi pi-search" />
+      <input
+        pInputText
+        id="search"
+        placeholder="Ej. Pago de luz"
+        fluid
+        formControlName="hint"
+        variant="filled"
       />
-    </div>
-  </form>
-</p-card>
+    </p-iconfield>
+  </div>
+  <!-- date -->
+  <div class="form-control">
+    <label for="date" class="form-label">Fecha</label>
+    <p-datepicker
+      view="month"
+      dateFormat="mm/yy"
+      [readonlyInput]="true"
+      [showIcon]="true"
+      formControlName="date"
+      id="date"
+      fluid
+      [maxDate]="maxDate"
+      [minDate]="formatedInitDate()"
+    />
+  </div>
+  <div class="flex justify-end w-full gap-4 mt-20">
+    <p-button
+      text
+      label="Limpiar"
+      severity="secondary"
+      type="button"
+      (click)="resetForm()"
+    />
+    <p-button label="Buscar" class="w-40" fluid (click)="search()" />
+  </div>
+</form>
