@@ -1,4 +1,3 @@
-import { JsonPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -15,12 +14,14 @@ import { FinanceStore } from '@features/finance/stores';
 import { TransactionTypeEnum } from '@nex-house/enums';
 import { FormOptions, FormValidationError } from '@shared/components/ui';
 import { DatePickerModule } from 'primeng/datepicker';
+import { DynamicDialogRef } from 'primeng/dynamicdialog';
+import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { TextareaModule } from 'primeng/textarea';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { DynamicDialogRef } from 'primeng/dynamicdialog';
+
+import { FileUploadModule } from 'primeng/fileupload';
 
 type MovementForm = {
   type: FormControl<string>;
@@ -29,7 +30,7 @@ type MovementForm = {
   amount: FormControl<number>;
   // category: FormControl<string>;
   transactionDate: FormControl<string>;
-  evidenceUrl: FormControl<string>;
+  evidence: FormControl<string>;
 };
 
 @Component({
@@ -43,8 +44,8 @@ type MovementForm = {
     FormOptions,
     ReactiveFormsModule,
     TextareaModule,
-    JsonPipe,
     InputNumberModule,
+    FileUploadModule,
   ],
   templateUrl: './cash-form.html',
   styleUrl: './cash-form.css',
@@ -81,12 +82,14 @@ export class CashForm implements OnInit {
       nonNullable: true,
       validators: [Validators.required],
     }),
-    evidenceUrl: new FormControl('', {
+    evidence: new FormControl('', {
       nonNullable: true,
     }),
   });
   private readonly ref = inject(DynamicDialogRef);
   protected readonly store = inject(FinanceStore);
+
+  selectedFile: File | null = null;
 
   ngOnInit(): void {
     const today = new Date();
@@ -94,18 +97,43 @@ export class CashForm implements OnInit {
     this.form.patchValue({ transactionDate: tString });
   }
 
+  onFileSelect(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+    }
+  }
+
+  removeFile(event: Event) {
+    event.stopPropagation();
+    this.selectedFile = null;
+  }
+
   async doSubmit() {
     this.form.markAllAsTouched();
     if (this.form.invalid) return;
 
     const raw = this.form.getRawValue();
-    const payload = {
-      ...raw,
-      sourceType: 'expense',
-      transactionDate: new Date(raw.transactionDate).toISOString(),
-    };
+    const formData = new FormData();
 
-    const success = await this.store.TransactionCreate(payload);
+    // Mapear campos al FormData
+    formData.append('type', raw.type);
+    formData.append('amount', raw.amount.toString());
+    formData.append('title', raw.title);
+    formData.append('description', raw.description);
+    formData.append('sourceType', 'expense');
+    formData.append(
+      'transactionDate',
+      new Date(raw.transactionDate).toISOString(),
+    );
+
+    // Adjuntar el archivo físico si existe
+    if (this.selectedFile) {
+      formData.append('evidence', this.selectedFile);
+    }
+
+    // IMPORTANTE: Tu API debe recibir 'formData' en lugar del objeto plano
+    const success = await this.store.TransactionCreate(formData);
     if (success) {
       this.ref.close();
     }

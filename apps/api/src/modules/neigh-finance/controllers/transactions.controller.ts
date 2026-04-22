@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Post,
+  Query,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { TransactionsService } from '../services';
 import { SearchTransactionDto } from '@common/dtos';
@@ -6,11 +15,17 @@ import { CurrentNeigh } from '@common/decorators';
 import { Neighborhood } from '@database/entities';
 import { TransactionToModel } from '../mappers';
 import { CreateTransactionDto } from '../dtos';
+import { StorageProvider } from '@modules/storage/providers';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { UploadedFile as IUploadedFile } from '@storage/providers';
 
 @ApiTags('Transactions')
 @Controller('neighborhoods/:neighborhoodId/transactions')
 export class TransactionsController {
-  constructor(private readonly transactionService: TransactionsService) {}
+  constructor(
+    private readonly transactionService: TransactionsService,
+    @Inject('STORAGE_PROVIDER') private readonly storage: StorageProvider,
+  ) {}
 
   @Get()
   async getJournal(
@@ -27,19 +42,28 @@ export class TransactionsController {
   @Get('summary')
   async getSummary(
     @Query() obj: { month: number; year: number },
-    // @Query() month: number,
-    // @Query() year: number,
     @CurrentNeigh() neigh: Neighborhood,
   ) {
     return this.transactionService.getKpis(neigh.id, obj.month, obj.year);
   }
 
   @Post()
+  @UseInterceptors(FileInterceptor('evidence'))
   async create(
     @Body() dto: CreateTransactionDto,
     @CurrentNeigh() neigh: Neighborhood,
+    @UploadedFile() file?: IUploadedFile,
   ) {
-    const response = await this.transactionService.create(neigh.id, dto);
+    let evidenceUrl = undefined;
+    if (file) {
+      evidenceUrl = await this.storage.upload(file, 'evidences');
+    }
+
+    const response = await this.transactionService.create(
+      neigh.id,
+      dto,
+      evidenceUrl,
+    );
 
     return TransactionToModel(response);
   }

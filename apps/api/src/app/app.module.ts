@@ -10,6 +10,7 @@ import {
   HousingUnitsModule,
   NeighborhoodsModule,
   NeighFinanceModule,
+  StorageModule,
   UsersModule,
 } from '@modules/index';
 import { DatabaseSeederService } from '@database/index';
@@ -25,6 +26,7 @@ import { NeighborhoodContextInterceptor } from '@common/interceptors';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    StorageModule.register(),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => getDatabaseConfig(config),

@@ -7,4 +7,5 @@ export class TransactionModel extends BaseModel {
   title: string;
   description: string;
   transactionDate: string;
+  evidenceUrl?: string;
 }

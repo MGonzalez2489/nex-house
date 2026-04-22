@@ -20,7 +20,11 @@ export class TransactionsService {
     private readonly repository: Repository<Transaction>,
   ) {}
 
-  async create(neighborhoodId: number, dto: CreateTransactionDto) {
+  async create(
+    neighborhoodId: number,
+    dto: CreateTransactionDto,
+    evidenceUrl?: string,
+  ) {
     const type =
       dto.type === 'income'
         ? TransactionTypeEnum.INCOME
@@ -34,6 +38,7 @@ export class TransactionsService {
       sourceType: source,
       neighborhoodId,
       transactionDate: dto.transactionDate.toString(),
+      evidenceUrl,
     };
 
     const transaction = this.repository.create(newRecord);

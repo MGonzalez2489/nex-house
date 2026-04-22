@@ -10,6 +10,7 @@ export function TransactionToModel(transaction: Transaction): TransactionModel {
     title: transaction.description,
     description: transaction.description,
     transactionDate: transaction.transactionDate.toString(),
+    evidenceUrl: transaction.evidenceUrl,
     // transactionDate: transaction.transactionDate.toDateString(),
   };
 }

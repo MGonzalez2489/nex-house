@@ -37,7 +37,7 @@ export class TransactionService {
     );
   }
 
-  create(neighborhood: string, dto: ICreateTransaction) {
+  create(neighborhood: string, dto: FormData) {
     return this.request.post<TransactionModel>(
       `${this.buildUrl(neighborhood)}`,
       dto,

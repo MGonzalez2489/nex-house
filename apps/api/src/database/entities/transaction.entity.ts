@@ -40,6 +40,9 @@ export class Transaction extends TraceableEntity {
   title: string; // "Pago Cuota Mantenimiento - Casa A1" o "Compra Escobas"
 
   @Column({ type: 'text', nullable: true })
+  evidenceUrl: string;
+
+  @Column({ type: 'text', nullable: true })
   description: string; // "Pago Cuota Mantenimiento - Casa A1" o "Compra Escobas"
 
   //relationships

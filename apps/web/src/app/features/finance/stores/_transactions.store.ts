@@ -147,7 +147,7 @@ export function withTransactionsFeature() {
       ),
     })),
     withMethods((store) => ({
-      TransactionCreate: async (dto: ICreateTransaction): Promise<boolean> => {
+      TransactionCreate: async (dto: FormData): Promise<boolean> => {
         const nId = store._contextStore.selectedId();
         if (!nId) return false;
 
