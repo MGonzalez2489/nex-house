@@ -142,7 +142,7 @@ export class CashControl implements OnInit {
   view(transaction: TransactionModel) {
     this.modalService.open(TransactionView, {
       showHeader: false,
-      width: '40vw',
+      width: '50vw',
       contentStyle: { padding: 0 },
       inputValues: {
         transaction,

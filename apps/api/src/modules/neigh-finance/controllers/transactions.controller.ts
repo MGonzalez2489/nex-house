@@ -56,16 +56,11 @@ export class TransactionsController {
     @CurrentUser() user: User,
     @UploadedFile() file?: IUploadedFile,
   ) {
-    let evidenceUrl = undefined;
-    if (file) {
-      evidenceUrl = await this.storage.upload(file, 'evidences');
-    }
-
     const response = await this.transactionService.create(
       neigh.id,
       dto,
       user,
-      evidenceUrl,
+      file,
     );
 
     if (!response) {

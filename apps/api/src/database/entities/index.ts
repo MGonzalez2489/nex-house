@@ -11,3 +11,4 @@ export * from './payment.entity';
 export * from './payment-application.entity';
 export * from './transaction.entity';
 export * from './transaction_category.entity';
+export * from './file.entity';

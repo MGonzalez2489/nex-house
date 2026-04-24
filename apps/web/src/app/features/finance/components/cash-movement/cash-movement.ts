@@ -43,7 +43,7 @@ export class CashMovement {
   ]);
 
   viewEvidence() {
-    const url = this.transaction()?.evidenceUrl;
+    const url = this.transaction()?.evidence?.url;
 
     if (!url) return;
 

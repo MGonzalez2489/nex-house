@@ -1,9 +1,15 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { NeighborhoodContextInterceptor } from '@common/interceptors';
+import { CryptoService } from '@common/services';
 import { getDatabaseConfig } from '@database/data-source';
+import {
+  HousingUnit,
+  Neighborhood,
+  TransactionCategory,
+  User,
+} from '@database/entities';
+import { DatabaseSeederService } from '@database/index';
+import { JwtAuthGuard } from '@modules/auth/guards';
+import { CatalogsModule } from '@modules/catalogs';
 import {
   AuthModule,
   FinanceModule,
@@ -13,18 +19,12 @@ import {
   StorageModule,
   UsersModule,
 } from '@modules/index';
-import { DatabaseSeederService } from '@database/index';
-import {
-  HousingUnit,
-  Neighborhood,
-  TransactionCategory,
-  User,
-} from '@database/entities';
-import { CryptoService } from '@common/services';
-import { JwtAuthGuard } from '@modules/auth/guards';
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
-import { NeighborhoodContextInterceptor } from '@common/interceptors';
-import { CatalogsModule } from '@modules/catalogs';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 @Module({
   imports: [

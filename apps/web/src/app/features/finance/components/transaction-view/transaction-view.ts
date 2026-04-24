@@ -3,15 +3,18 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  inject,
   input,
 } from '@angular/core';
 import { TransactionTypeEnum } from '@nex-house/enums';
 import { TransactionModel } from '@nex-house/models';
+import { FileSizePipe } from '@shared/pipes';
 import { ButtonModule } from 'primeng/button';
+import { DynamicDialogRef } from 'primeng/dynamicdialog';
 
 @Component({
   selector: 'app-transaction-view',
-  imports: [CurrencyPipe, DatePipe, ButtonModule],
+  imports: [CurrencyPipe, DatePipe, ButtonModule, FileSizePipe, ButtonModule],
   templateUrl: './transaction-view.html',
   styleUrl: './transaction-view.css',
   standalone: true,
@@ -19,18 +22,19 @@ import { ButtonModule } from 'primeng/button';
 })
 export class TransactionView {
   transaction = input.required<TransactionModel>();
+  private readonly ref = inject(DynamicDialogRef);
 
   isIncome = computed(
     () => this.transaction().type === TransactionTypeEnum.INCOME,
   );
-  hasEvidence = computed(
-    () =>
-      this.transaction().evidenceUrl && this.transaction().evidenceUrl !== '',
-  );
+  hasEvidence = computed(() => this.transaction().evidence);
 
-  url = computed(() => this.transaction().evidenceUrl?.split('/')[1]);
+  url = computed(() => this.transaction().evidence?.fileName);
 
   viewEvidence() {
-    window.open(`public/${this.transaction().evidenceUrl}`, '_blank');
+    window.open(`public/${this.transaction().evidence?.url}`, '_blank');
+  }
+  close() {
+    this.ref.close();
   }
 }

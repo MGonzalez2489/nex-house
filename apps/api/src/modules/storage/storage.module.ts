@@ -2,6 +2,9 @@ import { DynamicModule, Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { LocalStorageProvider } from './providers';
+import { FileService } from './services';
+import { NxFile } from '@database/entities';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Global()
 @Module({})
@@ -11,6 +14,7 @@ export class StorageModule {
       module: StorageModule,
       imports: [
         ConfigModule,
+        TypeOrmModule.forFeature([NxFile]),
         ServeStaticModule.forRootAsync({
           imports: [ConfigModule],
           useFactory: (config: ConfigService) => [
@@ -23,6 +27,7 @@ export class StorageModule {
         }),
       ],
       providers: [
+        FileService,
         {
           provide: 'STORAGE_CONFIG',
           useFactory: (config: ConfigService) => ({
@@ -35,7 +40,7 @@ export class StorageModule {
           useClass: LocalStorageProvider,
         },
       ],
-      exports: ['STORAGE_PROVIDER'],
+      exports: ['STORAGE_PROVIDER', FileService],
     };
   }
 }

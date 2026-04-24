@@ -1,3 +1,4 @@
+import { FileToModel } from '@common/mapper';
 import { Transaction } from '@database/entities';
 import { TransactionCategoryToModel } from '@modules/catalogs/mappers';
 import { UserEntityToModel } from '@modules/users/mappers';
@@ -14,7 +15,10 @@ export function TransactionToModel(transaction: Transaction): TransactionModel {
     description: transaction.description,
     transactionDate: transaction.transactionDate.toString(),
     category: TransactionCategoryToModel(transaction.category),
-    evidenceUrl: transaction.evidenceUrl ? transaction.evidenceUrl : undefined,
+    evidence: transaction.evidence
+      ? FileToModel(transaction.evidence)
+      : undefined,
+    // evidenceUrl: transaction.evidenceUrl ? transaction.evidenceUrl : undefined,
     createdBy: transaction.createdByUser
       ? UserEntityToModel(transaction.createdByUser)
       : undefined,

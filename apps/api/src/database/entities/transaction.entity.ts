@@ -3,11 +3,12 @@ import {
   TransactionTypeEnum,
 } from '@nex-house/enums';
 import { Exclude } from 'class-transformer';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 import { TraceableEntity } from './_traceable.entity';
+import { NxFile } from './file.entity';
 import { Neighborhood } from './neighborhood.entity';
-import { User } from './user.entity';
 import { TransactionCategory } from './transaction_category.entity';
+import { User } from './user.entity';
 
 @Entity('transactions')
 export class Transaction extends TraceableEntity {
@@ -41,8 +42,8 @@ export class Transaction extends TraceableEntity {
   @Column({ type: 'text' })
   title: string; // "Pago Cuota Mantenimiento - Casa A1" o "Compra Escobas"
 
-  @Column({ type: 'text', nullable: true })
-  evidenceUrl: string;
+  @Column({ nullable: true })
+  evidenceId: number;
 
   @Column({ type: 'text', nullable: true })
   description: string; // "Pago Cuota Mantenimiento - Casa A1" o "Compra Escobas"
@@ -63,4 +64,8 @@ export class Transaction extends TraceableEntity {
   @ManyToOne(() => TransactionCategory, (c) => c.transactions)
   @JoinColumn({ name: 'categoryId' })
   category: TransactionCategory;
+
+  @OneToOne(() => NxFile, { nullable: true, cascade: true })
+  @JoinColumn({ name: 'evidenceId' })
+  evidence?: NxFile;
 }

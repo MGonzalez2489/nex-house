@@ -11,6 +11,8 @@ import { TransactionKpiModel } from '@nex-house/models';
 import { Brackets, Repository } from 'typeorm';
 import { CreateTransactionDto } from '../dtos';
 import { CategoriesService } from '@modules/catalogs';
+import { UploadedFile as IUploadedFile } from '@storage/providers';
+import { FileService } from '@modules/storage/services';
 
 @Injectable()
 export class TransactionsService {
@@ -20,12 +22,13 @@ export class TransactionsService {
     @InjectRepository(Transaction)
     private readonly repository: Repository<Transaction>,
     private readonly categoryService: CategoriesService,
+    private readonly fileService: FileService,
   ) {}
 
   private async getById(id: number) {
     return await this.repository.findOne({
       where: { id },
-      relations: ['createdByUser', 'category'],
+      relations: ['createdByUser', 'category', 'evidence'],
     });
   }
 
@@ -33,7 +36,7 @@ export class TransactionsService {
     neighborhoodId: number,
     dto: CreateTransactionDto,
     creator: User,
-    evidenceUrl?: string,
+    evidence?: IUploadedFile,
   ) {
     const type =
       dto.type === 'income'
@@ -48,6 +51,10 @@ export class TransactionsService {
       throw new BadRequestException(`Category ${dto.category} not found.`);
     }
 
+    const fRecord = evidence
+      ? await this.fileService.uploadAndRegister(evidence, 'evidence', creator)
+      : undefined;
+
     const newRecord = {
       type,
       amount: dto.amount,
@@ -56,7 +63,7 @@ export class TransactionsService {
       sourceType: source,
       neighborhoodId,
       transactionDate: dto.transactionDate.toString(),
-      evidenceUrl,
+      evidenceId: fRecord?.id,
       createdBy: creator.id,
       categoryId: cat.id, //TODO: FIX THIS
     };
@@ -137,6 +144,7 @@ export class TransactionsService {
       .createQueryBuilder('t')
       .leftJoinAndSelect('t.createdByUser', 'user')
       .leftJoinAndSelect('t.category', 'cat')
+      .leftJoinAndSelect('t.evidence', 'evidence')
       .where('t.neighborhoodId = :neighborhoodId', { neighborhoodId });
 
     const { globalFilter, category, month, year } = filters;

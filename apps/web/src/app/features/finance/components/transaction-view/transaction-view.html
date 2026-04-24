@@ -8,7 +8,7 @@
         [class.bg-rose-100]="!isIncome()"
         [class.text-rose-700]="!isIncome()"
         class="px-3 py-1 text-[10px] font-black uppercase rounded-full"
-        >{{isIncome() ? 'Ingreso' : 'Gasto'}} Realizado</span
+        >{{isIncome() ? 'Ingreso' : 'Gasto'}}</span
       >
       <span
         class="text-[10px] font-bold text-slate-400 uppercase tracking-widest"
@@ -21,11 +21,13 @@
       {{transaction().title}}
     </h2>
   </div>
-  <button
-    class="w-10 h-10 bg-slate-50 text-slate-400 hover:text-slate-900 rounded-full flex items-center justify-center transition-colors"
-  >
-    <i class="pi pi-times"></i>
-  </button>
+  <p-button
+    icon="pi pi-times"
+    rounded
+    severity="secondary"
+    text
+    (click)="close()"
+  />
 </div>
 
 <!-- Contenido Principal -->
@@ -89,7 +91,9 @@
       <div class="flex-1">
         <p class="text-sm font-bold text-slate-800">{{url()}}</p>
         <!-- TODO: pending save metadata on db -->
-        <!-- <p class="text-[10px] text-slate-400 uppercase">Imagen JPG • 1.2 MB</p> -->
+        <p class="text-[10px] text-slate-400 uppercase">
+          {{transaction().evidence?.size | fileSize}}
+        </p>
       </div>
       <p-button
         label="VER ARCHIVO"
@@ -131,7 +135,8 @@
     </div>
 
     <!-- Ejemplo de Transacción Inversa (Si existiera) -->
-    <div class="space-y-3">
+    <!-- TODO: Reflect inverse transaction if exists -->
+    <div class="space-y-3 hidden">
       <h4
         class="text-[10px] font-black text-slate-400 uppercase tracking-widest"
       >
@@ -154,21 +159,23 @@
 <div
   class="p-8 bg-slate-50 border-t border-slate-100 flex justify-between gap-3"
 >
-  <button
-    class="px-6 py-3 text-slate-400 hover:text-slate-900 text-xs font-black uppercase tracking-widest transition-colors"
-  >
-    Imprimir Recibo
-  </button>
+  <!-- TODO: Print option -->
+  <p></p>
+  <!-- <p-button -->
+  <!--   label="Imprimir Recibo" -->
+  <!--   text -->
+  <!--   severity="secondary" -->
+  <!--   styleClass="text-slate-400" -->
+  <!-- /> -->
+
   <div class="flex gap-3">
-    <button
-      class="px-8 py-3 bg-white border border-slate-200 text-slate-700 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-50 transition-all"
-    >
-      Editar
-    </button>
-    <button
-      class="px-8 py-3 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-800 transition-all"
-    >
-      Cerrar
-    </button>
+    <p-button
+      severity="contrast"
+      label="Cerrar"
+      rounded
+      class="w-30"
+      fluid
+      (click)="close()"
+    />
   </div>
 </div>

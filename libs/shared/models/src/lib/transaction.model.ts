@@ -1,4 +1,5 @@
 import { BaseModel } from './_base.model';
+import { FileModel } from './file.model';
 import { TransactionCategoryModel } from './transaction_category.model';
 import { UserModel } from './user.model';
 
@@ -9,7 +10,7 @@ export class TransactionModel extends BaseModel {
   title: string;
   description: string;
   transactionDate: string;
-  evidenceUrl?: string;
+  evidence?: FileModel;
   createdBy?: UserModel;
   category: TransactionCategoryModel;
 }
