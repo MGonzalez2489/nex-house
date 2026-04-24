@@ -7,6 +7,8 @@ import { Repository } from 'typeorm';
 import { HousingUnit, Neighborhood, User } from './entities';
 import { UsersService } from '@modules/users';
 import { CreateUserDto } from '@modules/users/dtos';
+import { TransactionCategory } from './entities/transaction_category.entity';
+import { INITIAL_CATEGORIES } from './seeds';
 
 const initUsers: CreateUserDto[] = [
   {
@@ -205,6 +207,8 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
     private readonly neighRepository: Repository<Neighborhood>,
     @InjectRepository(HousingUnit)
     private readonly unitRepository: Repository<HousingUnit>,
+    @InjectRepository(TransactionCategory)
+    private readonly categoryRepo: Repository<TransactionCategory>,
     private readonly cryptoService: CryptoService,
     private readonly configService: ConfigService,
     private readonly userService: UsersService,
@@ -212,13 +216,30 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
 
   async onApplicationBootstrap() {
     try {
-      await this.seedSuperAdmin();
+      const seeds = Promise.all([this.seedSuperAdmin(), this.seedCategories()]);
+      await seeds;
       this.logger.log('Sembrado completado exitosamente.');
 
       this.seedTestData();
     } catch (error) {
       this.logger.error('Error durante el sembrado:', error.message);
     }
+  }
+
+  async seedCategories() {
+    const count = await this.categoryRepo.count();
+
+    if (count > 0) {
+      return; // Ya existen datos, omitimos para evitar duplicados
+    }
+
+    const categories = this.categoryRepo.create(INITIAL_CATEGORIES);
+    await this.categoryRepo.save(categories);
+
+    // Log opcional para verificar en consola
+    console.log(
+      `Successfully seeded ${categories.length} transaction categories.`,
+    );
   }
 
   private async seedSuperAdmin() {

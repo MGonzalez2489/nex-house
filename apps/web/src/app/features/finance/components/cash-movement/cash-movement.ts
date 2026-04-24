@@ -1,4 +1,4 @@
-import { CurrencyPipe, DatePipe } from '@angular/common';
+import { CurrencyPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -12,7 +12,7 @@ import { Card } from 'primeng/card';
 
 @Component({
   selector: 'app-cash-movement',
-  imports: [Card, CurrencyPipe, DatePipe, ButtonModule],
+  imports: [Card, CurrencyPipe, ButtonModule],
   templateUrl: './cash-movement.html',
   styleUrl: './cash-movement.css',
   standalone: true,

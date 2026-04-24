@@ -79,7 +79,21 @@
       />
     </div>
   </div>
-  <!-- Description -->
+
+  <!-- Category -->
+  <div class="form-control">
+    <div class="flex justify-between">
+      <label for="category" class="form-label required">Categoria</label>
+      <p class="text-xs text-gray-500">
+        Varia segun el tipo de movimiento (ingreso/gasto)
+      </p>
+    </div>
+    <app-transaction-category-select
+      [allowedType]="selType()"
+      formControlName="category"
+    />
+  </div>
+
   <div class="form-control">
     <label for="description" class="form-label required"
       >Concepto / Descripción</label
@@ -102,6 +116,10 @@
       label="Descripción"
     />
   </div>
+
+  <!-- Description -formControlName->
+
+
   <!-- Evidence -->
   <!-- Área de Carga de Archivos (Simulación de p-fileUpload) -->
   <div class="flex flex-col">
@@ -150,15 +168,3 @@
   <!-- options -->
   <app-form-options [callState]="store.callState()" />
 </form>
-
-<!-- Category -->
-<!-- <div class="form-control"> -->
-<!--   <label for="category" class="form-label">Categoria</label> -->
-<!--   <p-select -->
-<!--     formControlName="category" -->
-<!--     variant="filled" -->
-<!--     id="category" -->
-<!--     appendTo="body" -->
-<!--     fluid -->
-<!--   /> -->
-<!-- </div> -->

@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Inject,
+  InternalServerErrorException,
   Post,
   Query,
   UploadedFile,
@@ -11,8 +12,8 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { TransactionsService } from '../services';
 import { SearchTransactionDto } from '@common/dtos';
-import { CurrentNeigh } from '@common/decorators';
-import { Neighborhood } from '@database/entities';
+import { CurrentNeigh, CurrentUser } from '@common/decorators';
+import { Neighborhood, User } from '@database/entities';
 import { TransactionToModel } from '../mappers';
 import { CreateTransactionDto } from '../dtos';
 import { StorageProvider } from '@modules/storage/providers';
@@ -52,6 +53,7 @@ export class TransactionsController {
   async create(
     @Body() dto: CreateTransactionDto,
     @CurrentNeigh() neigh: Neighborhood,
+    @CurrentUser() user: User,
     @UploadedFile() file?: IUploadedFile,
   ) {
     let evidenceUrl = undefined;
@@ -62,8 +64,13 @@ export class TransactionsController {
     const response = await this.transactionService.create(
       neigh.id,
       dto,
+      user,
       evidenceUrl,
     );
+
+    if (!response) {
+      throw new InternalServerErrorException('Creation result not valid');
+    }
 
     return TransactionToModel(response);
   }

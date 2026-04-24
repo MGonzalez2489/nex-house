@@ -6,6 +6,8 @@ import { Exclude } from 'class-transformer';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { TraceableEntity } from './_traceable.entity';
 import { Neighborhood } from './neighborhood.entity';
+import { User } from './user.entity';
+import { TransactionCategory } from './transaction_category.entity';
 
 @Entity('transactions')
 export class Transaction extends TraceableEntity {
@@ -45,8 +47,20 @@ export class Transaction extends TraceableEntity {
   @Column({ type: 'text', nullable: true })
   description: string; // "Pago Cuota Mantenimiento - Casa A1" o "Compra Escobas"
 
+  @Column()
+  @Exclude()
+  categoryId: number;
+
   //relationships
   @ManyToOne(() => Neighborhood)
   @JoinColumn({ name: 'neighborhoodId' })
   neighborhood: Neighborhood;
+
+  @ManyToOne('User')
+  @JoinColumn({ name: 'createdBy' })
+  createdByUser?: User;
+
+  @ManyToOne(() => TransactionCategory, (c) => c.transactions)
+  @JoinColumn({ name: 'categoryId' })
+  category: TransactionCategory;
 }

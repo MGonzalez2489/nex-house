@@ -5,5 +5,6 @@ export interface ICreateTransaction {
   transactionDate: string;
   title: string;
   description: string;
+  category: string;
   evidence?: string;
 }

@@ -1,0 +1,48 @@
+<p-select
+  [options]="filteredCategories()"
+  [(ngModel)]="internalValue"
+  (onChange)="onSelect($event.value)"
+  (onBlur)="onTouched()"
+  optionLabel="name"
+  optionValue="publicId"
+  [filter]="filter()"
+  filterBy="name"
+  [placeholder]="placeholder()"
+  [variant]="variant()"
+  fluid
+>
+  <!-- Template del valor seleccionado -->
+  <ng-template pTemplate="selectedItem" let-item>
+    @if (item) { @let selected = getCategoryById(item.publicId);
+    <div class="flex items-center gap-3">
+      <div
+        class="w-8 h-8 rounded-xl flex items-center justify-center text-white shadow-md rotate-3"
+        [style.backgroundColor]="selected?.color"
+      >
+        <i [class]="getIcon(selected?.icon)"></i>
+      </div>
+      <span class="font-semibold text-slate-700">{{ selected?.name }}</span>
+    </div>
+    }
+  </ng-template>
+
+  <!-- Template de los items en la lista -->
+  <ng-template pTemplate="item" let-cat>
+    <div class="flex items-center gap-4 py-2 px-1 group transition-colors">
+      <div
+        class="w-10 h-10 rounded-2xl flex items-center justify-center text-white shadow-inner group-hover:scale-110 transition-transform"
+        [style.backgroundColor]="cat.color"
+      >
+        <i [class]="getIcon(cat.icon)" class="text-lg"></i>
+      </div>
+      <div class="flex flex-col">
+        <span class="text-sm font-bold text-slate-800">{{ cat.name }}</span>
+        <span
+          class="text-[10px] uppercase font-black text-slate-400 tracking-widest"
+        >
+          {{ cat.type }}
+        </span>
+      </div>
+    </div>
+  </ng-template>
+</p-select>

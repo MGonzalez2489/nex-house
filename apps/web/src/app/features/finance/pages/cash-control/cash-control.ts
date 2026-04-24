@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   OnInit,
 } from '@angular/core';
@@ -14,11 +15,15 @@ import {
   CashSummary,
   CashTransactionInit,
 } from '@features/finance/components';
+import { CashTransactionsTable } from '@features/finance/components/cash-transactions-table/cash-transactions-table';
+import { TransactionView } from '@features/finance/components/transaction-view/transaction-view';
 import { FinanceStore } from '@features/finance/stores';
 import { SearchTransaction } from '@nex-house/interfaces';
+import { TransactionModel } from '@nex-house/models';
 import { PageHeader } from '@shared/components/ui';
 import { ContextStore } from '@stores/context.store';
 import { ButtonModule } from 'primeng/button';
+import { Card } from 'primeng/card';
 import { OverlayBadgeModule } from 'primeng/overlaybadge';
 
 @Component({
@@ -31,6 +36,8 @@ import { OverlayBadgeModule } from 'primeng/overlaybadge';
     CashTransactionInit,
     OverlayBadgeModule,
     CashFiltersChips,
+    CashTransactionsTable,
+    Card,
   ],
   templateUrl: './cash-control.html',
   styleUrl: './cash-control.css',
@@ -53,6 +60,18 @@ export class CashControl implements OnInit {
     //
     // return true;
   });
+
+  constructor() {
+    // effect(() => {
+    //   const c = this.store.transactionsEntities();
+    //   if (!c) return;
+    //
+    //   const f = c[0];
+    //   if (!f) return;
+    //
+    //   this.view(f);
+    // });
+  }
 
   protected readonly filterCount = computed(() => {
     const cFilters = this.store.transactionsFilters();
@@ -77,6 +96,7 @@ export class CashControl implements OnInit {
       };
       this.search(filters);
     }
+    // this.addMovement();
   }
 
   addMovement(): void {
@@ -117,5 +137,22 @@ export class CashControl implements OnInit {
     ) {
       this.store.transactionsKpi(newFilters);
     }
+  }
+
+  view(transaction: TransactionModel) {
+    this.modalService.open(TransactionView, {
+      showHeader: false,
+      width: '40vw',
+      contentStyle: { padding: 0 },
+      inputValues: {
+        transaction,
+      },
+    });
+  }
+  update(transaction: TransactionModel) {
+    console.log('update', transaction.publicId);
+  }
+  delete(transaction: TransactionModel) {
+    console.log('delete', transaction.publicId);
   }
 }

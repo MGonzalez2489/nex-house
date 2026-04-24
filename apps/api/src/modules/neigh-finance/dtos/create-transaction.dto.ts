@@ -25,6 +25,9 @@ export class CreateTransactionDto implements ICreateTransaction {
   description: string;
 
   @IsString()
+  category: string;
+
+  @IsString()
   @IsOptional()
   evidence: string;
 }

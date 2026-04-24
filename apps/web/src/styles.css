@@ -70,3 +70,7 @@
 .p-panelmenu-header-link.p-panelmenu-item-link-active .p-panelmenu-header-icon {
   color: var(--cyan-700);
 }
+
+.first-letter-caps::first-letter {
+  text-transform: uppercase;
+}

@@ -13,3 +13,4 @@ export * from './charge-confirm.model';
 
 export * from './transaction.model';
 export * from './transaction-kpi.model';
+export * from './transaction_category.model';

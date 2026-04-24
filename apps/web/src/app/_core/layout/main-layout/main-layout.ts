@@ -2,7 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { SessionService } from '@core/services';
 import { AuthStore } from '@features/auth';
-import { FinanceStore } from '@features/finance/stores';
+import { CatalogsStore, FinanceStore } from '@features/finance/stores';
 import { UserRoleEnum } from '@nex-house/enums';
 import { ContextStore } from '@stores/context.store';
 import { DrawerModule } from 'primeng/drawer';
@@ -21,6 +21,7 @@ export class MainLayout {
   protected readonly contextStore = inject(ContextStore);
   protected readonly authStore = inject(AuthStore);
   protected readonly financeStore = inject(FinanceStore);
+  protected readonly catalogsStore = inject(CatalogsStore);
   sidebarVisible = signal(false);
 
   loadingContext = computed(() => {

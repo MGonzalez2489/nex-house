@@ -14,11 +14,17 @@ import {
   UsersModule,
 } from '@modules/index';
 import { DatabaseSeederService } from '@database/index';
-import { HousingUnit, Neighborhood, User } from '@database/entities';
+import {
+  HousingUnit,
+  Neighborhood,
+  TransactionCategory,
+  User,
+} from '@database/entities';
 import { CryptoService } from '@common/services';
 import { JwtAuthGuard } from '@modules/auth/guards';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { NeighborhoodContextInterceptor } from '@common/interceptors';
+import { CatalogsModule } from '@modules/catalogs';
 
 @Module({
   imports: [
@@ -31,7 +37,13 @@ import { NeighborhoodContextInterceptor } from '@common/interceptors';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => getDatabaseConfig(config),
     }),
-    TypeOrmModule.forFeature([User, Neighborhood, HousingUnit]),
+    TypeOrmModule.forFeature([
+      User,
+      Neighborhood,
+      HousingUnit,
+      TransactionCategory,
+    ]),
+    CatalogsModule,
     AuthModule,
     NeighborhoodsModule,
     FinanceModule,

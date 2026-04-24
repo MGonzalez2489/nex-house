@@ -7,11 +7,7 @@ import {
 } from '@angular-architects/ngrx-toolkit';
 import { computed, effect, inject } from '@angular/core';
 import { AuthStore } from '@features/auth';
-import {
-  ApiPaginationMeta,
-  ICreateTransaction,
-  SearchTransaction,
-} from '@nex-house/interfaces';
+import { ApiPaginationMeta, SearchTransaction } from '@nex-house/interfaces';
 import { TransactionKpiModel, TransactionModel } from '@nex-house/models';
 import { tapResponse } from '@ngrx/operators';
 import {
@@ -25,8 +21,8 @@ import {
   withState,
 } from '@ngrx/signals';
 import {
-  addEntity,
   entityConfig,
+  prependEntity,
   setAllEntities,
   withEntities,
 } from '@ngrx/signals/entities';
@@ -158,7 +154,7 @@ export function withTransactionsFeature() {
           );
           patchState(
             store,
-            addEntity(response.data, config),
+            prependEntity(response.data, config),
             setLoaded(collection),
           );
           const cFilters = store.transactionsFilters();

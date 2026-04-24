@@ -37,9 +37,19 @@
   />
   <!-- Timeline Journal -->
   <app-cash-movement-list
-    class="block"
+    class="block md:hidden"
     [records]="store.transactionsByDate()"
     [isLoading]="store.transactionsLoading()"
   />
+  <p-card class="hidden md:block">
+    <app-cash-transactions-table
+      [transactions]="store.transactionsEntities()"
+      [pagination]="store.transactionsPagination()"
+      [isLoading]="store.transactionsLoading()"
+      (view)="view($event)"
+      (update)="update($event)"
+      (delete)="delete($event)"
+    />
+  </p-card>
   }
 </div>

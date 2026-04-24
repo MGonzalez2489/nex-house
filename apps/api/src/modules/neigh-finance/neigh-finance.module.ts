@@ -23,6 +23,7 @@ import {
 import { HousingUnitsModule } from '@modules/housing-units';
 import { TaskService } from './services/task.service';
 import { ScheduleModule } from '@nestjs/schedule';
+import { CatalogsModule } from '@modules/catalogs';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { ScheduleModule } from '@nestjs/schedule';
       Transaction,
     ]),
     HousingUnitsModule,
+    CatalogsModule,
   ],
   controllers: [
     NeighFinanceController,

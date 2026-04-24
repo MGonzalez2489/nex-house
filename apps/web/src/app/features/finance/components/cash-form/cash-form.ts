@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   inject,
   OnInit,
 } from '@angular/core';
@@ -10,7 +11,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { FinanceStore } from '@features/finance/stores';
+import { CatalogsStore, FinanceStore } from '@features/finance/stores';
 import { TransactionTypeEnum } from '@nex-house/enums';
 import { FormOptions, FormValidationError } from '@shared/components/ui';
 import { DatePickerModule } from 'primeng/datepicker';
@@ -22,6 +23,8 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { TextareaModule } from 'primeng/textarea';
 
 import { FileUploadModule } from 'primeng/fileupload';
+import { TransactionCategorySelect } from '@shared/components/smart';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 type MovementForm = {
   type: FormControl<string>;
@@ -31,6 +34,7 @@ type MovementForm = {
   // category: FormControl<string>;
   transactionDate: FormControl<string>;
   evidence: FormControl<string>;
+  category: FormControl<string>;
 };
 
 @Component({
@@ -46,6 +50,7 @@ type MovementForm = {
     TextareaModule,
     InputNumberModule,
     FileUploadModule,
+    TransactionCategorySelect,
   ],
   templateUrl: './cash-form.html',
   styleUrl: './cash-form.css',
@@ -74,10 +79,10 @@ export class CashForm implements OnInit {
       nonNullable: true,
       validators: [Validators.required],
     }),
-    // category: new FormControl('', {
-    //   nonNullable: true,
-    //   validators: [Validators.required],
-    // }),
+    category: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
     transactionDate: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required],
@@ -88,8 +93,17 @@ export class CashForm implements OnInit {
   });
   private readonly ref = inject(DynamicDialogRef);
   protected readonly store = inject(FinanceStore);
+  protected readonly catStore = inject(CatalogsStore);
 
   selectedFile: File | null = null;
+
+  selTypeChanges = toSignal(this.form.controls.type.valueChanges);
+  selType = computed(() => {
+    const selType = this.selTypeChanges();
+    if (!selType) return TransactionTypeEnum.INCOME;
+
+    return selType as TransactionTypeEnum;
+  });
 
   ngOnInit(): void {
     const today = new Date();
@@ -122,6 +136,7 @@ export class CashForm implements OnInit {
     formData.append('title', raw.title);
     formData.append('description', raw.description);
     formData.append('sourceType', 'expense');
+    formData.append('category', raw.category);
     formData.append(
       'transactionDate',
       new Date(raw.transactionDate).toISOString(),
