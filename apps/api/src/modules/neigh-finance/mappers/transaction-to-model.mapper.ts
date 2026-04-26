@@ -22,5 +22,11 @@ export function TransactionToModel(transaction: Transaction): TransactionModel {
     createdBy: transaction.createdByUser
       ? UserEntityToModel(transaction.createdByUser)
       : undefined,
+
+    isActive: transaction.isActive,
+    isReversal: transaction.isReversal,
+    reversedBy: transaction.reversedBy
+      ? TransactionToModel(transaction.reversedBy)
+      : undefined,
   };
 }

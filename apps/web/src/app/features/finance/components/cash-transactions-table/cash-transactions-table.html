@@ -1,3 +1,4 @@
+<pre>selected: {{selected()?.publicId}}</pre>
 <app-table
   #tb
   [data]="transactions()"
@@ -10,7 +11,11 @@
   <ng-template #body let-transaction let-field="field">
     @switch (field) { @case ('transactionDate') {
     <div>
-      <span class="text-xs font-bold text-slate-500"
+      <span
+        [class.text-slate-400]="!transaction.isActive"
+        [class.text-slate-500]="transaction.isActive"
+        [class.line-through]="!transaction.isActive"
+        class="text-xs font-bold"
         >{{ transaction.transactionDate | date }}
       </span>
     </div>
@@ -18,20 +23,28 @@
     <div>
       <div class="flex items-center gap-3">
         <div
-          [class.bg-rose-50]="transaction.type === 'expense'"
-          [class.text-rose-500]="transaction.type === 'expense'"
-          [class.bg-emerald-50]="transaction.type === 'income'"
-          [class.text-emerald-500]="transaction.type === 'income'"
+          [class.bg-slate-100]="!transaction.isActive"
+          [class.text-slate-400]="!transaction.isActive"
+          [class.bg-rose-50]="transaction.type === 'expense' && transaction.isActive"
+          [class.text-rose-500]="transaction.type === 'expense' && transaction.isActive"
+          [class.bg-emerald-50]="transaction.type === 'income' && transaction.isActive"
+          [class.text-emerald-500]="transaction.type === 'income' && transaction.isActive"
           class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
         >
           <i
-            [class.pi-arrow-down-left]="transaction.type === 'expense'"
-            [class.pi-arrow-up-left]="transaction.type === 'income'"
+            [class.pi-ban]="!transaction.isActive"
+            [class.pi-arrow-down-left]="transaction.type === 'expense' && transaction.isActive"
+            [class.pi-arrow-up-left]="transaction.type === 'income' && transaction.isActive"
             class="pi text-xs"
           ></i>
         </div>
         <div>
-          <p class="text-sm font-bold text-slate-800 tracking-tight capitalize">
+          <p
+            [class.line-through]="!transaction.isActive"
+            [class.text-slate-500]="!transaction.isActive"
+            [class.text-slate-800]="transaction.isActive"
+            class="text-sm font-bold text-slate-800 tracking-tight capitalize"
+          >
             {{transaction.title}}
           </p>
           <p class="text-[10px] text-slate-400">{{transaction.description}}</p>
@@ -41,15 +54,16 @@
     } @case ('amount') {
 
     <span
-      [class.text-rose-600]="transaction.type === 'expense'"
-      [class.text-emerald-600]="transaction.type === 'income'"
+      [class.text-slate-400]="!transaction.isActive"
+      [class.text-rose-600]="transaction.type === 'expense' && transaction.isActive"
+      [class.text-emerald-600]="transaction.type === 'income'  && transaction.isActive"
       class="text-sm font-black"
     >
       <span [class.collapse]="transaction.type === 'income'">-</span>
       {{transaction.amount | currency}}</span
     >
 
-    } @case('category'){
+    } @case('category'){ @if(transaction.isActive){
 
     <span
       class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold shadow-sm ring-1 ring-inset"
@@ -65,14 +79,22 @@
 
       {{ transaction.category.name }}
     </span>
+    } @else{
+    <span
+      class="inline-flex bg-slate-100 items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold text-slate-500"
+    >
+      <span class="w-1.5 h-1.5 rounded-full"> </span>
 
-    }}
+      {{ transaction.category.name }}
+    </span>
+
+    } }}
   </ng-template>
 
   <ng-template #actions let-transaction>
     <div class="flex justify-center gap-1">
       <p-button
-        [class.collapse]="transaction.evidenceUrl === ''"
+        [class.collapse]="!transaction.evidence"
         icon="pi pi-paperclip"
         text
         severity="secondary"
@@ -85,13 +107,7 @@
         text
         severity="secondary"
       />
-      <p-menu
-        #menu
-        [model]="items()"
-        [popup]="true"
-        appendTo="body"
-        (onHide)="selected.set(undefined)"
-      />
+      <p-menu #menu [model]="items()" [popup]="true" appendTo="body" />
     </div>
   </ng-template>
 </app-table>

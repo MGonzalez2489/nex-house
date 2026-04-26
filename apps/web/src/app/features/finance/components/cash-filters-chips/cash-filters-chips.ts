@@ -39,7 +39,7 @@ export class CashFiltersChips {
 
     //dates
     if (cFilters.month && cFilters.year) {
-      const d = new Date(cFilters.year, cFilters.month);
+      const d = new Date(cFilters.year, cFilters.month - 1);
       const dString =
         this.dPipe.transform(d, 'MMMM yyyy') || new Date().toDateString();
       c.push({

@@ -24,6 +24,7 @@ import {
   entityConfig,
   prependEntity,
   setAllEntities,
+  updateEntity,
   withEntities,
 } from '@ngrx/signals/entities';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
@@ -155,6 +156,33 @@ export function withTransactionsFeature() {
           patchState(
             store,
             prependEntity(response.data, config),
+            setLoaded(collection),
+          );
+          const cFilters = store.transactionsFilters();
+          if (cFilters) {
+            store.transactionsKpi(cFilters);
+          }
+
+          return true;
+        } catch (err) {
+          patchState(store, setError(err, collection));
+          return false;
+        }
+      },
+      TransactionRemove: async (id: string) => {
+        const nId = store._contextStore.selectedId();
+        if (!nId) return false;
+
+        patchState(store, setLoading(collection));
+        try {
+          const response = await lastValueFrom(
+            store._transactionService.remove(nId, id),
+          );
+          const { original, reverse } = response.data;
+          patchState(
+            store,
+            updateEntity({ id, changes: original }, config),
+            prependEntity(reverse, config),
             setLoaded(collection),
           );
           const cFilters = store.transactionsFilters();

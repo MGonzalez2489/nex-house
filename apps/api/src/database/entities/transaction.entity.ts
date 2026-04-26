@@ -52,6 +52,22 @@ export class Transaction extends TraceableEntity {
   @Exclude()
   categoryId: number;
 
+  // --- Campos para Auditoría y Reversión ---
+
+  @Column({ default: true })
+  isActive: boolean;
+
+  @Column({ nullable: true })
+  @Exclude()
+  reversedById: number;
+
+  @OneToOne(() => Transaction, { nullable: true })
+  @JoinColumn({ name: 'reversedById' })
+  reversedBy?: Transaction;
+
+  @Column({ default: false })
+  isReversal: boolean;
+
   //relationships
   @ManyToOne(() => Neighborhood)
   @JoinColumn({ name: 'neighborhoodId' })

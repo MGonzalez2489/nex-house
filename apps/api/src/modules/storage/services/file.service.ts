@@ -58,4 +58,12 @@ export class FileService {
       await this.fileRepository.remove(file);
     }
   }
+
+  async deleteById(id: number): Promise<void> {
+    const file = await this.fileRepository.findOneBy({ id });
+    if (file) {
+      await this.storage.delete(file.url);
+      await this.fileRepository.remove(file);
+    }
+  }
 }

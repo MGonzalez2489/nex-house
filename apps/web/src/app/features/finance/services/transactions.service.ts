@@ -44,6 +44,13 @@ export class TransactionService {
     );
   }
 
+  //TODO: create model for this response
+  remove(neighborhood: string, id: string) {
+    return this.request.delete<{
+      original: TransactionModel;
+      reverse: TransactionModel;
+    }>(`${this.buildUrl(neighborhood)}/${id}`);
+  }
   private buildUrl(neighborhood: string) {
     return `${this.endpoint}/${neighborhood}/${this.feature}`;
   }

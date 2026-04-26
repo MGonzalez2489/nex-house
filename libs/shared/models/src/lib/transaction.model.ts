@@ -13,4 +13,8 @@ export class TransactionModel extends BaseModel {
   evidence?: FileModel;
   createdBy?: UserModel;
   category: TransactionCategoryModel;
+
+  isActive: boolean;
+  isReversal: boolean;
+  reversedBy?: TransactionModel;
 }

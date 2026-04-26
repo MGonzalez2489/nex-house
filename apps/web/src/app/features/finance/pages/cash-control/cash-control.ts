@@ -124,6 +124,7 @@ export class CashControl implements OnInit {
   }
 
   search(newFilters: SearchTransaction) {
+    newFilters.month++;
     this.store.transactionsLoadAll(newFilters);
     const cFilters = this.store.transactionsFilters();
     if (!cFilters) {
@@ -153,6 +154,6 @@ export class CashControl implements OnInit {
     console.log('update', transaction.publicId);
   }
   delete(transaction: TransactionModel) {
-    console.log('delete', transaction.publicId);
+    this.store.TransactionRemove(transaction.publicId);
   }
 }

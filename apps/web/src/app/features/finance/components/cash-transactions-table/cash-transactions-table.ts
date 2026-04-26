@@ -49,6 +49,7 @@ export class CashTransactionsTable {
       {
         label: 'Ver',
         icon: PrimeIcons.SEARCH,
+
         command: () => {
           const cSel = this.selected();
           if (cSel) this.view.emit(cSel);
@@ -57,6 +58,7 @@ export class CashTransactionsTable {
       {
         label: 'Editar',
         icon: PrimeIcons.PENCIL,
+        disabled: !this.selected()?.isActive || this.selected()?.isReversal,
         command: () => {
           const cSel = this.selected();
           if (cSel) this.update.emit(cSel);
@@ -67,6 +69,7 @@ export class CashTransactionsTable {
         label: 'Borrar',
         icon: PrimeIcons.TRASH,
         labelClass: 'text-rose-500',
+        disabled: !this.selected()?.isActive || this.selected()?.isReversal,
         iconClass: 'text-rose-500',
         command: () => {
           const cSel = this.selected();

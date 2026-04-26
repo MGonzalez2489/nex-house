@@ -32,7 +32,7 @@ type MovementForm = {
   description: FormControl<string>;
   amount: FormControl<number>;
   // category: FormControl<string>;
-  transactionDate: FormControl<string>;
+  transactionDate: FormControl<Date>;
   evidence: FormControl<string>;
   category: FormControl<string>;
 };
@@ -83,7 +83,7 @@ export class CashForm implements OnInit {
       nonNullable: true,
       validators: [Validators.required],
     }),
-    transactionDate: new FormControl('', {
+    transactionDate: new FormControl(new Date(), {
       nonNullable: true,
       validators: [Validators.required],
     }),
@@ -106,9 +106,10 @@ export class CashForm implements OnInit {
   });
 
   ngOnInit(): void {
-    const today = new Date();
-    const tString = `${today.getMonth()}/${today.getDay()}/${today.getFullYear()}`;
-    this.form.patchValue({ transactionDate: tString });
+    console.log('a');
+    // const today = new Date();
+    // const tString = `${today.getMonth()}/${today.getDay()}/${today.getFullYear()}`;
+    // this.form.patchValue({ transactionDate: tString });
   }
 
   onFileSelect(event: any) {
@@ -137,10 +138,7 @@ export class CashForm implements OnInit {
     formData.append('description', raw.description);
     formData.append('sourceType', 'expense');
     formData.append('category', raw.category);
-    formData.append(
-      'transactionDate',
-      new Date(raw.transactionDate).toISOString(),
-    );
+    formData.append('transactionDate', raw.transactionDate.toISOString());
 
     // Adjuntar el archivo físico si existe
     if (this.selectedFile) {

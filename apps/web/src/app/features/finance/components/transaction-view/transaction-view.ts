@@ -21,7 +21,7 @@ import { DynamicDialogRef } from 'primeng/dynamicdialog';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TransactionView {
-  transaction = input.required<TransactionModel>();
+  readonly transaction = input.required<TransactionModel>();
   private readonly ref = inject(DynamicDialogRef);
 
   isIncome = computed(

@@ -1,181 +1,195 @@
-<!-- Header con Status -->
-<div class="p-8 pb-0 flex justify-between items-start">
-  <div>
-    <div class="flex items-center gap-2 mb-2">
-      <span
-        [class.bg-emerald-100]="isIncome()"
-        [class.text-emerald-700]="isIncome()"
-        [class.bg-rose-100]="!isIncome()"
-        [class.text-rose-700]="!isIncome()"
-        class="px-3 py-1 text-[10px] font-black uppercase rounded-full"
-        >{{isIncome() ? 'Ingreso' : 'Gasto'}}</span
-      >
-      <span
-        class="text-[10px] font-bold text-slate-400 uppercase tracking-widest"
-        >ID: {{transaction().publicId}}</span
-      >
-    </div>
-    <h2
-      class="text-3xl font-black text-slate-900 tracking-tight first-letter-caps"
-    >
-      {{transaction().title}}
-    </h2>
-  </div>
-  <p-button
-    icon="pi pi-times"
-    rounded
-    severity="secondary"
-    text
-    (click)="close()"
-  />
-</div>
-
-<!-- Contenido Principal -->
-<div class="p-8 space-y-8">
-  <!-- Grid de Información Rápida -->
-  <div
-    class="grid grid-cols-2 md:grid-cols-4 gap-6 p-6 bg-slate-50 rounded-4xl border border-slate-100"
-  >
-    <div class="space-y-1">
-      <p class="text-[9px] font-bold text-slate-400 uppercase">Monto</p>
-      <p class="text-xl font-black text-slate-900">
-        {{transaction().amount | currency}}
-      </p>
-    </div>
-    <div class="space-y-1">
-      <p class="text-[9px] font-bold text-slate-400 uppercase">Fecha</p>
-      <p class="text-sm font-bold text-slate-700">
-        {{transaction().transactionDate | date}}
-      </p>
-    </div>
-    <div class="space-y-1">
-      <p class="text-[9px] font-bold text-slate-400 uppercase">Categoría</p>
-      <p class="text-sm font-bold" [style.color]="transaction().category.color">
-        {{transaction().category.name}}
-      </p>
-    </div>
-    <div class="space-y-1">
-      <p class="text-[9px] font-bold text-slate-400 uppercase">Origen</p>
-      <p class="text-sm font-bold text-slate-700">
-        {{transaction().sourceType}}
-      </p>
-    </div>
-  </div>
-
-  <!-- Descripción Detallada -->
-  <div class="space-y-2">
-    <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-      Descripción
-    </h4>
-    <p
-      class="text-slate-600 text-sm leading-relaxed bg-white border border-slate-100 p-4 rounded-2xl"
-    >
-      {{transaction().description}}
-    </p>
-  </div>
-
-  <!-- Evidencia y Archivos -->
-  @if(hasEvidence()){
-  <div class="space-y-2">
-    <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-      Evidencia Adjunta
-    </h4>
-    <div
-      class="flex items-center gap-4 p-4 border border-blue-100 bg-blue-50/30 rounded-2xl group cursor-pointer hover:bg-blue-50 transition-colors"
-    >
-      <div
-        class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-blue-500"
-      >
-        <i class="pi pi-image text-xl"></i>
-      </div>
-      <div class="flex-1">
-        <p class="text-sm font-bold text-slate-800">{{url()}}</p>
-        <!-- TODO: pending save metadata on db -->
-        <p class="text-[10px] text-slate-400 uppercase">
-          {{transaction().evidence?.size | fileSize}}
-        </p>
-      </div>
-      <p-button
-        label="VER ARCHIVO"
-        variant="outlined"
-        size="small"
-        class="bg-white"
-        (click)="viewEvidence()"
-      />
-    </div>
-  </div>
-  }
-
-  <!-- Auditoría y Transacciones Inversas -->
-  <div
-    class="pt-6 border-t border-slate-100 flex flex-col md:flex-row justify-between gap-6"
-  >
-    <div class="space-y-3">
-      <h4
-        class="text-[10px] font-black text-slate-400 uppercase tracking-widest"
-      >
-        Historial de Registro
-      </h4>
-      <div class="flex items-center gap-3">
-        <div
-          class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-bold"
+<div>
+  <!-- Header con Status -->
+  <div class="p-8 pb-0 flex justify-between items-start">
+    <div>
+      <div class="flex items-center gap-2 mb-2">
+        <span
+          [class.bg-emerald-100]="isIncome()"
+          [class.text-emerald-700]="isIncome()"
+          [class.bg-rose-100]="!isIncome()"
+          [class.text-rose-700]="!isIncome()"
+          class="px-3 py-1 text-[10px] font-black uppercase rounded-full"
+          >{{isIncome() ? 'Ingreso' : 'Gasto'}}</span
         >
-          RQ
-        </div>
-        <div>
-          <p class="text-[11px] font-bold text-slate-700">
-            Registrado por {{transaction().createdBy?.fullName ||
-            transaction().createdBy?.email}}
-          </p>
-          <p class="text-[10px] text-slate-400">
-            {{transaction().createdAt | date:'d MMMM y h:mm a'}}
-          </p>
-        </div>
+        <span
+          class="text-[10px] font-bold text-slate-400 uppercase tracking-widest"
+          >ID: {{transaction().publicId}}</span
+        >
       </div>
-    </div>
-
-    <!-- Ejemplo de Transacción Inversa (Si existiera) -->
-    <!-- TODO: Reflect inverse transaction if exists -->
-    <div class="space-y-3 hidden">
-      <h4
-        class="text-[10px] font-black text-slate-400 uppercase tracking-widest"
+      <h2
+        class="text-3xl font-black text-slate-900 tracking-tight first-letter-caps"
       >
-        Estado de Anulación
-      </h4>
-      <p class="text-[11px] text-slate-500 italic">
-        Sin transacciones inversas vinculadas.
-      </p>
-      <!-- Si existiera:
-                        <div class="flex items-center gap-2 text-rose-600 font-bold text-[11px]">
-                            <i class="pi pi-exclamation-circle"></i>
-                            Anulada por #REV-992
-                        </div>
-                        -->
+        {{transaction().title}}
+      </h2>
     </div>
-  </div>
-</div>
-
-<!-- Footer con Acciones Secundarias -->
-<div
-  class="p-8 bg-slate-50 border-t border-slate-100 flex justify-between gap-3"
->
-  <!-- TODO: Print option -->
-  <p></p>
-  <!-- <p-button -->
-  <!--   label="Imprimir Recibo" -->
-  <!--   text -->
-  <!--   severity="secondary" -->
-  <!--   styleClass="text-slate-400" -->
-  <!-- /> -->
-
-  <div class="flex gap-3">
     <p-button
-      severity="contrast"
-      label="Cerrar"
+      icon="pi pi-times"
       rounded
-      class="w-30"
-      fluid
+      severity="secondary"
+      text
       (click)="close()"
     />
+  </div>
+
+  <!-- Contenido Principal -->
+  <div class="p-8 space-y-8">
+    <!-- Grid de Información Rápida -->
+    <div
+      class="grid grid-cols-2 md:grid-cols-3 gap-6 p-6 bg-slate-50 rounded-4xl border border-slate-100"
+    >
+      <div class="space-y-1">
+        <p class="text-[9px] font-bold text-slate-400 uppercase">Monto</p>
+        <p class="text-xl font-black text-slate-900">
+          {{transaction().amount | currency}}
+        </p>
+      </div>
+      <div class="space-y-1">
+        <p class="text-[9px] font-bold text-slate-400 uppercase">Fecha</p>
+        <p class="text-sm font-bold text-slate-700">
+          {{transaction().transactionDate | date}}
+        </p>
+      </div>
+      <div class="space-y-1">
+        <p class="text-[9px] font-bold text-slate-400 uppercase">Categoría</p>
+        <p
+          class="text-sm font-bold"
+          [style.color]="transaction().category.color"
+        >
+          {{transaction().category.name}}
+        </p>
+      </div>
+      <!-- <div class="space-y-1"> -->
+      <!--   <p class="text-[9px] font-bold text-slate-400 uppercase">Origen</p> -->
+      <!--   <p class="text-sm font-bold text-slate-700"> -->
+      <!--     {{transaction().sourceType}} -->
+      <!--   </p> -->
+      <!-- </div> -->
+    </div>
+
+    <!-- Descripción Detallada -->
+    <div class="space-y-2">
+      <h4
+        class="text-[10px] font-black text-slate-400 uppercase tracking-widest"
+      >
+        Descripción
+      </h4>
+      <p
+        class="text-slate-600 text-sm leading-relaxed bg-white border border-slate-100 p-4 rounded-2xl"
+      >
+        {{transaction().description}}
+      </p>
+    </div>
+
+    <!-- Evidencia y Archivos -->
+    @if(hasEvidence()){
+    <div class="space-y-2">
+      <h4
+        class="text-[10px] font-black text-slate-400 uppercase tracking-widest"
+      >
+        Evidencia Adjunta
+      </h4>
+      <div
+        class="flex items-center gap-4 p-4 border border-blue-100 bg-blue-50/30 rounded-2xl group cursor-pointer hover:bg-blue-50 transition-colors"
+      >
+        <div
+          class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-blue-500"
+        >
+          <i class="pi pi-image text-xl"></i>
+        </div>
+        <div class="flex-1">
+          <p class="text-sm font-bold text-slate-800">{{url()}}</p>
+          <!-- TODO: pending save metadata on db -->
+          <p class="text-[10px] text-slate-400 uppercase">
+            {{transaction().evidence?.size | fileSize}}
+          </p>
+        </div>
+        <p-button
+          label="VER ARCHIVO"
+          variant="outlined"
+          size="small"
+          class="bg-white"
+          (click)="viewEvidence()"
+        />
+      </div>
+    </div>
+    }
+
+    <!-- Auditoría y Transacciones Inversas -->
+    <div
+      class="pt-6 border-t border-slate-100 flex flex-col md:flex-row justify-around gap-6"
+    >
+      <div class="space-y-3">
+        <h4
+          class="text-[10px] font-black text-slate-400 uppercase tracking-widest"
+        >
+          Historial de Registro
+        </h4>
+        <div class="flex items-center gap-3">
+          <div
+            class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-bold"
+          >
+            RQ
+          </div>
+          <div>
+            <p class="text-[11px] font-bold text-slate-700">
+              Registrado por {{transaction().createdBy?.fullName ||
+              transaction().createdBy?.email}}
+            </p>
+            <p class="text-[10px] text-slate-400">
+              {{transaction().createdAt | date:'d MMMM y h:mm a'}}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ejemplo de Transacción Inversa (Si existiera) -->
+      <!-- TODO: Reflect inverse transaction if exists -->
+
+      <div class="space-y-3">
+        <h4
+          class="text-[10px] font-black text-slate-400 uppercase tracking-widest"
+        >
+          Estado de Anulación
+        </h4>
+        @if(transaction().isActive){
+        <p class="text-[11px] text-slate-500 italic">
+          Sin transacciones inversas vinculadas.
+        </p>
+        } @else{
+
+        <div
+          class="flex items-center gap-2 text-rose-600 font-bold text-[11px]"
+        >
+          <i class="pi pi-exclamation-circle"></i>
+          Anulada
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer con Acciones Secundarias -->
+  <div
+    class="p-8 bg-slate-50 border-t border-slate-100 flex justify-between gap-3"
+  >
+    <!-- TODO: Print option -->
+    <p></p>
+    <!-- <p-button -->
+    <!--   label="Imprimir Recibo" -->
+    <!--   text -->
+    <!--   severity="secondary" -->
+    <!--   styleClass="text-slate-400" -->
+    <!-- /> -->
+
+    <div class="flex gap-3">
+      <p-button
+        severity="contrast"
+        label="Cerrar"
+        rounded
+        class="w-30"
+        fluid
+        (click)="close()"
+      />
+    </div>
   </div>
 </div>
