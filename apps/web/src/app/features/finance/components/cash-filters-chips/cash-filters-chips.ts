@@ -8,6 +8,7 @@ import {
   output,
 } from '@angular/core';
 import { SearchTransaction } from '@nex-house/interfaces';
+import { TransactionCategoryModel } from '@nex-house/models';
 import { PrimeIcons } from 'primeng/api';
 import { ChipModule } from 'primeng/chip';
 
@@ -31,9 +32,10 @@ type FilterChip = {
 export class CashFiltersChips {
   private readonly dPipe = inject(DatePipe);
   filters = input<SearchTransaction>();
+  categories = input.required<TransactionCategoryModel[]>();
   removeFilter = output<string>();
   chips = computed<FilterChip[]>(() => {
-    const cFilters = this.filters();
+    const cFilters = Object.assign({}, this.filters());
     const c: FilterChip[] = [];
     if (!cFilters) return c;
 
@@ -59,6 +61,19 @@ export class CashFiltersChips {
         label: `Descripcion : ${cFilters.globalFilter}`,
         value: cFilters.globalFilter,
         icon: PrimeIcons.FILE,
+        permanent: false,
+      });
+    }
+
+    if (cFilters.category) {
+      const cat = this.categories().find(
+        (f) => f.publicId === cFilters.category,
+      );
+      c.push({
+        key: 'cateogry',
+        label: `Categoria: ${cat?.name}`,
+        value: cFilters.category,
+        icon: PrimeIcons.TAG,
         permanent: false,
       });
     }

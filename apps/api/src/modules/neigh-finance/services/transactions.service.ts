@@ -240,7 +240,7 @@ export class TransactionsService {
 
     // Filtro por Categoría (SourceType en tu ERD)
     if (category) {
-      query.andWhere('t.sourceType = :category', { category });
+      query.andWhere('cat.publicId = :category', { category });
     }
 
     // Buscador Global

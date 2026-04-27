@@ -1,3 +1,5 @@
+//TODO: DEFINE FIRST EMPTY STATE VS RESULTS NOT FOUND
+//TODO: DEFINE IF CANCELLED TRANSACTIONS SHOULD BE REFLECTED SOMEWHERE
 import {
   ChangeDetectionStrategy,
   Component,
@@ -16,7 +18,7 @@ import {
 } from '@features/finance/components';
 import { CashTransactionsTable } from '@features/finance/components/cash-transactions-table/cash-transactions-table';
 import { TransactionView } from '@features/finance/components/transaction-view/transaction-view';
-import { FinanceStore } from '@features/finance/stores';
+import { CatalogsStore, FinanceStore } from '@features/finance/stores';
 import { SearchTransaction } from '@nex-house/interfaces';
 import { TransactionModel } from '@nex-house/models';
 import { PageHeader } from '@shared/components/ui';
@@ -35,8 +37,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
     CashSummary,
     CashMovementList,
     CashTransactionInit,
-    OverlayBadgeModule,
     CashFiltersChips,
+    OverlayBadgeModule,
     CashTransactionsTable,
     Card,
     ConfirmDialogModule,
@@ -52,6 +54,7 @@ export class CashControl implements OnInit {
   protected readonly store = inject(FinanceStore);
   protected readonly contextStore = inject(ContextStore);
   protected readonly confirmationService = inject(ConfirmationService);
+  protected readonly catalogsStore = inject(CatalogsStore);
 
   protected readonly existsRecords = computed(() => {
     return true;
@@ -100,7 +103,7 @@ export class CashControl implements OnInit {
       };
       this.search(filters);
     }
-    // this.addMovement();
+    this.changeFilters();
   }
 
   addMovement(): void {

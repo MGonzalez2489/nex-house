@@ -2,14 +2,15 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   input,
-  OnInit,
   output,
 } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { FinanceStore } from '@features/finance/stores';
 import { SearchTransaction } from '@nex-house/interfaces';
+import { TransactionCategorySelect } from '@shared/components/smart';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { DynamicDialogRef } from 'primeng/dynamicdialog';
@@ -26,13 +27,14 @@ import { InputTextModule } from 'primeng/inputtext';
     ButtonModule,
     DatePickerModule,
     ReactiveFormsModule,
+    TransactionCategorySelect,
   ],
   templateUrl: './cash-filters.html',
   styleUrl: './cash-filters.css',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CashFilters implements OnInit {
+export class CashFilters {
   readonly filters = input<SearchTransaction>();
   protected readonly doSearch = output<SearchTransaction>();
   protected readonly maxDate = new Date();
@@ -56,27 +58,30 @@ export class CashFilters implements OnInit {
     date: new FormControl(new Date(), { nonNullable: true }),
   });
 
-  ngOnInit(): void {
-    const cFilters = this.filters();
+  constructor() {
+    effect(() => {
+      const cFilters = this.filters();
 
-    if (!cFilters) return;
+      if (!cFilters) return;
 
-    this.form.patchValue({
-      hint: cFilters.globalFilter,
-      date:
-        cFilters.month && cFilters.year
-          ? new Date(cFilters.year, cFilters.month)
-          : new Date(),
+      const dFilter = new Date(cFilters.year, cFilters.month - 1);
+
+      this.form.patchValue({
+        hint: cFilters.globalFilter,
+        date: dFilter,
+        category: cFilters.category,
+      });
     });
   }
 
   search() {
     const cFilters = Object.assign({}, this.filters());
-    const { hint, date } = this.form.value;
+    const { hint, date, category } = this.form.value;
 
     cFilters.globalFilter = hint ? hint : undefined;
+    cFilters.category = category;
     if (date) {
-      cFilters.month = date.getMonth();
+      cFilters.month = date.getMonth() + 1;
       cFilters.year = date.getFullYear();
     }
 
@@ -87,8 +92,9 @@ export class CashFilters implements OnInit {
   protected resetForm() {
     this.form.patchValue({
       hint: '',
+      category: '',
       date: new Date(),
     });
-    this.search();
+    this.form.updateValueAndValidity();
   }
 }

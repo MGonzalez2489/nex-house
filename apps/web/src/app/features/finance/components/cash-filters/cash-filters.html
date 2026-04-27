@@ -15,6 +15,15 @@
       />
     </p-iconfield>
   </div>
+  <!-- category -->
+  <div class="form-control">
+    <label for="category" class="form-label">Categoria</label>
+    <app-transaction-category-select
+      id="category"
+      formControlName="category"
+      allowedType="all"
+    />
+  </div>
   <!-- date -->
   <div class="form-control">
     <label for="date" class="form-label">Fecha</label>
@@ -23,6 +32,7 @@
       dateFormat="mm/yy"
       [readonlyInput]="true"
       [showIcon]="true"
+      appendTo="body"
       formControlName="date"
       id="date"
       fluid

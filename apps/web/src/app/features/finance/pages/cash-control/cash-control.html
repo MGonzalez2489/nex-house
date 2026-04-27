@@ -33,6 +33,7 @@
   <app-cash-filters-chips
     class="block"
     [filters]="store.transactionsFilters()"
+    [categories]="catalogsStore.transactionCategoriesEntities()"
     (removeFilter)="removeFilter($event)"
   />
   <!-- Timeline Journal -->

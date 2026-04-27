@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   computed,
   forwardRef,
@@ -37,22 +38,30 @@ import { SelectModule } from 'primeng/select';
 })
 export class TransactionCategorySelect implements ControlValueAccessor {
   private readonly store = inject(CatalogsStore);
+  private readonly cdr = inject(ChangeDetectorRef);
   placeholder = input<string>('Selecciona una categoría');
   filter = input<boolean>(false);
-  allowedType = input.required<TransactionTypeEnum>();
+  allowedType = input.required<
+    string | 'income' | 'expense' | 'all' | 'both'
+  >();
   variant = input<'filled' | 'outlined'>('filled');
   showAnulationCat = input<boolean>(false);
+  id = input<string>();
 
   filteredCategories = computed(() => {
     const all = this.store.transactionCategoriesEntities();
     const allowed = this.allowedType();
     if (!all || !allowed) return [];
 
-    let filtered = all.filter(
-      (c) =>
-        c.allowedType === this.allowedType().toString() ||
-        c.allowedType === TransactionTypeEnum.BOTH.toString(),
-    );
+    let filtered = all;
+
+    if (this.allowedType() !== 'all') {
+      filtered = all.filter(
+        (c) =>
+          c.allowedType === this.allowedType().toString() ||
+          c.allowedType === TransactionTypeEnum.BOTH.toString(),
+      );
+    }
 
     if (!this.showAnulationCat()) {
       filtered = filtered.filter(
@@ -105,6 +114,7 @@ export class TransactionCategorySelect implements ControlValueAccessor {
 
   writeValue(val: any): void {
     this.internalValue = val;
+    this.cdr.markForCheck();
   }
 
   registerOnChange(fn: any): void {

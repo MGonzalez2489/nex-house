@@ -39,7 +39,6 @@ export class CashTransactionsTable {
   protected cols: TableColumn<TransactionModel>[] = [
     { field: 'transactionDate', header: 'Fecha' },
     { field: 'title', header: 'Concepto' },
-    // {field:'category',header:'Categori'},
     { field: 'amount', header: 'Monto' },
     { field: 'category', header: 'Categoria' },
   ];
