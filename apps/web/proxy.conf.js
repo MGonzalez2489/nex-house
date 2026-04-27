@@ -7,6 +7,10 @@ const PROXY_CONFIG = {
     },
     logLevel: 'debug',
   },
+  '/public': {
+    target: process.env.IS_DOCKER ? 'http://api:3000' : 'http://localhost:3000',
+    secure: false,
+  },
 };
 
 module.exports = PROXY_CONFIG;

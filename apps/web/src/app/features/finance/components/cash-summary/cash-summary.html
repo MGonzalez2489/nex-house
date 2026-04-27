@@ -1,0 +1,89 @@
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+  <!-- Balance -->
+  <p-card>
+    <div class="flex items-center gap-3 mb-4">
+      <div
+        class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center"
+      >
+        <i class="pi pi-wallet"></i>
+      </div>
+      <span
+        class="text-[10px] font-bold text-slate-400 uppercase tracking-widest"
+        >Balance General
+      </span>
+    </div>
+    <h3 class="text-2xl font-black text-slate-900">
+      {{summary()?.balance | currency}}
+    </h3>
+
+    <div class="mt-4 flex items-center gap-2">
+      <span class="text-[10px] font-bold text-slate-400 uppercase"
+        >Actividad:</span
+      >
+      <span class="text-[10px] font-black text-slate-700">
+        @if(summary()?.totalCount === 1){ 1 Movimiento } @else{
+        {{summary()?.totalCount}} Movimientos }
+      </span>
+    </div>
+  </p-card>
+
+  <!-- Incomes -->
+  <p-card>
+    <div class="flex items-center gap-3 mb-4">
+      <div
+        class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center"
+      >
+        <i class="pi pi-arrow-up-left"></i>
+      </div>
+      <span
+        class="text-[10px] font-bold text-slate-400 uppercase tracking-widest"
+        >Ingresos (Mes)</span
+      >
+    </div>
+    <h3 class="text-2xl font-black text-slate-900">
+      {{summary()?.income | currency}}
+    </h3>
+
+    <div class="mt-4 flex flex-wrap gap-1 items-center">
+      <p-progressbar
+        [value]="incomePercentage()"
+        class="h-4 w-[83%]"
+        [pt]="{value:'bg-emerald-500'}"
+      />
+      <span class="text-[10px] font-bold text-emerald-600">
+        @if(summary()?.incomeCount === 1){ 1 Pago } @else{
+        {{summary()?.incomeCount}} Pagos }
+      </span>
+    </div>
+  </p-card>
+
+  <!-- Expenses -->
+  <p-card>
+    <div class="flex items-center gap-3 mb-4">
+      <div
+        class="w-10 h-10 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center"
+      >
+        <i class="pi pi-arrow-down-left"></i>
+      </div>
+      <span
+        class="text-[10px] font-bold text-slate-400 uppercase tracking-widest"
+        >Egresos (Mes)</span
+      >
+    </div>
+    <h3 class="text-2xl font-black text-slate-900">
+      {{summary()?.expense | currency}}
+    </h3>
+    <div class="mt-4 flex items-center flex-wrap gap-1">
+      <p-progressbar
+        [value]="expensePercentage()"
+        class="h-4 w-[83%]"
+        [pt]="{value:'bg-rose-500'}"
+      />
+
+      <span class="text-[10px] font-bold text-rose-600">
+        @if(summary()?.expenseCount === 1){ 1 Gasto } @else{
+        {{summary()?.expenseCount}} Gastos }
+      </span>
+    </div>
+  </p-card>
+</div>

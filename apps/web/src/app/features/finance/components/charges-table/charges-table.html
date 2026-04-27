@@ -1,0 +1,65 @@
+<app-table
+  #tb
+  [data]="data()"
+  [columns]="cols"
+  [isLoading]="isLoading()"
+  [lazy]="true"
+  [loadOnInit]="true"
+  (filter)="search($event)"
+  [pagination]="pagination()"
+>
+  <ng-template #body let-charge let-field="field">
+    @switch (field) { @case ('issuedToUser') {
+    <div class="flex items-center gap-2">
+      <app-user-avatar [text]="charge.issuedToUser.fullName" />
+
+      <div class="flex flex-col">
+        <span class="font-bold text-slate-700 capitalize"
+          >{{ charge.issuedToUser.fullName }}
+        </span>
+        <span class="text-xs text-slate-500 line-clamp-1 italic"
+          >{{charge.issuedToUser.email}}</span
+        >
+      </div>
+    </div>
+    } @case ('unit') {
+    <p class="font-semibold text-slate-700">{{ charge.unit.street }}</p>
+    <small class="text-xs text-slate-500 line-clamp-1 italic">
+      #{{ charge.unit.identifier }}</small
+    >
+
+    } @case ('description') {
+    <p>{{charge.description}}</p>
+
+    } @case ('amount') {
+    <p>{{charge.amount | currency}}</p>
+
+    } @case ('status') {
+    <app-charge-status-tag [status]="charge.status" />
+
+    } @case ('dueDate') {
+
+    <p>{{charge.dueDate | date}}</p>
+
+    } }
+  </ng-template>
+
+  <ng-template #actions let-charge>
+    <div class="flex justify-center gap-1">
+      <p-menu
+        (onHide)="selected.set(undefined)"
+        #menu
+        [model]="items()"
+        [popup]="true"
+        appendTo="body"
+      />
+      <p-button
+        text
+        severity="secondary"
+        size="small"
+        (click)="selected.set(charge) ;menu.toggle($event)"
+        icon="pi pi-ellipsis-v"
+      />
+    </div>
+  </ng-template>
+</app-table>

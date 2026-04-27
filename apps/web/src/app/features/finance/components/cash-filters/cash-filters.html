@@ -1,0 +1,52 @@
+<form [formGroup]="form" class="space-y-6" (ngSubmit)="search()">
+  <!-- description -->
+  <div class="form-control">
+    <label for="search" class="form-label">Descripcion</label>
+    <p-iconfield>
+      <p-inputicon class="pi pi-search" />
+      <input
+        pInputText
+        id="search"
+        placeholder="Ej. Pago de luz"
+        fluid
+        formControlName="hint"
+        variant="filled"
+      />
+    </p-iconfield>
+  </div>
+  <!-- category -->
+  <div class="form-control">
+    <label for="category" class="form-label">Categoria</label>
+    <app-transaction-category-select
+      id="category"
+      formControlName="category"
+      allowedType="all"
+    />
+  </div>
+  <!-- date -->
+  <div class="form-control">
+    <label for="date" class="form-label">Fecha</label>
+    <p-datepicker
+      view="month"
+      dateFormat="mm/yy"
+      [readonlyInput]="true"
+      [showIcon]="true"
+      appendTo="body"
+      formControlName="date"
+      id="date"
+      fluid
+      [maxDate]="maxDate"
+      [minDate]="formatedInitDate()"
+    />
+  </div>
+  <div class="flex justify-end w-full gap-4 mt-20">
+    <p-button
+      text
+      label="Limpiar"
+      severity="secondary"
+      type="button"
+      (click)="resetForm()"
+    />
+    <p-button label="Buscar" class="w-40" fluid (click)="search()" />
+  </div>
+</form>

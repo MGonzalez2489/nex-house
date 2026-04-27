@@ -16,7 +16,10 @@ import { ERROR_MESSAGES } from './error-messages';
     @if (shouldShowErrors()) {
       <div class="flex flex-column gap-1 ms-1">
         @for (error of errorMessages(); track $index) {
-          <small class="p-error block animate-fade-in text-xs text-red-500">
+          <small
+            class="block animate-fade-in text-[10px] font-medium text-rose-500 mt-1.5 ml-1 tracking-wide"
+          >
+            <i class="pi pi-exclamation-circle text-[9px] mr-1"></i>
             {{ error }}
           </small>
         }

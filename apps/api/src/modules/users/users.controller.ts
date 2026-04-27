@@ -1,6 +1,6 @@
-import { CurrentUser } from '@common/decorators';
-import { SearchDto, SearchUserDto } from '@common/dtos';
-import { User } from '@database/entities';
+import { CurrentNeigh, CurrentUser } from '@common/decorators';
+import { SearchUserDto } from '@common/dtos';
+import { Neighborhood, User } from '@database/entities';
 import {
   Body,
   Controller,
@@ -27,15 +27,11 @@ export class UsersController {
   @Post()
   @ApiOperation({ summary: 'Create a user' })
   async create(
-    @Param('neighborhoodId', ParseUUIDPipe) neighborhoodId: string,
     @Body() createDto: CreateUserDto,
     @CurrentUser() user: User,
+    @CurrentNeigh() neigh: Neighborhood,
   ) {
-    const response = await this.usersService.create(
-      neighborhoodId,
-      createDto,
-      user,
-    );
+    const response = await this.usersService.create(neigh, createDto, user);
     if (!response) {
       throw new InternalServerErrorException('Used not created.');
     }
@@ -44,13 +40,10 @@ export class UsersController {
 
   @Get()
   async findAll(
-    @Param('neighborhoodId', ParseUUIDPipe) neighborhoodId: string,
     @Query() searchDto: SearchUserDto,
+    @CurrentNeigh() neigh: Neighborhood,
   ) {
-    const searchResult = await this.usersService.findAll(
-      neighborhoodId,
-      searchDto,
-    );
+    const searchResult = await this.usersService.findAll(neigh.id, searchDto);
     return {
       meta: searchResult.meta,
       data: searchResult.data.map((user) => UserEntityToModel(user)),
@@ -58,10 +51,10 @@ export class UsersController {
   }
   @Get(':publicId')
   async findById(
-    @Param('neighborhoodId', ParseUUIDPipe) neighborhoodId: string,
     @Param('publicId', ParseUUIDPipe) publicId: string,
+    @CurrentNeigh() neigh: Neighborhood,
   ) {
-    const result = await this.usersService.findByPublicId(publicId);
+    const result = await this.usersService.findByPublicId(publicId, neigh.id);
 
     if (!result) {
       throw new NotFoundException('Used not found.');
@@ -72,7 +65,6 @@ export class UsersController {
 
   @Patch(':publicId')
   async update(
-    @Param('neighborhoodId', ParseUUIDPipe) neighborhoodId: string,
     @Param('publicId', ParseUUIDPipe) publicId: string,
     @Body() createDto: CreateUserDto,
     @CurrentUser() user: User,
@@ -88,10 +80,10 @@ export class UsersController {
 
   @Delete(':publicId')
   async delete(
-    @Param('neighborhoodId', ParseUUIDPipe) neighborhoodId: string,
     @Param('publicId', ParseUUIDPipe) publicId: string,
     @CurrentUser() user: User,
+    @CurrentNeigh() neigh: Neighborhood,
   ) {
-    return await this.usersService.remove(publicId, user);
+    return await this.usersService.remove(publicId, user, neigh);
   }
 }

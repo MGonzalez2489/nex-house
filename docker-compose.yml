@@ -44,10 +44,13 @@ services:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
+      UPLOAD_DIR: ${UPLOAD_DIR:-/app/uploads}
     ports:
       - '3000:3000'
     networks:
       - nex-house-network
+    volumes:
+      - nexhouse_uploads:${UPLOAD_DIR:-/app/uploads}
 
   web:
     build:
@@ -74,3 +77,5 @@ networks:
 
 volumes:
   db_data:
+  nexhouse_uploads:
+    driver: local

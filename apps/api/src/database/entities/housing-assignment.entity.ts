@@ -4,7 +4,7 @@ import { HousingUnit } from './housing-unit.entity';
 import { User } from './user.entity';
 import { Exclude } from 'class-transformer';
 
-@Entity()
+@Entity('housing_assignments')
 export class UnitAssignment extends TraceableEntity {
   @ManyToOne(() => HousingUnit)
   @JoinColumn({ name: 'unitId' })

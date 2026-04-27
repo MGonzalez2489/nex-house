@@ -1,0 +1,77 @@
+<div>
+  <form
+    [formGroup]="form"
+    (ngSubmit)="search()"
+    class="flex items-center gap-3"
+  >
+    <input
+      pInputText
+      variant="filled"
+      fluid
+      class="md:w-[70%]"
+      formControlName="globalFilter"
+      placeholder="Buscar por residente, unidad, concepto..."
+    />
+    <p-select
+      [options]="status()"
+      optionLabel="key"
+      optionValue="value"
+      fluid
+      class="w-[20%] hidden md:flex"
+      formControlName="status"
+      variant="filled"
+    />
+    @if(form.value.filterDate !== 'custom'){
+    <p-select
+      [options]="dateFilters()"
+      optionLabel="key"
+      optionValue="value"
+      fluid
+      class="w-[30%] hidden md:flex"
+      formControlName="filterDate"
+      variant="filled"
+    />
+    } @else{
+    <p-datepicker
+      formControlName="from"
+      selectionMode="range"
+      placeholder="Selecciona el rango de fechas"
+      [readonlyInput]="true"
+      class="w-[30%] hidden md:flex"
+      [showIcon]="true"
+      [showButtonBar]="true"
+      appendTo="body"
+    >
+      <ng-template
+        #buttonbar
+        let-todayCallback="todayCallback"
+        let-clearCallback="clearCallback"
+      >
+        <div class="flex justify-between w-full">
+          <p-button
+            size="small"
+            text
+            label="Mes Pasado"
+            severity="secondary"
+            (click)="setDateLastMonth()"
+          />
+          <p-button
+            size="small"
+            text
+            label="Este Mes"
+            severity="secondary"
+            (click)="setDateThisMonth()"
+          />
+        </div>
+      </ng-template>
+    </p-datepicker>
+    }
+
+    <p-button
+      severity="secondary"
+      fluid
+      icon="pi pi-sliders-h"
+      type="submite"
+    />
+  </form>
+</div>

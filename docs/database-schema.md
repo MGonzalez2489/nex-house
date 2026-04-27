@@ -21,6 +21,89 @@ erDiagram
         enum status
     }
     Neighborhood ||--|{ HousingUnit : "units"
+    FeeSchedule {
+        int id
+        uuid publicId
+        timestamp createdAt
+        timestamp updatedAt
+        timestamp deletedAt
+        number createdBy
+        number updatedBy
+        number deletedBy
+        number neighborhoodId
+        string name
+        string description
+        int amount
+        enum type
+        string cronSchedule
+        string cronDescription
+        date startDate
+        date lastExecutionDate
+        date endDate
+        enum status
+    }
+    FeeSchedule }|--|| Neighborhood : "neighborhood"
+    FeeSchedule ||--|{ Charge : "charges"
+    Payment {
+        int id
+        uuid publicId
+        timestamp createdAt
+        timestamp updatedAt
+        timestamp deletedAt
+        number createdBy
+        number updatedBy
+        number deletedBy
+        number unitId
+        int amount
+        string evidenceUrl
+        enum status
+        timestamp paymentDate
+        number reportedByUserId
+        text adminNotes
+    }
+    Payment }|--|| HousingUnit : "unit"
+    Payment }|--|| User : "reportedByUser"
+    Payment ||--|{ PaymentApplication : "applications"
+    PaymentApplication {
+        int id
+        uuid publicId
+        timestamp createdAt
+        timestamp updatedAt
+        timestamp deletedAt
+        number createdBy
+        number updatedBy
+        number deletedBy
+        number paymentId
+        number chargeId
+        int amountApplied
+        timestamp appliedAt
+    }
+    PaymentApplication }|--|| Payment : "payment"
+    PaymentApplication }|--|| Charge : "charge"
+    Charge {
+        int id
+        uuid publicId
+        timestamp createdAt
+        timestamp updatedAt
+        timestamp deletedAt
+        number createdBy
+        number updatedBy
+        number deletedBy
+        number unitId
+        number feeScheduleId
+        number issuedToUserId
+        string description
+        int amount
+        enum status
+        timestamp dueDate
+        string cancelationReason
+        number canceledByUserId
+    }
+    Charge }|--|| HousingUnit : "unit"
+    Charge }|--|| User : "issuedToUser"
+    Charge }|--|| FeeSchedule : "feeSchedule"
+    Charge ||--|{ PaymentApplication : "applications"
+    Charge }|--|| User : "canceledByUser"
     User {
         int id
         uuid publicId
@@ -38,9 +121,12 @@ erDiagram
         enum role
         number neighborhoodId
         enum status
+        int pwdResetCode
+        text pwdResetToken
     }
     User }|--|| Neighborhood : "neighborhood"
     User ||--|{ UnitAssignment : "assignments"
+    User ||--|{ Charge : "charges"
     UnitAssignment {
         int id
         uuid publicId
@@ -76,49 +162,39 @@ erDiagram
     }
     HousingUnit }|--|| Neighborhood : "neighborhood"
     HousingUnit ||--|{ UnitAssignment : "assignments"
-    PaymentConcept {
+    Expense {
         int id
         uuid publicId
         timestamp createdAt
         timestamp updatedAt
         timestamp deletedAt
-        string name
-        string neighborhoodId
-        number defaultAmount
-        boolean isActive
-        number dayOfMonth
-        boolean isRecurrent
-        number maxOccurrences
-    }
-    ResidentPayment {
-        int id
-        uuid publicId
-        timestamp createdAt
-        timestamp updatedAt
-        timestamp deletedAt
-        string neighborhoodId
-        number unitId
-        string userId
-        decimal amount
-        string conceptName
-        enum status
-        enum method
-        string evidenceUrl
-        timestamp verifiedAt
-    }
-    ResidentPayment }|--|| HousingUnit : "unit"
-    ResidentDebt {
-        int id
-        uuid publicId
-        timestamp createdAt
-        timestamp updatedAt
-        timestamp deletedAt
-        number unitId
-        string conceptId
-        number amount
+        number createdBy
+        number updatedBy
+        number deletedBy
+        number neighborhoodId
         string description
-        enum status
-        date dueDate
+        int amount
+        string evidenceUrl
+        enum category
+        date expenseDate
+        string providerName
     }
-    ResidentDebt }|--|| HousingUnit : "unit"
+    Expense }|--|| Neighborhood : "neighborhood"
+    Transaction {
+        int id
+        uuid publicId
+        timestamp createdAt
+        timestamp updatedAt
+        timestamp deletedAt
+        number createdBy
+        number updatedBy
+        number deletedBy
+        number neighborhoodId
+        enum type
+        int amount
+        enum sourceType
+        date transactionDate
+        text description
+    }
+    Transaction }|--|| Neighborhood : "neighborhood"
 ```

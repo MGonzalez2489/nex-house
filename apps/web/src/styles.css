@@ -2,6 +2,8 @@
 @import 'tailwindcss';
 @import 'primeicons/primeicons';
 
+@import './theme/sidebar.css';
+
 @layer base {
   *,
   ::after,
@@ -13,24 +15,43 @@
 }
 
 .form-control {
+  @apply mb-5; /* Espacio entre campos del formulario */
+
   .form-label {
-    --tw-font-weight: var(--font-weight-medium);
-    font-weight: var(--font-weight-medium);
-    display: block;
-    font-size: var(--text-sm);
-    color: var(--color-slate-700);
-
-    margin-bottom: calc(var(--spacing) * 0.1);
-
-    font-size: var(--text-sm);
-    line-height: var(--tw-leading, var(--text-sm--line-height));
+    @apply block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 ml-1;
   }
 
   .required:after {
-    content: ' *';
-    color: red;
+    content: '*';
+    @apply text-rose-500 font-bold ml-1;
   }
+
+  /* Estilo opcional para inputs dentro de NexHouse */
+  /* input, */
+  /* select, */
+  /* textarea { */
+  /*   @apply transition-all duration-200 focus:ring-2 focus:ring-slate-900/10; */
+  /* } */
 }
+/* .form-control { */
+/*   .form-label { */
+/*     --tw-font-weight: var(--font-weight-medium); */
+/*     font-weight: var(--font-weight-medium); */
+/*     display: block; */
+/*     font-size: var(--text-sm); */
+/*     color: var(--color-slate-700); */
+/**/
+/*     margin-bottom: calc(var(--spacing) * 0.3); */
+/**/
+/*     font-size: var(--text-sm); */
+/*     line-height: var(--tw-leading, var(--text-sm--line-height)); */
+/*   } */
+/**/
+/*   .required:after { */
+/*     content: ' *'; */
+/*     color: red; */
+/*   } */
+/* } */
 
 .p-panelmenu-header-label {
   color: var(--p-gray-600);
@@ -48,4 +69,8 @@
 
 .p-panelmenu-header-link.p-panelmenu-item-link-active .p-panelmenu-header-icon {
   color: var(--cyan-700);
+}
+
+.first-letter-caps::first-letter {
+  text-transform: uppercase;
 }

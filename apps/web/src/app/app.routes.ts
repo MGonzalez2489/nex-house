@@ -1,6 +1,7 @@
 import { Route } from '@angular/router';
 import { authGuard } from '@core/guards/auth.guard';
 import { DASHBOARD_ROUTES_ENUM } from '@features/dashboard';
+import { FINANCE_ROUTES_ENUM } from '@features/finance';
 import { UNITS_ROUTES_ENUM } from '@features/housing-unit';
 import { NEIGHBORHOODS_ROUTES_ENUM } from '@features/neighborhoods';
 import { USERS_ROUTES_ENUM } from '@features/users';
@@ -47,6 +48,13 @@ export const appRoutes: Route[] = [
         loadChildren: () =>
           import('./features/housing-unit/housing-units.routes').then(
             (r) => r.UNITS_ROUTES,
+          ),
+      },
+      {
+        path: FINANCE_ROUTES_ENUM.HOME,
+        loadChildren: () =>
+          import('./features/finance/finance.routes').then(
+            (r) => r.FINANCE_ROUTES,
           ),
       },
     ],

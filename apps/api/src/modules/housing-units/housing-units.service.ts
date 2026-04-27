@@ -62,7 +62,7 @@ export class HousingUnitsService {
   }
 
   async findAll(
-    neighborhoodId: string,
+    neighborhoodId: number,
     filters: SearchDto,
   ): Promise<PaginatedResult<HousingUnit>> {
     const query = this.repository
@@ -70,9 +70,10 @@ export class HousingUnitsService {
       .leftJoinAndSelect('unit.neighborhood', 'neighborhood')
       .leftJoinAndSelect('unit.assignments', 'assignments')
       .leftJoinAndSelect('assignments.user', 'user')
-      .where('neighborhood.publicId = :neighborhoodId', {
+      .where('neighborhood.id = :neighborhoodId', {
         neighborhoodId,
-      });
+      })
+      .andWhere('assignments.isActive = :isActive', { isActive: true });
 
     const { globalFilter } = filters;
 

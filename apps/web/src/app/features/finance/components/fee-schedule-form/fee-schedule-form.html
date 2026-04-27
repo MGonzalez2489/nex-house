@@ -1,0 +1,198 @@
+<form class="space-y-6" [formGroup]="form" (submit)="doSubmit()">
+  <!-- name -->
+  <div class="form-control">
+    <label for="name" class="form-label">Nombre del Cobro</label>
+
+    <input
+      pInputText
+      id="name"
+      type="text"
+      formControlName="name"
+      placeholder="Ej. Cuota de Vigilancia"
+      fluid
+      [invalid]="form.controls.name.invalid && form.controls.name.touched"
+      [attr.aria-invalid]="form.controls.name.invalid && form.controls.name.touched"
+      [attr.aria-describedby]="form.controls.name.touched && form.controls.name.errors ? 'name-error' : null"
+    />
+    <app-form-validation-error
+      id="name-errors"
+      [touched]="form.controls.name.touched"
+      [errors]="form.controls.name.errors"
+      label="Nombre"
+    />
+  </div>
+  <!-- description -->
+  <div class="form-control">
+    <label for="description" class="form-label">Descripción</label>
+    <textarea
+      pInputTextarea
+      id="description"
+      formControlName="description"
+      placeholder="Ej. Descripción detallada del cobro"
+      fluid
+      [invalid]="form.controls.description.invalid && form.controls.description.touched"
+      [attr.aria-invalid]="form.controls.description.invalid && form.controls.description.touched"
+      [attr.aria-describedby]="form.controls.description.touched && form.controls.description.errors ? 'description-error' : null"
+    ></textarea>
+    <app-form-validation-error
+      id="description-errors"
+      [touched]="form.controls.description.touched"
+      [errors]="form.controls.description.errors"
+      label="Descripción"
+    />
+  </div>
+  <!-- amount -->
+  <div class="form-control">
+    <label for="amount" class="form-label">Monto</label>
+    <p-inputNumber
+      id="amount"
+      formControlName="amount"
+      mode="decimal"
+      [minFractionDigits]="2"
+      [maxFractionDigits]="2"
+      placeholder="Ej. 50.00"
+      fluid
+      [invalid]="form.controls.amount.invalid && form.controls.amount.touched"
+      [attr.aria-invalid]="form.controls.amount.invalid && form.controls.amount.touched"
+      [attr.aria-describedby]="form.controls.amount.touched && form.controls.amount.errors ? 'amount-error' : null"
+    ></p-inputNumber>
+    <app-form-validation-error
+      id="amount-errors"
+      [touched]="form.controls.amount.touched"
+      [errors]="form.controls.amount.errors"
+      label="Monto"
+    />
+  </div>
+  <!-- type -->
+  <div class="form-control">
+    <p-selectbutton
+      [options]="types"
+      [unselectable]="false"
+      [allowEmpty]="false"
+      formControlName="type"
+      optionLabel="key"
+      optionValue="value"
+      fluid
+    />
+
+    <app-form-validation-error
+      id="type-errors"
+      [touched]="form.controls.type.touched"
+      [errors]="form.controls.type.errors"
+      label="Tipo"
+    />
+  </div>
+  <!-- execution date /  startDate -->
+  <div class="form-control">
+    <label for="startDate" class="form-label"
+      >{{isRecurrent() ? 'Fecha de Inicio':'Fecha de Cobro'}}</label
+    >
+    <p-datepicker
+      id="startDate"
+      formControlName="startDate"
+      dateFormat="yy-mm-dd"
+      placeholder="Selecciona una fecha"
+      [showIcon]="true"
+      fluid
+      [minDate]="today()"
+      [invalid]="form.controls.startDate.invalid && form.controls.startDate.touched"
+      [attr.aria-invalid]="form.controls.startDate.invalid && form.controls.startDate.touched"
+      [attr.aria-describedby]="form.controls.startDate.touched && form.controls.startDate.errors ? 'startDate-error' : null"
+    ></p-datepicker>
+    <app-form-validation-error
+      id="startDate-errors"
+      [touched]="form.controls.startDate.touched"
+      [errors]="form.controls.startDate.errors"
+      label="Fecha de Inicio"
+    />
+  </div>
+  <!-- RECURRENCE -->
+  @if(isRecurrent()){
+  <!-- frecuency -->
+  <div class="form-control">
+    <label for="frecuency" class="form-label">Frecuencia</label>
+
+    <p-select
+      formControlName="frecuency"
+      [options]="frecuency"
+      optionLabel="key"
+      optionValue="value"
+      fluid
+    />
+
+    <app-form-validation-error
+      id="frecuency-errors"
+      [touched]="form.controls.frecuency.touched"
+      [errors]="form.controls.frecuency.errors"
+      label="Fecha de Fin"
+    />
+  </div>
+  @switch(form.controls.frecuency.value) { @case('weekly'){
+
+  <div class="form-control">
+    <label for="dayOfweek" class="form-label">Cada dia de la semana</label>
+    <p-select
+      formControlName="dayOfWeek"
+      [options]="daysOfWeek"
+      optionLabel="key"
+      optionValue="value"
+      fluid
+    />
+    <app-form-validation-error
+      id="frecuency-errors"
+      [touched]="form.controls.dayOfWeek.touched"
+      [errors]="form.controls.dayOfWeek.errors"
+      label="Dia de la semana"
+    />
+  </div>
+
+  } @case('monthly'){
+  <div class="form-control">
+    <label for="dayOfMonth" class="form-label">Cada dia de mes</label>
+    <p-select formControlName="dayOfMonth" [options]="daysOfMonth" fluid />
+    <app-form-validation-error
+      id="frecuency-errors"
+      [touched]="form.controls.dayOfMonth.touched"
+      [errors]="form.controls.dayOfMonth.errors"
+      label="Dia de la semana"
+    />
+  </div>
+  } @case('yearly'){
+  <p>yearly</p>
+  } }
+
+  <!-- EndDate -->
+  <div class="form-control">
+    <label for="endDate" class="form-label">Fecha de Fin</label>
+    <p-datepicker
+      id="endDate"
+      formControlName="endDate"
+      dateFormat="yy-mm-dd"
+      placeholder="Selecciona una fecha"
+      [showIcon]="true"
+      fluid
+      [invalid]="form.controls.endDate.invalid && form.controls.endDate.touched"
+      [attr.aria-invalid]="form.controls.endDate.invalid && form.controls.endDate.touched"
+      [attr.aria-describedby]="form.controls.endDate.touched && form.controls.endDate.errors ? 'endDate-error' : null"
+    ></p-datepicker>
+    <app-form-validation-error
+      id="endDate-errors"
+      [touched]="form.controls.endDate.touched"
+      [errors]="form.controls.endDate.errors"
+      label="Fecha de Fin"
+    />
+  </div>
+
+  <div class="bg-gray-50 p-2 flex items-center gap-3 rounded-md">
+    <i class="pi pi-info-circle"></i>
+    <p class="text-xs">
+      Si quieres que el cobro sea de forma indefinida no selecciones una
+      <strong>Fecha de Fin</strong>
+    </p>
+  </div>
+  }
+
+  <div class="py-5">
+    <app-form-options [callState]="store.callState()" (doCancel)="doCancel()" />
+  </div>
+</form>

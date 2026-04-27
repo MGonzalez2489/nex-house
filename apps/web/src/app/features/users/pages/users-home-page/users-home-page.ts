@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ModalService } from '@core/services';
 import { UsersFilters, UsersList } from '@features/users/components';
 import { UsersTable } from '@features/users/components/users-table/users-table';
 import { UsersStore } from '@features/users/users.store';
@@ -31,7 +30,6 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 })
 export class UsersHomePage {
   protected readonly store = inject(UsersStore);
-  protected readonly modalService = inject(ModalService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly confirmationService = inject(ConfirmationService);

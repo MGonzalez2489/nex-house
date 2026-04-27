@@ -1,16 +1,10 @@
-<div class="max-w-5xl mx-auto space-y-8">
+<div class="space-y-4 md:space-y-8">
   <!-- header -->
-  <div class="flex items-center justify-between border-b border-slate-200 pb-5">
-    <div>
-      <h1 class="text-xl font-bold text-slate-900">
-        {{ isEdit() ? 'Editar Residente' : 'Configuración de Residente' }}
-      </h1>
-      <p class="text-xs text-slate-500 text-pretty">
-        Gestiona la información personal y los vínculos de propiedad del
-        habitante.
-      </p>
-    </div>
-  </div>
+  <app-page-header
+    [title]="isEdit() ? 'Editar Residente' : 'Configuración de Residente'"
+    subTitle="Gestiona la información personal y los vínculos de propiedad del
+  habitante."
+  />
 
   <form
     class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8"
@@ -108,7 +102,8 @@
     <!-- Unity -->
     <p-card class="md:col-span-2 space-y-4">
       @if(isNewUnit()){
-      <div class="flex items-center justify-end mb-4">
+      <div class="flex items-center justify-between mb-4">
+        <p class="text-slate-500">Registrar nueva unidad</p>
         <p-button
           text="true"
           label="Buscar existente"
@@ -179,6 +174,7 @@
           forceSelection="true"
           placeholder="Busca por calle o número..."
           optionLabel="labelFull"
+          (onSelect)="selectUnit($event)"
           [invalid]="form.controls.unit.invalid && form.controls.unit.touched"
           [emptyMessage]="'No se encontró la unidad. Presiona Enter para crearla.'"
           fluid
@@ -216,7 +212,7 @@
         <div class="flex gap-6"></div>
       </div>
 
-      <div class="pb-6 my-3 px-3 flex items-center gap-10 form-control">
+      <div class="pb-6 my-3 px-3 form-control">
         <div class="flex flex-wrap items-center gap-6">
           <div class="flex items-center gap-2">
             <p-checkbox
@@ -224,6 +220,7 @@
               [binary]="true"
               inputId="owner"
               variant="filled"
+              [invalid]="form.errors?.['atLeastOneRoleRequired'] && form.touched"
               [pt]="{box:'rounded-full'}"
             ></p-checkbox>
             <label for="owner" class="text-sm text-slate-600 cursor-pointer"
@@ -237,6 +234,7 @@
               [binary]="true"
               inputId="family"
               variant="filled"
+              [invalid]="form.errors?.['atLeastOneRoleRequired'] && form.touched"
               [pt]="{box:'rounded-full'}"
             ></p-checkbox>
             <label for="family" class="text-sm text-slate-600 cursor-pointer"
@@ -249,6 +247,7 @@
               formControlName="isTenant"
               [binary]="true"
               inputId="tenant"
+              [invalid]="form.errors?.['atLeastOneRoleRequired'] && form.touched"
               variant="filled"
               [pt]="{box:'rounded-full'}"
             ></p-checkbox>
@@ -257,6 +256,12 @@
             >
           </div>
         </div>
+        @if(form.errors?.['atLeastOneRoleRequired'] && form.touched){
+
+        <p class="p-error pt-3 block animate-fade-in text-xs text-red-500">
+          Un rol es requerido
+        </p>
+        }
       </div>
 
       <div class="flex items-center flex-col">
@@ -277,6 +282,7 @@
         [submitLabel]="isEdit() ? 'Actualizar' : 'Guardar'"
         [callState]="store.callState()"
         (doCancel)="doCancel()"
+        [isLoading]="store.loading()"
       />
     </div>
   </form>

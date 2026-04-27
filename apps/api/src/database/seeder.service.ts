@@ -7,6 +7,8 @@ import { Repository } from 'typeorm';
 import { HousingUnit, Neighborhood, User } from './entities';
 import { UsersService } from '@modules/users';
 import { CreateUserDto } from '@modules/users/dtos';
+import { TransactionCategory } from './entities/transaction_category.entity';
+import { INITIAL_CATEGORIES } from './seeds';
 
 const initUsers: CreateUserDto[] = [
   {
@@ -205,6 +207,8 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
     private readonly neighRepository: Repository<Neighborhood>,
     @InjectRepository(HousingUnit)
     private readonly unitRepository: Repository<HousingUnit>,
+    @InjectRepository(TransactionCategory)
+    private readonly categoryRepo: Repository<TransactionCategory>,
     private readonly cryptoService: CryptoService,
     private readonly configService: ConfigService,
     private readonly userService: UsersService,
@@ -212,13 +216,30 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
 
   async onApplicationBootstrap() {
     try {
-      await this.seedSuperAdmin();
+      const seeds = Promise.all([this.seedSuperAdmin(), this.seedCategories()]);
+      await seeds;
       this.logger.log('Sembrado completado exitosamente.');
 
       this.seedTestData();
     } catch (error) {
       this.logger.error('Error durante el sembrado:', error.message);
     }
+  }
+
+  async seedCategories() {
+    const count = await this.categoryRepo.count();
+
+    if (count > 0) {
+      return; // Ya existen datos, omitimos para evitar duplicados
+    }
+
+    const categories = this.categoryRepo.create(INITIAL_CATEGORIES);
+    await this.categoryRepo.save(categories);
+
+    // Log opcional para verificar en consola
+    console.log(
+      `Successfully seeded ${categories.length} transaction categories.`,
+    );
   }
 
   private async seedSuperAdmin() {
@@ -273,7 +294,7 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
 
     for (const u of initUsers) {
       try {
-        await this.userService.create(neighborhood.publicId, u, rUser);
+        await this.userService.create(neighborhood, u, rUser);
         this.logger.log(`User ${u.email} seeded successfully.`);
       } catch (error) {
         this.logger.error(`Failed to seed user ${u.email}: ${error.message}`);
@@ -296,14 +317,10 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
     for (const u of nextUsers) {
       const unitKey = `${u.streetName}#${u.identifier}`.toLowerCase().trim();
 
-      // console.log('Llaves disponibles en el Map:', Array.from(unitMap.keys()));
-      // console.log('Buscando llave:', unitKey);
-
-      //`${u.streetName}#${u.identifier}`;
       const existingUnitId = unitMap.get(unitKey);
       try {
         const savedUser = await this.userService.create(
-          neighborhood.publicId,
+          neighborhood,
           { ...u, unitId: existingUnitId },
           rUser,
         );
@@ -352,7 +369,7 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
       'Gonzalez',
     ];
 
-    for (let i = 11; i <= 150; i++) {
+    for (let i = 11; i <= 50; i++) {
       const street = streets[i % streets.length];
       const houseNum = 100 + Math.floor(i / 5); // Distribuye casas de 100 en adelante
 

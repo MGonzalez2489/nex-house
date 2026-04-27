@@ -8,22 +8,30 @@ import {
   signal,
 } from '@angular/core';
 import {
+  AbstractControl,
   FormControl,
   FormGroup,
   ReactiveFormsModule,
+  ValidationErrors,
   Validators,
 } from '@angular/forms';
-import { Router } from '@angular/router';
 import { ICreateUser } from '@nex-house/interfaces';
 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormOptions, FormValidationError } from '@shared/components/ui';
-import { ContextStore } from '@stores/context.store';
+import { SessionService } from '@core/services';
 import { UnitsStore } from '@features/housing-unit/units.store';
 import { UsersStore } from '@features/users/users.store';
+import { UserRoleEnum } from '@nex-house/enums';
+import {
+  FormOptions,
+  FormValidationError,
+  PageHeader,
+} from '@shared/components/ui';
+import { ContextStore } from '@stores/context.store';
 import {
   AutoCompleteCompleteEvent,
   AutoCompleteModule,
+  AutoCompleteSelectEvent,
 } from 'primeng/autocomplete';
 import { ButtonModule } from 'primeng/button';
 import { Card } from 'primeng/card';
@@ -33,7 +41,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { ICreateUserForm, IUserUnitForm } from './iuser-form';
-import { UserRoleEnum } from '@nex-house/enums';
+import { UnitModel } from '@nex-house/models';
 
 @Component({
   selector: 'app-user-form-page',
@@ -49,6 +57,7 @@ import { UserRoleEnum } from '@nex-house/enums';
     CheckboxModule,
     RadioButtonModule,
     ToggleSwitchModule,
+    PageHeader,
   ],
   templateUrl: './user-form-page.html',
   styleUrl: './user-form-page.css',
@@ -56,50 +65,53 @@ import { UserRoleEnum } from '@nex-house/enums';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserFormPage {
+  private readonly sessionService = inject(SessionService);
   protected readonly store = inject(UsersStore);
   protected readonly unitStore = inject(UnitsStore);
   protected readonly contextStore = inject(ContextStore);
-  protected readonly form = new FormGroup<ICreateUserForm>({
-    firstName: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.minLength(3)],
-    }),
-    lastName: new FormControl(null, {
-      validators: [Validators.minLength(3)],
-    }),
-    phone: new FormControl(null, {
-      validators: [Validators.minLength(3)],
-    }),
-    email: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.email],
-    }),
-    unit: new FormControl(null, {
-      validators: [Validators.required],
-    }),
-    newUnit: new FormGroup<IUserUnitForm>({
-      streetName: new FormControl<string>('', { nonNullable: true }),
-      identifier: new FormControl<string>('', { nonNullable: true }),
-    }),
-    isAdmin: new FormControl(false, {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    isOwner: new FormControl(false, {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    isFamily: new FormControl(false, {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    isTenant: new FormControl(false, {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-  });
+  protected readonly form = new FormGroup<ICreateUserForm>(
+    {
+      firstName: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.required, Validators.minLength(3)],
+      }),
+      lastName: new FormControl(null, {
+        validators: [Validators.minLength(3)],
+      }),
+      phone: new FormControl(null, {
+        validators: [Validators.minLength(3)],
+      }),
+      email: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.required, Validators.email],
+      }),
+      unit: new FormControl(null, {
+        validators: [Validators.required],
+      }),
+      newUnit: new FormGroup<IUserUnitForm>({
+        streetName: new FormControl<string>('', { nonNullable: true }),
+        identifier: new FormControl<string>('', { nonNullable: true }),
+      }),
+      isAdmin: new FormControl(false, {
+        nonNullable: true,
+        validators: [Validators.required],
+      }),
+      isOwner: new FormControl(false, {
+        nonNullable: true,
+        validators: [Validators.required],
+      }),
+      isFamily: new FormControl(false, {
+        nonNullable: true,
+        validators: [Validators.required],
+      }),
+      isTenant: new FormControl(false, {
+        nonNullable: true,
+        validators: [Validators.required],
+      }),
+    },
+    { validators: [atLeastOneRoleRequired] },
+  );
   protected readonly isNewUnit = signal<boolean>(false);
-  private readonly router = inject(Router);
   private readonly exclusiveFields = [
     'isOwner',
     'isFamily',
@@ -205,6 +217,18 @@ export class UserFormPage {
     this.navigateBack();
   }
 
+  protected selectUnit(event: AutoCompleteSelectEvent) {
+    const unit = event.value as UnitModel;
+    if (!unit) return;
+
+    const existsOwner = unit.assignations.some((f) => f.isOwner);
+
+    if (existsOwner) this.form.controls.isOwner.disable();
+    else {
+      this.form.controls.isOwner.enable();
+    }
+  }
+
   private setupExclusiveFieldsLogic() {
     this.exclusiveFields.forEach((field) => {
       this.form
@@ -223,7 +247,7 @@ export class UserFormPage {
       });
   }
   private syncUnitValidators(isNew: boolean) {
-    const { newUnit, unit } = this.form.controls;
+    const { newUnit, unit, isOwner } = this.form.controls;
     const { identifier, streetName } = newUnit.controls;
 
     if (isNew) {
@@ -231,6 +255,8 @@ export class UserFormPage {
       unit.clearValidators();
       identifier.setValidators([Validators.required]);
       streetName.setValidators([Validators.required]);
+      isOwner.enable();
+      isOwner.patchValue(false);
     } else {
       unit.patchValue(null, { emitEvent: false });
       identifier.clearValidators();
@@ -245,7 +271,31 @@ export class UserFormPage {
   }
 
   private navigateBack() {
-    const sel = this.contextStore.selectedId();
-    this.router.navigateByUrl(`/neighborhoods/${sel}/users`);
+    this.sessionService.goBack();
   }
 }
+
+function atLeastOneRoleRequired(
+  control: AbstractControl,
+): ValidationErrors | null {
+  const group = control as FormGroup; // Castea a FormGroup para acceder a los controles
+
+  const isOwner = group.get('isOwner')?.value;
+  const isFamily = group.get('isFamily')?.value;
+  const isTenant = group.get('isTenant')?.value;
+
+  if (!isOwner && !isFamily && !isTenant) {
+    return { atLeastOneRoleRequired: true };
+  }
+  return null;
+}
+// function atLeastOneRoleRequired(group: FormGroup): ValidationErrors | null {
+//   const isOwner = group.get('isOwner')?.value;
+//   const isFamily = group.get('isFamily')?.value;
+//   const isTenant = group.get('isTenant')?.value;
+//
+//   if (!isOwner && !isFamily && !isTenant) {
+//     return { atLeastOneRoleRequired: true };
+//   }
+//   return null;
+// }

@@ -1,11 +1,86 @@
-<div class="flex flex-col h-full py-6">
-  <div class="flex items-center px-6 mb-8">
-    <img src="assets/images/logo.svg" alt="NexHouse" class="h-8 w-auto" />
-    <span class="ml-3 text-xl font-bold text-blue-900">NexHouse</span>
+<aside
+  class="sidebar"
+  [class.sidebar--collapsed]="service.collapsed()"
+  role="navigation"
+  aria-label="Navegación principal"
+>
+  <!-- ── HEADER ────────────────────────────────── -->
+  <div class="sidebar-header">
+    <a
+      class="logo-area"
+      routerLink="/"
+      aria-label="{{ config().header.name }} - Inicio"
+    >
+      <img class="logo-icon" [src]="config().header.icon" alt="nex-icon" />
+
+      <div class="logo-text">
+        <span class="logo-name">{{ config().header.name }}</span>
+        @if (config().header.tagline) {
+        <span class="logo-tagline">{{ config().header.tagline }}</span>
+        }
+      </div>
+    </a>
+
+    <p-button
+      (click)="service.toggleCollapsed()"
+      text
+      class="hidden"
+      severity="secondary"
+      [attr.aria-label]="service.collapsed() ? 'Expandir menú' : 'Colapsar menú'"
+      [attr.aria-expanded]="!service.collapsed()"
+      [icon]="service.collapsed() ? 'pi pi-chevron-right' : 'pi pi-chevron-down'"
+    />
   </div>
 
-  <div class="flex flex-col justify-between h-full">
-    <p-panelMenu [model]="menuItems()" [pt]="{ root: '',panel:'border-0' }" />
-    <p-panelMenu [model]="footerItems()" [pt]="{ root: '',panel:'border-0' }" />
-  </div>
-</div>
+  <!-- ── NAV ──────────────────────────────────── -->
+  <nav class="sidebar-nav">
+    @for (section of config().sections; track $index) {
+    <div class="nav-section">
+      @if (section.label && !service.collapsed()) {
+      <div class="nav-section-label" role="presentation">
+        {{ section.label }}
+      </div>
+      } @for (item of section.items; track item.id) {
+      <app-nav-item [item]="item" />
+      }
+    </div>
+
+    @if (!$last) {
+    <div class="sidebar-divider" role="separator"></div>
+    } }
+  </nav>
+
+  <!-- ── FOOTER ────────────────────────────────── -->
+  <footer class="sidebar-footer">
+    <!-- User card -->
+    <div class="user-card" [class.user-card--collapsed]="service.collapsed()">
+      <app-user-avatar [text]="user()?.fullName" />
+      <div class="user-info">
+        <span class="user-name">{{ user()?.fullName }}</span>
+        <span class="user-role">{{ user()?.role |role}}</span>
+      </div>
+    </div>
+
+    <div class="sidebar-divider sidebar-divider--footer" role="separator"></div>
+
+    <a
+      pButton
+      icon="pi pi-question-circle"
+      text
+      [routerLink]="['/help']"
+      severity="secondary"
+      class="footer-item"
+      label="Centro de ayuda"
+    >
+    </a>
+
+    <button
+      pButton
+      class="footer-item footer-item--danger"
+      (click)="sessionService.logout()"
+      [attr.title]="service.collapsed() ? 'Cerrar sesión' : null"
+      icon="pi pi-sign-out"
+      label="Cerrar sesión"
+    ></button>
+  </footer>
+</aside>

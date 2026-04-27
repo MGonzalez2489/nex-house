@@ -3,13 +3,16 @@ import { Router } from '@angular/router';
 import { AUTH_ROUTES_ENUM, AuthStore } from '@features/auth';
 import { UserRoleEnum } from '@nex-house/enums';
 import { ContextStore } from '@stores/context.store';
+import { BreadcrumbService } from './breadcrumb.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SessionService {
+  //////////////////////stores
   private readonly authStore = inject(AuthStore);
   private readonly contextStore = inject(ContextStore);
+  private readonly breadcrumbService = inject(BreadcrumbService);
   private router = inject(Router);
 
   readonly user = computed(() => this.authStore.user());
@@ -35,10 +38,17 @@ export class SessionService {
 
   logout() {
     this.authStore.logout();
+    this.contextStore.resetState();
     this.router.navigateByUrl(AUTH_ROUTES_ENUM.LOGIN);
   }
   //
-  navigateTo() {
-    console.log('navigate');
+  goBack() {
+    const crumbs = this.breadcrumbService.breadcrumbs();
+    if (crumbs.length > 1) {
+      const parentRoute = crumbs[crumbs.length - 2].url;
+      this.router.navigateByUrl(parentRoute);
+    } else {
+      this.router.navigate(['/dashboard']);
+    }
   }
 }

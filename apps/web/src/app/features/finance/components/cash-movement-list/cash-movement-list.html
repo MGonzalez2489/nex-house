@@ -1,0 +1,37 @@
+@if(isLoading()){
+
+<div class="w-full flex items-center justify-center h-[30vh]">
+  <div class="flex flex-col justify-center gap-5 items-center">
+    <p-progress-spinner ariaLabel="loading" />
+    <p class="text-gray-400">Cargando...</p>
+  </div>
+</div>
+
+} @else{ @if(records().length > 0){
+
+<div class="space-y-6">
+  @for(gp of records(); track gp.date){
+  <div class="flex items-center gap-4">
+    <span
+      class="px-4 py-1 bg-slate-200 text-slate-600 text-[10px] font-black uppercase rounded-full tracking-widest"
+      >{{gp.date|date}}</span
+    >
+    <div class="h-px flex-1 bg-slate-200"></div>
+  </div>
+
+  @for(r of gp.transactions; track r.publicId){
+  <app-cash-movement [transaction]="r" class="block" />
+  } }
+</div>
+<div class="text-center py-12">
+  <p class="text-[10px] font-bold text-slate-300 uppercase tracking-[0.3em]">
+    Fin del historial reciente
+  </p>
+</div>
+
+} @else{
+
+<div class="flex justify-center items-center h-[30vh]">
+  <h2 class="text-gray-500">No se encontraron resultados</h2>
+</div>
+} }

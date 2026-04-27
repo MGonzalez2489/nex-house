@@ -6,16 +6,11 @@ import {
 } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { UserRoleEnum, UserStatusEnum } from '@nex-house/enums';
-import { SearchUser } from '@nex-house/interfaces';
+import { KeyValueItem, SearchUser } from '@nex-house/interfaces';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
-
-interface KeyValueItem {
-  key: string;
-  value: string;
-}
 
 interface ISearchUser {
   globalFilter: FormControl<string>;

@@ -1,0 +1,57 @@
+<div
+  class="w-full min-h-[60vh] md:min-h-[70vh] flex items-center justify-center p-4"
+>
+  <div
+    class="flex flex-col items-center justify-center py-20 px-4 animate-fade-in"
+  >
+    <!-- Ilustración Iconográfica -->
+    <div class="relative mb-8">
+      <div
+        class="absolute inset-0 bg-blue-50 rounded-full scale-150 blur-xl opacity-50"
+      ></div>
+
+      <div
+        class="relative w-24 h-24 bg-white shadow-sm border border-slate-100 rounded-3xl flex items-center justify-center text-blue-500 transform rotate-3"
+      >
+        <i class="pi pi-book text-5xl"></i>
+      </div>
+
+      <div
+        class="absolute -bottom-2 -right-2 w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center shadow-lg border-4 border-white"
+      >
+        <i class="pi pi-search text-sm"></i>
+      </div>
+    </div>
+
+    <!-- Texto de Información -->
+    <div class="text-center max-w-sm space-y-2">
+      <h3 class="text-xl font-black text-slate-900 tracking-tight">
+        Sin movimientos registrados
+      </h3>
+      <p class="text-sm text-slate-500 leading-relaxed">
+        Parece que aún no hay transacciones en este periodo. Comienza
+        registrando un ingreso o un gasto para ver el balance.
+      </p>
+    </div>
+
+    <!-- Acción Sugerida -->
+    <div class="mt-8">
+      <p-button
+        severity="contrast"
+        label="Registrar primer movimiento"
+        styleClass="shadow-xl shadow-slate-200 rounded-lg"
+        icon="pi pi-plus-circle"
+        (click)="add.emit()"
+        size="large"
+      />
+    </div>
+
+    <!-- Guía rápida (Opcional) -->
+    <p
+      class="mt-8 text-[11px] text-slate-400 uppercase tracking-widest font-bold"
+    >
+      ¿Necesitas ayuda?
+      <a href="#" class="text-blue-500 hover:underline">Mira el tutorial</a>
+    </p>
+  </div>
+</div>

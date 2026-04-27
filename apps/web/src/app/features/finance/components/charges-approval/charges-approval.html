@@ -1,0 +1,117 @@
+<form [formGroup]="form" (submit)="doSubmit()">
+  <div class="flex flex-col gap-4 py-2">
+    @if (charge(); as charge) {
+    <div
+      class="grid grid-cols-2 gap-3 bg-slate-100 p-4 rounded-xl text-white shadow-inner"
+    >
+      <div class="col-span-2 border-b border-slate-700 pb-2 mb-1">
+        <p class="text-xs uppercase font-bold text-slate-800">Concepto</p>
+        <p class="text-base capitalize font-medium truncate text-slate-600">
+          {{ charge.description }}
+        </p>
+      </div>
+      <div>
+        <p class="text-xs uppercase font-bold text-slate-800">Residente</p>
+        <p class="text-base font-medium text-slate-600">
+          {{ charge.issuedToUser.fullName }}
+        </p>
+      </div>
+      <div class="text-right">
+        <p class="text-xs uppercase font-bold text-slate-800">
+          Total a Validar
+        </p>
+        <p class="text-lg font-black text-green-400">
+          {{ charge.amount | currency }}
+        </p>
+      </div>
+    </div>
+    }
+
+    <div class="flex flex-col gap-3">
+      <div class="form-control">
+        <label for="paymentDate" class="form-label"
+          >Fecha Efectiva del Pago</label
+        >
+        <p-datepicker
+          [showIcon]="true"
+          appendTo="body"
+          id="paymentDate"
+          dateFormat="dd/mm/yy"
+          autofocus="false"
+          fluid
+          formControlName="paymentDate"
+          [invalid]="form.controls.paymentDate.invalid && form.controls.paymentDate.touched"
+          [attr.aria-invalid]="form.controls.paymentDate.invalid && form.controls.paymentDate.touched"
+          [attr.aria-describedby]="form.controls.paymentDate.touched && form.controls.paymentDate.errors ? 'paymentDate-error' : null"
+        >
+        </p-datepicker>
+        <app-form-validation-error
+          id="paymentDate-errors"
+          [touched]="form.controls.paymentDate.touched"
+          [errors]="form.controls.paymentDate.errors"
+          label="Fecha de Pago"
+        />
+      </div>
+
+      <div class="form-control">
+        <label for="approvalNotes" class="form-label"
+          >Notas u Observaciones</label
+        >
+        <textarea
+          pInputTextarea
+          rows="4"
+          id="approvalNotes"
+          formControlName="approvalNotes"
+          placeholder="Ej: Pago en efectivo, folio 123..."
+          fluid
+          [invalid]="form.controls.approvalNotes.invalid && form.controls.approvalNotes.touched"
+          [attr.aria-invalid]="form.controls.approvalNotes.invalid && form.controls.approvalNotes.touched"
+          [attr.aria-describedby]="form.controls.approvalNotes.touched && form.controls.approvalNotes.errors ? 'approvalNotes-error' : null"
+        >
+        </textarea>
+        <app-form-validation-error
+          id="approvalNotes-errors"
+          [touched]="form.controls.approvalNotes.touched"
+          [errors]="form.controls.approvalNotes.errors"
+          label="Notas u Observaciones"
+        />
+      </div>
+    </div>
+
+    <div
+      class="w-full bg-slate-50 rounded-xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center p-6 group hover:border-blue-400 transition-colors"
+    >
+      <!-- @if (!charge()?.evidenceUrl) { -->
+      @if(true){
+      <div class="text-center">
+        <i
+          class="pi pi-cloud-upload text-3xl text-slate-300 group-hover:text-blue-400 mb-2"
+        ></i>
+        <p
+          class="text-[11px] font-bold text-slate-400 uppercase tracking-widest"
+        >
+          Sin Comprobante Digital
+        </p>
+        <p class="text-[10px] text-slate-400 mt-1 italic">
+          Aprobación administrativa manual
+        </p>
+      </div>
+      } @else {
+      <div class="w-full h-10 border border-gray-200 bg-gray-100 rounded-md">
+        evidencia
+      </div>
+      <!-- <img -->
+      <!--   [src]="selectedCharge()?.evidenceUrl" -->
+      <!--   class="max-h-48 rounded shadow-lg" -->
+      <!-- /> -->
+      }
+    </div>
+  </div>
+
+  <app-form-options
+    [callState]="store.callState()"
+    submitSeverity="success"
+    (doCancel)="doCancel()"
+    [isLoading]="store.loading()"
+  />
+</form>

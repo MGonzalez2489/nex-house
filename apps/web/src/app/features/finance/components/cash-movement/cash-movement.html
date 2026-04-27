@@ -1,0 +1,68 @@
+<p-card>
+  <div class="flex justify-between">
+    <!-- left -->
+    <div class="flex items-center gap-4">
+      <!-- icon -->
+      <div
+        [class.bg-rose-50]="transaction().type === 'expense'"
+        [class.text-rose-500]="transaction().type === 'expense'"
+        [class.bg-emerald-50]="transaction().type === 'income'"
+        [class.text-emerald-500]="transaction().type === 'income'"
+        class="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform"
+      >
+        <i class="pi pi-arrow-up-right text-xl"></i>
+      </div>
+      <!-- info -->
+      <div class="flex-1">
+        <div class="flex items-center gap-2 mb-1">
+          <span
+            [class.bg-rose-50]="transaction().type === 'expense'"
+            [class.text-rose-500]="transaction().type === 'expense'"
+            [class.bg-emerald-50]="transaction().type === 'income'"
+            [class.text-emerald-500]="transaction().type === 'income'"
+            class="text-[10px] font-bold px-2 py-0.5 rounded"
+            >{{transaction().type === 'income' ? 'Ingreso' : 'Gasto'}}</span
+          >
+          <!-- <span -->
+          <!--   class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter" -->
+          <!--   >{{transaction().transactionDate | date:'time'}}</span -->
+          <!-- > -->
+        </div>
+        <h4 class="text-base font-bold text-slate-800 capitalize">
+          {{transaction().title}}
+        </h4>
+        <!-- TODO: keep this? -->
+        <p class="text-xs text-slate-500">{{transaction().description}}</p>
+      </div>
+    </div>
+    <div>
+      <span class="text-lg font-black text-slate-900">
+        @if(transaction().type === 'expense'){ - } {{transaction().amount |
+        currency}}
+      </span>
+      <div class="flex items-center justify-end gap-2 mt-1">
+        @if(transaction().evidence){
+        <p-button
+          icon="pi pi-paperclip"
+          text
+          severity="secondary"
+          (click)="viewEvidence()"
+        />
+
+        <!-- <button -->
+        <!--   class="p-2 text-slate-400 hover:text-blue-500 transition-colors" -->
+        <!-- > -->
+        <!--   <i class="pi pi-paperclip"></i> -->
+        <!-- </button> -->
+        }
+
+        <p-button severity="secondary" text icon="pi pi-ellipsis-v" />
+        <!-- <button -->
+        <!--   class="p-2 text-slate-400 hover:text-slate-600 transition-colors" -->
+        <!-- > -->
+        <!--   <i class="pi pi-ellipsis-v"></i> -->
+        <!-- </button> -->
+      </div>
+    </div>
+  </div>
+</p-card>

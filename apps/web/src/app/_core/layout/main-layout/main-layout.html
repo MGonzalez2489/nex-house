@@ -1,27 +1,8 @@
 <div class="flex h-screen overflow-hidden bg-gray-50">
-  <aside class="hidden lg:flex lg:shrink-0">
-    <div class="flex flex-col w-64 border-r bg-white">
-      <app-sidebar
-        [user]="sessionService.user()"
-        class="h-full"
-        (logout)="sessionService.logout()"
-      />
-    </div>
-  </aside>
-
-  <p-drawer
-    [visible]="sidebarVisible()"
-    class="lg:hidden"
-    blockScroll="true"
-    [closeOnEscape]="true"
-  >
-    <app-sidebar
-      [user]="sessionService.user()"
-      class="h-full"
-      (logout)="sessionService.logout()"
-      (navigate)="sidebarVisible.set(false)"
-    />
-  </p-drawer>
+  <app-sidebar
+    class="h-full hidden lg:flex lg:shrink-0"
+    (logout)="sessionService.logout()"
+  />
 
   <div class="flex flex-col flex-1 w-0 overflow-hidden">
     <app-navbar
@@ -46,3 +27,18 @@
     </main>
   </div>
 </div>
+
+<p-drawer
+  [visible]="sidebarVisible()"
+  class="lg:hidden"
+  blockScroll="true"
+  [closeOnEscape]="true"
+  [pt]="{root:'w-16'}"
+  (visibleChange)="this.sidebarVisible.set($event)"
+>
+  <app-sidebar
+    class="h-full"
+    (logout)="sessionService.logout()"
+    (navigate)="sidebarVisible.set(false)"
+  />
+</p-drawer>

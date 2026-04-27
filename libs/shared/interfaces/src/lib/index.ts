@@ -4,3 +4,6 @@ export * from './auth';
 export * from './neighborhood';
 export * from './housing-unit';
 export * from './users';
+
+export * from './finance';
+export * from './key-value-item.interface';

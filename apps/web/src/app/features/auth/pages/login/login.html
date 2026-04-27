@@ -63,6 +63,8 @@
       />
     </div>
 
+    <app-form-feedback [callState]="store.callState()" />
+
     <div class="flex items-center gap-2 ml-1">
       <p-checkbox [binary]="true" inputId="remember"></p-checkbox>
       <label for="remember" class="text-sm text-slate-600 cursor-pointer"

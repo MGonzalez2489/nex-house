@@ -1,28 +1,14 @@
-<!-- Header Actions -->
-<div class="hidden md:flex items-end justify-between mb-12">
-  <div>
-    <nav
-      class="flex items-center space-x-2 text-on-surface-variant text-sm mb-2"
-    >
-      <span>Residentes</span>
-      <span class="pi pi-chevron-right text-xs"></span>
-      <span class="font-semibold text-blue-600">Detalle</span>
-    </nav>
-    <h1
-      class="text-4xl font-extrabold tracking-tight text-on-surface font-headline"
-    >
-      {{user()?.fullName}}
-    </h1>
-  </div>
-  <div class="flex items-center space-x-3">
+@if(user(); as user){
+<app-page-header [title]="user.fullName" class="capitalize">
+  <div actions class="flex gap-2">
     <p-button label="Editar" variant="outlined" routerLink="update" />
     <p-button label="Borrar Usuario" severity="danger" variant="outlined" />
   </div>
-</div>
+</app-page-header>
+
 <!-- Bento Grid Content -->
 <div class="grid grid-cols-12 gap-6">
   <!-- Profile Section -->
-  @if(user(); as user){
   <div class="col-span-12 lg:col-span-8">
     <app-user-card [user]="user" class="" />
     <div class="md:hidden flex gap-3 items-center py-3">
@@ -44,5 +30,5 @@
     </div>
   </div>
   <app-user-unit-card class="col-span-12 lg:col-span-4" [user]="user" />
-  }
 </div>
+}

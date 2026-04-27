@@ -1,0 +1,484 @@
+<div class="space-y-6">
+  <!-- Header Section -->
+  <app-page-header
+    class="max-w-[50%]"
+    title="Calendario de cobros"
+    subTitle="Administra y programa los ciclos de facturación para residentes y áreas
+comerciales. Visualiza el estado actual de tus flujos de efectivo."
+  >
+    @if(store.feeScheduleExists()){
+    <div actions class="flex gap-2">
+      <p-button label="Crear Nuevo" icon="pi pi-plus" (click)="openForm()" />
+    </div>
+    }
+  </app-page-header>
+
+  @if(!store.feeScheduleExists()){
+  <app-fee-schedule-init class="block" (addCharge)="openForm()" />
+  } @else{
+  <!-- Fees Ledger (Table Section) -->
+  <p-card class="hidden md:block">
+    <app-fee-schedule-table
+      [data]="store.feeSchedulesEntities()"
+      [isLoading]="store.loading()"
+      [pagination]="store.feesSchedulePagination()"
+      (filter)="store.feeScheduleLoadAll($event)"
+      (add)="openForm()"
+      (inspect)="openDetails($event)"
+    />
+  </p-card>
+  <app-fee-schedule-list class="md:hidden" />
+
+  }
+</div>
+
+<p-drawer
+  [header]="drawerConfig()?.header"
+  appendTo="body"
+  blockScroll="true"
+  styleClass="w-full max-w-md"
+  [(visible)]="isDrawerOpen"
+  position="right"
+>
+  @switch(drawerConfig()?.component){ @case ('FORM'){
+  <app-fee-schedule-form (save)="closeDrawer()" />
+  } @case ('DETAILS'){
+  <app-fee-schedule-details [record]="selected()" />
+  } }
+</p-drawer>
+
+<!-- Secondary Context Grid -->
+<div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 hidden">
+  <div class="p-6 bg-white rounded-xl shadow-sm border-l-4 border-emerald-500">
+    <h4 class="text-sm font-bold text-on-surface mb-2">
+      Próximo Cierre Fiscal
+    </h4>
+    <p class="text-xs text-on-surface-variant leading-relaxed">
+      El periodo actual finaliza en
+      <span class="text-on-surface font-semibold">9 días</span>. Asegúrate de
+      que todos los cobros recurrentes estén activos.
+    </p>
+  </div>
+  <div class="p-6 bg-white rounded-xl shadow-sm border-l-4 border-amber-400">
+    <h4 class="text-sm font-bold text-on-surface mb-2">Acción Requerida</h4>
+    <p class="text-xs text-on-surface-variant leading-relaxed">
+      Hay
+      <span class="text-on-surface font-semibold">2 cobros pausados</span> que
+      excedieron la fecha de reanudación automática.
+    </p>
+  </div>
+  <div class="p-6 bg-white rounded-xl shadow-sm border-l-4 border-blue-500">
+    <h4 class="text-sm font-bold text-on-surface mb-2">Soporte NexHouse</h4>
+    <p class="text-xs text-on-surface-variant leading-relaxed">
+      ¿Necesitas ayuda con la facturación masiva? Consulta nuestra
+      <span class="text-emerald-600 font-semibold cursor-pointer"
+        >guía de gestión financiera</span
+      >.
+    </p>
+  </div>
+</div>
+
+<!-- Stats Overview (Asymmetric Grid) -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 my-12 bg-cyan-100 hidden">
+  <div
+    class="md:col-span-8 bg-gray-300 p-8 rounded-xl flex items-center justify-between overflow-hidden relative group"
+  >
+    <div class="relative z-10">
+      <p
+        class="text-xs font-bold uppercase tracking-widest text-emerald-600 mb-2"
+      >
+        Total Recaudado Mes
+      </p>
+      <h3 class="text-4xl font-black text-on-surface tracking-tighter">
+        $1,240,500.00
+        <span class="text-sm font-medium text-slate-400">MXN</span>
+      </h3>
+      <div
+        class="mt-4 flex items-center gap-2 text-emerald-700 text-sm font-bold bg-secondary-container/30 w-fit px-3 py-1 rounded-full"
+      >
+        <span class="pi pi-chart-line text-sm"></span>
+        +12.5% vs mes anterior
+      </div>
+    </div>
+    <div
+      class="hidden sm:block absolute right-0 top-0 bottom-0 w-1/3 opacity-10 group-hover:opacity-20 transition-opacity"
+    >
+      <span
+        class="pi pi-wallet text-[120px] absolute -right-4 -bottom-4"
+        style="font-variation-settings: 'FILL' 1"
+      ></span>
+    </div>
+  </div>
+  <div
+    class="md:col-span-4 bg-primary-container p-8 rounded-xl text-white flex flex-col justify-between"
+  >
+    <p class="text-xs font-bold uppercase tracking-widest text-slate-400">
+      Cobros Pendientes
+    </p>
+    <div>
+      <h3 class="text-3xl font-bold tracking-tight">42 Cobros</h3>
+      <p class="text-slate-400 text-sm mt-1">Próximos 7 días hábiles</p>
+    </div>
+  </div>
+</div>
+
+<section
+  class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0px_20px_50px_rgba(11,28,48,0.04)] hidden"
+>
+  <div
+    class="px-8 py-6 flex items-center justify-between border-b border-slate-50"
+  >
+    <h3 class="text-xl font-bold text-on-surface">Listado de Programaciones</h3>
+    <div class="flex gap-2">
+      <button
+        class="p-2 hover:bg-surface-container-low rounded-lg transition-colors text-slate-500"
+      >
+        <span class="pi pi-filter"></span>
+      </button>
+      <button
+        class="p-2 hover:bg-surface-container-low rounded-lg transition-colors text-slate-500"
+      >
+        <span class="material-symbols-outlined">download</span>
+      </button>
+    </div>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr class="bg-surface-container-low/50">
+          <th
+            class="px-8 py-4 text-[11px] font-bold uppercase tracking-widest text-on-primary-container"
+          >
+            Nombre
+          </th>
+          <th
+            class="px-8 py-4 text-[11px] font-bold uppercase tracking-widest text-on-primary-container"
+          >
+            Monto (MXN)
+          </th>
+          <th
+            class="px-8 py-4 text-[11px] font-bold uppercase tracking-widest text-on-primary-container"
+          >
+            Frecuencia
+          </th>
+          <th
+            class="px-8 py-4 text-[11px] font-bold uppercase tracking-widest text-on-primary-container"
+          >
+            Estado
+          </th>
+          <th
+            class="px-8 py-4 text-[11px] font-bold uppercase tracking-widest text-on-primary-container"
+          >
+            Próxima Ejecución
+          </th>
+          <th
+            class="px-8 py-4 text-[11px] font-bold uppercase tracking-widest text-on-primary-container text-right"
+          >
+            Acciones
+          </th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-50">
+        <!-- Row 1: Active -->
+        <tr class="hover:bg-surface-container-high/30 transition-colors group">
+          <td class="px-8 py-6">
+            <div class="flex items-center gap-3">
+              <div
+                class="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600"
+              >
+                <span class="material-symbols-outlined">house</span>
+              </div>
+              <div>
+                <p class="font-bold text-on-surface text-sm">
+                  Mantenimiento Torre A
+                </p>
+                <p class="text-xs text-on-surface-variant">
+                  Residencial Santa Fe
+                </p>
+              </div>
+            </div>
+          </td>
+          <td class="px-8 py-6">
+            <span class="font-mono font-semibold text-sm">$4,500.00</span>
+          </td>
+          <td class="px-8 py-6">
+            <span
+              class="text-xs font-medium text-slate-600 px-2 py-1 bg-slate-100 rounded"
+              >Recurrente</span
+            >
+          </td>
+          <td class="px-8 py-6">
+            <span
+              class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-secondary-container text-on-secondary-container"
+            >
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              Activo
+            </span>
+          </td>
+          <td class="px-8 py-6">
+            <p class="text-sm font-medium">01 Oct, 2023</p>
+            <p class="text-[10px] text-on-surface-variant">En 12 días</p>
+          </td>
+          <td class="px-8 py-6 text-right">
+            <div
+              class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <button
+                class="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all"
+                title="Pausar"
+              >
+                <span class="material-symbols-outlined text-lg"
+                  >pause_circle</span
+                >
+              </button>
+              <button
+                class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                title="Editar"
+              >
+                <span class="material-symbols-outlined text-lg"
+                  >edit_square</span
+                >
+              </button>
+              <button
+                class="p-2 text-slate-400 hover:text-error hover:bg-error-container/20 rounded-lg transition-all"
+                title="Eliminar"
+              >
+                <span class="material-symbols-outlined text-lg">delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+        <!-- Row 2: Paused -->
+        <tr class="hover:bg-surface-container-high/30 transition-colors group">
+          <td class="px-8 py-6">
+            <div class="flex items-center gap-3">
+              <div
+                class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600"
+              >
+                <span class="material-symbols-outlined">pool</span>
+              </div>
+              <div>
+                <p class="font-bold text-on-surface text-sm">
+                  Cuota Extra Piscina
+                </p>
+                <p class="text-xs text-on-surface-variant">Amenidades</p>
+              </div>
+            </div>
+          </td>
+          <td class="px-8 py-6">
+            <span class="font-mono font-semibold text-sm">$850.00</span>
+          </td>
+          <td class="px-8 py-6">
+            <span
+              class="text-xs font-medium text-slate-600 px-2 py-1 bg-slate-100 rounded"
+              >Único</span
+            >
+          </td>
+          <td class="px-8 py-6">
+            <span
+              class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-200 text-slate-600"
+            >
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+              Pausado
+            </span>
+          </td>
+          <td class="px-8 py-6">
+            <p class="text-sm font-medium text-slate-400">Suspendido</p>
+          </td>
+          <td class="px-8 py-6 text-right">
+            <div
+              class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <button
+                class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
+                title="Reanudar"
+              >
+                <span class="material-symbols-outlined text-lg"
+                  >play_circle</span
+                >
+              </button>
+              <button
+                class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                title="Editar"
+              >
+                <span class="material-symbols-outlined text-lg"
+                  >edit_square</span
+                >
+              </button>
+              <button
+                class="p-2 text-slate-400 hover:text-error hover:bg-error-container/20 rounded-lg transition-all"
+                title="Eliminar"
+              >
+                <span class="material-symbols-outlined text-lg">delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+        <!-- Row 3: Scheduled -->
+        <tr class="hover:bg-surface-container-high/30 transition-colors group">
+          <td class="px-8 py-6">
+            <div class="flex items-center gap-3">
+              <div
+                class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600"
+              >
+                <span class="material-symbols-outlined">security</span>
+              </div>
+              <div>
+                <p class="font-bold text-on-surface text-sm">
+                  Seguridad Privada Nocturna
+                </p>
+                <p class="text-xs text-on-surface-variant">
+                  Servicios Externos
+                </p>
+              </div>
+            </div>
+          </td>
+          <td class="px-8 py-6">
+            <span class="font-mono font-semibold text-sm">$12,000.00</span>
+          </td>
+          <td class="px-8 py-6">
+            <span
+              class="text-xs font-medium text-slate-600 px-2 py-1 bg-slate-100 rounded"
+              >Recurrente</span
+            >
+          </td>
+          <td class="px-8 py-6">
+            <span
+              class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700"
+            >
+              <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+              Programado
+            </span>
+          </td>
+          <td class="px-8 py-6">
+            <p class="text-sm font-medium">15 Oct, 2023</p>
+            <p class="text-[10px] text-on-surface-variant">Inicio de periodo</p>
+          </td>
+          <td class="px-8 py-6 text-right">
+            <div
+              class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <button
+                class="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all"
+                title="Pausar"
+              >
+                <span class="material-symbols-outlined text-lg"
+                  >pause_circle</span
+                >
+              </button>
+              <button
+                class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                title="Editar"
+              >
+                <span class="material-symbols-outlined text-lg"
+                  >edit_square</span
+                >
+              </button>
+              <button
+                class="p-2 text-slate-400 hover:text-error hover:bg-error-container/20 rounded-lg transition-all"
+                title="Eliminar"
+              >
+                <span class="material-symbols-outlined text-lg">delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+        <!-- Row 4: Cancelled -->
+        <tr class="hover:bg-surface-container-high/30 transition-colors group">
+          <td class="px-8 py-6">
+            <div class="flex items-center gap-3">
+              <div
+                class="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400"
+              >
+                <span class="material-symbols-outlined">event_busy</span>
+              </div>
+              <div>
+                <p class="font-bold text-slate-400 text-sm line-through">
+                  Evento Fin de Año
+                </p>
+                <p class="text-xs text-on-surface-variant">Fondo Social</p>
+              </div>
+            </div>
+          </td>
+          <td class="px-8 py-6">
+            <span class="font-mono font-semibold text-sm text-slate-400"
+              >$25,000.00</span
+            >
+          </td>
+          <td class="px-8 py-6">
+            <span
+              class="text-xs font-medium text-slate-400 px-2 py-1 bg-slate-50 rounded"
+              >Único</span
+            >
+          </td>
+          <td class="px-8 py-6">
+            <span
+              class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-error-container/30 text-error"
+            >
+              <span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+              Cancelado
+            </span>
+          </td>
+          <td class="px-8 py-6">
+            <p class="text-sm font-medium text-slate-400">—</p>
+          </td>
+          <td class="px-8 py-6 text-right">
+            <div
+              class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <button
+                class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
+                title="Restaurar"
+              >
+                <span class="material-symbols-outlined text-lg">restore</span>
+              </button>
+              <button
+                class="p-2 text-slate-400 hover:text-error hover:bg-error-container/20 rounded-lg transition-all"
+                title="Eliminar Permanente"
+              >
+                <span class="material-symbols-outlined text-lg"
+                  >delete_forever</span
+                >
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- Pagination/Footer -->
+  <div class="px-8 py-6 bg-slate-50/50 flex items-center justify-between">
+    <p class="text-xs text-on-surface-variant font-medium">
+      Mostrando 4 de 12 cobros registrados
+    </p>
+    <div class="flex items-center gap-4">
+      <button
+        class="text-xs font-bold uppercase tracking-widest text-slate-400 cursor-not-allowed"
+      >
+        Anterior
+      </button>
+      <div class="flex gap-1">
+        <button
+          class="w-8 h-8 flex items-center justify-center rounded-lg bg-white shadow-sm border border-slate-100 text-xs font-bold text-emerald-600"
+        >
+          1
+        </button>
+        <button
+          class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white text-xs font-bold text-slate-500 transition-colors"
+        >
+          2
+        </button>
+        <button
+          class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white text-xs font-bold text-slate-500 transition-colors"
+        >
+          3
+        </button>
+      </div>
+      <button
+        class="text-xs font-bold uppercase tracking-widest text-emerald-600 hover:text-emerald-700"
+      >
+        Siguiente
+      </button>
+    </div>
+  </div>
+</section>

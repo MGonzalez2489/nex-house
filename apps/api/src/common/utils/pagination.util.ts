@@ -57,10 +57,9 @@ export async function paginateQuery<T extends ObjectLiteral>(
     query.addOrderBy(orderColumn, sortOrder);
   }
 
-  const [entities, count] = await query
-    .skip(first)
-    .take(rows)
-    .getManyAndCount();
+  const [entities, count] = searchDto.showAll
+    ? await query.getManyAndCount()
+    : await query.skip(first).take(rows).getManyAndCount();
 
   return {
     data: entities,

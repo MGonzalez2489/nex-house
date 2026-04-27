@@ -4,6 +4,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { TraceableEntity } from './_traceable.entity';
 import { Neighborhood } from './neighborhood.entity';
 import { UnitAssignment } from './housing-assignment.entity';
+import { Charge } from './charge.entity';
 
 @Entity('users')
 export class User extends TraceableEntity {
@@ -41,10 +42,22 @@ export class User extends TraceableEntity {
   })
   status: UserStatusEnum;
 
+  @Column({ type: 'int', nullable: true })
+  @Exclude()
+  pwdResetCode: number | null;
+
+  @Column({ type: 'text', nullable: true })
+  @Exclude()
+  pwdResetToken: string | null;
+
+  //relationshipts
   @ManyToOne(() => Neighborhood)
   @JoinColumn({ name: 'neighborhoodId' })
   neighborhood: Neighborhood;
 
   @OneToMany(() => UnitAssignment, (assignment) => assignment.user)
   assignments: UnitAssignment[];
+
+  @OneToMany(() => Charge, (charge) => charge.issuedToUser)
+  charges: Charge[];
 }

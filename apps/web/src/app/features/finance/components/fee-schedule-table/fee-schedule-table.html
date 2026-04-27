@@ -1,0 +1,64 @@
+<app-table
+  #tb
+  [data]="formatedData()"
+  [columns]="cols"
+  [isLoading]="isLoading()"
+  [lazy]="true"
+  [loadOnInit]="true"
+  (filter)="search($event)"
+  [pagination]="pagination()"
+  [loadOnInit]="false"
+>
+  <ng-template #body let-fee let-field="field">
+    @switch (field) { @case ('name') {
+    <div class="flex flex-col">
+      <span class="font-bold text-slate-800 capitalize">{{fee.name}}</span>
+      <span class="text-xs text-slate-500 line-clamp-1 italic"
+        >{{fee.description}}</span
+      >
+    </div>
+
+    } @case ('description') {
+    <div class="flex items-center gap-2">
+      <span
+        [class.bg-blue-50]="fee.type === 'recurrent'"
+        [class.text-blue-600]="fee.type === 'recurrent'"
+        [class.bg-slate-100]="fee.type ==='one_time'"
+        class="p-1.5 rounded-lg"
+      >
+        <i
+          [class.pi-history]="fee.type !== 'recurrent'"
+          [class.pi-calendar]="fee.type === 'recurrent'"
+          class="pi text-lg w-5 h-5 text-center"
+        ></i>
+      </span>
+      <p class="text-xs italic">{{fee.cronDescription}}</p>
+    </div>
+    } @case ('amount') {
+    <p class="font-mono font-semibold text-slate-700">
+      {{fee.amount | currency}}
+    </p>
+    } @case ('status') {
+    <p-tag [value]="fee.statusLabel" [severity]="fee.statusSeverity" />
+
+    } @case ('startDate') { @let isRecurrent = !!(fee.type ==='recurrent');
+    @if(isRecurrent){
+    <div class="flex flex-col text-[11px] text-slate-500">
+      <span>Inicia: {{fee.startDate | date}}</span>
+      <span>Termina: {{fee.endDate ? (fee.endDate | date) : '--'}}</span>
+    </div>
+    } @else{
+
+    <span class="text-[11px] text-slate-500">
+      Ejecución: {{fee.startDate | date}}
+    </span>
+
+    } } }
+  </ng-template>
+
+  <ng-template #actions let-user>
+    <div class="flex justify-center gap-1">
+      <p-button label="Detalles" text (click)="inspect.emit(user)" />
+    </div>
+  </ng-template>
+</app-table>

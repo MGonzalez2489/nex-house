@@ -1,6 +1,14 @@
 import { Search } from '@nex-house/interfaces';
 import { Type } from 'class-transformer';
-import { IsOptional, IsInt, Min, Max, IsString, IsIn } from 'class-validator';
+import {
+  IsOptional,
+  IsInt,
+  Min,
+  Max,
+  IsString,
+  IsIn,
+  IsBoolean,
+} from 'class-validator';
 
 export class SearchDto implements Search {
   @IsOptional()
@@ -28,4 +36,8 @@ export class SearchDto implements Search {
   @IsOptional()
   @IsString()
   globalFilter?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  showAll: boolean;
 }
