@@ -26,8 +26,8 @@ import { ContextStore } from '@stores/context.store';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { Card } from 'primeng/card';
-import { OverlayBadgeModule } from 'primeng/overlaybadge';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { OverlayBadgeModule } from 'primeng/overlaybadge';
 
 @Component({
   selector: 'app-cash-control',
@@ -57,28 +57,15 @@ export class CashControl implements OnInit {
   protected readonly catalogsStore = inject(CatalogsStore);
 
   protected readonly existsRecords = computed(() => {
-    return true;
-    // const pg = this.store.transactionsPagination();
+    const pg = this.store.transactionsPagination();
     // const count = this.store.transactionsEntities().length;
-    //
-    // if (count === 0) return false;
-    // if (!pg) return false;
-    // if (pg.total === 0) return false;
-    //
-    // return true;
-  });
 
-  constructor() {
-    // effect(() => {
-    //   const c = this.store.transactionsEntities();
-    //   if (!c) return;
-    //
-    //   const f = c[0];
-    //   if (!f) return;
-    //
-    //   this.view(f);
-    // });
-  }
+    if (!pg) return false;
+    if (pg.total === 0) return false;
+    // if (count === 0) return false;
+
+    return true;
+  });
 
   protected readonly filterCount = computed(() => {
     const cFilters = this.store.transactionsFilters();
@@ -103,7 +90,6 @@ export class CashControl implements OnInit {
       };
       this.search(filters);
     }
-    this.changeFilters();
   }
 
   addMovement(): void {

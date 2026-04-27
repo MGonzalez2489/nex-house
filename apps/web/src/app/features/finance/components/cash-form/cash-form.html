@@ -185,5 +185,9 @@
     </div>
   </div>
 
-  <app-form-options [callState]="store.callState()" (doCancel)="doCancel()" />
+  <app-form-options
+    [callState]="store.callState()"
+    (doCancel)="doCancel()"
+    [isLoading]="store.loading()"
+  />
 </form>
