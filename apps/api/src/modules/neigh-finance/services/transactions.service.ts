@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
+  TransactionCategoriesEnum,
   TransactionSourceTypeEnum,
   TransactionTypeEnum,
 } from '@nex-house/enums';
@@ -293,7 +294,7 @@ export class TransactionsService {
       const adjustmentCategory = await queryRunner.manager.findOne(
         TransactionCategory,
         {
-          where: { name: 'Otros' },
+          where: { name: TransactionCategoriesEnum.CANCELLATION },
         },
       );
 

@@ -43,6 +43,12 @@ export class TransactionService {
       dto,
     );
   }
+  update(neighborhood: string, id: string, dto: FormData) {
+    return this.request.patch<TransactionModel>(
+      `${this.buildUrl(neighborhood)}/${id}`,
+      dto,
+    );
+  }
 
   //TODO: create model for this response
   remove(neighborhood: string, id: string) {

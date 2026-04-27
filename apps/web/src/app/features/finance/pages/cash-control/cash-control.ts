@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  effect,
   inject,
   OnInit,
 } from '@angular/core';
@@ -22,9 +21,11 @@ import { SearchTransaction } from '@nex-house/interfaces';
 import { TransactionModel } from '@nex-house/models';
 import { PageHeader } from '@shared/components/ui';
 import { ContextStore } from '@stores/context.store';
+import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { OverlayBadgeModule } from 'primeng/overlaybadge';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @Component({
   selector: 'app-cash-control',
@@ -38,16 +39,19 @@ import { OverlayBadgeModule } from 'primeng/overlaybadge';
     CashFiltersChips,
     CashTransactionsTable,
     Card,
+    ConfirmDialogModule,
   ],
   templateUrl: './cash-control.html',
   styleUrl: './cash-control.css',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [ConfirmationService],
 })
 export class CashControl implements OnInit {
   protected readonly modalService = inject(ModalService);
   protected readonly store = inject(FinanceStore);
   protected readonly contextStore = inject(ContextStore);
+  protected readonly confirmationService = inject(ConfirmationService);
 
   protected readonly existsRecords = computed(() => {
     return true;
@@ -151,9 +155,32 @@ export class CashControl implements OnInit {
     });
   }
   update(transaction: TransactionModel) {
-    console.log('update', transaction.publicId);
+    this.modalService.open(CashForm, {
+      header: 'Actualizar Movimiento',
+      inputValues: { existing: transaction },
+    });
   }
   delete(transaction: TransactionModel) {
-    this.store.TransactionRemove(transaction.publicId);
+    console.log('entro al delete');
+
+    this.confirmationService.confirm({
+      header: 'Confirmar Anulación',
+      message: `¿Estás seguro de anular "${transaction.title}"?`,
+      icon: 'pi pi-exclamation-triangle',
+      rejectLabel: 'Cancelar',
+      blockScroll: true,
+
+      rejectButtonProps: {
+        label: 'Cancelar',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptLabel: 'Anular Movimiento',
+      acceptButtonProps: { label: 'Anular Movimiento', severity: 'danger' },
+      accept: () => {
+        this.store.TransactionRemove(transaction.publicId);
+      },
+    });
+    // this.store.TransactionRemove(transaction.publicId);
   }
 }

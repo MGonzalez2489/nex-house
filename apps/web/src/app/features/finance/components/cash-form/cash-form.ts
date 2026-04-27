@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   inject,
+  input,
   OnInit,
 } from '@angular/core';
 import {
@@ -25,13 +26,13 @@ import { TextareaModule } from 'primeng/textarea';
 import { FileUploadModule } from 'primeng/fileupload';
 import { TransactionCategorySelect } from '@shared/components/smart';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { TransactionModel } from '@nex-house/models';
 
 type MovementForm = {
   type: FormControl<string>;
   title: FormControl<string>;
   description: FormControl<string>;
   amount: FormControl<number>;
-  // category: FormControl<string>;
   transactionDate: FormControl<Date>;
   evidence: FormControl<string>;
   category: FormControl<string>;
@@ -63,7 +64,7 @@ export class CashForm implements OnInit {
     { key: 'Gasto', value: TransactionTypeEnum.EXPENSE },
   ];
   protected readonly form = new FormGroup<MovementForm>({
-    type: new FormControl(TransactionTypeEnum.INCOME, {
+    type: new FormControl(TransactionTypeEnum.EXPENSE, {
       nonNullable: true,
       validators: [Validators.required],
     }),
@@ -95,6 +96,8 @@ export class CashForm implements OnInit {
   protected readonly store = inject(FinanceStore);
   protected readonly catStore = inject(CatalogsStore);
 
+  existing = input<TransactionModel>();
+
   selectedFile: File | null = null;
 
   selTypeChanges = toSignal(this.form.controls.type.valueChanges);
@@ -106,10 +109,19 @@ export class CashForm implements OnInit {
   });
 
   ngOnInit(): void {
-    console.log('a');
-    // const today = new Date();
-    // const tString = `${today.getMonth()}/${today.getDay()}/${today.getFullYear()}`;
-    // this.form.patchValue({ transactionDate: tString });
+    const ex = this.existing();
+
+    if (ex) {
+      this.form.patchValue({
+        type: ex.type,
+        title: ex.title,
+        description: ex.description,
+        amount: ex.amount,
+        category: ex.category.publicId,
+        transactionDate: new Date(ex.transactionDate),
+        evidence: ex.evidence?.fileName,
+      });
+    }
   }
 
   onFileSelect(event: any) {
@@ -128,6 +140,38 @@ export class CashForm implements OnInit {
     this.form.markAllAsTouched();
     if (this.form.invalid) return;
 
+    // const raw = this.form.getRawValue();
+    // const formData = new FormData();
+    //
+    // // Mapear campos al FormData
+    // formData.append('type', raw.type);
+    // formData.append('amount', raw.amount.toString());
+    // formData.append('title', raw.title);
+    // formData.append('description', raw.description);
+    // formData.append('sourceType', 'expense');
+    // formData.append('category', raw.category);
+    // formData.append('transactionDate', raw.transactionDate.toISOString());
+    //
+    // // Adjuntar el archivo físico si existe
+    // if (this.selectedFile) {
+    //   formData.append('evidence', this.selectedFile);
+    // }
+
+    const ex = this.existing();
+    const formData = ex ? this.updatePayload() : this.createPayload();
+    // IMPORTANTE: Tu API debe recibir 'formData' en lugar del objeto plano
+    const success = ex
+      ? await this.store.TransactionUpdate(ex.publicId, formData)
+      : await this.store.TransactionCreate(formData);
+    if (success) {
+      this.ref.close();
+    }
+  }
+  doCancel() {
+    this.ref.close();
+  }
+
+  private createPayload() {
     const raw = this.form.getRawValue();
     const formData = new FormData();
 
@@ -145,10 +189,49 @@ export class CashForm implements OnInit {
       formData.append('evidence', this.selectedFile);
     }
 
-    // IMPORTANTE: Tu API debe recibir 'formData' en lugar del objeto plano
-    const success = await this.store.TransactionCreate(formData);
-    if (success) {
-      this.ref.close();
+    return formData;
+  }
+  private updatePayload(): FormData {
+    const raw = this.form.getRawValue();
+    const formData = new FormData();
+    const ex = this.existing();
+
+    if (!ex) return formData;
+
+    // 1. Mapeo de comparaciones simples (valor directo)
+    const simpleFields: (keyof typeof raw & keyof TransactionModel)[] = [
+      'type',
+      'amount',
+      'title',
+      'description',
+    ];
+
+    simpleFields.forEach((field) => {
+      if (raw[field] !== undefined && (ex[field] as any) !== raw[field]) {
+        formData.append(field, raw[field].toString());
+      }
+    });
+
+    // 2. Lógica para la categoría (propiedad anidada)
+    if (raw.category && ex.category?.publicId !== raw.category) {
+      formData.append('category', raw.category);
     }
+
+    // 3. Lógica para la fecha (comparación de tiempo)
+    if (raw.transactionDate) {
+      const exDate = new Date(ex.transactionDate).getTime();
+      const rawDate = new Date(raw.transactionDate).getTime();
+
+      if (exDate !== rawDate) {
+        formData.append('transactionDate', raw.transactionDate.toISOString());
+      }
+    }
+
+    // 4. Lógica para el archivo (evidencia)
+    if (this.selectedFile && this.selectedFile.name !== ex.evidence?.fileName) {
+      formData.append('evidence', this.selectedFile);
+    }
+
+    return formData;
   }
 }

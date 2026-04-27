@@ -169,6 +169,35 @@ export function withTransactionsFeature() {
           return false;
         }
       },
+      TransactionUpdate: async (
+        id: string,
+        dto: FormData,
+      ): Promise<boolean> => {
+        const nId = store._contextStore.selectedId();
+        if (!nId) return false;
+
+        patchState(store, setLoading(collection));
+        try {
+          const response = await lastValueFrom(
+            store._transactionService.update(nId, id, dto),
+          );
+          patchState(
+            store,
+            updateEntity({ id, changes: response.data }, config),
+            setLoaded(collection),
+          );
+          const cFilters = store.transactionsFilters();
+          if (cFilters) {
+            store.transactionsKpi(cFilters);
+          }
+
+          return true;
+        } catch (err) {
+          patchState(store, setError(err, collection));
+          return false;
+        }
+      },
+
       TransactionRemove: async (id: string) => {
         const nId = store._contextStore.selectedId();
         if (!nId) return false;

@@ -1,4 +1,7 @@
-import { TransactionTypeEnum } from '@nex-house/enums';
+import {
+  TransactionCategoriesEnum,
+  TransactionTypeEnum,
+} from '@nex-house/enums';
 
 export const INITIAL_CATEGORIES = [
   {
@@ -32,9 +35,15 @@ export const INITIAL_CATEGORIES = [
     allowedType: TransactionTypeEnum.BOTH,
   },
   {
-    name: 'Otros',
+    name: TransactionCategoriesEnum.OTHER,
     icon: 'others',
     color: '#64748b',
+    allowedType: TransactionTypeEnum.BOTH,
+  },
+  {
+    name: TransactionCategoriesEnum.CANCELLATION,
+    icon: 'cancellation',
+    color: '#0891b2',
     allowedType: TransactionTypeEnum.BOTH,
   },
 ];

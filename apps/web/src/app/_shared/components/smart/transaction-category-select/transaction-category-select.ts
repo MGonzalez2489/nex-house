@@ -14,7 +14,10 @@ import {
   NG_VALUE_ACCESSOR,
 } from '@angular/forms';
 import { CatalogsStore } from '@features/finance/stores';
-import { TransactionTypeEnum } from '@nex-house/enums';
+import {
+  TransactionCategoriesEnum,
+  TransactionTypeEnum,
+} from '@nex-house/enums';
 import { SelectModule } from 'primeng/select';
 
 @Component({
@@ -38,17 +41,24 @@ export class TransactionCategorySelect implements ControlValueAccessor {
   filter = input<boolean>(false);
   allowedType = input.required<TransactionTypeEnum>();
   variant = input<'filled' | 'outlined'>('filled');
+  showAnulationCat = input<boolean>(false);
 
   filteredCategories = computed(() => {
     const all = this.store.transactionCategoriesEntities();
     const allowed = this.allowedType();
     if (!all || !allowed) return [];
 
-    const filtered = all.filter(
+    let filtered = all.filter(
       (c) =>
         c.allowedType === this.allowedType().toString() ||
         c.allowedType === TransactionTypeEnum.BOTH.toString(),
     );
+
+    if (!this.showAnulationCat()) {
+      filtered = filtered.filter(
+        (f) => f.name !== TransactionCategoriesEnum.CANCELLATION,
+      );
+    }
 
     return [...filtered].sort((a, b) => {
       const nameA = a.name.toLowerCase();

@@ -70,13 +70,20 @@ export class TransactionsController {
   }
 
   @Patch(':publicId')
-  update(
+  @UseInterceptors(FileInterceptor('evidence'))
+  async update(
     @Param('publicId', ParseUUIDPipe) id: string,
     @Body() dto: UpdateTransactionDto,
     @CurrentUser() user: User,
     @UploadedFile() file?: IUploadedFile,
   ) {
-    return this.transactionService.update(id, dto, user, file);
+    const response = await this.transactionService.update(id, dto, user, file);
+
+    if (!response) {
+      throw new InternalServerErrorException('Update result not valid');
+    }
+
+    return TransactionToModel(response);
   }
 
   @Delete(':publicId')

@@ -14,7 +14,10 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src/**/*.ts"],
+  "include": [
+    "src/**/*.ts",
+    "../../libs/shared/enums/src/lib/transaction-categories.enum.ts"
+  ],
   "exclude": [
     "jest.config.ts",
     "jest.config.cts",
