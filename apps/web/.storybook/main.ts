@@ -2,12 +2,28 @@ import type { StorybookConfig } from '@storybook/angular';
 
 const config: StorybookConfig = {
   stories: ['../src/app/**/*.@(mdx|stories.@(js|jsx|ts|tsx))'],
-  addons: ['@storybook/addon-essentials', '@storybook/addon-interactions'],
+  addons: [
+    '@storybook/addon-essentials',
+    '@storybook/addon-interactions',
+    '@storybook/addon-docs',
+  ],
   framework: {
     name: '@storybook/angular',
     options: {},
   },
-  staticDirs: ['../src/styles.css'],
+
+  docs: {
+    defaultName: 'autodocs',
+  },
+  core: {
+    builder: {
+      name: '@storybook/builder-webpack5',
+      options: {
+        fsCache: true,
+        lazyCompilation: true,
+      },
+    },
+  },
 };
 
 export default config;

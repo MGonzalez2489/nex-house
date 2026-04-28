@@ -14,7 +14,6 @@ import {
   CashForm,
   CashMovementList,
   CashSummary,
-  CashTransactionInit,
 } from '@features/finance/components';
 import { CashTransactionsTable } from '@features/finance/components/cash-transactions-table/cash-transactions-table';
 import { TransactionView } from '@features/finance/components/transaction-view/transaction-view';
@@ -36,7 +35,7 @@ import { OverlayBadgeModule } from 'primeng/overlaybadge';
     ButtonModule,
     CashSummary,
     CashMovementList,
-    CashTransactionInit,
+    // CashTransactionInit,
     CashFiltersChips,
     OverlayBadgeModule,
     CashTransactionsTable,

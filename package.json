@@ -6,7 +6,9 @@
     "prepare": "husky",
     "lint": "eslint . --ext .ts,.html",
     "lint:fix": "eslint . --ext .ts,.html --fix",
-    "doc:db": "npx ts-node -r tsconfig-paths/register -P apps/api/tsconfig.app.json tools/scripts/generate-erd.ts"
+    "doc:db": "npx ts-node -r tsconfig-paths/register -P apps/api/tsconfig.app.json tools/scripts/generate-erd.ts",
+    "docs:json": "compodoc -p apps/web/tsconfig.json -e json -d apps/web",
+    "storybook": "npm run docs:json && nx storybook apps/web"
   },
   "private": true,
   "devDependencies": {
@@ -19,6 +21,7 @@
     "@angular/language-service": "~21.2.10",
     "@commitlint/cli": "^20.5.2",
     "@commitlint/config-conventional": "^20.5.0",
+    "@compodoc/compodoc": "^1.2.1",
     "@eslint/js": "^10.0.1",
     "@nestjs/schematics": "^11.1.0",
     "@nestjs/testing": "^11.1.19",
@@ -34,6 +37,8 @@
     "@nx/webpack": "22.7.0",
     "@nx/workspace": "22.7.0",
     "@schematics/angular": "~21.2.8",
+    "@storybook/addon-docs": "^10.3.5",
+    "@storybook/addon-styling-webpack": "^3.0.2",
     "@storybook/angular": "10.3.5",
     "@swc-node/register": "~1.11.1",
     "@swc/core": "~1.15.32",
@@ -68,6 +73,7 @@
   },
   "dependencies": {
     "@angular-architects/ngrx-toolkit": "^21.0.1",
+    "@angular/animations": "^21.2.10",
     "@angular/common": "~21.2.10",
     "@angular/compiler": "~21.2.10",
     "@angular/core": "~21.2.10",
@@ -89,6 +95,7 @@
     "@ngrx/operators": "^21.1.0",
     "@ngrx/signals": "^21.1.0",
     "@primeuix/themes": "^2.0.3",
+    "@storybook-addons/docs": "^2.0.1",
     "axios": "^1.15.2",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",

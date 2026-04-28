@@ -5,6 +5,7 @@ const meta: Meta<FormOptions> = {
   title: 'Components/FormOptions',
   component: FormOptions,
   tags: ['autodocs'],
+
   argTypes: {
     submitSeverity: {
       control: 'select',

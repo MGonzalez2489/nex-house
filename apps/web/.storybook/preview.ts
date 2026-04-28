@@ -1,20 +1,27 @@
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { provideRouter } from '@angular/router';
 import { applicationConfig, type Preview } from '@storybook/angular';
-// import Aura from '@primeng/themes/aura';
 import { NxPreset } from '../src/app/theme/preset';
 
 import { providePrimeNG } from 'primeng/config';
 
-// En Tailwind 4, solo importamos el punto de entrada principal
+import { setCompodocJson } from '@storybook/addon-docs/angular';
+
+import docJson from './../documentation.json';
+
+setCompodocJson(docJson);
+
+import '!style-loader!css-loader!postcss-loader!../src/styles.css';
 
 const preview: Preview = {
   decorators: [
     applicationConfig({
       providers: [
-        // provideAnimationsAsync(),
+        provideRouter([]),
+        provideAnimationsAsync(),
         providePrimeNG({
           theme: {
             preset: NxPreset,
-
             options: {
               darkModeSelector: 'none',
               cssLayer: {
