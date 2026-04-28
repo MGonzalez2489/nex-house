@@ -11,7 +11,7 @@ const config: StorybookConfig = {
     name: '@storybook/angular',
     options: {},
   },
-
+  staticDirs: ['../src/assets/images'],
   docs: {
     defaultName: 'autodocs',
   },

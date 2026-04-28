@@ -99,7 +99,19 @@
         "port": 4400,
         "configDir": "apps/web/.storybook",
         "browserTarget": "web:build-storybook",
-        "compodoc": false
+        "compodoc": false,
+        "assets": [
+          {
+            "glob": "favicon.ico",
+            "input": "apps/web/src",
+            "output": "/"
+          },
+          {
+            "glob": "**/*",
+            "input": "apps/web/src/assets",
+            "output": "/assets"
+          }
+        ]
       },
       "configurations": {
         "ci": {

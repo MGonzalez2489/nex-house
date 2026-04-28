@@ -13631,21 +13631,21 @@
         "name": "config",
         "ctype": "miscellaneous",
         "subtype": "variable",
-        "file": "apps/web/src/app/features/users/users.store.ts",
-        "deprecated": false,
-        "deprecationMessage": "",
-        "type": "unknown",
-        "defaultValue": "entityConfig({\n  entity: type<UserModel>(),\n  selectId: (user: UserModel) => user.publicId,\n})"
-      },
-      {
-        "name": "config",
-        "ctype": "miscellaneous",
-        "subtype": "variable",
         "file": "apps/web/src/app/features/neighborhoods/neighborhoods.store.ts",
         "deprecated": false,
         "deprecationMessage": "",
         "type": "unknown",
         "defaultValue": "entityConfig({\n  entity: type<NeighborhoodModel>(),\n  selectId: (neigh: NeighborhoodModel) => neigh.publicId,\n})"
+      },
+      {
+        "name": "config",
+        "ctype": "miscellaneous",
+        "subtype": "variable",
+        "file": "apps/web/src/app/features/users/users.store.ts",
+        "deprecated": false,
+        "deprecationMessage": "",
+        "type": "unknown",
+        "defaultValue": "entityConfig({\n  entity: type<UserModel>(),\n  selectId: (user: UserModel) => user.publicId,\n})"
       },
       {
         "name": "config",
@@ -13718,6 +13718,16 @@
         "deprecationMessage": "",
         "type": "Routes",
         "defaultValue": "[\n  {\n    path: '',\n    loadComponent: () =>\n      \"import('./dashboard-container').then((c) => c.DashboardContainer)\",\n  },\n  {\n    path: '**',\n    redirectTo: '',\n  },\n]"
+      },
+      {
+        "name": "Default",
+        "ctype": "miscellaneous",
+        "subtype": "variable",
+        "file": "apps/web/src/app/features/auth/auth-container.stories.ts",
+        "deprecated": false,
+        "deprecationMessage": "",
+        "type": "Story",
+        "defaultValue": "{}"
       },
       {
         "name": "Default",
@@ -13853,20 +13863,20 @@
         "name": "initialState",
         "ctype": "miscellaneous",
         "subtype": "variable",
-        "file": "apps/web/src/app/features/users/users.store.ts",
+        "file": "apps/web/src/app/features/neighborhoods/neighborhoods.store.ts",
         "deprecated": false,
         "deprecationMessage": "",
-        "type": "UsersState",
+        "type": "Neighborhoodstate",
         "defaultValue": "{\n  pagination: undefined,\n}"
       },
       {
         "name": "initialState",
         "ctype": "miscellaneous",
         "subtype": "variable",
-        "file": "apps/web/src/app/features/neighborhoods/neighborhoods.store.ts",
+        "file": "apps/web/src/app/features/users/users.store.ts",
         "deprecated": false,
         "deprecationMessage": "",
-        "type": "Neighborhoodstate",
+        "type": "UsersState",
         "defaultValue": "{\n  pagination: undefined,\n}"
       },
       {
@@ -13918,6 +13928,16 @@
         "deprecationMessage": "",
         "type": "Story",
         "defaultValue": "{\n  decorators: [\n    moduleMetadata({\n      providers: [createAuthStoreMock({ callState: 'LOADING', loading: true })],\n    }),\n  ],\n}"
+      },
+      {
+        "name": "meta",
+        "ctype": "miscellaneous",
+        "subtype": "variable",
+        "file": "apps/web/src/app/features/auth/auth-container.stories.ts",
+        "deprecated": false,
+        "deprecationMessage": "",
+        "type": "Meta<AuthContainer>",
+        "defaultValue": "{\n  title: 'Auth/Container',\n  component: AuthContainer,\n  decorators: [\n    moduleMetadata({\n      imports: [RouterTestingModule],\n    }),\n  ],\n  tags: ['autodocs'],\n}"
       },
       {
         "name": "meta",
@@ -14240,6 +14260,17 @@
         "deprecationMessage": "",
         "description": "",
         "kind": 188
+      },
+      {
+        "name": "Story",
+        "ctype": "miscellaneous",
+        "subtype": "typealias",
+        "rawtype": "StoryObj<AuthContainer>",
+        "file": "apps/web/src/app/features/auth/auth-container.stories.ts",
+        "deprecated": false,
+        "deprecationMessage": "",
+        "description": "",
+        "kind": 184
       },
       {
         "name": "Story",
@@ -14653,38 +14684,6 @@
           "defaultValue": "signalStore(\n  { providedIn: 'root' },\n  withDevtools('units'),\n  withReset(),\n  withEntities(config),\n  withCallState(),\n  withProps(() => ({\n    _contextStore: inject(ContextStore),\n    _unitsService: inject(UnitsService),\n  })),\n  withState(initialState),\n  withMethods((store) => ({\n    loadAll: rxMethod<Search>(\n      pipe(\n        tap(() => patchState(store, setLoading())),\n        switchMap((params) => {\n          const nId = store._contextStore.selectedId();\n          if (!nId) return [];\n\n          return store._unitsService.getAll(nId, params).pipe(\n            tapResponse({\n              next: (response) =>\n                patchState(\n                  store,\n                  setAllEntities(response.data, config),\n                  {\n                    pagination: response.meta,\n                  },\n                  setLoaded(),\n                ),\n              error: (err: Error) => patchState(store, setError(err)),\n            }),\n          );\n        }),\n      ),\n    ),\n    searchSuggestions: async (hint: string) => {\n      const nId = store._contextStore.selectedId();\n      if (!nId) return [patchState(store, { suggestions: [] })];\n\n      try {\n        patchState(store, setLoading());\n        const response = await lastValueFrom(\n          store._unitsService.getAll(nId, {\n            globalFilter: hint,\n            first: 0,\n            rows: 10,\n          }),\n        );\n        patchState(store, { suggestions: response.data }, setLoaded());\n        return true;\n      } catch (err) {\n        patchState(store, { suggestions: [] });\n        return false;\n      }\n    },\n    // searchSuggestions: rxMethod<string>(\n    //   pipe(\n    //     debounceTime(300),\n    //     distinctUntilChanged(),\n    //     switchMap((query) => {\n    //       const nId = store._contextStore.selectedId();\n    //       if (!nId || query.length < 2)\n    //         return [patchState(store, { suggestions: [] })];\n    //\n    //       // Usamos el mismo service, pero con params de búsqueda mínima\n    //       return store._unitsService\n    //         .getAll(nId, { globalFilter: query, first: 0, rows: 10 })\n    //         .pipe(\n    //           tapResponse({\n    //             next: (response) =>\n    //               patchState(store, { suggestions: response.data }),\n    //             error: () => patchState(store, { suggestions: [] }),\n    //           }),\n    //         );\n    //     }),\n    //   ),\n    // ),\n    create: async (dto: ICreateHousingUnit): Promise<boolean> => {\n      const nId = store._contextStore.selectedId();\n      if (!nId) return false;\n\n      patchState(store, setLoading());\n      try {\n        const response = await lastValueFrom(\n          store._unitsService.create(nId, dto),\n        );\n        patchState(store, addEntity(response.data, config), setLoaded());\n\n        return true;\n      } catch (err) {\n        patchState(store, setError(err));\n        return false;\n      }\n    },\n    bulkCreate: async (dto: IBulkCreateHousingUnit): Promise<boolean> => {\n      const nId = store._contextStore.selectedId();\n      if (!nId) return false;\n\n      patchState(store, setLoading());\n      try {\n        const response = await lastValueFrom(\n          store._unitsService.bulkCreate(nId, dto),\n        );\n        patchState(store, addEntities(response.data, config), setLoaded());\n\n        return true;\n      } catch (err) {\n        patchState(store, setError(err));\n        return false;\n      }\n    },\n  })),\n)"
         }
       ],
-      "apps/web/src/app/features/users/users.store.ts": [
-        {
-          "name": "config",
-          "ctype": "miscellaneous",
-          "subtype": "variable",
-          "file": "apps/web/src/app/features/users/users.store.ts",
-          "deprecated": false,
-          "deprecationMessage": "",
-          "type": "unknown",
-          "defaultValue": "entityConfig({\n  entity: type<UserModel>(),\n  selectId: (user: UserModel) => user.publicId,\n})"
-        },
-        {
-          "name": "initialState",
-          "ctype": "miscellaneous",
-          "subtype": "variable",
-          "file": "apps/web/src/app/features/users/users.store.ts",
-          "deprecated": false,
-          "deprecationMessage": "",
-          "type": "UsersState",
-          "defaultValue": "{\n  pagination: undefined,\n}"
-        },
-        {
-          "name": "UsersStore",
-          "ctype": "miscellaneous",
-          "subtype": "variable",
-          "file": "apps/web/src/app/features/users/users.store.ts",
-          "deprecated": false,
-          "deprecationMessage": "",
-          "type": "unknown",
-          "defaultValue": "signalStore(\n  { providedIn: 'root' },\n  withDevtools('users'),\n  withReset(),\n  withEntities(config),\n  withCallState(),\n  withProps(() => ({\n    _userService: inject(UsersService),\n    _contextStore: inject(ContextStore),\n  })),\n  withState(initialState),\n  withMethods((store) => ({\n    loadAll: rxMethod<SearchUser>(\n      pipe(\n        tap(() => patchState(store, setLoading())),\n        switchMap((params) => {\n          const nId = store._contextStore.selectedId();\n          if (!nId) return [];\n\n          return store._userService.getAll(nId, params).pipe(\n            tapResponse({\n              next: (response) =>\n                patchState(\n                  store,\n                  setAllEntities(response.data, config),\n                  {\n                    pagination: response.meta,\n                  },\n                  setLoaded(),\n                ),\n              error: (err: Error) => patchState(store, setError(err)),\n            }),\n          );\n        }),\n      ),\n    ),\n    findById: async (id: string) => {\n      const nId = store._contextStore.selectedId();\n      if (!nId) return null;\n\n      const existingUser = store.entities().find((f) => f.publicId === id);\n      if (existingUser) {\n        return existingUser;\n      }\n\n      try {\n        patchState(store, setLoading());\n        const response = await lastValueFrom(\n          store._userService.getById(nId, id),\n        );\n        patchState(store, setLoaded());\n        return response.data;\n      } catch (err) {\n        patchState(store, setError(err));\n        return null;\n      }\n    },\n\n    create: async (dto: ICreateUser): Promise<boolean> => {\n      const nId = store._contextStore.selectedId();\n      if (!nId) return false;\n\n      patchState(store, setLoading());\n      try {\n        const response = await lastValueFrom(\n          store._userService.create(nId, dto),\n        );\n        patchState(store, addEntity(response.data, config), setLoaded());\n\n        return true;\n      } catch (err) {\n        patchState(store, setError(err));\n        return false;\n      }\n    },\n    update: async (id: string, dto: ICreateUser): Promise<boolean> => {\n      const nId = store._contextStore.selectedId();\n      if (!nId) return false;\n\n      patchState(store, setLoading());\n      try {\n        const response = await lastValueFrom(\n          store._userService.update(nId, id, dto),\n        );\n        patchState(\n          store,\n          updateEntity({ id, changes: response.data }, config),\n          setLoaded(),\n        );\n        return true;\n      } catch (err) {\n        patchState(store, setError(err));\n        return false;\n      }\n    },\n    delete: async (id: string): Promise<boolean> => {\n      const nId = store._contextStore.selectedId();\n      if (!nId) return false;\n\n      patchState(store, setLoading());\n\n      try {\n        await lastValueFrom(store._userService.delete(nId, id));\n        patchState(store, removeEntity(id), setLoaded());\n        return true;\n      } catch (err) {\n        patchState(store, setError(err));\n        return false;\n      }\n    },\n  })),\n\n  withHooks((store) => {\n    const authStore = inject(AuthStore);\n    return {\n      onInit: (): void => {\n        effect(() => {\n          const id = store._contextStore.selectedId();\n          const isAuth = authStore.isAuthenticated();\n\n          if (!isAuth || !id) {\n            store.resetState();\n            return;\n          }\n        });\n      },\n    };\n  }),\n)"
-        }
-      ],
       "apps/web/src/app/features/neighborhoods/neighborhoods.store.ts": [
         {
           "name": "config",
@@ -14715,6 +14714,38 @@
           "deprecationMessage": "",
           "type": "unknown",
           "defaultValue": "signalStore(\n  { providedIn: 'root' },\n  withDevtools('neighborhood'),\n  withReset(),\n  withEntities(config),\n  withCallState(),\n  withProps(() => ({\n    _neighService: inject(NeighborhoodService),\n  })),\n  withState(initialState),\n  withMethods((store) => ({\n    loadAll: rxMethod<Search>(\n      pipe(\n        tap(() => patchState(store, setLoading())),\n        switchMap((dto) =>\n          store._neighService.getAll(dto).pipe(\n            tapResponse({\n              next: (response) =>\n                patchState(\n                  store,\n                  setAllEntities(response.data, config),\n                  {\n                    pagination: response.meta,\n                  },\n                  setLoaded(),\n                ),\n              error: (err: any) =>\n                patchState(store, {\n                  callState: {\n                    error: err.error?.message || 'Load buildings failed',\n                  },\n                }),\n            }),\n          ),\n        ),\n      ),\n    ),\n    create: async (dto: ICreateNeighborhood): Promise<boolean> => {\n      patchState(store, setLoading());\n\n      try {\n        const res = await lastValueFrom(store._neighService.create(dto));\n\n        patchState(store, addEntity(res.data, config), setLoaded());\n\n        return true;\n      } catch (error) {\n        patchState(store, setError(error));\n        return false;\n      }\n    },\n    update: async (id: string, dto: ICreateNeighborhood): Promise<boolean> => {\n      patchState(store, setLoading());\n\n      try {\n        const res = await lastValueFrom(store._neighService.update(id, dto));\n\n        patchState(\n          store,\n          updateEntity({ id, changes: res.data }, config),\n          setLoaded(),\n        );\n\n        return true;\n      } catch (error) {\n        patchState(store, setError(error));\n        return false;\n      }\n    },\n  })),\n  withHooks((store) => {\n    const authStore = inject(AuthStore);\n    return {\n      onInit: (): void => {\n        effect(() => {\n          const isLoggedIn = authStore.isAuthenticated();\n          if (!isLoggedIn) {\n            store.resetState();\n          }\n        });\n      },\n    };\n  }),\n)"
+        }
+      ],
+      "apps/web/src/app/features/users/users.store.ts": [
+        {
+          "name": "config",
+          "ctype": "miscellaneous",
+          "subtype": "variable",
+          "file": "apps/web/src/app/features/users/users.store.ts",
+          "deprecated": false,
+          "deprecationMessage": "",
+          "type": "unknown",
+          "defaultValue": "entityConfig({\n  entity: type<UserModel>(),\n  selectId: (user: UserModel) => user.publicId,\n})"
+        },
+        {
+          "name": "initialState",
+          "ctype": "miscellaneous",
+          "subtype": "variable",
+          "file": "apps/web/src/app/features/users/users.store.ts",
+          "deprecated": false,
+          "deprecationMessage": "",
+          "type": "UsersState",
+          "defaultValue": "{\n  pagination: undefined,\n}"
+        },
+        {
+          "name": "UsersStore",
+          "ctype": "miscellaneous",
+          "subtype": "variable",
+          "file": "apps/web/src/app/features/users/users.store.ts",
+          "deprecated": false,
+          "deprecationMessage": "",
+          "type": "unknown",
+          "defaultValue": "signalStore(\n  { providedIn: 'root' },\n  withDevtools('users'),\n  withReset(),\n  withEntities(config),\n  withCallState(),\n  withProps(() => ({\n    _userService: inject(UsersService),\n    _contextStore: inject(ContextStore),\n  })),\n  withState(initialState),\n  withMethods((store) => ({\n    loadAll: rxMethod<SearchUser>(\n      pipe(\n        tap(() => patchState(store, setLoading())),\n        switchMap((params) => {\n          const nId = store._contextStore.selectedId();\n          if (!nId) return [];\n\n          return store._userService.getAll(nId, params).pipe(\n            tapResponse({\n              next: (response) =>\n                patchState(\n                  store,\n                  setAllEntities(response.data, config),\n                  {\n                    pagination: response.meta,\n                  },\n                  setLoaded(),\n                ),\n              error: (err: Error) => patchState(store, setError(err)),\n            }),\n          );\n        }),\n      ),\n    ),\n    findById: async (id: string) => {\n      const nId = store._contextStore.selectedId();\n      if (!nId) return null;\n\n      const existingUser = store.entities().find((f) => f.publicId === id);\n      if (existingUser) {\n        return existingUser;\n      }\n\n      try {\n        patchState(store, setLoading());\n        const response = await lastValueFrom(\n          store._userService.getById(nId, id),\n        );\n        patchState(store, setLoaded());\n        return response.data;\n      } catch (err) {\n        patchState(store, setError(err));\n        return null;\n      }\n    },\n\n    create: async (dto: ICreateUser): Promise<boolean> => {\n      const nId = store._contextStore.selectedId();\n      if (!nId) return false;\n\n      patchState(store, setLoading());\n      try {\n        const response = await lastValueFrom(\n          store._userService.create(nId, dto),\n        );\n        patchState(store, addEntity(response.data, config), setLoaded());\n\n        return true;\n      } catch (err) {\n        patchState(store, setError(err));\n        return false;\n      }\n    },\n    update: async (id: string, dto: ICreateUser): Promise<boolean> => {\n      const nId = store._contextStore.selectedId();\n      if (!nId) return false;\n\n      patchState(store, setLoading());\n      try {\n        const response = await lastValueFrom(\n          store._userService.update(nId, id, dto),\n        );\n        patchState(\n          store,\n          updateEntity({ id, changes: response.data }, config),\n          setLoaded(),\n        );\n        return true;\n      } catch (err) {\n        patchState(store, setError(err));\n        return false;\n      }\n    },\n    delete: async (id: string): Promise<boolean> => {\n      const nId = store._contextStore.selectedId();\n      if (!nId) return false;\n\n      patchState(store, setLoading());\n\n      try {\n        await lastValueFrom(store._userService.delete(nId, id));\n        patchState(store, removeEntity(id), setLoaded());\n        return true;\n      } catch (err) {\n        patchState(store, setError(err));\n        return false;\n      }\n    },\n  })),\n\n  withHooks((store) => {\n    const authStore = inject(AuthStore);\n    return {\n      onInit: (): void => {\n        effect(() => {\n          const id = store._contextStore.selectedId();\n          const isAuth = authStore.isAuthenticated();\n\n          if (!isAuth || !id) {\n            store.resetState();\n            return;\n          }\n        });\n      },\n    };\n  }),\n)"
         }
       ],
       "apps/web/src/app/features/finance/stores/_charge.store.ts": [
@@ -14899,6 +14930,28 @@
           "deprecationMessage": "",
           "type": "Routes",
           "defaultValue": "[\n  {\n    path: '',\n    loadComponent: () =>\n      \"import('./dashboard-container').then((c) => c.DashboardContainer)\",\n  },\n  {\n    path: '**',\n    redirectTo: '',\n  },\n]"
+        }
+      ],
+      "apps/web/src/app/features/auth/auth-container.stories.ts": [
+        {
+          "name": "Default",
+          "ctype": "miscellaneous",
+          "subtype": "variable",
+          "file": "apps/web/src/app/features/auth/auth-container.stories.ts",
+          "deprecated": false,
+          "deprecationMessage": "",
+          "type": "Story",
+          "defaultValue": "{}"
+        },
+        {
+          "name": "meta",
+          "ctype": "miscellaneous",
+          "subtype": "variable",
+          "file": "apps/web/src/app/features/auth/auth-container.stories.ts",
+          "deprecated": false,
+          "deprecationMessage": "",
+          "type": "Meta<AuthContainer>",
+          "defaultValue": "{\n  title: 'Auth/Container',\n  component: AuthContainer,\n  decorators: [\n    moduleMetadata({\n      imports: [RouterTestingModule],\n    }),\n  ],\n  tags: ['autodocs'],\n}"
         }
       ],
       "apps/web/src/environments/environment.prod.ts": [
@@ -15437,6 +15490,19 @@
           "deprecationMessage": "",
           "description": "",
           "kind": 188
+        }
+      ],
+      "apps/web/src/app/features/auth/auth-container.stories.ts": [
+        {
+          "name": "Story",
+          "ctype": "miscellaneous",
+          "subtype": "typealias",
+          "rawtype": "StoryObj<AuthContainer>",
+          "file": "apps/web/src/app/features/auth/auth-container.stories.ts",
+          "deprecated": false,
+          "deprecationMessage": "",
+          "description": "",
+          "kind": 184
         }
       ],
       "apps/web/src/app/_shared/components/ui/form-options/form-options.stories.ts": [
@@ -16046,6 +16112,36 @@
         "name": "App",
         "coveragePercent": 0,
         "coverageCount": "0/2",
+        "status": "low"
+      },
+      {
+        "filePath": "apps/web/src/app/features/auth/auth-container.stories.ts",
+        "type": "variable",
+        "linktype": "miscellaneous",
+        "linksubtype": "variable",
+        "name": "Default",
+        "coveragePercent": 0,
+        "coverageCount": "0/1",
+        "status": "low"
+      },
+      {
+        "filePath": "apps/web/src/app/features/auth/auth-container.stories.ts",
+        "type": "variable",
+        "linktype": "miscellaneous",
+        "linksubtype": "variable",
+        "name": "meta",
+        "coveragePercent": 0,
+        "coverageCount": "0/1",
+        "status": "low"
+      },
+      {
+        "filePath": "apps/web/src/app/features/auth/auth-container.stories.ts",
+        "type": "type alias",
+        "linktype": "miscellaneous",
+        "linksubtype": "typealias",
+        "name": "Story",
+        "coveragePercent": 0,
+        "coverageCount": "0/1",
         "status": "low"
       },
       {
