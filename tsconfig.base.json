@@ -13,7 +13,6 @@
     "lib": ["es2020", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    "baseUrl": ".",
     "strictPropertyInitialization": false,
     "paths": {
       "@nex-house/models": ["libs/shared/models/src/index.ts"],

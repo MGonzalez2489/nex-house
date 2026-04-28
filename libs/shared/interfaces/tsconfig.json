@@ -5,6 +5,7 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "importHelpers": true,
+    "moduleResolution": "bundler",
     "noImplicitOverride": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,

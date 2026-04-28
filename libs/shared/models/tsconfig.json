@@ -6,6 +6,7 @@
     "strict": true,
     "importHelpers": true,
     "noImplicitOverride": true,
+    "moduleResolution": "bundler",
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noPropertyAccessFromIndexSignature": true

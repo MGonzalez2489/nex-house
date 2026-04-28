@@ -57,14 +57,18 @@ export class CashControl implements OnInit {
   protected readonly catalogsStore = inject(CatalogsStore);
 
   protected readonly existsRecords = computed(() => {
+    const loading = this.store.transactionsLoading();
+
+    if (loading) return false;
+
     const pg = this.store.transactionsPagination();
-    // const count = this.store.transactionsEntities().length;
+    const count = this.store.transactionsEntities().length;
 
-    if (!pg) return false;
-    if (pg.total === 0) return false;
-    // if (count === 0) return false;
+    if (count > 0) return true;
 
-    return true;
+    if (pg && pg.total > 0) return true;
+
+    return false;
   });
 
   protected readonly filterCount = computed(() => {

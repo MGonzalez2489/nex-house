@@ -59,6 +59,8 @@ export class Table<T> {
   actionsTemplate = contentChild<TemplateRef<any>>('actions');
   captionTemplate = contentChild<TemplateRef<any>>('caption');
 
+  loadingTemplate = contentChild<TemplateRef<any>>('loading');
+
   private table = viewChild.required<PTable>('dt');
   public filterGlobal(value: string, mode = 'contains') {
     this.table().filterGlobal(value, mode);

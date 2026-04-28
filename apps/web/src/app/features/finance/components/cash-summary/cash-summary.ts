@@ -8,10 +8,11 @@ import {
 import { TransactionKpiModel } from '@nex-house/models';
 import { Card } from 'primeng/card';
 import { ProgressBarModule } from 'primeng/progressbar';
+import { SkeletonModule } from 'primeng/skeleton';
 
 @Component({
   selector: 'app-cash-summary',
-  imports: [Card, CurrencyPipe, ProgressBarModule],
+  imports: [Card, CurrencyPipe, ProgressBarModule, SkeletonModule],
   templateUrl: './cash-summary.html',
   styleUrl: './cash-summary.css',
   standalone: true,
@@ -19,6 +20,7 @@ import { ProgressBarModule } from 'primeng/progressbar';
 })
 export class CashSummary {
   summary = input<TransactionKpiModel>();
+  isLoading = input.required<boolean>();
 
   protected readonly incomePercentage = computed(() => {
     const cSummary = this.summary();

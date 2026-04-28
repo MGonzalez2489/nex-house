@@ -12,7 +12,7 @@
   ],
   "compilerOptions": {
     "esModuleInterop": true,
-    "baseUrl": ".",
+    "useUnknownInCatchVariables": false,
     "paths": {
       "@nex-house/models": ["../../libs/shared/models/src/index.ts"],
       "@nex-house/interfaces": ["../../libs/shared/interfaces/src/index.ts"],
