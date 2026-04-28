@@ -47,3 +47,7 @@ __screenshots__/
 .env
 
 uploads
+
+.claude/worktrees
+.nx/polygraph
+.nx/self-healing
