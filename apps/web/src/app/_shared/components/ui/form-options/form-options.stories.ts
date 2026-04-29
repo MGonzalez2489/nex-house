@@ -2,7 +2,8 @@ import type { Meta, StoryObj } from '@storybook/angular';
 import { FormOptions } from './form-options';
 
 const meta: Meta<FormOptions> = {
-  title: 'Components/FormOptions',
+  // title: 'Components/FormOptions',
+  title: 'Shared/UI/FormOptions',
   component: FormOptions,
   tags: ['autodocs'],
 
