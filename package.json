@@ -38,6 +38,7 @@
     "@nx/workspace": "22.7.0",
     "@schematics/angular": "~21.2.8",
     "@storybook/addon-docs": "^10.3.5",
+    "@storybook/addon-interactions": "^8.6.14",
     "@storybook/addon-styling-webpack": "^3.0.2",
     "@storybook/angular": "10.3.5",
     "@swc-node/register": "~1.11.1",

@@ -3,7 +3,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { AuthContainer } from './auth-container';
 
 const meta: Meta<AuthContainer> = {
-  title: 'Auth/Container',
+  title: 'Features/Auth/Container',
   component: AuthContainer,
   decorators: [
     moduleMetadata({

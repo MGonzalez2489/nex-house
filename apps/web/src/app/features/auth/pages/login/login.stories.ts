@@ -30,7 +30,7 @@ const createAuthStoreMock = (overrides: any = {}) => {
 };
 
 const meta: Meta<Login> = {
-  title: 'Features/Auth/Login',
+  title: 'Features/Auth/pages/Login',
   component: Login,
   decorators: [
     moduleMetadata({

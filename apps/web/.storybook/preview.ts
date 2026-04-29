@@ -35,12 +35,61 @@ const preview: Preview = {
     }),
   ],
   parameters: {
-    layout: 'centered',
+    layout: 'fullscreen',
+    // layout: 'centered',
     controls: {
       matchers: {
         color: /(background|color)$/i,
         date: /Date$/i,
       },
+    },
+    viewport: {
+      viewports: {
+        xs: {
+          name: 'Tailwind xs (default)',
+          styles: {
+            width: '375px',
+            height: '667px',
+          },
+        },
+        sm: {
+          name: 'Tailwind sm',
+          styles: {
+            width: '640px',
+            height: '800px',
+          },
+        },
+        md: {
+          name: 'Tailwind md',
+          styles: {
+            width: '768px',
+            height: '1024px',
+          },
+        },
+        lg: {
+          name: 'Tailwind lg',
+          styles: {
+            width: '1024px',
+            height: '768px',
+          },
+        },
+        xl: {
+          name: 'Tailwind xl',
+          styles: {
+            width: '1280px',
+            height: '800px',
+          },
+        },
+        '2xl': {
+          name: 'Tailwind 2xl',
+          styles: {
+            width: '1536px',
+            height: '1000px',
+          },
+        },
+      },
+      // Puedes definir un viewport por defecto si lo deseas
+      defaultViewport: 'responsive',
     },
   },
 };

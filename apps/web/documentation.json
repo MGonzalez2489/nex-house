@@ -10503,6 +10503,74 @@
       "templateData": "<p-tag\n  [class.text-sm]=\"size() === 'small'\"\n  [class.text-base]=\"size() === 'normal'\"\n  [class.text-lg]=\"size() === 'large'\"\n  [severity]=\"severity()\"\n  [rounded]=\"rounded()\"\n  [value]=\"label()\"\n/>\n"
     },
     {
+      "name": "ShellComponent",
+      "id": "component-ShellComponent-f2f2eb8f7d338b6f90e21fcdf4af87410b3f5a6953ddf4d2fad529aaec02e73f36b3fd4bb7e9d089ea53bc3a05a1c5d63ad69d9c872110c1c7f0df28f5962da5",
+      "file": "apps/web/src/app/features/auth/auth-layout.stories.ts",
+      "encapsulation": [],
+      "entryComponents": [],
+      "inputs": [],
+      "outputs": [],
+      "providers": [],
+      "selector": "app-shell",
+      "styleUrls": [],
+      "styles": [],
+      "template": "<nav     class=\"p-4 bg-slate-800 flex gap-4 border-b border-slate-700 shadow-sm\"\n   >\n     <button\n       routerLink=\"/login\"\n       class=\"px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors\"\n     >\n       Ver Login\n     </button>\n     <button\n       routerLink=\"/password-recovery\"\n       class=\"px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white text-sm font-medium rounded-md transition-colors\"\n     >\n       Ver Recuperación\n     </button>\n   </nav>\n\n   <main class=\"relative\">\n     <router-outlet></router-outlet>\n   </main>",
+      "templateUrl": [],
+      "viewProviders": [],
+      "hostDirectives": [],
+      "inputsClass": [],
+      "outputsClass": [],
+      "propertiesClass": [
+        {
+          "name": "router",
+          "defaultValue": "inject(Router)",
+          "deprecated": false,
+          "deprecationMessage": "",
+          "type": "unknown",
+          "indexKey": "",
+          "optional": false,
+          "description": "",
+          "line": 46,
+          "modifierKind": [123]
+        }
+      ],
+      "methodsClass": [
+        {
+          "name": "ngOnInit",
+          "args": [],
+          "optional": false,
+          "returnType": "any",
+          "typeParameters": [],
+          "line": 48,
+          "deprecated": false,
+          "deprecationMessage": "",
+          "modifierKind": [134]
+        }
+      ],
+      "deprecated": false,
+      "deprecationMessage": "",
+      "hostBindings": [],
+      "hostListeners": [],
+      "standalone": true,
+      "imports": [
+        {
+          "name": "RouterOutlet"
+        },
+        {
+          "name": "RouterLink"
+        }
+      ],
+      "description": "",
+      "rawdescription": "\n",
+      "type": "component",
+      "sourceCode": "import { Component, inject, OnInit } from '@angular/core';\nimport {\n  provideRouter,\n  Router,\n  RouterLink,\n  RouterOutlet,\n} from '@angular/router';\nimport {\n  applicationConfig,\n  Meta,\n  moduleMetadata,\n  StoryObj,\n} from '@storybook/angular';\nimport { AuthContainer } from './auth-container';\nimport { AUTH_ROUTES } from './auth.routes';\nimport { Login } from './pages/login/login';\n\n// Componente auxiliar para evitar que Storybook instancie el container manualmente\n@Component({\n  selector: 'app-shell',\n  standalone: true,\n  imports: [RouterOutlet, RouterLink],\n  // template: `<router-outlet></router-outlet>`,\n  template: ` <nav\n      class=\"p-4 bg-slate-800 flex gap-4 border-b border-slate-700 shadow-sm\"\n    >\n      <button\n        routerLink=\"/login\"\n        class=\"px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors\"\n      >\n        Ver Login\n      </button>\n      <button\n        routerLink=\"/password-recovery\"\n        class=\"px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white text-sm font-medium rounded-md transition-colors\"\n      >\n        Ver Recuperación\n      </button>\n    </nav>\n\n    <main class=\"relative\">\n      <router-outlet></router-outlet>\n    </main>`,\n})\nclass ShellComponent implements OnInit {\n  private router = inject(Router);\n\n  async ngOnInit() {\n    try {\n      await this.router.navigate(['/login']);\n    } catch (err) {\n      console.error('Navegación fallida:', err);\n    }\n  }\n}\n\nconst meta: Meta<ShellComponent> = {\n  title: 'Features/Auth/Full Flow',\n  component: ShellComponent,\n  decorators: [\n    applicationConfig({\n      providers: [provideRouter(AUTH_ROUTES)],\n    }),\n    moduleMetadata({\n      imports: [AuthContainer, Login],\n    }),\n  ],\n};\n\nexport default meta;\ntype Story = StoryObj<ShellComponent>;\n\nexport const InteractiveFlow: Story = {\n  name: 'Flujo Interactivo Completo',\n};\n",
+      "assetsDirs": [],
+      "styleUrlsData": "",
+      "stylesData": "",
+      "extends": [],
+      "implements": ["OnInit"]
+    },
+    {
       "name": "Sidebar",
       "id": "component-Sidebar-83b2acf240c69d67ba25eb3431eaea3f6464b3c8b2c18e6f6ee91b3537e8a5723bba9e31ba6198c20126f3bab774fecb1cb4bcc84126983f8ab36680acc09836",
       "file": "apps/web/src/app/_core/layout/sidebar/sidebar.ts",
@@ -13910,6 +13978,16 @@
         "defaultValue": "{\n  transactionsSummary: undefined,\n  transactionsFilters: undefined,\n  transactionsPagination: undefined,\n}"
       },
       {
+        "name": "InteractiveFlow",
+        "ctype": "miscellaneous",
+        "subtype": "variable",
+        "file": "apps/web/src/app/features/auth/auth-layout.stories.ts",
+        "deprecated": false,
+        "deprecationMessage": "",
+        "type": "Story",
+        "defaultValue": "{\n  name: 'Flujo Interactivo Completo',\n}"
+      },
+      {
         "name": "Loading",
         "ctype": "miscellaneous",
         "subtype": "variable",
@@ -13937,7 +14015,17 @@
         "deprecated": false,
         "deprecationMessage": "",
         "type": "Meta<AuthContainer>",
-        "defaultValue": "{\n  title: 'Auth/Container',\n  component: AuthContainer,\n  decorators: [\n    moduleMetadata({\n      imports: [RouterTestingModule],\n    }),\n  ],\n  tags: ['autodocs'],\n}"
+        "defaultValue": "{\n  title: 'Features/Auth/Container',\n  component: AuthContainer,\n  decorators: [\n    moduleMetadata({\n      imports: [RouterTestingModule],\n    }),\n  ],\n  tags: ['autodocs'],\n}"
+      },
+      {
+        "name": "meta",
+        "ctype": "miscellaneous",
+        "subtype": "variable",
+        "file": "apps/web/src/app/features/auth/auth-layout.stories.ts",
+        "deprecated": false,
+        "deprecationMessage": "",
+        "type": "Meta<ShellComponent>",
+        "defaultValue": "{\n  title: 'Features/Auth/Full Flow',\n  component: ShellComponent,\n  decorators: [\n    applicationConfig({\n      providers: [provideRouter(AUTH_ROUTES)],\n    }),\n    moduleMetadata({\n      imports: [AuthContainer, Login],\n    }),\n  ],\n}"
       },
       {
         "name": "meta",
@@ -13957,7 +14045,7 @@
         "deprecated": false,
         "deprecationMessage": "",
         "type": "Meta<Login>",
-        "defaultValue": "{\n  title: 'Features/Auth/Login',\n  component: Login,\n  decorators: [\n    moduleMetadata({\n      // Importante: Asegúrate de que Login sea standalone o añade sus imports aquí\n      imports: [],\n    }),\n  ],\n  tags: ['autodocs'],\n}"
+        "defaultValue": "{\n  title: 'Features/Auth/pages/Login',\n  component: Login,\n  decorators: [\n    moduleMetadata({\n      // Importante: Asegúrate de que Login sea standalone o añade sus imports aquí\n      imports: [],\n    }),\n  ],\n  tags: ['autodocs'],\n}"
       },
       {
         "name": "NeighborhoodsStore",
@@ -14267,6 +14355,17 @@
         "subtype": "typealias",
         "rawtype": "StoryObj<AuthContainer>",
         "file": "apps/web/src/app/features/auth/auth-container.stories.ts",
+        "deprecated": false,
+        "deprecationMessage": "",
+        "description": "",
+        "kind": 184
+      },
+      {
+        "name": "Story",
+        "ctype": "miscellaneous",
+        "subtype": "typealias",
+        "rawtype": "StoryObj<ShellComponent>",
+        "file": "apps/web/src/app/features/auth/auth-layout.stories.ts",
         "deprecated": false,
         "deprecationMessage": "",
         "description": "",
@@ -14865,7 +14964,7 @@
           "deprecated": false,
           "deprecationMessage": "",
           "type": "Meta<Login>",
-          "defaultValue": "{\n  title: 'Features/Auth/Login',\n  component: Login,\n  decorators: [\n    moduleMetadata({\n      // Importante: Asegúrate de que Login sea standalone o añade sus imports aquí\n      imports: [],\n    }),\n  ],\n  tags: ['autodocs'],\n}"
+          "defaultValue": "{\n  title: 'Features/Auth/pages/Login',\n  component: Login,\n  decorators: [\n    moduleMetadata({\n      // Importante: Asegúrate de que Login sea standalone o añade sus imports aquí\n      imports: [],\n    }),\n  ],\n  tags: ['autodocs'],\n}"
         }
       ],
       "apps/web/src/app/_shared/components/ui/form-options/form-options.stories.ts": [
@@ -14951,7 +15050,7 @@
           "deprecated": false,
           "deprecationMessage": "",
           "type": "Meta<AuthContainer>",
-          "defaultValue": "{\n  title: 'Auth/Container',\n  component: AuthContainer,\n  decorators: [\n    moduleMetadata({\n      imports: [RouterTestingModule],\n    }),\n  ],\n  tags: ['autodocs'],\n}"
+          "defaultValue": "{\n  title: 'Features/Auth/Container',\n  component: AuthContainer,\n  decorators: [\n    moduleMetadata({\n      imports: [RouterTestingModule],\n    }),\n  ],\n  tags: ['autodocs'],\n}"
         }
       ],
       "apps/web/src/environments/environment.prod.ts": [
@@ -15024,6 +15123,28 @@
           "deprecationMessage": "",
           "type": "unknown",
           "defaultValue": "signalStore(\n  { providedIn: 'root' },\n  withDevtools('finance'),\n  // withState(initialState),\n  withReset(),\n  // withCallState(),\n  withFeeScheduleFeature(),\n  withChargeFeature(),\n  withTransactionsFeature(),\n)"
+        }
+      ],
+      "apps/web/src/app/features/auth/auth-layout.stories.ts": [
+        {
+          "name": "InteractiveFlow",
+          "ctype": "miscellaneous",
+          "subtype": "variable",
+          "file": "apps/web/src/app/features/auth/auth-layout.stories.ts",
+          "deprecated": false,
+          "deprecationMessage": "",
+          "type": "Story",
+          "defaultValue": "{\n  name: 'Flujo Interactivo Completo',\n}"
+        },
+        {
+          "name": "meta",
+          "ctype": "miscellaneous",
+          "subtype": "variable",
+          "file": "apps/web/src/app/features/auth/auth-layout.stories.ts",
+          "deprecated": false,
+          "deprecationMessage": "",
+          "type": "Meta<ShellComponent>",
+          "defaultValue": "{\n  title: 'Features/Auth/Full Flow',\n  component: ShellComponent,\n  decorators: [\n    applicationConfig({\n      providers: [provideRouter(AUTH_ROUTES)],\n    }),\n    moduleMetadata({\n      imports: [AuthContainer, Login],\n    }),\n  ],\n}"
         }
       ],
       "apps/web/src/app/theme/preset.ts": [
@@ -15499,6 +15620,19 @@
           "subtype": "typealias",
           "rawtype": "StoryObj<AuthContainer>",
           "file": "apps/web/src/app/features/auth/auth-container.stories.ts",
+          "deprecated": false,
+          "deprecationMessage": "",
+          "description": "",
+          "kind": 184
+        }
+      ],
+      "apps/web/src/app/features/auth/auth-layout.stories.ts": [
+        {
+          "name": "Story",
+          "ctype": "miscellaneous",
+          "subtype": "typealias",
+          "rawtype": "StoryObj<ShellComponent>",
+          "file": "apps/web/src/app/features/auth/auth-layout.stories.ts",
           "deprecated": false,
           "deprecationMessage": "",
           "description": "",
@@ -16149,6 +16283,45 @@
         "type": "component",
         "linktype": "component",
         "name": "AuthContainer",
+        "coveragePercent": 0,
+        "coverageCount": "0/1",
+        "status": "low"
+      },
+      {
+        "filePath": "apps/web/src/app/features/auth/auth-layout.stories.ts",
+        "type": "component",
+        "linktype": "component",
+        "name": "ShellComponent",
+        "coveragePercent": 0,
+        "coverageCount": "0/3",
+        "status": "low"
+      },
+      {
+        "filePath": "apps/web/src/app/features/auth/auth-layout.stories.ts",
+        "type": "variable",
+        "linktype": "miscellaneous",
+        "linksubtype": "variable",
+        "name": "InteractiveFlow",
+        "coveragePercent": 0,
+        "coverageCount": "0/1",
+        "status": "low"
+      },
+      {
+        "filePath": "apps/web/src/app/features/auth/auth-layout.stories.ts",
+        "type": "variable",
+        "linktype": "miscellaneous",
+        "linksubtype": "variable",
+        "name": "meta",
+        "coveragePercent": 0,
+        "coverageCount": "0/1",
+        "status": "low"
+      },
+      {
+        "filePath": "apps/web/src/app/features/auth/auth-layout.stories.ts",
+        "type": "type alias",
+        "linktype": "miscellaneous",
+        "linksubtype": "typealias",
+        "name": "Story",
         "coveragePercent": 0,
         "coverageCount": "0/1",
         "status": "low"
