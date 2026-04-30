@@ -20,9 +20,9 @@
 
     <!-- personal data form -->
     <p-card class="md:col-span-2 md:space-y-4">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-y-0 gap-4">
         <!-- firstName -->
-        <div class="col-span-1 flex flex-col gap-1.5 form-control">
+        <div class="form-control">
           <label for="fName" class="form-label required">Nombre</label>
           <input
             pInputText
@@ -30,7 +30,9 @@
             formControlName="firstName"
             placeholder="Ej. John"
             fluid
-            [invalid]="form.controls.firstName.invalid && form.controls.firstName.touched"
+            [invalid]="
+              form.controls.firstName.invalid && form.controls.firstName.touched
+            "
           />
           <app-form-validation-error
             [touched]="form.controls.firstName.touched"
@@ -39,7 +41,7 @@
           />
         </div>
         <!-- lastName -->
-        <div class="col-span-1 flex flex-col gap-1.5 form-control">
+        <div class="form-control">
           <label for="lName" class="form-label">Apellidos</label>
           <input
             pInputText
@@ -47,7 +49,9 @@
             formControlName="lastName"
             placeholder="Ej. Doe"
             fluid
-            [invalid]="form.controls.lastName.invalid && form.controls.lastName.touched"
+            [invalid]="
+              form.controls.lastName.invalid && form.controls.lastName.touched
+            "
           />
           <app-form-validation-error
             [touched]="form.controls.lastName.touched"
@@ -56,7 +60,7 @@
           />
         </div>
         <!-- email -->
-        <div class="col-span-1 flex flex-col gap-1.5 form-control">
+        <div class="form-control">
           <label for="email" class="form-label required">Email</label>
           <input
             pInputText
@@ -64,7 +68,9 @@
             formControlName="email"
             placeholder="john@doe.com"
             fluid
-            [invalid]="form.controls.email.invalid && form.controls.email.touched"
+            [invalid]="
+              form.controls.email.invalid && form.controls.email.touched
+            "
           />
           <app-form-validation-error
             [touched]="form.controls.email.touched"
@@ -73,7 +79,7 @@
           />
         </div>
         <!-- phone -->
-        <div class="col-span-1 flex flex-col gap-1.5 form-control">
+        <div class="form-control">
           <label for="phone" class="form-label">Teléfono</label>
           <p-inputMask
             id="phone"
@@ -81,7 +87,9 @@
             mask="(999) 999-9999"
             placeholder="(000) 000-0000"
             fluid
-            [invalid]="form.controls.phone.invalid && form.controls.phone.touched"
+            [invalid]="
+              form.controls.phone.invalid && form.controls.phone.touched
+            "
           />
           <app-form-validation-error
             [touched]="form.controls.phone.touched"
@@ -101,109 +109,108 @@
 
     <!-- Unity -->
     <p-card class="md:col-span-2 space-y-4">
-      @if(isNewUnit()){
-      <div class="flex items-center justify-between mb-4">
-        <p class="text-slate-500">Registrar nueva unidad</p>
-        <p-button
-          text="true"
-          label="Buscar existente"
-          severity="info"
-          (click)="isNewUnit.set(false)"
-        />
-      </div>
-      <div class="grid grid-cols-2 gap-x-6 gap-y-4" formGroupName="newUnit">
-        <div class="flex flex-col gap-1.5 form-control">
-          <label class="form-label" for="streetName"
-            >Calle / Privada / Torre</label
-          >
-          <input
-            pInputText
-            id="streetName"
-            formControlName="streetName"
-            placeholder="Ej. Privada Maple"
-            fluid
-          />
-          <app-form-validation-error
-            [touched]="form.controls.newUnit.controls.streetName.touched"
-            [errors]="form.controls.newUnit.controls.streetName.errors"
-            label="Calle"
-          />
-        </div>
-
-        <div class="flex flex-col gap-1.5 form-control">
-          <label class="form-label" for="identifier"
-            >Número / Identificador</label
-          >
-          <input
-            pInputText
-            id="identifier"
-            formControlName="identifier"
-            placeholder="Ej. Casa 10, Depto 4B"
-            fluid
-          />
-          <app-form-validation-error
-            [touched]="form.controls.newUnit.controls.identifier.touched"
-            [errors]="form.controls.newUnit.controls.identifier.errors"
-            label="Identificador"
-          />
-        </div>
-      </div>
-
-      } @else{
-      <div class="col-span-2 flex flex-col gap-1.5 form-control">
-        <div class="flex items-center justify-between">
-          <label for="fName" class="form-label">Unidad</label>
+      @if (isNewUnit()) {
+        <div class="flex items-center justify-between mb-4">
+          <p class="text-slate-500">Registrar nueva unidad</p>
           <p-button
             text="true"
-            label="Crear"
+            label="Buscar existente"
             severity="info"
-            tabIndex="-1"
-            [style]="{ 'tabindex': '-1' }"
-            [attr.tabindex]="-1"
-            [pt]="{
-                    root: { class: 'p-0',tabindex: '-1' },
-                    host: { tabindex: '-1' }
-              }"
-            (click)="isNewUnit.set(true)"
+            (click)="isNewUnit.set(false)"
           />
         </div>
-        <p-autoComplete
-          formControlName="unit"
-          [suggestions]="suggestions()"
-          (completeMethod)="searchUnit($event)"
-          forceSelection="true"
-          placeholder="Busca por calle o número..."
-          optionLabel="labelFull"
-          (onSelect)="selectUnit($event)"
-          [invalid]="form.controls.unit.invalid && form.controls.unit.touched"
-          [emptyMessage]="'No se encontró la unidad. Presiona Enter para crearla.'"
-          fluid
-        >
-          <ng-template let-unit pTemplate="item">
-            <div class="flex flex-col">
-              <span class="font-bold text-sm">{{ unit.street }}</span>
-              <small class="text-slate-500"># {{ unit.identifier }}</small>
-            </div>
-          </ng-template>
-          <ng-template let-unit pTemplate="empty">
-            <div class="flex flex-col">
-              <span
-                >No se encontraron resultados.
-                <p-button
-                  text="true"
-                  label="Crear"
-                  (click)="isNewUnit.set(true)"
-              /></span>
-            </div>
-          </ng-template>
-        </p-autoComplete>
+        <div class="grid grid-cols-2 gap-4 gap-y-0" formGroupName="newUnit">
+          <div class="form-control">
+            <label class="form-label" for="streetName"
+              >Calle / Privada / Torre</label
+            >
+            <input
+              pInputText
+              id="streetName"
+              formControlName="streetName"
+              placeholder="Ej. Privada Maple"
+              fluid
+            />
+            <app-form-validation-error
+              [touched]="form.controls.newUnit.controls.streetName.touched"
+              [errors]="form.controls.newUnit.controls.streetName.errors"
+              label="Calle"
+            />
+          </div>
 
-        <app-form-validation-error
-          [touched]="form.controls.unit.touched"
-          [errors]="form.controls.unit.errors"
-          label="Unidad"
-        />
-      </div>
+          <div class="form-control">
+            <label class="form-label" for="identifier"
+              >Número / Identificador</label
+            >
+            <input
+              pInputText
+              id="identifier"
+              formControlName="identifier"
+              placeholder="Ej. Casa 10, Depto 4B"
+              fluid
+            />
+            <app-form-validation-error
+              [touched]="form.controls.newUnit.controls.identifier.touched"
+              [errors]="form.controls.newUnit.controls.identifier.errors"
+              label="Identificador"
+            />
+          </div>
+        </div>
+      } @else {
+        <div class="col-span-2 flex flex-col gap-1.5 form-control">
+          <div class="flex items-center justify-between">
+            <label for="fName" class="form-label">Unidad</label>
+            <p-button
+              text="true"
+              label="Crear"
+              severity="info"
+              tabIndex="-1"
+              [style]="{ tabindex: '-1' }"
+              [attr.tabindex]="-1"
+              [pt]="{
+                root: { class: 'p-0', tabindex: '-1' },
+                host: { tabindex: '-1' },
+              }"
+              (click)="isNewUnit.set(true)"
+            />
+          </div>
+          <p-autoComplete
+            formControlName="unit"
+            [suggestions]="suggestions()"
+            (completeMethod)="searchUnit($event)"
+            forceSelection="true"
+            placeholder="Busca por calle o número..."
+            optionLabel="labelFull"
+            (onSelect)="selectUnit($event)"
+            [invalid]="form.controls.unit.invalid && form.controls.unit.touched"
+            [emptyMessage]="'No se encontró la unidad. Presiona Enter para crearla.'"
+            fluid
+          >
+            <ng-template let-unit pTemplate="item">
+              <div class="flex flex-col">
+                <span class="font-bold text-sm">{{ unit.street }}</span>
+                <small class="text-slate-500"># {{ unit.identifier }}</small>
+              </div>
+            </ng-template>
+            <ng-template let-unit pTemplate="empty">
+              <div class="flex flex-col">
+                <span
+                  >No se encontraron resultados.
+                  <p-button
+                    text="true"
+                    label="Crear"
+                    (click)="isNewUnit.set(true)"
+                /></span>
+              </div>
+            </ng-template>
+          </p-autoComplete>
+
+          <app-form-validation-error
+            [touched]="form.controls.unit.touched"
+            [errors]="form.controls.unit.errors"
+            label="Unidad"
+          />
+        </div>
       }
       <div class="col-span-2 mt-6 pt-2">
         <p class="text-xs font-bold text-slate-500 uppercase block mb-3">
@@ -220,8 +227,10 @@
               [binary]="true"
               inputId="owner"
               variant="filled"
-              [invalid]="form.errors?.['atLeastOneRoleRequired'] && form.touched"
-              [pt]="{box:'rounded-full'}"
+              [invalid]="
+                form.errors?.['atLeastOneRoleRequired'] && form.touched
+              "
+              [pt]="{ box: 'rounded-full' }"
             ></p-checkbox>
             <label for="owner" class="text-sm text-slate-600 cursor-pointer"
               >Dueño</label
@@ -234,8 +243,10 @@
               [binary]="true"
               inputId="family"
               variant="filled"
-              [invalid]="form.errors?.['atLeastOneRoleRequired'] && form.touched"
-              [pt]="{box:'rounded-full'}"
+              [invalid]="
+                form.errors?.['atLeastOneRoleRequired'] && form.touched
+              "
+              [pt]="{ box: 'rounded-full' }"
             ></p-checkbox>
             <label for="family" class="text-sm text-slate-600 cursor-pointer"
               >Familiar</label
@@ -247,20 +258,21 @@
               formControlName="isTenant"
               [binary]="true"
               inputId="tenant"
-              [invalid]="form.errors?.['atLeastOneRoleRequired'] && form.touched"
+              [invalid]="
+                form.errors?.['atLeastOneRoleRequired'] && form.touched
+              "
               variant="filled"
-              [pt]="{box:'rounded-full'}"
+              [pt]="{ box: 'rounded-full' }"
             ></p-checkbox>
             <label for="tenant" class="text-sm text-slate-600 cursor-pointer"
               >Renta</label
             >
           </div>
         </div>
-        @if(form.errors?.['atLeastOneRoleRequired'] && form.touched){
-
-        <p class="p-error pt-3 block animate-fade-in text-xs text-red-500">
-          Un rol es requerido
-        </p>
+        @if (form.errors?.['atLeastOneRoleRequired'] && form.touched) {
+          <p class="p-error pt-3 block animate-fade-in text-xs text-red-500">
+            Un rol es requerido
+          </p>
         }
       </div>
 

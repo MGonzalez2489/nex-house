@@ -1,10 +1,9 @@
-<p-confirmDialog />
 <div class="space-y-6 pb-25 md:pb-0">
   <app-page-header
     title="Usuarios & Admins"
     subTitle=" Gestión centralizada de residentes y administradores del fraccionamiento, permitiendo el control de roles y estados de registro."
   >
-    <div actions class="flex gap-2">
+    <div actions>
       <p-button label="Nuevo Usuario" icon="pi pi-plus" (click)="addUser()" />
     </div>
   </app-page-header>
@@ -21,7 +20,7 @@
     <app-users-table
       [isLoading]="store.loading()"
       [users]="store.entities()"
-      [pagination]="store.pagination() "
+      [pagination]="store.pagination()"
       (filter)="search($event)"
       (inspect)="inspect($event)"
     />

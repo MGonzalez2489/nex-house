@@ -6,29 +6,28 @@
     subTitle="Administra y programa los ciclos de facturación para residentes y áreas
 comerciales. Visualiza el estado actual de tus flujos de efectivo."
   >
-    @if(store.feeScheduleExists()){
-    <div actions class="flex gap-2">
-      <p-button label="Crear Nuevo" icon="pi pi-plus" (click)="openForm()" />
-    </div>
+    @if (store.feeScheduleExists()) {
+      <div actions class="flex gap-2">
+        <p-button label="Crear Nuevo" icon="pi pi-plus" (click)="openForm()" />
+      </div>
     }
   </app-page-header>
 
-  @if(!store.feeScheduleExists()){
-  <app-fee-schedule-init class="block" (addCharge)="openForm()" />
-  } @else{
-  <!-- Fees Ledger (Table Section) -->
-  <p-card class="hidden md:block">
-    <app-fee-schedule-table
-      [data]="store.feeSchedulesEntities()"
-      [isLoading]="store.loading()"
-      [pagination]="store.feesSchedulePagination()"
-      (filter)="store.feeScheduleLoadAll($event)"
-      (add)="openForm()"
-      (inspect)="openDetails($event)"
-    />
-  </p-card>
-  <app-fee-schedule-list class="md:hidden" />
-
+  @if (!store.feeScheduleExists()) {
+    <app-fee-schedule-init class="block" (addCharge)="openForm()" />
+  } @else {
+    <!-- Fees Ledger (Table Section) -->
+    <p-card class="hidden md:block">
+      <app-fee-schedule-table
+        [data]="store.feeSchedulesEntities()"
+        [isLoading]="store.loading()"
+        [pagination]="store.feesSchedulePagination()"
+        (filter)="store.feeScheduleLoadAll($event)"
+        (add)="openForm()"
+        (inspect)="openDetails($event)"
+      />
+    </p-card>
+    <app-fee-schedule-list class="md:hidden" />
   }
 </div>
 
@@ -40,11 +39,14 @@ comerciales. Visualiza el estado actual de tus flujos de efectivo."
   [(visible)]="isDrawerOpen"
   position="right"
 >
-  @switch(drawerConfig()?.component){ @case ('FORM'){
-  <app-fee-schedule-form (save)="closeDrawer()" />
-  } @case ('DETAILS'){
-  <app-fee-schedule-details [record]="selected()" />
-  } }
+  @switch (drawerConfig()?.component) {
+    @case ('FORM') {
+      <app-fee-schedule-form (save)="closeDrawer()" />
+    }
+    @case ('DETAILS') {
+      <app-fee-schedule-details [record]="selected()" />
+    }
+  }
 </p-drawer>
 
 <!-- Secondary Context Grid -->

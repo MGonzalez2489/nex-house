@@ -8,7 +8,6 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { UserRoleEnum, UserStatusEnum } from '@nex-house/enums';
 import { KeyValueItem, SearchUser } from '@nex-house/interfaces';
 import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 
@@ -20,13 +19,7 @@ interface ISearchUser {
 
 @Component({
   selector: 'app-users-filters',
-  imports: [
-    InputTextModule,
-    SelectModule,
-    ButtonModule,
-    ReactiveFormsModule,
-    CardModule,
-  ],
+  imports: [InputTextModule, SelectModule, ButtonModule, ReactiveFormsModule],
   templateUrl: './users-filters.html',
   styleUrl: './users-filters.css',
   standalone: true,

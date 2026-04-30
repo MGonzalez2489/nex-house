@@ -1,0 +1,1355 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <!-- Google Tag Manager -->
+    <script>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != 'dataLayer' ? '&l=' + l : '';
+        j.async = true;
+        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, 'script', 'dataLayer', 'GTM-P8JP46S6');
+    </script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NexHouse — Administración Inteligente de Fraccionamientos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --aura-primary: #6366f1;
+        --aura-primary-dark: #4f46e5;
+        --aura-primary-light: #818cf8;
+        --aura-surface: #f8fafc;
+        --aura-surface-2: #f1f5f9;
+        --aura-text: #0f172a;
+        --aura-text-muted: #64748b;
+        --aura-accent: #06b6d4;
+        --aura-gold: #f59e0b;
+        --gradient-primary: linear-gradient(
+          135deg,
+          #6366f1 0%,
+          #4f46e5 50%,
+          #3730a3 100%
+        );
+        --gradient-mesh:
+          radial-gradient(
+            at 20% 20%,
+            hsla(240, 100%, 74%, 0.15) 0px,
+            transparent 50%
+          ),
+          radial-gradient(
+            at 80% 10%,
+            hsla(189, 100%, 56%, 0.12) 0px,
+            transparent 50%
+          ),
+          radial-gradient(
+            at 60% 80%,
+            hsla(248, 100%, 71%, 0.1) 0px,
+            transparent 50%
+          );
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: 'DM Sans', sans-serif;
+        background: #fff;
+        color: var(--aura-text);
+        overflow-x: hidden;
+      }
+
+      h1,
+      h2,
+      h3,
+      .serif {
+        font-family: 'DM Serif Display', serif;
+      }
+
+      /* NAVBAR */
+      .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(16px);
+        border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+        transition: all 0.3s ease;
+      }
+      .navbar.scrolled {
+        background: rgba(255, 255, 255, 0.97);
+        box-shadow: 0 4px 24px rgba(99, 102, 241, 0.08);
+      }
+
+      /* HERO */
+      .hero {
+        min-height: 100vh;
+        background:
+          var(--gradient-mesh), linear-gradient(180deg, #fff 0%, #f0f0ff 100%);
+        display: flex;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+      }
+      .hero::before {
+        content: '';
+        position: absolute;
+        top: -20%;
+        right: -10%;
+        width: 700px;
+        height: 700px;
+        background: radial-gradient(
+          circle,
+          rgba(99, 102, 241, 0.12) 0%,
+          transparent 70%
+        );
+        border-radius: 50%;
+      }
+      .hero::after {
+        content: '';
+        position: absolute;
+        bottom: -15%;
+        left: -5%;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(
+          circle,
+          rgba(6, 182, 212, 0.1) 0%,
+          transparent 70%
+        );
+        border-radius: 50%;
+      }
+
+      /* BADGE */
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(99, 102, 241, 0.08);
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        color: var(--aura-primary-dark);
+        border-radius: 999px;
+        padding: 6px 16px;
+        font-size: 13px;
+        font-weight: 500;
+      }
+      .badge-dot {
+        width: 6px;
+        height: 6px;
+        background: var(--aura-primary);
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.5;
+          transform: scale(0.85);
+        }
+      }
+
+      /* HERO TITLE */
+      .hero-title {
+        font-size: clamp(2.8rem, 6vw, 5.5rem);
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        color: var(--aura-text);
+      }
+      .hero-title .accent {
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      /* CTA BUTTON */
+      .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--gradient-primary);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        padding: 16px 32px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 32px rgba(99, 102, 241, 0.35);
+        text-decoration: none;
+      }
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 40px rgba(99, 102, 241, 0.45);
+      }
+      .btn-secondary {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: transparent;
+        color: var(--aura-primary-dark);
+        border: 1.5px solid rgba(99, 102, 241, 0.35);
+        border-radius: 12px;
+        padding: 15px 28px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+      .btn-secondary:hover {
+        background: rgba(99, 102, 241, 0.06);
+        border-color: var(--aura-primary);
+      }
+
+      /* HERO MOCKUP */
+      .hero-mockup {
+        background: #fff;
+        border-radius: 20px;
+        box-shadow:
+          0 32px 80px rgba(99, 102, 241, 0.18),
+          0 0 0 1px rgba(99, 102, 241, 0.08);
+        overflow: hidden;
+        position: relative;
+      }
+      .mockup-header {
+        background: var(--gradient-primary);
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .mockup-dots {
+        display: flex;
+        gap: 6px;
+      }
+      .mockup-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        opacity: 0.6;
+      }
+      .mockup-body {
+        padding: 20px;
+        background: #f8faff;
+      }
+      .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+      .stat-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 14px;
+        border: 1px solid rgba(99, 102, 241, 0.1);
+      }
+      .stat-label {
+        font-size: 11px;
+        color: #94a3b8;
+        font-weight: 500;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .stat-value {
+        font-size: 22px;
+        font-weight: 600;
+        color: #0f172a;
+        margin-top: 4px;
+      }
+      .stat-sub {
+        font-size: 11px;
+        margin-top: 3px;
+      }
+
+      /* SECTION STYLES */
+      .section-label {
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--aura-primary);
+        margin-bottom: 12px;
+      }
+      .section-title {
+        font-size: clamp(2rem, 4vw, 3rem);
+        line-height: 1.15;
+        color: var(--aura-text);
+      }
+
+      /* FEATURE CARDS */
+      .feature-card {
+        background: #fff;
+        border: 1px solid rgba(99, 102, 241, 0.12);
+        border-radius: 20px;
+        padding: 32px;
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+      }
+      .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--gradient-primary);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      .feature-card:hover {
+        border-color: rgba(99, 102, 241, 0.25);
+        box-shadow: 0 20px 60px rgba(99, 102, 241, 0.1);
+        transform: translateY(-4px);
+      }
+      .feature-card:hover::before {
+        opacity: 1;
+      }
+
+      .feature-icon {
+        width: 52px;
+        height: 52px;
+        background: rgba(99, 102, 241, 0.08);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+        font-size: 24px;
+      }
+      .feature-title {
+        font-size: 1.15rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+      .feature-desc {
+        font-size: 14.5px;
+        color: var(--aura-text-muted);
+        line-height: 1.65;
+      }
+
+      /* HOW IT WORKS */
+      .step-number {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: var(--gradient-primary);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 16px;
+        flex-shrink: 0;
+        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
+      }
+
+      /* WAITLIST FORM */
+      .waitlist-section {
+        background: var(--gradient-primary);
+        position: relative;
+        overflow: hidden;
+      }
+      .waitlist-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.06) 0%,
+          transparent 70%
+        );
+        border-radius: 50%;
+      }
+      .waitlist-section::after {
+        content: '';
+        position: absolute;
+        bottom: -40%;
+        left: -5%;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(
+          circle,
+          rgba(6, 182, 212, 0.15) 0%,
+          transparent 70%
+        );
+        border-radius: 50%;
+      }
+      .email-form {
+        display: flex;
+        gap: 12px;
+        max-width: 520px;
+        margin: 0 auto;
+      }
+      .email-input {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1.5px solid rgba(255, 255, 255, 0.25);
+        border-radius: 12px;
+        padding: 14px 20px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 15px;
+        color: #fff;
+        outline: none;
+        transition: all 0.3s ease;
+      }
+      .email-input::placeholder {
+        color: rgba(255, 255, 255, 0.55);
+      }
+      .email-input:focus {
+        border-color: rgba(255, 255, 255, 0.5);
+        background: rgba(255, 255, 255, 0.18);
+      }
+      .btn-white {
+        background: #fff;
+        color: var(--aura-primary-dark);
+        border: none;
+        border-radius: 12px;
+        padding: 14px 28px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+      }
+      .btn-white:hover {
+        background: #f0f0ff;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      }
+
+      /* TESTIMONIALS / SOCIAL PROOF */
+      .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--gradient-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 600;
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+
+      /* COUNTER ANIMATION */
+      .counter-section {
+        background: #0f172a;
+        color: #fff;
+      }
+      .counter-value {
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        font-weight: 700;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      /* DIVIDER */
+      .gradient-divider {
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(99, 102, 241, 0.25),
+          transparent
+        );
+      }
+
+      /* SCROLLED NAV */
+      @media (max-width: 768px) {
+        .email-form {
+          flex-direction: column;
+        }
+        .btn-white {
+          width: 100%;
+        }
+      }
+
+      /* FLOATING SHAPES */
+      .shape {
+        position: absolute;
+        border-radius: 50%;
+        opacity: 0.04;
+        background: var(--aura-primary);
+        animation: float 8s ease-in-out infinite;
+      }
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px) rotate(0deg);
+        }
+        50% {
+          transform: translateY(-20px) rotate(8deg);
+        }
+      }
+
+      /* ANIMATE IN */
+      .animate-up {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      .animate-up.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* SUCCESS MESSAGE */
+      .success-msg {
+        display: none;
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 12px;
+        padding: 14px 24px;
+        color: #fff;
+        font-size: 15px;
+        text-align: center;
+        max-width: 520px;
+        margin: 0 auto;
+      }
+      .success-msg.show {
+        display: block;
+      }
+
+      /* CHIP TAG */
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(99, 102, 241, 0.07);
+        color: var(--aura-primary-dark);
+        border-radius: 8px;
+        padding: 4px 12px;
+        font-size: 12.5px;
+        font-weight: 500;
+      }
+
+      /* PROGRESS BAR */
+      .progress-bar {
+        height: 6px;
+        border-radius: 999px;
+        background: rgba(99, 102, 241, 0.12);
+        overflow: hidden;
+      }
+      .progress-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: var(--gradient-primary);
+        transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- ========== NAVBAR ========== -->
+    <nav class="navbar" id="navbar">
+      <div
+        class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between"
+      >
+        <div class="flex items-center gap-3">
+          <div
+            class="w-9 h-9 rounded-xl flex items-center justify-center text-white text-sm font-bold"
+            style="background: var(--gradient-primary)"
+          >
+            NH
+          </div>
+          <span
+            class="font-semibold text-lg tracking-tight"
+            style="color: var(--aura-text)"
+            >NexHouse</span
+          >
+        </div>
+        <div
+          class="hidden md:flex items-center gap-8 text-sm font-medium"
+          style="color: var(--aura-text-muted)"
+        >
+          <a
+            href="#funcionalidades"
+            class="hover:text-indigo-600 transition-colors"
+            >Funcionalidades</a
+          >
+          <a
+            href="#como-funciona"
+            class="hover:text-indigo-600 transition-colors"
+            >Cómo funciona</a
+          >
+          <a href="#para-quien" class="hover:text-indigo-600 transition-colors"
+            >Para quién</a
+          >
+        </div>
+        <a
+          href="#lista-espera"
+          class="btn-primary"
+          style="padding: 10px 22px; font-size: 14px"
+        >
+          Unirme a la lista →
+        </a>
+      </div>
+    </nav>
+
+    <!-- ========== HERO ========== -->
+    <section class="hero pt-20">
+      <div
+        class="shape"
+        style="
+          width: 600px;
+          height: 600px;
+          top: -100px;
+          right: -200px;
+          animation-delay: 0s;
+        "
+      ></div>
+      <div
+        class="shape"
+        style="
+          width: 300px;
+          height: 300px;
+          bottom: 50px;
+          left: 100px;
+          animation-delay: 3s;
+          opacity: 0.03;
+        "
+      ></div>
+      <div class="max-w-7xl mx-auto px-6 py-24 w-full">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+          <!-- LEFT -->
+          <div>
+            <div class="badge mb-6 animate-up visible">
+              <span class="badge-dot"></span>
+              Próximamente disponible
+            </div>
+            <h1
+              class="hero-title mb-6 animate-up visible"
+              style="transition-delay: 0.1s"
+            >
+              Administra tu<br />
+              fraccionamiento<br />
+              <span class="accent">sin complicaciones</span>
+            </h1>
+            <p
+              class="text-lg mb-10 animate-up visible"
+              style="
+                color: var(--aura-text-muted);
+                line-height: 1.7;
+                max-width: 480px;
+                transition-delay: 0.2s;
+              "
+            >
+              La plataforma todo-en-uno para comités y administradores. Finanzas
+              en tiempo real, cobro de cuotas, rendición de cuentas, votaciones
+              y comunicación con residentes — todo desde un solo lugar.
+            </p>
+            <div
+              class="flex flex-wrap gap-4 mb-12 animate-up visible"
+              style="transition-delay: 0.3s"
+            >
+              <a href="#lista-espera" class="btn-primary">
+                Quiero acceso anticipado
+                <svg
+                  width="16"
+                  height="16"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2.5"
+                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                  />
+                </svg>
+              </a>
+              <a href="#funcionalidades" class="btn-secondary">
+                Ver funciones
+              </a>
+            </div>
+            <div
+              class="flex items-center gap-6 animate-up visible"
+              style="transition-delay: 0.4s"
+            >
+              <div class="flex -space-x-2">
+                <div
+                  class="avatar"
+                  style="
+                    background: linear-gradient(135deg, #6366f1, #4f46e5);
+                    border: 2px solid #fff;
+                  "
+                >
+                  MR
+                </div>
+                <div
+                  class="avatar"
+                  style="
+                    background: linear-gradient(135deg, #06b6d4, #0891b2);
+                    border: 2px solid #fff;
+                  "
+                >
+                  JL
+                </div>
+                <div
+                  class="avatar"
+                  style="
+                    background: linear-gradient(135deg, #f59e0b, #d97706);
+                    border: 2px solid #fff;
+                  "
+                >
+                  AG
+                </div>
+                <div
+                  class="avatar"
+                  style="
+                    background: linear-gradient(135deg, #10b981, #059669);
+                    border: 2px solid #fff;
+                  "
+                >
+                  +8
+                </div>
+              </div>
+              <div>
+                <p class="text-sm font-semibold">
+                  +200 personas en lista de espera
+                </p>
+                <p class="text-xs" style="color: var(--aura-text-muted)">
+                  Administradores y comités interesados
+                </p>
+              </div>
+            </div>
+          </div>
+          <!-- RIGHT: MOCKUP -->
+          <div
+            class="hero-mockup animate-up visible"
+            style="transition-delay: 0.25s"
+          >
+            <div class="mockup-header">
+              <div class="mockup-dots">
+                <div class="mockup-dot" style="background: #ff5f57"></div>
+                <div class="mockup-dot" style="background: #ffc12f"></div>
+                <div class="mockup-dot" style="background: #2bc840"></div>
+              </div>
+              <span class="text-white text-xs opacity-70 ml-2"
+                >Panel de Administrador — Residencial El Roble</span
+              >
+            </div>
+            <div class="mockup-body">
+              <p
+                class="text-xs font-semibold mb-3"
+                style="color: #94a3b8; letter-spacing: 0.06em"
+              >
+                RESUMEN FINANCIERO — OCTUBRE 2025
+              </p>
+              <div class="stat-grid">
+                <div class="stat-card">
+                  <p class="stat-label">Ingresos del mes</p>
+                  <p class="stat-value" style="color: #6366f1">$48,600</p>
+                  <p class="stat-sub" style="color: #22c55e">↑ 12% vs sept.</p>
+                </div>
+                <div class="stat-card">
+                  <p class="stat-label">Gastos registrados</p>
+                  <p class="stat-value">$21,340</p>
+                  <p class="stat-sub" style="color: #94a3b8">Actualizado hoy</p>
+                </div>
+                <div class="stat-card">
+                  <p class="stat-label">Balance disponible</p>
+                  <p class="stat-value" style="color: #059669">$27,260</p>
+                  <p class="stat-sub" style="color: #94a3b8">En caja</p>
+                </div>
+                <div class="stat-card">
+                  <p class="stat-label">Cuotas pendientes</p>
+                  <p class="stat-value" style="color: #f59e0b">7</p>
+                  <p class="stat-sub" style="color: #94a3b8">de 62 viviendas</p>
+                </div>
+              </div>
+              <!-- mini progress bars -->
+              <div class="mb-3">
+                <div
+                  class="flex justify-between text-xs mb-1"
+                  style="color: #64748b"
+                >
+                  <span>Cuotas cobradas este mes</span
+                  ><span style="color: #6366f1; font-weight: 600">88.7%</span>
+                </div>
+                <div class="progress-bar">
+                  <div
+                    class="progress-fill"
+                    data-width="88.7"
+                    style="width: 88.7%"
+                  ></div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <div
+                  class="flex justify-between text-xs mb-1"
+                  style="color: #64748b"
+                >
+                  <span>Participación en última votación</span
+                  ><span style="color: #6366f1; font-weight: 600">73%</span>
+                </div>
+                <div class="progress-bar">
+                  <div
+                    class="progress-fill"
+                    data-width="73"
+                    style="width: 73%"
+                  ></div>
+                </div>
+              </div>
+              <!-- aviso -->
+              <div
+                class="mt-4 rounded-xl p-3 text-xs"
+                style="
+                  background: rgba(99, 102, 241, 0.06);
+                  border: 1px solid rgba(99, 102, 241, 0.15);
+                "
+              >
+                <span style="color: #6366f1; font-weight: 600"
+                  >📌 Aviso reciente:</span
+                >
+                <span style="color: #475569">
+                  Mantenimiento de áreas comunes — Sábado 18 de octubre, 9:00
+                  am.</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== COUNTERS ========== -->
+    <section class="counter-section py-20">
+      <div
+        class="max-w-8xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 text-center"
+      >
+        <div class="animate-up">
+          <div class="counter-value">∞</div>
+          <p class="text-sm mt-2" style="color: #94a3b8">
+            Fraccionamientos soportados
+          </p>
+        </div>
+        <div class="animate-up" style="transition-delay: 0.1s">
+          <div class="counter-value">100%</div>
+          <p class="text-sm mt-2" style="color: #94a3b8">
+            Trazabilidad financiera
+          </p>
+        </div>
+        <div
+          class="animate-up"
+          style="transition-delay: 0.2s"
+          style="width: 400px"
+        >
+          <div class="counter-value">Tiempo Real</div>
+          <p class="text-sm mt-2" style="color: #94a3b8">Reportes y métricas</p>
+        </div>
+        <div class="animate-up" style="transition-delay: 0.3s">
+          <div class="counter-value">1 solo</div>
+          <p class="text-sm mt-2" style="color: #94a3b8">Sistema para todo</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== FEATURES ========== -->
+    <section
+      id="funcionalidades"
+      class="py-28"
+      style="background: var(--aura-surface)"
+    >
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="text-center mb-16 animate-up">
+          <p class="section-label">Funcionalidades</p>
+          <h2 class="section-title mb-5">
+            Todo lo que necesita tu fraccionamiento
+          </h2>
+          <p
+            class="text-lg max-w-2xl mx-auto"
+            style="color: var(--aura-text-muted)"
+          >
+            Diseñado para que los comités administren con total transparencia y
+            los residentes confíen en cada peso.
+          </p>
+        </div>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="feature-card animate-up">
+            <div class="feature-icon">💰</div>
+            <h3 class="feature-title">Gestión financiera completa</h3>
+            <p class="feature-desc">
+              Registra ingresos, gastos y pagos de servicios. Ve el balance en
+              tiempo real y lleva un histórico detallado de cada movimiento.
+            </p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <span class="chip">Ingresos</span><span class="chip">Gastos</span
+              ><span class="chip">Balance</span>
+            </div>
+          </div>
+
+          <div class="feature-card animate-up" style="transition-delay: 0.08s">
+            <div class="feature-icon">🏠</div>
+            <h3 class="feature-title">Cuotas fijas y recurrentes</h3>
+            <p class="feature-desc">
+              Configura cuotas ordinarias o extraordinarias por vivienda.
+              Registra pagos con un solo clic y genera estados de cuenta
+              automáticamente.
+            </p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <span class="chip">Cuotas</span><span class="chip">Pagos</span
+              ><span class="chip">Estados de cuenta</span>
+            </div>
+          </div>
+
+          <div class="feature-card animate-up" style="transition-delay: 0.16s">
+            <div class="feature-icon">📊</div>
+            <h3 class="feature-title">Métricas e histórico</h3>
+            <p class="feature-desc">
+              Visualiza gráficas de ingresos vs gastos por período, tendencias
+              de cobranza y comparativos históricos para tomar mejores
+              decisiones.
+            </p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <span class="chip">Gráficas</span
+              ><span class="chip">Histórico</span
+              ><span class="chip">Tendencias</span>
+            </div>
+          </div>
+
+          <div class="feature-card animate-up" style="transition-delay: 0.24s">
+            <div class="feature-icon">🗳️</div>
+            <h3 class="feature-title">Votaciones y encuestas</h3>
+            <p class="feature-desc">
+              Crea votaciones formales o encuestas rápidas. Los resultados se
+              registran por vivienda, garantizando transparencia y validez.
+            </p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <span class="chip">Por vivienda</span
+              ><span class="chip">Resultados</span
+              ><span class="chip">Transparente</span>
+            </div>
+          </div>
+
+          <div class="feature-card animate-up" style="transition-delay: 0.32s">
+            <div class="feature-icon">📢</div>
+            <h3 class="feature-title">Tablero de avisos</h3>
+            <p class="feature-desc">
+              Publica anuncios, convocatorias y eventos para todos los
+              residentes. Mantén a tu comunidad siempre informada desde el
+              panel.
+            </p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <span class="chip">Avisos</span><span class="chip">Eventos</span
+              ><span class="chip">Comunidad</span>
+            </div>
+          </div>
+
+          <div class="feature-card animate-up" style="transition-delay: 0.4s">
+            <div class="feature-icon">🏘️</div>
+            <h3 class="feature-title">Registro de viviendas y residentes</h3>
+            <p class="feature-desc">
+              Administra el catálogo de unidades y sus residentes. Asigna
+              múltiples personas por vivienda y lleva un directorio siempre
+              actualizado.
+            </p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <span class="chip">Unidades</span
+              ><span class="chip">Residentes</span
+              ><span class="chip">Directorio</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== HOW IT WORKS ========== -->
+    <section id="como-funciona" class="py-28 bg-white">
+      <div class="max-w-5xl mx-auto px-6">
+        <div class="text-center mb-16 animate-up">
+          <p class="section-label">Cómo funciona</p>
+          <h2 class="section-title mb-5">
+            De la configuración al control total en minutos
+          </h2>
+        </div>
+        <div class="grid md:grid-cols-3 gap-10">
+          <div class="flex flex-col items-start gap-4 animate-up">
+            <div class="step-number">1</div>
+            <div>
+              <h3 class="text-lg font-semibold mb-2">
+                Registra tu fraccionamiento
+              </h3>
+              <p
+                class="text-sm"
+                style="color: var(--aura-text-muted); line-height: 1.7"
+              >
+                Crea el perfil de tu fraccionamiento, agrega las viviendas y
+                asigna residentes. En minutos tienes el catálogo completo.
+              </p>
+            </div>
+          </div>
+          <div
+            class="flex flex-col items-start gap-4 animate-up"
+            style="transition-delay: 0.15s"
+          >
+            <div class="step-number">2</div>
+            <div>
+              <h3 class="text-lg font-semibold mb-2">
+                Configura cuotas y gastos
+              </h3>
+              <p
+                class="text-sm"
+                style="color: var(--aura-text-muted); line-height: 1.7"
+              >
+                Define las cuotas ordinarias y extraordinarias, registra los
+                gastos recurrentes y comienza a llevar el control financiero.
+              </p>
+            </div>
+          </div>
+          <div
+            class="flex flex-col items-start gap-4 animate-up"
+            style="transition-delay: 0.3s"
+          >
+            <div class="step-number">3</div>
+            <div>
+              <h3 class="text-lg font-semibold mb-2">
+                Gestiona y rinde cuentas
+              </h3>
+              <p
+                class="text-sm"
+                style="color: var(--aura-text-muted); line-height: 1.7"
+              >
+                Consulta métricas en tiempo real, publica avisos, organiza
+                votaciones y comparte reportes financieros con total
+                transparencia.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="gradient-divider"></div>
+
+    <!-- ========== FOR WHOM ========== -->
+    <section
+      id="para-quien"
+      class="py-28"
+      style="background: var(--aura-surface)"
+    >
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="text-center mb-16 animate-up">
+          <p class="section-label">Para quién es</p>
+          <h2 class="section-title mb-5">
+            Construido para quienes administran comunidades
+          </h2>
+        </div>
+        <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div
+            class="rounded-2xl p-8 animate-up"
+            style="background: #fff; border: 1px solid rgba(99, 102, 241, 0.12)"
+          >
+            <div class="text-4xl mb-4">🏛️</div>
+            <h3 class="text-xl font-semibold mb-3">
+              Comités y administradores
+            </h3>
+            <ul class="space-y-2 text-sm" style="color: var(--aura-text-muted)">
+              <li class="flex items-start gap-2">
+                <span style="color: #6366f1">✓</span> Control total de ingresos
+                y egresos
+              </li>
+              <li class="flex items-start gap-2">
+                <span style="color: #6366f1">✓</span> Rendición de cuentas
+                transparente
+              </li>
+              <li class="flex items-start gap-2">
+                <span style="color: #6366f1">✓</span> Historial de cada
+                movimiento financiero
+              </li>
+              <li class="flex items-start gap-2">
+                <span style="color: #6366f1">✓</span> Reportes automáticos para
+                asambleas
+              </li>
+              <li class="flex items-start gap-2">
+                <span style="color: #6366f1">✓</span> Gestión de eventos
+                especiales y servicios
+              </li>
+            </ul>
+          </div>
+          <div
+            class="rounded-2xl p-8 animate-up"
+            style="
+              background: #fff;
+              border: 1px solid rgba(99, 102, 241, 0.12);
+              transition-delay: 0.15s;
+            "
+          >
+            <div class="text-4xl mb-4">🏡</div>
+            <h3 class="text-xl font-semibold mb-3">
+              Residentes y propietarios
+            </h3>
+            <ul class="space-y-2 text-sm" style="color: var(--aura-text-muted)">
+              <li class="flex items-start gap-2">
+                <span style="color: #6366f1">✓</span> Visibilidad sobre en qué
+                se gasta su cuota
+              </li>
+              <li class="flex items-start gap-2">
+                <span style="color: #6366f1">✓</span> Participación en
+                votaciones y encuestas
+              </li>
+              <li class="flex items-start gap-2">
+                <span style="color: #6366f1">✓</span> Consulta su estado de
+                cuenta individual
+              </li>
+              <li class="flex items-start gap-2">
+                <span style="color: #6366f1">✓</span> Recibe avisos y
+                comunicados del comité
+              </li>
+              <li class="flex items-start gap-2">
+                <span style="color: #6366f1">✓</span> Confianza en la gestión de
+                su comunidad
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== WAITLIST ========== -->
+    <section id="lista-espera" class="waitlist-section py-28 relative">
+      <div class="max-w-3xl mx-auto px-6 text-center relative z-10 animate-up">
+        <div
+          class="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full text-sm font-medium"
+          style="
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+          "
+        >
+          <span>🎯</span> Acceso anticipado gratuito para los primeros registros
+        </div>
+        <h2
+          class="serif text-4xl md:text-5xl font-normal text-white mb-4"
+          style="line-height: 1.2"
+        >
+          Sé parte de los primeros
+        </h2>
+        <p class="text-lg mb-10" style="color: rgba(255, 255, 255, 0.75)">
+          Regístrate hoy y obtén acceso anticipado, precio especial de
+          lanzamiento y soporte personalizado para configurar tu
+          fraccionamiento.
+        </p>
+
+        <!-- FORM -->
+        <div data-fs-success>
+          ✅ ¡Gracias! Te hemos añadido a la lista de espera. Te avisaremos
+        </div>
+        <div data-fs-error>Oops! Hubo un problema al registrarte.</div>
+        <form id="form-container">
+          <div class="email-form flex-wrap justify-center">
+            <!-- <label for="email">Email:</label> -->
+            <input
+              type="email"
+              class="email-input"
+              id="email"
+              name="email"
+              placeholder="tucorreo@ejemplo.com"
+              data-fs-field
+            />
+            <span data-fs-error="email"></span>
+            <button class="btn-white" type="submit" data-fs-submit-btn>
+              Submit
+            </button>
+          </div>
+
+          <p class="text-xs mt-4" style="color: rgba(255, 255, 255, 0.5)">
+            Sin spam. Sin compromisos. Te avisamos cuando esté lista.
+          </p>
+        </form>
+
+        <!-- BENEFITS -->
+        <div class="grid sm:grid-cols-3 gap-4 mt-14 text-left">
+          <div
+            class="rounded-xl p-5"
+            style="
+              background: rgba(255, 255, 255, 0.08);
+              border: 1px solid rgba(255, 255, 255, 0.12);
+            "
+          >
+            <p class="text-2xl mb-2">🚀</p>
+            <p class="font-semibold text-white text-sm mb-1">
+              Acceso anticipado
+            </p>
+            <p class="text-xs" style="color: rgba(255, 255, 255, 0.6)">
+              Prueba la plataforma antes que nadie y da forma al producto.
+            </p>
+          </div>
+          <div
+            class="rounded-xl p-5"
+            style="
+              background: rgba(255, 255, 255, 0.08);
+              border: 1px solid rgba(255, 255, 255, 0.12);
+            "
+          >
+            <p class="text-2xl mb-2">💎</p>
+            <p class="font-semibold text-white text-sm mb-1">
+              Precio de lanzamiento
+            </p>
+            <p class="text-xs" style="color: rgba(255, 255, 255, 0.6)">
+              Tarifas especiales exclusivas para los primeros registros.
+            </p>
+          </div>
+          <div
+            class="rounded-xl p-5"
+            style="
+              background: rgba(255, 255, 255, 0.08);
+              border: 1px solid rgba(255, 255, 255, 0.12);
+            "
+          >
+            <p class="text-2xl mb-2">🤝</p>
+            <p class="font-semibold text-white text-sm mb-1">
+              Onboarding personalizado
+            </p>
+            <p class="text-xs" style="color: rgba(255, 255, 255, 0.6)">
+              Te ayudamos a configurar y migrar tu fraccionamiento sin costo.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== FOOTER ========== -->
+    <footer
+      class="py-12"
+      style="
+        background: #0f172a;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+      "
+    >
+      <div
+        class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6"
+      >
+        <div class="flex items-center gap-3">
+          <div
+            class="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold"
+            style="background: var(--gradient-primary)"
+          >
+            NH
+          </div>
+          <span class="font-semibold text-white">NexHouse</span>
+        </div>
+        <p class="text-sm" style="color: #475569">
+          Administración inteligente para comunidades residenciales.
+        </p>
+        <div class="flex gap-6 text-sm" style="color: #475569">
+          <a href="#funcionalidades" class="hover:text-white transition-colors"
+            >Funciones</a
+          >
+          <a href="#lista-espera" class="hover:text-white transition-colors"
+            >Lista de espera</a
+          >
+        </div>
+      </div>
+      <div
+        class="max-w-7xl mx-auto px-6 mt-8 pt-8 text-center text-xs"
+        style="color: #334155; border-top: 1px solid rgba(255, 255, 255, 0.04)"
+      >
+        © 2026 NexHouse. Todos los derechos reservados.
+      </div>
+    </footer>
+
+    <script>
+      // Navbar scroll effect
+      window.addEventListener('scroll', () => {
+        const nav = document.getElementById('navbar');
+        nav.classList.toggle('scrolled', window.scrollY > 20);
+      });
+
+      // Intersection Observer for animations
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) entry.target.classList.add('visible');
+          });
+        },
+        { threshold: 0.12 },
+      );
+      document
+        .querySelectorAll('.animate-up')
+        .forEach((el) => observer.observe(el));
+
+      // Waitlist form
+      function handleSubmit() {
+        const email = document.getElementById('email-input').value.trim();
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!re.test(email)) {
+          document.getElementById('email-input').style.borderColor =
+            'rgba(239,68,68,0.6)';
+          document.getElementById('email-input').placeholder =
+            'Por favor ingresa un correo válido';
+          return;
+        }
+        document.getElementById('form-container').style.display = 'none';
+        document.getElementById('success-msg').classList.add('show');
+      }
+
+      // Allow Enter key on input
+      document.addEventListener('DOMContentLoaded', () => {
+        const inp = document.getElementById('email-input');
+        if (inp)
+          inp.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') handleSubmit();
+          });
+      });
+    </script>
+
+    <script>
+      window.formspree =
+        window.formspree ||
+        function () {
+          (formspree.q = formspree.q || []).push(arguments);
+        };
+      formspree('initForm', {
+        formElement: '#form-container',
+        formId: 'xdabodrw',
+      });
+    </script>
+    <script src="https://unpkg.com/@formspree/ajax@1" defer></script>
+  </body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript
+    ><iframe
+      src="https://www.googletagmanager.com/ns.html?id=GTM-P8JP46S6"
+      height="0"
+      width="0"
+      style="display: none; visibility: hidden"
+    ></iframe
+  ></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+</html>

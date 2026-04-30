@@ -1,78 +1,79 @@
 <div class="nav-item-wrapper">
   <!-- Item con hijos (collapsable) -->
   @if (item().children?.length) {
-  <button
-    pButton
-    [disabled]="item().isDisabled"
-    class="nav-item"
-    [attr.aria-expanded]="isOpen()"
-    [attr.title]="sidebarService.collapsed() ? item().label : null"
-    (click)="toggle()"
-  >
-    @if (item().icon) {
-    <i class="nav-icon" [class]="item().icon"></i>
+    <button
+      pButton
+      [disabled]="item().isDisabled"
+      class="nav-item"
+      [attr.aria-expanded]="isOpen()"
+      [attr.title]="sidebarService.collapsed() ? item().label : null"
+      (click)="toggle()"
+    >
+      @if (item().icon) {
+        <i class="nav-icon" [class]="item().icon"></i>
+      }
+      <span class="nav-label">{{ item().label }}</span>
+      @if (item().badge && !sidebarService.collapsed()) {
+        <span
+          class="nav-badge"
+          [class]="'nav-badge--' + (item().badgeVariant ?? 'primary')"
+        >
+          {{ item().badge }}
+        </span>
+      }
+
+      <i
+        class="pi"
+        [class.pi-chevron-down]="isOpen()"
+        [class.pi-chevron-right]="!isOpen()"
+      ></i>
+    </button>
+
+    <!-- Submenú animado -->
+    @if (!sidebarService.collapsed()) {
+      <app-nav-submenu [items]="item().children!" [open]="isOpen()" />
     }
-    <span class="nav-label">{{ item().label }}</span>
-    @if (item().badge && !sidebarService.collapsed()) {
+  } @else {
+    <!-- Item simple - con o sin route -->
+    @if (item().route) {
+      <a
+        class="nav-item"
+        [class.active]="isActive()"
+        [class.disabled]="item().isDisabled"
+        [routerLink]="item().isDisabled ? null : item().route"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: false }"
+        [attr.title]="sidebarService.collapsed() ? item().label : null"
+        [attr.aria-disabled]="item().isDisabled"
+        (click)="!item().isDisabled && activate()"
+      >
+        <ng-container *ngTemplateOutlet="itemContent" />
+      </a>
+    } @else {
+      <button
+        class="nav-item"
+        [disabled]="item().isDisabled"
+        [class.active]="isActive()"
+        [attr.title]="sidebarService.collapsed() ? item().label : null"
+        (click)="activate()"
+      >
+        <ng-container *ngTemplateOutlet="itemContent" />
+      </button>
+    }
+  }
+</div>
+
+<ng-template #itemContent>
+  @if (item().icon) {
+    <i [class]="item().icon"></i>
+  }
+  <span class="nav-label">{{ item().label }}</span>
+  @if (item().badge && !sidebarService.collapsed()) {
     <span
       class="nav-badge"
       [class]="'nav-badge--' + (item().badgeVariant ?? 'primary')"
     >
       {{ item().badge }}
     </span>
-    }
-
-    <i
-      class="pi"
-      [class.pi-chevron-down]="isOpen()"
-      [class.pi-chevron-right]="!isOpen()"
-    ></i>
-  </button>
-
-  <!-- Submenú animado -->
-  @if (!sidebarService.collapsed()) {
-  <app-nav-submenu [items]="item().children!" [open]="isOpen()" />
-  } } @else {
-  <!-- Item simple - con o sin route -->
-  @if (item().route) {
-  <a
-    class="nav-item"
-    [class.active]="isActive()"
-    [class.disabled]="item().isDisabled"
-    [routerLink]="item().isDisabled ? null : item().route"
-    routerLinkActive="active"
-    [routerLinkActiveOptions]="{exact:true}"
-    [attr.title]="sidebarService.collapsed() ? item().label : null"
-    [attr.aria-disabled]="item().isDisabled"
-    (click)="!item().isDisabled && activate()"
-  >
-    <ng-container *ngTemplateOutlet="itemContent" />
-  </a>
-
-  } @else {
-  <button
-    class="nav-item"
-    [disabled]="item().isDisabled"
-    [class.active]="isActive()"
-    [attr.title]="sidebarService.collapsed() ? item().label : null"
-    (click)="activate()"
-  >
-    <ng-container *ngTemplateOutlet="itemContent" />
-  </button>
-  } }
-</div>
-
-<ng-template #itemContent>
-  @if (item().icon) {
-  <i [class]="item().icon"></i>
-  }
-  <span class="nav-label">{{ item().label }}</span>
-  @if (item().badge && !sidebarService.collapsed()) {
-  <span
-    class="nav-badge"
-    [class]="'nav-badge--' + (item().badgeVariant ?? 'primary')"
-  >
-    {{ item().badge }}
-  </span>
   }
 </ng-template>

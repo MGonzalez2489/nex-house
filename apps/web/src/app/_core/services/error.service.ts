@@ -14,6 +14,7 @@ export class ErrorService {
    */
   handleError(error: any): Observable<never> {
     const formattedError: FormattedError = formatError(error);
+    console.log('formatedError', formattedError);
 
     this._logError(formattedError);
     this._showNotification(formattedError.message);

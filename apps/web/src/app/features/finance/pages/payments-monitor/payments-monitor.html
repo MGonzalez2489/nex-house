@@ -4,26 +4,25 @@
     subTitle="Control centralizado de cuotas, vencimientos y estatus de pago."
   />
 
-  @if((store.chargesPagination()?.total || 0) > 0){ @if(store.chargesSummary();
-  as summary){
-  <app-charges-summary class="block" [summary]="summary" />
-  }
+  @if ((store.chargesPagination()?.total || 0) > 0) {
+    @if (store.chargesSummary(); as summary) {
+      <app-charges-summary class="block" [summary]="summary" />
+    }
 
-  <p-card>
-    <app-charges-filters (filter)="search($event)" />
-  </p-card>
-  <p-card>
-    <app-charges-table
-      [data]="store.chargesEntities()"
-      [isLoading]="store.loading()"
-      [pagination]="store.chargesPagination()"
-      (confirm)="confirm($event)"
-      (cancelCharge)="cancelCharge($event)"
-      (view)="view($event)"
-    />
-  </p-card>
-
-  } @else{
-  <app-charges-init />
+    <p-card>
+      <app-charges-filters (filter)="search($event)" />
+    </p-card>
+    <p-card>
+      <app-charges-table
+        [data]="store.chargesEntities()"
+        [isLoading]="store.loading()"
+        [pagination]="store.chargesPagination()"
+        (confirm)="confirm($event)"
+        (cancelCharge)="cancelCharge($event)"
+        (view)="view($event)"
+      />
+    </p-card>
+  } @else {
+    <app-charges-init />
   }
 </div>

@@ -16,7 +16,7 @@
       <div class="logo-text">
         <span class="logo-name">{{ config().header.name }}</span>
         @if (config().header.tagline) {
-        <span class="logo-tagline">{{ config().header.tagline }}</span>
+          <span class="logo-tagline">{{ config().header.tagline }}</span>
         }
       </div>
     </a>
@@ -26,28 +26,34 @@
       text
       class="hidden"
       severity="secondary"
-      [attr.aria-label]="service.collapsed() ? 'Expandir menú' : 'Colapsar menú'"
+      [attr.aria-label]="
+        service.collapsed() ? 'Expandir menú' : 'Colapsar menú'
+      "
       [attr.aria-expanded]="!service.collapsed()"
-      [icon]="service.collapsed() ? 'pi pi-chevron-right' : 'pi pi-chevron-down'"
+      [icon]="
+        service.collapsed() ? 'pi pi-chevron-right' : 'pi pi-chevron-down'
+      "
     />
   </div>
 
   <!-- ── NAV ──────────────────────────────────── -->
   <nav class="sidebar-nav">
     @for (section of config().sections; track $index) {
-    <div class="nav-section">
-      @if (section.label && !service.collapsed()) {
-      <div class="nav-section-label" role="presentation">
-        {{ section.label }}
+      <div class="nav-section">
+        @if (section.label && !service.collapsed()) {
+          <div class="nav-section-label" role="presentation">
+            {{ section.label }}
+          </div>
+        }
+        @for (item of section.items; track item.id) {
+          <app-nav-item [item]="item" />
+        }
       </div>
-      } @for (item of section.items; track item.id) {
-      <app-nav-item [item]="item" />
-      }
-    </div>
 
-    @if (!$last) {
-    <div class="sidebar-divider" role="separator"></div>
-    } }
+      @if (!$last) {
+        <div class="sidebar-divider" role="separator"></div>
+      }
+    }
   </nav>
 
   <!-- ── FOOTER ────────────────────────────────── -->
@@ -57,7 +63,7 @@
       <app-user-avatar [text]="user()?.fullName" />
       <div class="user-info">
         <span class="user-name">{{ user()?.fullName }}</span>
-        <span class="user-role">{{ user()?.role |role}}</span>
+        <span class="user-role">{{ user()?.role | role }}</span>
       </div>
     </div>
 

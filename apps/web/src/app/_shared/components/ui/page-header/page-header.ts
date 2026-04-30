@@ -12,4 +12,7 @@ import { Breadcrumbs } from '../breadcrumbs/breadcrumbs';
 export class PageHeader {
   title = input.required<string>();
   subTitle = input<string>();
+
+  showActionsOnSM = input<boolean>(false);
+  showSubTitleOnSM = input<boolean>(false);
 }

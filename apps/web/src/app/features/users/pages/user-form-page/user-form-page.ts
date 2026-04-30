@@ -22,6 +22,7 @@ import { SessionService } from '@core/services';
 import { UnitsStore } from '@features/housing-unit/units.store';
 import { UsersStore } from '@features/users/users.store';
 import { UserRoleEnum } from '@nex-house/enums';
+import { UnitModel } from '@nex-house/models';
 import {
   FormOptions,
   FormValidationError,
@@ -38,10 +39,8 @@ import { Card } from 'primeng/card';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputMaskModule } from 'primeng/inputmask';
 import { InputTextModule } from 'primeng/inputtext';
-import { RadioButtonModule } from 'primeng/radiobutton';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { ICreateUserForm, IUserUnitForm } from './iuser-form';
-import { UnitModel } from '@nex-house/models';
 
 @Component({
   selector: 'app-user-form-page',
@@ -55,7 +54,6 @@ import { UnitModel } from '@nex-house/models';
     FormOptions,
     AutoCompleteModule,
     CheckboxModule,
-    RadioButtonModule,
     ToggleSwitchModule,
     PageHeader,
   ],
