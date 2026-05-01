@@ -78,12 +78,25 @@ export class HousingUnitsService {
     const { globalFilter } = filters;
 
     if (globalFilter) {
+      const globalFilterWords = globalFilter
+        .split(' ')
+        .filter((word) => word.length > 0);
+
       query.andWhere(
-        new Brackets((qb) => {
-          qb.where('unit.identifier LIKE :filter', {
-            filter: `%${globalFilter}%`,
-          }).orWhere('unit.streetName LIKE :filter', {
-            filter: `%${globalFilter}%`,
+        new Brackets((andQb) => {
+          globalFilterWords.forEach((word, index) => {
+            const paramName = `globalFilterWord${index}`;
+            andQb.andWhere(
+              new Brackets((orQb) => {
+                orQb
+                  .orWhere(`unit.streetName LIKE :${paramName}`, {
+                    [paramName]: `%${word}%`,
+                  })
+                  .orWhere(`unit.identifier LIKE :${paramName}`, {
+                    [paramName]: `%${word}%`,
+                  });
+              }),
+            );
           });
         }),
       );

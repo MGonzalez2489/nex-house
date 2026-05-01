@@ -54,28 +54,42 @@ export class UsersService {
     }
 
     if (globalFilter) {
-      query.andWhere(
-        new Brackets((qb) => {
-          qb.where('users.firstName LIKE :filter', {
-            filter: `%${globalFilter}%`,
-          })
-            .orWhere('users.lastName LIKE :filter', {
-              filter: `%${globalFilter}%`,
-            })
-            .orWhere('users.email LIKE :filter', {
-              filter: `%${globalFilter}%`,
-            })
-            .orWhere('users.phone LIKE :filter', {
-              filter: `%${globalFilter}%`,
-            })
-            .orWhere('unit.streetName LIKE :filter', {
-              filter: `%${globalFilter}%`,
-            })
-            .orWhere('unit.identifier LIKE :filter', {
-              filter: `%${globalFilter}%`,
+      const globalFilterWords = globalFilter
+        .split(' ')
+        .filter((word) => word.length > 0);
+
+      if (globalFilterWords.length > 0) {
+        query.andWhere(
+          new Brackets((andQb) => {
+            globalFilterWords.forEach((word, index) => {
+              const paramName = `globalFilterWord${index}`;
+              andQb.andWhere(
+                new Brackets((orQb) => {
+                  orQb
+                    .where(`users.firstName LIKE :${paramName}`, {
+                      [paramName]: `%${word}%`,
+                    })
+                    .orWhere(`users.lastName LIKE :${paramName}`, {
+                      [paramName]: `%${word}%`,
+                    })
+                    .orWhere(`users.email LIKE :${paramName}`, {
+                      [paramName]: `%${word}%`,
+                    })
+                    .orWhere(`users.phone LIKE :${paramName}`, {
+                      [paramName]: `%${word}%`,
+                    })
+                    .orWhere(`unit.streetName LIKE :${paramName}`, {
+                      [paramName]: `%${word}%`,
+                    })
+                    .orWhere(`unit.identifier LIKE :${paramName}`, {
+                      [paramName]: `%${word}%`,
+                    });
+                }),
+              );
             });
-        }),
-      );
+          }),
+        );
+      }
     }
 
     query.addSelect(
