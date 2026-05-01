@@ -1,9 +1,17 @@
 import { SearchUserDto } from '@common/dtos';
 import { CryptoService } from '@common/services';
-import { paginateQuery } from '@common/utils';
+import {
+  formatPhone,
+  generateRandomString,
+  isProd,
+  isValidEmail,
+  paginateQuery,
+  validatePhone,
+} from '@common/utils';
 import { HousingUnit, Neighborhood, User } from '@database/entities';
 import { UnitAssignment } from '@database/entities/housing-assignment.entity';
 import {
+  BadRequestException,
   ConflictException,
   ForbiddenException,
   Injectable,
@@ -16,7 +24,13 @@ import {
   UserRoleEnum,
   UserStatusEnum,
 } from '@nex-house/enums';
-import { Brackets, DataSource, Repository } from 'typeorm';
+import {
+  Brackets,
+  DataSource,
+  DeepPartial,
+  FindOptionsWhere,
+  Repository,
+} from 'typeorm';
 import { CreateUserDto } from './dtos';
 
 @Injectable()
@@ -108,7 +122,7 @@ export class UsersService {
     publicId: string,
     neighborhoodId?: number,
   ): Promise<User | null> {
-    const whereCondition: any = { publicId };
+    const whereCondition: FindOptionsWhere<User> = { publicId };
     if (neighborhoodId !== undefined) {
       whereCondition.neighborhood = { id: neighborhoodId };
     }
@@ -124,7 +138,7 @@ export class UsersService {
     email: string,
     neighborhoodId?: number,
   ): Promise<User | null> {
-    const whereCondition: any = { email };
+    const whereCondition: FindOptionsWhere<User> = { email };
     if (neighborhoodId !== undefined) {
       whereCondition.neighborhood = { id: neighborhoodId };
     }
@@ -147,31 +161,55 @@ export class UsersService {
     createDto: CreateUserDto,
     currentUser: User,
   ) {
-    //TODO: validate : phone format, email format
+    const { email, phone } = createDto;
+
+    //email validations
+    const formatedEmail = await this.validateEmail(email);
+    //phone validations
+    const formatedPhone = phone
+      ? await this.validateAndFormatPhone(phone)
+      : undefined;
+
+    //unit validations
+    if (!createDto.unitId) {
+      if (!createDto.streetName) {
+        throw new BadRequestException('Street name is required.');
+      }
+      if (!createDto.identifier) {
+        throw new BadRequestException('Identifier is required.');
+      }
+    }
+
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      const hashedPassword = await this.cryptoService.hash('1234'); // TODO: Random pass
+      const pwd = isProd ? generateRandomString(10) : '1234';
+      const hashedPassword = await this.cryptoService.hash(pwd);
 
-      // 2. Crear el Usuario
-      const newUser = queryRunner.manager.create(User, {
-        firstName: createDto.firstName,
-        lastName: createDto.lastName,
-        email: createDto.email.toLowerCase().trim(),
-        phone: createDto.phone,
+      const nUser: DeepPartial<User> = {
+        firstName: createDto.firstName.trim(),
+        lastName: createDto.lastName
+          ? createDto.lastName.trim()
+          : createDto.lastName,
+        email: formatedEmail,
+        phone: formatedPhone,
         role: createDto.isAdmin ? UserRoleEnum.ADMIN : UserRoleEnum.RESIDENT,
         status: UserStatusEnum.PENDING_COMPLETION,
         createdBy: currentUser.id,
         neighborhoodId: neighborhood.id,
         password: hashedPassword,
-      });
+      };
+
+      // 2. Create User
+      const newUser = queryRunner.manager.create(User, nUser);
+
       const savedUser = await queryRunner.manager.save(newUser);
 
       let targetUnit: HousingUnit | null = null;
 
-      // 3. Gestión de la Unidad (Existente o Nueva)
+      // 3. Handle unit (new or existing)
       if (createDto.unitId) {
         targetUnit = await queryRunner.manager.findOne(HousingUnit, {
           where: { publicId: createDto.unitId },
@@ -188,10 +226,10 @@ export class UsersService {
       }
 
       if (!targetUnit) {
-        throw new NotFoundException('Unidad no encontrada');
+        throw new NotFoundException('Unit not found.');
       }
 
-      // 4. CREAR VÍNCULO MULTI-USUARIO (La nueva relación)
+      // 4. Unit assignment
       if (targetUnit) {
         const assignment = queryRunner.manager.create(UnitAssignment, {
           unitId: targetUnit.id,
@@ -201,11 +239,11 @@ export class UsersService {
           isFamily: createDto.isFamily,
           isOwner: createDto.isOwner,
           isTenant: createDto.isTenant,
-
-          // Aquí podrías usar un enum para distinguir roles internos
         });
         await queryRunner.manager.save(assignment);
       }
+
+      //TODO: Send email notification
 
       await queryRunner.commitTransaction();
       return this.findByPublicId(savedUser.publicId);
@@ -233,7 +271,7 @@ export class UsersService {
     await queryRunner.startTransaction();
 
     try {
-      // 1. Buscar el usuario existente
+      // 1. Find user
       const user = await queryRunner.manager.findOne(User, {
         where: { publicId: userPublicId },
         relations: ['neighborhood'], // Necesario para validar IDs numéricos
@@ -242,15 +280,28 @@ export class UsersService {
       if (!user) throw new NotFoundException('Usuario no encontrado');
 
       // 2. Actualizar datos básicos del Usuario
-      user.firstName = updateDto.firstName;
-      user.lastName = updateDto.lastName; // Asumiendo que agregaste este campo
-      user.phone = updateDto.phone;
+      if (updateDto.firstName && user.firstName !== updateDto.firstName) {
+        user.firstName = updateDto.firstName.trim();
+      }
+      if (updateDto.lastName && user.lastName !== updateDto.lastName) {
+        user.lastName = updateDto.lastName.trim();
+      }
+      if (user.phone) {
+        const fPhone = await this.validateAndFormatPhone(user.phone);
+        if (user.phone !== fPhone) {
+          user.phone = fPhone;
+        }
+      }
+      if (user.email) {
+        const fEmail = await this.validateEmail(user.email);
+        if (user.phone !== fEmail) {
+          user.email = fEmail;
+        }
+      }
       user.role = updateDto.isAdmin
         ? UserRoleEnum.ADMIN
         : UserRoleEnum.RESIDENT;
 
-      // Si el email cambia, TypeORM lanzará error de duplicado (manejado en el catch)
-      user.email = updateDto.email.toLowerCase().trim();
       user.updatedBy = currentUser.id;
 
       await queryRunner.manager.save(user);
@@ -311,6 +362,7 @@ export class UsersService {
       }
 
       await queryRunner.commitTransaction();
+      //TODO: Send email notification
       return this.findByPublicId(user.publicId);
     } catch (err) {
       await queryRunner.rollbackTransaction();
@@ -398,11 +450,42 @@ export class UsersService {
     }
   }
 
-  private async findOrThrow(publicId: string): Promise<User> {
-    const user = await this.repository.findOne({ where: { publicId } });
-    if (!user) {
-      throw new NotFoundException(`User with ID ${publicId} not found.`);
+  ///////////////////////////////////
+  /////////////////// PRIVATE METHODS ///////////////////
+  ///////////////////////////////////
+  async validateEmail(email: string) {
+    //email validations
+    if (!email) {
+      throw new BadRequestException('User email is required.');
     }
-    return user;
+    if (!isValidEmail(email)) {
+      throw new BadRequestException('User email format not valid.');
+    }
+    const formatedEmail = email.toLowerCase().trim();
+    const existsEmail = await this.repository.exists({
+      where: { email: formatedEmail },
+    });
+    if (existsEmail) {
+      throw new ConflictException(`Email ${existsEmail} already in use.`);
+    }
+    return formatedEmail;
+  }
+
+  async validateAndFormatPhone(phone: string) {
+    const formatedPhone = formatPhone(phone);
+
+    if (!validatePhone(formatedPhone)) {
+      throw new BadRequestException('User phone format not valid.');
+    }
+
+    const existsPhone = await this.repository.exists({
+      where: { phone: formatedPhone },
+    });
+
+    if (existsPhone) {
+      throw new ConflictException(`Phone ${phone} already in use.`);
+    }
+
+    return formatedPhone;
   }
 }

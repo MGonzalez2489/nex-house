@@ -5,6 +5,7 @@ import {
   effect,
   inject,
   input,
+  OnInit,
   signal,
 } from '@angular/core';
 import {
@@ -41,6 +42,8 @@ import { InputMaskModule } from 'primeng/inputmask';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { ICreateUserForm, IUserUnitForm } from './iuser-form';
+import { ConfirmationService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @Component({
   selector: 'app-user-form-page',
@@ -56,17 +59,20 @@ import { ICreateUserForm, IUserUnitForm } from './iuser-form';
     CheckboxModule,
     ToggleSwitchModule,
     PageHeader,
+    ConfirmDialogModule,
   ],
   templateUrl: './user-form-page.html',
   styleUrl: './user-form-page.css',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [ConfirmationService],
 })
-export class UserFormPage {
+export class UserFormPage implements OnInit {
   private readonly sessionService = inject(SessionService);
   protected readonly store = inject(UsersStore);
   protected readonly unitStore = inject(UnitsStore);
   protected readonly contextStore = inject(ContextStore);
+  protected readonly confirmationService = inject(ConfirmationService);
   protected readonly form = new FormGroup<ICreateUserForm>(
     {
       firstName: new FormControl('', {
@@ -125,6 +131,10 @@ export class UserFormPage {
     }));
   });
 
+  //form selections
+  payload = signal<ICreateUser | undefined>(undefined);
+  selectedUnit = signal<UnitModel | undefined>(undefined);
+
   constructor() {
     effect(async () => {
       const userId = this.id();
@@ -137,6 +147,7 @@ export class UserFormPage {
 
         if (unit) {
           this.isNewUnit.set(false);
+          this.selectedUnit.set(unit);
 
           const unitForAutocomplete = {
             ...unit,
@@ -169,6 +180,9 @@ export class UserFormPage {
 
     this.setupExclusiveFieldsLogic();
   }
+  ngOnInit(): void {
+    this.doSubmit();
+  }
 
   searchUnit(event: AutoCompleteCompleteEvent) {
     //TODO: add debounce
@@ -176,12 +190,14 @@ export class UserFormPage {
   }
 
   async doSubmit() {
+    const userId = this.id();
+
     this.form.markAllAsTouched();
+
     if (this.form.invalid) return;
 
     const raw = this.form.getRawValue();
 
-    const userId = this.id();
     const payload: ICreateUser = {
       firstName: raw.firstName,
       lastName: raw.lastName ? raw.lastName : null,
@@ -203,13 +219,30 @@ export class UserFormPage {
       alert("there's something wrong");
     }
 
-    const success = userId
-      ? await this.store.update(userId, payload)
-      : await this.store.create(payload);
+    this.payload.set(payload);
 
-    if (success) {
-      this.navigateBack();
-    }
+    this.confirmationService.confirm({
+      acceptLabel: 'Confirmar',
+      rejectLabel: 'Cancelar',
+      rejectButtonProps: {
+        severity: 'secondary',
+        text: true,
+      },
+      accept: async () => {
+        const success = userId
+          ? await this.store.update(userId, payload)
+          : await this.store.create(payload);
+
+        if (success) {
+          this.navigateBack();
+        } else {
+          this.payload.set(undefined);
+        }
+      },
+      reject: () => {
+        this.payload.set(undefined);
+      },
+    });
   }
   doCancel() {
     this.navigateBack();
@@ -217,6 +250,7 @@ export class UserFormPage {
 
   protected selectUnit(event: AutoCompleteSelectEvent) {
     const unit = event.value as UnitModel;
+    this.selectedUnit.set(unit);
     if (!unit) return;
 
     const existsOwner = unit.assignations.some((f) => f.isOwner);
@@ -249,6 +283,7 @@ export class UserFormPage {
     const { identifier, streetName } = newUnit.controls;
 
     if (isNew) {
+      this.selectedUnit.set(undefined);
       unit.setValue(null, { emitEvent: false });
       unit.clearValidators();
       identifier.setValidators([Validators.required]);
@@ -287,13 +322,3 @@ function atLeastOneRoleRequired(
   }
   return null;
 }
-// function atLeastOneRoleRequired(group: FormGroup): ValidationErrors | null {
-//   const isOwner = group.get('isOwner')?.value;
-//   const isFamily = group.get('isFamily')?.value;
-//   const isTenant = group.get('isTenant')?.value;
-//
-//   if (!isOwner && !isFamily && !isTenant) {
-//     return { atLeastOneRoleRequired: true };
-//   }
-//   return null;
-// }

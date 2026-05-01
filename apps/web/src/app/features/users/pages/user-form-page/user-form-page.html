@@ -299,3 +299,104 @@
     </div>
   </form>
 </div>
+
+<p-confirmdialog>
+  <ng-template #header>
+    <!-- Encabezado con Rol Enfatizado -->
+    <div class="">
+      <p class="text-lg font-bold text-slate-800">
+        {{ isEdit() ? 'Confirmar Actualización' : 'Confirmar Registro' }}
+      </p>
+      <p
+        [class]="
+          payload()?.isAdmin
+            ? 'bg-indigo-100 text-indigo-700'
+            : 'bg-emerald-100 text-emerald-700'
+        "
+        class="px-3 flex items-center justify-center py-1.5 rounded-full text-xs font-black uppercase tracking-wider"
+      >
+        {{ payload()?.isAdmin ? 'Administrador' : 'Residente' }}
+      </p>
+    </div>
+  </ng-template>
+  <ng-template #message let-message>
+    <div
+      class="flex flex-col gap-y-6 min-w-[320px] pt-5 border-t border-gray-100"
+    >
+      <div class="grid grid-cols-1 gap-y-3 text-sm">
+        <!-- Datos Personales -->
+        <div class="bg-slate-50 p-3 rounded-lg space-y-2">
+          <div class="flex justify-between">
+            <span class="text-slate-500">Nombre</span>
+            <span class="font-medium capitalize"
+              >{{ payload()?.firstName }} {{ payload()?.lastName }}</span
+            >
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-500">Email</span>
+            <span class="font-medium truncate ml-4">{{
+              payload()?.email
+            }}</span>
+          </div>
+          @if (payload()?.phone) {
+            <div class="flex justify-between">
+              <span class="text-slate-500">Teléfono</span>
+              <span class="font-medium truncate ml-4">{{
+                payload()?.phone
+              }}</span>
+            </div>
+          }
+        </div>
+
+        <!-- Relacion -->
+        <div class="bg-slate-50 p-3 my-4 rounded-lg space-y-2">
+          <div class="flex justify-between">
+            <span class="text-slate-500">Relacion</span>
+            <span class="font-bold capitalize">
+              @if (payload()?.isOwner) {
+                <span>Dueño</span>
+              } @else if (payload()?.isFamily) {
+                <span>Familiar</span>
+              } @else if (payload()?.isTenant) {
+                <span>Renta</span>
+              } @else {
+                <span></span>
+              }
+            </span>
+          </div>
+        </div>
+
+        <!-- Unidad con Alerta de Creación -->
+        <div class="px-3">
+          <div class="flex justify-between items-center">
+            <span class="font-semibold text-slate-700 italic"
+              >Unidad / Lote</span
+            >
+            @if (selectedUnit(); as unit) {
+              <span class="font-bold text-blue-600">
+                {{ unit.street }} {{ unit.identifier }}
+              </span>
+            } @else {
+              <span class="font-bold text-blue-600">
+                {{ payload()?.streetName }} {{ payload()?.identifier }}
+              </span>
+            }
+          </div>
+
+          <!-- Lógica para Unidad Nueva -->
+          @if (!selectedUnit() && !payload()?.unitId) {
+            <div
+              class="mt-4 flex items-center gap-2 text-amber-600 text-[11px] bg-amber-50 p-2 rounded border border-amber-100"
+            >
+              <i class="pi pi-exclamation-triangle text-xs"></i>
+              <span
+                >La unidad no existe y se
+                <span class="font-bold">creará automáticamente</span>.</span
+              >
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-confirmdialog>
