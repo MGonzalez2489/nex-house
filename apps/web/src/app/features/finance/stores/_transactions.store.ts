@@ -4,12 +4,12 @@ import {
   setLoading,
   withCallState,
   withReset,
-} from '@angular-architects/ngrx-toolkit';
-import { computed, effect, inject } from '@angular/core';
-import { AuthStore } from '@features/auth';
-import { ApiPaginationMeta, SearchTransaction } from '@nex-house/interfaces';
-import { TransactionKpiModel, TransactionModel } from '@nex-house/models';
-import { tapResponse } from '@ngrx/operators';
+} from "@angular-architects/ngrx-toolkit";
+import { computed, effect, inject } from "@angular/core";
+import { AuthStore } from "@features/auth";
+import { ApiPaginationMeta, SearchTransaction } from "@nex-house/interfaces";
+import { TransactionKpiModel, TransactionModel } from "@nex-house/models";
+import { tapResponse } from "@ngrx/operators";
 import {
   patchState,
   signalStoreFeature,
@@ -19,20 +19,20 @@ import {
   withMethods,
   withProps,
   withState,
-} from '@ngrx/signals';
+} from "@ngrx/signals";
 import {
   entityConfig,
   prependEntity,
   setAllEntities,
   updateEntity,
   withEntities,
-} from '@ngrx/signals/entities';
-import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { ContextStore } from '@stores/context.store';
-import { lastValueFrom, pipe, switchMap, tap } from 'rxjs';
-import { TransactionService } from '../services';
+} from "@ngrx/signals/entities";
+import { rxMethod } from "@ngrx/signals/rxjs-interop";
+import { ContextStore } from "@stores/context.store";
+import { lastValueFrom, pipe, switchMap, tap } from "rxjs";
+import { TransactionService } from "../services";
 
-const collection = 'transactions';
+const collection = "transactions";
 //TODO: move this to other folder
 export type GroupedTransactionList = {
   date: string;
@@ -155,9 +155,10 @@ export function withTransactionsFeature() {
           );
           patchState(
             store,
-            prependEntity(response.data, config),
+            // prependEntity(response.data, config),
             setLoaded(collection),
           );
+          store.transactionsLoadAll(store.transactionsFilters()!);
           const cFilters = store.transactionsFilters();
           if (cFilters) {
             store.transactionsKpi(cFilters);

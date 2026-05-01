@@ -4,59 +4,65 @@
     title="Control Financiero"
     subTitle="Seguimiento de todos los movimientos del fraccionamiento."
   >
-    @if(existsRecords()){
-    <div actions class="flex items-center gap-4">
-      <p-overlaybadge [value]="filterCount()">
+    @if (existsRecords()) {
+      <div actions class="flex items-center gap-4">
+        <p-overlaybadge [value]="filterCount()">
+          <p-button
+            icon="pi pi-filter"
+            severity="secondary"
+            (click)="changeFilters()"
+          />
+        </p-overlaybadge>
         <p-button
-          icon="pi pi-filter"
-          severity="secondary"
-          (click)="changeFilters()"
+          label="Nuevo Movimiento"
+          icon="pi pi-plus"
+          (click)="addMovement()"
         />
-      </p-overlaybadge>
-      <p-button
-        label="Nuevo Movimiento"
-        icon="pi pi-plus"
-        (click)="addMovement()"
-      />
-    </div>
+      </div>
     }
   </app-page-header>
 
-  <!-- @if(!existsRecords()){ -->
-  <!-- <app-cash-transaction-init (add)="addMovement()" /> -->
-  <!-- } @else{ -->
-
-  <!-- MOCK -->
-  <!-- Quick Stats Cards -->
-  <app-cash-summary
-    class="block"
-    [isLoading]="store.transactionsLoading()"
-    [summary]="store.transactionsSummary()"
-  />
-
-  <app-cash-filters-chips
-    class="block"
-    [filters]="store.transactionsFilters()"
-    [categories]="catalogsStore.transactionCategoriesEntities()"
-    (removeFilter)="removeFilter($event)"
-  />
-  <!-- Timeline Journal -->
-  <app-cash-movement-list
-    class="block md:hidden"
-    [records]="store.transactionsByDate()"
-    [isLoading]="store.transactionsLoading()"
-  />
-  <p-card class="hidden md:block">
-    <app-cash-transactions-table
-      [transactions]="store.transactionsEntities()"
-      [pagination]="store.transactionsPagination()"
+  @if (store.transactionsLoading()) {
+    <app-cash-summary
+      class="block"
       [isLoading]="true"
-      (view)="view($event)"
-      (update)="update($event)"
-      (delete)="delete($event)"
+      [summary]="store.transactionsSummary()"
     />
-  </p-card>
-  <!-- } -->
+  } @else {
+    @if (!existsRecords()) {
+      <app-cash-transaction-init (add)="addMovement()" />
+    } @else {
+      <!-- Quick Stats Cards -->
+      <app-cash-summary
+        class="block"
+        [isLoading]="store.transactionsLoading()"
+        [summary]="store.transactionsSummary()"
+      />
+
+      <app-cash-filters-chips
+        class="block"
+        [filters]="store.transactionsFilters()"
+        [categories]="catalogsStore.transactionCategoriesEntities()"
+        (removeFilter)="removeFilter($event)"
+      />
+      <!-- Timeline Journal -->
+      <app-cash-movement-list
+        class="block md:hidden"
+        [records]="store.transactionsByDate()"
+        [isLoading]="store.transactionsLoading()"
+      />
+      <p-card class="hidden md:block">
+        <app-cash-transactions-table
+          [transactions]="store.transactionsEntities()"
+          [pagination]="store.transactionsPagination()"
+          [isLoading]="false"
+          (view)="view($event)"
+          (update)="update($event)"
+          (delete)="delete($event)"
+        />
+      </p-card>
+    }
+  }
 </div>
 
 <p-confirmDialog>

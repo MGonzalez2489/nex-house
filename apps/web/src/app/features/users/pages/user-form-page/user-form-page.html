@@ -269,7 +269,7 @@
             >
           </div>
         </div>
-        @if (form.errors?.['atLeastOneRoleRequired'] && form.touched) {
+        @if (form.errors?.["atLeastOneRoleRequired"] && form.touched) {
           <p class="p-error pt-3 block animate-fade-in text-xs text-red-500">
             Un rol es requerido
           </p>
@@ -300,12 +300,12 @@
   </form>
 </div>
 
-<p-confirmdialog>
+<p-confirmdialog [pt]="{ header: 'pb-2' }">
   <ng-template #header>
     <!-- Encabezado con Rol Enfatizado -->
-    <div class="">
+    <div>
       <p class="text-lg font-bold text-slate-800">
-        {{ isEdit() ? 'Confirmar Actualización' : 'Confirmar Registro' }}
+        {{ isEdit() ? "Confirmar Actualización" : "Confirmar Registro" }}
       </p>
       <p
         [class]="
@@ -313,9 +313,9 @@
             ? 'bg-indigo-100 text-indigo-700'
             : 'bg-emerald-100 text-emerald-700'
         "
-        class="px-3 flex items-center justify-center py-1.5 rounded-full text-xs font-black uppercase tracking-wider"
+        class="px-3 mt-2 flex items-center justify-center py-1.5 rounded-full text-xs font-black uppercase tracking-wider"
       >
-        {{ payload()?.isAdmin ? 'Administrador' : 'Residente' }}
+        {{ payload()?.isAdmin ? "Administrador" : "Residente" }}
       </p>
     </div>
   </ng-template>

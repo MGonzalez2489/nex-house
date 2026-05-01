@@ -3,6 +3,7 @@ export interface ApiPaginationMeta {
   page: number;
   lastPage: number;
   limit: number;
+  existRecords: boolean;
 }
 
 export interface ApiResponse<T> {

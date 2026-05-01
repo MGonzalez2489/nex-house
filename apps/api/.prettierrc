@@ -1,0 +1,6 @@
+{
+  "extends": "../../.prettierrc",
+  "trailingComma": "all",
+  "singleQuote": true,
+  "printWidth": 80
+}

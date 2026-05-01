@@ -22,6 +22,8 @@ export async function paginate<T extends ObjectLiteral>(
   const sortField = searchDto.sortField ? searchDto.sortField : 'createdAt';
   const sortOrder = searchDto.sortOrder === 1 ? 'ASC' : 'DESC';
 
+  const totalRecordsInDb = await repository.count();
+
   const [data, total] = await repository.findAndCount({
     ...findOptions,
     skip: first, // Index to start from
@@ -36,6 +38,7 @@ export async function paginate<T extends ObjectLiteral>(
       page: Math.floor(first / rows) + 1,
       lastPage: Math.ceil(total / rows),
       limit: rows,
+      existRecords: totalRecordsInDb > 0, // Se establece si existen registros
     },
   };
 }
@@ -48,6 +51,11 @@ export async function paginateQuery<T extends ObjectLiteral>(
   const rows = searchDto.rows || 10;
   const sortField = searchDto.sortField ? searchDto.sortField : 'createdAt';
   const sortOrder = searchDto.sortOrder === 1 ? 'ASC' : 'DESC';
+
+  // const totalRecordsInDb = await query.repository.count();
+  const mainAlias = query.expressionMap.mainAlias;
+  const repository = query.connection.getRepository(mainAlias!.target);
+  const totalRecordsInDb = await repository.count();
 
   if (sortField) {
     const orderColumn = sortField.includes('.')
@@ -68,6 +76,7 @@ export async function paginateQuery<T extends ObjectLiteral>(
       page: Math.floor(first / rows) + 1,
       lastPage: Math.ceil(count / rows) || 1,
       limit: rows,
+      existRecords: totalRecordsInDb > 0, // Se establece si existen registros
     },
   };
 }

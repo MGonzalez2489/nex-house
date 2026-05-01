@@ -6,20 +6,20 @@ import {
   inject,
   input,
   output,
-} from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { FinanceStore } from '@features/finance/stores';
-import { SearchTransaction } from '@nex-house/interfaces';
-import { TransactionCategorySelect } from '@shared/components/smart';
-import { ButtonModule } from 'primeng/button';
-import { DatePickerModule } from 'primeng/datepicker';
-import { DynamicDialogRef } from 'primeng/dynamicdialog';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
-import { InputTextModule } from 'primeng/inputtext';
+} from "@angular/core";
+import { FormControl, FormGroup, ReactiveFormsModule } from "@angular/forms";
+import { FinanceStore } from "@features/finance/stores";
+import { SearchTransaction } from "@nex-house/interfaces";
+import { TransactionCategorySelect } from "@shared/components/smart";
+import { ButtonModule } from "primeng/button";
+import { DatePickerModule } from "primeng/datepicker";
+import { DynamicDialogRef } from "primeng/dynamicdialog";
+import { IconFieldModule } from "primeng/iconfield";
+import { InputIconModule } from "primeng/inputicon";
+import { InputTextModule } from "primeng/inputtext";
 
 @Component({
-  selector: 'app-cash-filters',
+  selector: "app-cash-filters",
   imports: [
     InputTextModule,
     InputIconModule,
@@ -29,8 +29,8 @@ import { InputTextModule } from 'primeng/inputtext';
     ReactiveFormsModule,
     TransactionCategorySelect,
   ],
-  templateUrl: './cash-filters.html',
-  styleUrl: './cash-filters.css',
+  templateUrl: "./cash-filters.html",
+  styleUrl: "./cash-filters.css",
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -53,8 +53,8 @@ export class CashFilters {
   });
 
   protected readonly form = new FormGroup({
-    hint: new FormControl('', { nonNullable: true }),
-    category: new FormControl('', { nonNullable: true }),
+    hint: new FormControl("", { nonNullable: true }),
+    category: new FormControl("", { nonNullable: true }),
     date: new FormControl(new Date(), { nonNullable: true }),
   });
 
@@ -64,7 +64,7 @@ export class CashFilters {
 
       if (!cFilters) return;
 
-      const dFilter = new Date(cFilters.year, cFilters.month - 1);
+      const dFilter = new Date(cFilters.year, cFilters.month);
 
       this.form.patchValue({
         hint: cFilters.globalFilter,
@@ -81,7 +81,7 @@ export class CashFilters {
     cFilters.globalFilter = hint ? hint : undefined;
     cFilters.category = category;
     if (date) {
-      cFilters.month = date.getMonth() + 1;
+      cFilters.month = date.getMonth();
       cFilters.year = date.getFullYear();
     }
 
@@ -91,8 +91,8 @@ export class CashFilters {
   }
   protected resetForm() {
     this.form.patchValue({
-      hint: '',
-      category: '',
+      hint: "",
+      category: "",
       date: new Date(),
     });
     this.form.updateValueAndValidity();

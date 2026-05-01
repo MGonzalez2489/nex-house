@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { DatePipe } from "@angular/common";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -6,11 +6,11 @@ import {
   inject,
   input,
   output,
-} from '@angular/core';
-import { SearchTransaction } from '@nex-house/interfaces';
-import { TransactionCategoryModel } from '@nex-house/models';
-import { PrimeIcons } from 'primeng/api';
-import { ChipModule } from 'primeng/chip';
+} from "@angular/core";
+import { SearchTransaction } from "@nex-house/interfaces";
+import { TransactionCategoryModel } from "@nex-house/models";
+import { PrimeIcons } from "primeng/api";
+import { ChipModule } from "primeng/chip";
 
 type FilterChip = {
   key: string;
@@ -21,10 +21,10 @@ type FilterChip = {
 };
 
 @Component({
-  selector: 'app-cash-filters-chips',
+  selector: "app-cash-filters-chips",
   imports: [ChipModule],
-  templateUrl: './cash-filters-chips.html',
-  styleUrl: './cash-filters-chips.css',
+  templateUrl: "./cash-filters-chips.html",
+  styleUrl: "./cash-filters-chips.css",
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [DatePipe],
@@ -43,9 +43,9 @@ export class CashFiltersChips {
     if (cFilters.month && cFilters.year) {
       const d = new Date(cFilters.year, cFilters.month - 1);
       const dString =
-        this.dPipe.transform(d, 'MMMM yyyy') || new Date().toDateString();
+        this.dPipe.transform(d, "MMMM yyyy") || new Date().toDateString();
       c.push({
-        key: 'date',
+        key: "date",
         label: dString, //'Fecha',
         value: `${cFilters.month}/${cFilters.year}`,
         icon: PrimeIcons.CALENDAR,
@@ -56,7 +56,7 @@ export class CashFiltersChips {
     //Description
     if (cFilters.globalFilter) {
       c.push({
-        key: 'globalFilter',
+        key: "globalFilter",
         // label: 'Descripcion',
         label: `Descripcion : ${cFilters.globalFilter}`,
         value: cFilters.globalFilter,
@@ -70,7 +70,7 @@ export class CashFiltersChips {
         (f) => f.publicId === cFilters.category,
       );
       c.push({
-        key: 'cateogry',
+        key: "category",
         label: `Categoria: ${cat?.name}`,
         value: cFilters.category,
         icon: PrimeIcons.TAG,

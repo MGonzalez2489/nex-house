@@ -6,44 +6,45 @@ import {
   computed,
   inject,
   OnInit,
-} from '@angular/core';
-import { ModalService } from '@core/services';
+} from "@angular/core";
+import { ModalService } from "@core/services";
 import {
   CashFilters,
   CashFiltersChips,
   CashForm,
   CashMovementList,
   CashSummary,
-} from '@features/finance/components';
-import { CashTransactionsTable } from '@features/finance/components/cash-transactions-table/cash-transactions-table';
-import { TransactionView } from '@features/finance/components/transaction-view/transaction-view';
-import { CatalogsStore, FinanceStore } from '@features/finance/stores';
-import { SearchTransaction } from '@nex-house/interfaces';
-import { TransactionModel } from '@nex-house/models';
-import { PageHeader } from '@shared/components/ui';
-import { ContextStore } from '@stores/context.store';
-import { ConfirmationService } from 'primeng/api';
-import { ButtonModule } from 'primeng/button';
-import { Card } from 'primeng/card';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { OverlayBadgeModule } from 'primeng/overlaybadge';
+  CashTransactionInit,
+} from "@features/finance/components";
+import { CashTransactionsTable } from "@features/finance/components/cash-transactions-table/cash-transactions-table";
+import { TransactionView } from "@features/finance/components/transaction-view/transaction-view";
+import { CatalogsStore, FinanceStore } from "@features/finance/stores";
+import { SearchTransaction } from "@nex-house/interfaces";
+import { TransactionModel } from "@nex-house/models";
+import { PageHeader } from "@shared/components/ui";
+import { ContextStore } from "@stores/context.store";
+import { ConfirmationService } from "primeng/api";
+import { ButtonModule } from "primeng/button";
+import { Card } from "primeng/card";
+import { ConfirmDialogModule } from "primeng/confirmdialog";
+import { OverlayBadgeModule } from "primeng/overlaybadge";
 
 @Component({
-  selector: 'app-cash-control',
+  selector: "app-cash-control",
   imports: [
     PageHeader,
     ButtonModule,
     CashSummary,
     CashMovementList,
-    // CashTransactionInit,
+    CashTransactionInit,
     CashFiltersChips,
     OverlayBadgeModule,
     CashTransactionsTable,
     Card,
     ConfirmDialogModule,
   ],
-  templateUrl: './cash-control.html',
-  styleUrl: './cash-control.css',
+  templateUrl: "./cash-control.html",
+  styleUrl: "./cash-control.css",
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [ConfirmationService],
@@ -56,18 +57,7 @@ export class CashControl implements OnInit {
   protected readonly catalogsStore = inject(CatalogsStore);
 
   protected readonly existsRecords = computed(() => {
-    const loading = this.store.transactionsLoading();
-
-    if (loading) return false;
-
-    const pg = this.store.transactionsPagination();
-    const count = this.store.transactionsEntities().length;
-
-    if (count > 0) return true;
-
-    if (pg && pg.total > 0) return true;
-
-    return false;
+    return this.store.transactionsPagination()?.existRecords;
   });
 
   protected readonly filterCount = computed(() => {
@@ -96,13 +86,13 @@ export class CashControl implements OnInit {
   }
 
   addMovement(): void {
-    this.modalService.open(CashForm, { header: 'Registrar Movimiento' });
+    this.modalService.open(CashForm, { header: "Registrar Movimiento" });
   }
 
   changeFilters(): void {
     this.modalService.open(CashFilters, {
-      header: 'Filtrar transacciones',
-      width: '25vw',
+      header: "Filtrar transacciones",
+      width: "25vw",
       inputValues: {
         filters: this.store.transactionsFilters(),
       },
@@ -120,7 +110,6 @@ export class CashControl implements OnInit {
   }
 
   search(newFilters: SearchTransaction) {
-    newFilters.month++;
     this.store.transactionsLoadAll(newFilters);
     const cFilters = this.store.transactionsFilters();
     if (!cFilters) {
@@ -139,7 +128,7 @@ export class CashControl implements OnInit {
   view(transaction: TransactionModel) {
     this.modalService.open(TransactionView, {
       showHeader: false,
-      width: '50vw',
+      width: "50vw",
       contentStyle: { padding: 0 },
       inputValues: {
         transaction,
@@ -148,27 +137,27 @@ export class CashControl implements OnInit {
   }
   update(transaction: TransactionModel) {
     this.modalService.open(CashForm, {
-      header: 'Actualizar Movimiento',
+      header: "Actualizar Movimiento",
       inputValues: { existing: transaction },
     });
   }
   delete(transaction: TransactionModel) {
-    console.log('entro al delete');
+    console.log("entro al delete");
 
     this.confirmationService.confirm({
-      header: 'Confirmar Anulación',
+      header: "Confirmar Anulación",
       message: `¿Estás seguro de anular "${transaction.title}"?`,
-      icon: 'pi pi-exclamation-triangle',
-      rejectLabel: 'Cancelar',
+      icon: "pi pi-exclamation-triangle",
+      rejectLabel: "Cancelar",
       blockScroll: true,
 
       rejectButtonProps: {
-        label: 'Cancelar',
-        severity: 'secondary',
+        label: "Cancelar",
+        severity: "secondary",
         outlined: true,
       },
-      acceptLabel: 'Anular Movimiento',
-      acceptButtonProps: { label: 'Anular Movimiento', severity: 'danger' },
+      acceptLabel: "Anular Movimiento",
+      acceptButtonProps: { label: "Anular Movimiento", severity: "danger" },
       accept: () => {
         this.store.TransactionRemove(transaction.publicId);
       },
