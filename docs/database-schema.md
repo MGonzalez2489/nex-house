@@ -180,6 +180,35 @@ erDiagram
         string providerName
     }
     Expense }|--|| Neighborhood : "neighborhood"
+    NxFile {
+        int id
+        uuid publicId
+        timestamp createdAt
+        timestamp updatedAt
+        timestamp deletedAt
+        number createdBy
+        number updatedBy
+        number deletedBy
+        string originalName
+        string fileName
+        string mimeType
+        bigint size
+        string url
+        string extension
+    }
+    TransactionCategory {
+        int id
+        uuid publicId
+        timestamp createdAt
+        timestamp updatedAt
+        timestamp deletedAt
+        string name
+        string description
+        string icon
+        string color
+        enum allowedType
+    }
+    TransactionCategory ||--|{ Transaction : "transactions"
     Transaction {
         int id
         uuid publicId
@@ -193,8 +222,18 @@ erDiagram
         enum type
         int amount
         enum sourceType
-        date transactionDate
+        timestamp transactionDate
+        text title
+        number evidenceId
         text description
+        number categoryId
+        boolean isActive
+        number reversedById
+        boolean isReversal
     }
+    Transaction ||--|{ Transaction : "reversedBy"
     Transaction }|--|| Neighborhood : "neighborhood"
+    Transaction }|--|| User : "createdByUser"
+    Transaction }|--|| TransactionCategory : "category"
+    Transaction ||--|{ NxFile : "evidence"
 ```

@@ -1,12 +1,11 @@
-import { Injectable, computed, effect, inject } from '@angular/core';
-import { Router } from '@angular/router';
-import { AUTH_ROUTES_ENUM, AuthStore } from '@features/auth';
-import { UserRoleEnum } from '@nex-house/enums';
-import { ContextStore } from '@stores/context.store';
-import { BreadcrumbService } from './breadcrumb.service';
+import { Injectable, computed, effect, inject } from "@angular/core";
+import { Router } from "@angular/router";
+import { AUTH_ROUTES_ENUM, AuthStore } from "@features/auth";
+import { ContextStore } from "@stores/context.store";
+import { BreadcrumbService } from "./breadcrumb.service";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class SessionService {
   //////////////////////stores
@@ -17,14 +16,15 @@ export class SessionService {
 
   readonly user = computed(() => this.authStore.user());
   readonly token = computed(() => this.authStore.token());
+  readonly role = computed(() => this.authStore.user()?.role);
 
-  readonly isRoot = computed(
-    () => this.user()?.role === UserRoleEnum.SUPER_ADMIN,
-  );
-  readonly isAdmin = computed(() => this.user()?.role === UserRoleEnum.ADMIN);
-  readonly isResident = computed(
-    () => this.user()?.role === UserRoleEnum.RESIDENT,
-  );
+  // readonly isRoot = computed(
+  //   () => this.user()?.role === UserRoleEnum.SUPER_ADMIN,
+  // );
+  // readonly isAdmin = computed(() => this.user()?.role === UserRoleEnum.ADMIN);
+  // readonly isResident = computed(
+  //   () => this.user()?.role === UserRoleEnum.RESIDENT,
+  // );
 
   constructor() {
     effect(() => {
@@ -48,7 +48,7 @@ export class SessionService {
       const parentRoute = crumbs[crumbs.length - 2].url;
       this.router.navigateByUrl(parentRoute);
     } else {
-      this.router.navigate(['/dashboard']);
+      this.router.navigate(["/dashboard"]);
     }
   }
 }

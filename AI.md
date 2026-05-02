@@ -2,7 +2,7 @@
 
 ## 🛠 Stack Tecnológico
 
-- **Framework:** Angular 19+ (Uso intensivo de **Signals**, `inject()`, y nuevos flujos de control `@if` / `@for`).
+- **Framework:** Angular 21.x+ (Uso intensivo de **Signals**, `inject()`, y nuevos flujos de control `@if` / `@for`).
 - **Estilos:** Tailwind CSS.
 - **UI Library:** PrimeIcons.
 - **Estado:** Reactividad basada en Signals para servicios globales.
