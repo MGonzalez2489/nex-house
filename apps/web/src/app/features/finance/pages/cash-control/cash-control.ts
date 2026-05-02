@@ -78,7 +78,7 @@ export class CashControl implements OnInit {
       filters = {
         rows: 10,
         first: 0,
-        month: today.getMonth(),
+        month: today.getMonth() + 1,
         year: today.getFullYear(),
       };
       this.search(filters);

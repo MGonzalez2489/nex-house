@@ -64,7 +64,9 @@ export class CashFilters {
 
       if (!cFilters) return;
 
-      const dFilter = new Date(cFilters.year, cFilters.month);
+      const month = cFilters.month - 1;
+
+      const dFilter = new Date(cFilters.year, month);
 
       this.form.patchValue({
         hint: cFilters.globalFilter,
@@ -81,7 +83,7 @@ export class CashFilters {
     cFilters.globalFilter = hint ? hint : undefined;
     cFilters.category = category;
     if (date) {
-      cFilters.month = date.getMonth();
+      cFilters.month = date.getMonth() + 1;
       cFilters.year = date.getFullYear();
     }
 
@@ -90,10 +92,11 @@ export class CashFilters {
     this.ref.close();
   }
   protected resetForm() {
+    const nDate = new Date();
     this.form.patchValue({
       hint: "",
       category: "",
-      date: new Date(),
+      date: new Date(nDate.getFullYear(), nDate.getMonth(), 1),
     });
     this.form.updateValueAndValidity();
   }
