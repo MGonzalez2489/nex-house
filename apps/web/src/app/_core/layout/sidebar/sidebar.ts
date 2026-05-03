@@ -3,19 +3,20 @@ import {
   Component,
   computed,
   inject,
-} from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { SessionService, SidebarService } from '@core/services';
-import { UserAvatar } from '@shared/components/ui';
-import { RolePipe } from '@shared/pipes';
-import { ButtonModule } from 'primeng/button';
-import { NavItem } from './nav-item/nav-item';
+} from "@angular/core";
+import { RouterLink } from "@angular/router";
+import { SessionService, SidebarService } from "@core/services";
+import { UserAvatar } from "@shared/components/ui";
+import { RolePipe } from "@shared/pipes";
+import { ButtonModule } from "primeng/button";
+import { NavItem } from "./nav-item/nav-item";
+import { Brand } from "../brand/brand";
 
 @Component({
-  selector: 'app-sidebar',
-  imports: [RouterLink, NavItem, ButtonModule, UserAvatar, RolePipe],
-  templateUrl: './sidebar.html',
-  styleUrl: './sidebar.css',
+  selector: "app-sidebar",
+  imports: [RouterLink, NavItem, ButtonModule, UserAvatar, RolePipe, Brand],
+  templateUrl: "./sidebar.html",
+  styleUrl: "./sidebar.css",
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

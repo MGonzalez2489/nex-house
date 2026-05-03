@@ -1,20 +1,28 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { SessionService } from '@core/services';
-import { AuthStore } from '@features/auth';
-import { CatalogsStore, FinanceStore } from '@features/finance/stores';
-import { UserRoleEnum } from '@nex-house/enums';
-import { ContextStore } from '@stores/context.store';
-import { DrawerModule } from 'primeng/drawer';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { Navbar } from '../navbar/navbar';
-import { Sidebar } from '../sidebar/sidebar';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+} from "@angular/core";
+import { RouterOutlet } from "@angular/router";
+import { SessionService } from "@core/services";
+import { AuthStore } from "@features/auth";
+import { CatalogsStore, FinanceStore } from "@features/finance/stores";
+import { UserRoleEnum } from "@nex-house/enums";
+import { ContextStore } from "@stores/context.store";
+import { DrawerModule } from "primeng/drawer";
+import { ProgressSpinnerModule } from "primeng/progressspinner";
+import { Navbar } from "../navbar/navbar";
+import { Sidebar } from "../sidebar/sidebar";
 
 @Component({
-  selector: 'app-main-layout',
+  selector: "app-main-layout",
   imports: [RouterOutlet, Sidebar, Navbar, DrawerModule, ProgressSpinnerModule],
-  templateUrl: './main-layout.html',
-  styleUrl: './main-layout.css',
+  templateUrl: "./main-layout.html",
+  styleUrl: "./main-layout.css",
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MainLayout {
   protected readonly sessionService = inject(SessionService);
@@ -22,6 +30,7 @@ export class MainLayout {
   protected readonly authStore = inject(AuthStore);
   protected readonly financeStore = inject(FinanceStore);
   protected readonly catalogsStore = inject(CatalogsStore);
+
   sidebarVisible = signal(false);
 
   loadingContext = computed(() => {

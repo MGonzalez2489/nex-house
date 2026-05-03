@@ -3,6 +3,7 @@ import { Router } from "@angular/router";
 import { AUTH_ROUTES_ENUM, AuthStore } from "@features/auth";
 import { ContextStore } from "@stores/context.store";
 import { BreadcrumbService } from "./breadcrumb.service";
+import { UserRoleEnum } from "@nex-house/enums";
 
 @Injectable({
   providedIn: "root",
@@ -14,17 +15,17 @@ export class SessionService {
   private readonly breadcrumbService = inject(BreadcrumbService);
   private router = inject(Router);
 
+  readonly neighborhood = computed(() => this.contextStore.neighborhood());
   readonly user = computed(() => this.authStore.user());
   readonly token = computed(() => this.authStore.token());
   readonly role = computed(() => this.authStore.user()?.role);
+  readonly expTime = computed(() => this.authStore.exp());
+  readonly requireSideBar = computed(() => {
+    const r = this.role();
+    if (!r) return false;
 
-  // readonly isRoot = computed(
-  //   () => this.user()?.role === UserRoleEnum.SUPER_ADMIN,
-  // );
-  // readonly isAdmin = computed(() => this.user()?.role === UserRoleEnum.ADMIN);
-  // readonly isResident = computed(
-  //   () => this.user()?.role === UserRoleEnum.RESIDENT,
-  // );
+    return r !== UserRoleEnum.RESIDENT;
+  });
 
   constructor() {
     effect(() => {

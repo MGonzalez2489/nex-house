@@ -6,20 +6,7 @@
 >
   <!-- ── HEADER ────────────────────────────────── -->
   <div class="sidebar-header">
-    <a
-      class="logo-area"
-      routerLink="/"
-      aria-label="{{ config().header.name }} - Inicio"
-    >
-      <img class="logo-icon" [src]="config().header.icon" alt="nex-icon" />
-
-      <div class="logo-text">
-        <span class="logo-name">{{ config().header.name }}</span>
-        @if (config().header.tagline) {
-          <span class="logo-tagline">{{ config().header.tagline }}</span>
-        }
-      </div>
-    </a>
+    <app-brand />
 
     <p-button
       (click)="service.toggleCollapsed()"

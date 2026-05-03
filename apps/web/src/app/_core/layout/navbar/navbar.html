@@ -1,40 +1,102 @@
 <header
   class="bg-white/80 border-b border-slate-200 h-16 flex items-center justify-between px-4 lg:px-8"
 >
-  <div class="flex items-center gap-3">
-    <p-button
-      icon="pi pi-bars"
-      severity="secondary"
-      text
-      class="lg:hidden"
-      (click)="toggleSidebar.emit()"
-    />
-    @if(user()?.role !=='super_admin'){
-
-    <p
-      class="capitalize font-semibold font-sans text-lg text-slate-700 w-64 md:w-80 truncate"
-    >
-      {{neighborhood()?.name}}
-    </p>
-    }
-  </div>
-
-  <div class="flex items-center gap-4">
-    <p>{{expirationCounter()}}</p>
-    <div class="hidden md:block">
-      <p-button icon="pi pi-bell" severity="secondary" text />
-      <p-button icon="pi pi-question-circle" severity="secondary" text />
+  @if (isResident()) {
+    <div class="flex items-center gap-10">
+      <app-brand />
+      <!-- Links de Navegación Rápidos -->
+      <div class="hidden md:flex items-center gap-6">
+        <a
+          href="#"
+          class="text-indigo-600 font-bold text-sm border-b-2 border-indigo-600 h-16 flex items-center"
+          >Inicio</a
+        >
+        <a
+          href="#"
+          class="text-slate-500 hover:text-slate-800 font-semibold text-sm transition-colors"
+          >Mis Pagos</a
+        >
+        <a
+          href="#"
+          class="text-slate-300 hover:text-slate-800 font-semibold text-sm transition-colors"
+          >Anuncios</a
+        >
+        <a
+          href="#"
+          class="text-slate-300 hover:text-slate-800 font-semibold text-sm transition-colors"
+          >Encuestas</a
+        >
+      </div>
     </div>
 
-    <div class="h-8 w-px bg-slate-200 mx-2 hidden md:block"></div>
-    <div class="flex items-center gap-3 pl-2">
-      @if(user(); as user){
-      <app-user-avatar [text]="user.fullName" />
-      <div class="hidden lg:block">
-        <p class="text-sm">{{user.email}}</p>
-        <p class="text-xs text-slate-400">{{user.role | role}}</p>
+    <div class="flex items-center gap-4">
+      <p>{{ expirationCounter() }}</p>
+      <div class="hidden md:flex items-center gap-3">
+        <p-button icon="pi pi-bell" severity="secondary" text />
+        <p-button icon="pi pi-question-circle" severity="secondary" text />
+        <p-button
+          icon="pi pi-sign-out"
+          severity="secondary"
+          text
+          (click)="sessionService.logout()"
+        />
       </div>
+
+      <div class="h-8 w-px bg-slate-200 mx-2 hidden md:block"></div>
+      @if (sessionService.user(); as user) {
+        <p-button
+          text
+          severity="secondary"
+          variant="outlined"
+          styleClass="px-2"
+          (click)="menu.toggle($event)"
+        >
+          <div class="flex gap-2">
+            <app-user-avatar class="block" [text]="user.fullName" />
+            <div class="hidden lg:flex flex-col items-start">
+              <p class="text-sm">{{ user.email }}</p>
+              <p
+                class="text-xs font-bold uppercase tracking-tighter leading-none text-indigo-500"
+              >
+                {{ user.role | role }}
+              </p>
+            </div>
+          </div>
+        </p-button>
+        <p-menu #menu [model]="residentMenu()" appendTo="body" [popup]="true" />
       }
     </div>
-  </div>
+  } @else {
+    <div class="flex items-center gap-1 md:gap-3">
+      <div class="">
+        <p-button
+          icon="pi pi-bars"
+          severity="secondary"
+          text
+          class="lg:hidden"
+          (click)="toggleSidebar.emit()"
+        />
+
+        <div
+          class="size-9 text-xl bg-slate-200 rounded-lg flex items-center justify-center font-bold"
+        >
+          <i class="pi pi-home text-inherit"></i>
+        </div>
+      </div>
+
+      <p
+        class="capitalize font-semibold font-sans text-lg text-slate-700 w-64 md:w-80 truncate"
+      >
+        {{ sessionService.neighborhood()?.name }}
+      </p>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <p>{{ expirationCounter() }}</p>
+      <div class="hidden md:block">
+        <p-button icon="pi pi-bell" severity="secondary" text />
+        <p-button icon="pi pi-question-circle" severity="secondary" text />
+      </div>
+    </div>
+  }
 </header>

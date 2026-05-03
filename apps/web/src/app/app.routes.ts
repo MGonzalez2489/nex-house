@@ -1,59 +1,62 @@
-import { Route } from '@angular/router';
-import { authGuard } from '@core/guards/auth.guard';
-import { DASHBOARD_ROUTES_ENUM } from '@features/dashboard';
-import { FINANCE_ROUTES_ENUM } from '@features/finance';
-import { UNITS_ROUTES_ENUM } from '@features/housing-unit';
-import { NEIGHBORHOODS_ROUTES_ENUM } from '@features/neighborhoods';
-import { USERS_ROUTES_ENUM } from '@features/users';
+import { Route } from "@angular/router";
+import { roleGuard } from "@core/guards";
+import { authGuard } from "@core/guards/auth.guard";
+import { DASHBOARD_ROUTES_ENUM } from "@features/dashboard";
+import { FINANCE_ROUTES_ENUM } from "@features/finance";
+import { UNITS_ROUTES_ENUM } from "@features/housing-unit";
+import { NEIGHBORHOODS_ROUTES_ENUM } from "@features/neighborhoods";
+import { USERS_ROUTES_ENUM } from "@features/users";
+import { UserRoleEnum } from "@nex-house/enums";
 
 export const appRoutes: Route[] = [
   //public routes
   {
-    path: 'auth',
+    path: "auth",
     loadChildren: () =>
-      import('./features/auth/auth.routes').then((m) => m.AUTH_ROUTES),
+      import("./features/auth/auth.routes").then((m) => m.AUTH_ROUTES),
   },
   //private routes
   {
-    path: '',
+    path: "",
     loadComponent: () =>
-      import('./_core/layout/main-layout/main-layout').then(
+      import("./_core/layout/main-layout/main-layout").then(
         (m) => m.MainLayout,
       ),
     canActivate: [authGuard],
     children: [
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: "", redirectTo: "dashboard", pathMatch: "full" },
 
       {
         path: DASHBOARD_ROUTES_ENUM.HOME,
         loadChildren: () =>
-          import('./features/dashboard/dashboard.routes').then(
+          import("./features/dashboard/dashboard.routes").then(
             (m) => m.DASHBOARD_ROUTES,
           ),
       },
       {
         path: NEIGHBORHOODS_ROUTES_ENUM.HOME,
+        canActivate: [roleGuard([UserRoleEnum.SUPER_ADMIN])],
         loadChildren: () =>
-          import('./features/neighborhoods/neighborhoods.routes').then(
+          import("./features/neighborhoods/neighborhoods.routes").then(
             (m) => m.NEIGHBORHOODS_ROUTES,
           ),
       },
       {
         path: USERS_ROUTES_ENUM.HOME,
         loadChildren: () =>
-          import('./features/users/users.routes').then((r) => r.USERS_ROUTES),
+          import("./features/users/users.routes").then((r) => r.USERS_ROUTES),
       },
       {
         path: UNITS_ROUTES_ENUM.HOME,
         loadChildren: () =>
-          import('./features/housing-unit/housing-units.routes').then(
+          import("./features/housing-unit/housing-units.routes").then(
             (r) => r.UNITS_ROUTES,
           ),
       },
       {
         path: FINANCE_ROUTES_ENUM.HOME,
         loadChildren: () =>
-          import('./features/finance/finance.routes').then(
+          import("./features/finance/finance.routes").then(
             (r) => r.FINANCE_ROUTES,
           ),
       },
@@ -61,7 +64,7 @@ export const appRoutes: Route[] = [
   },
 
   {
-    path: '**',
-    redirectTo: '/auth/login',
+    path: "**",
+    redirectTo: "/auth/login",
   },
 ];
