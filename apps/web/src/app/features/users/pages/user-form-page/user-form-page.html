@@ -270,9 +270,18 @@
           </div>
         </div>
         @if (form.errors?.["atLeastOneRoleRequired"] && form.touched) {
-          <p class="p-error pt-3 block animate-fade-in text-xs text-red-500">
-            Un rol es requerido
-          </p>
+          <div class="flex flex-column gap-1 ms-1">
+            <small
+              class="block animate-fade-in text-[10px] font-medium text-rose-500 mt-1.5 ml-1 tracking-wide"
+            >
+              <i class="pi pi-exclamation-circle text-[9px] mr-1"></i>
+              Un rol es requerido
+            </small>
+          </div>
+
+          <p
+            class="p-error pt-3 block animate-fade-in text-xs text-red-500"
+          ></p>
         }
       </div>
 
