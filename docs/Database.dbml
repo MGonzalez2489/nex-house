@@ -3,7 +3,6 @@ Table Neighborhood {
   publicId GUID [not null]
   name text [not null]
   isActive bool [not null]
-
   createdAt datetime [not null]
   createdBy integer
   updatedAt datetime [not null]
@@ -19,8 +18,7 @@ Table Neigh_Street {
   id integer [primary key]
   publicId GUID [not null]
   name text [not null]
-
-  neighborhood_id integer [not null]
+  neighborhoodId integer [not null]
   createdAt datetime [not null]
   createdBy integer
   updatedAt datetime [not null]
@@ -36,15 +34,13 @@ Table Neigh_Street {
 Table User {
   id integer [primary key]
   publicId GUID [not null]
-
   firstName text
   lastName text
   email text [unique, not null]
   phone text
   password text [not null]
-
-  role_id integer [not null]
-  status_id integer [not null]
+  roleId integer [not null]
+  statusId integer [not null]
   createdAt datetime [not null]
   createdBy integer
   updatedAt datetime [not null]
@@ -56,6 +52,7 @@ Table User {
     publicId [unique]
   }
 }
+
 Table UserRole {
   id integer [primary key]
   publicId GUID [not null]
@@ -80,9 +77,9 @@ Table UserStatus {
 Table Unit {
   id integer [primary key]
   publicId GUID [not null]
-  street_id integer [not null]
-  type_id integer [not null]
-  status_id integer [not null]
+  streetId integer [not null]
+  typeId integer [not null]
+  statusId integer [not null]
   identifier text [not null]
   createdAt datetime [not null]
   createdBy integer
@@ -119,9 +116,9 @@ Table UnitStatus {
 Table UserUnit{
    id integer [primary key]
   publicId GUID [not null]
-   user_id integer [not null]
-   unit_id integer [not null]
-   role_id integer [not null]
+   userId integer [not null]
+   unitId integer [not null]
+   roleId integer [not null]
    isCurrentOccupant bool [not null]
 
     createdAt datetime [not null]
@@ -132,7 +129,7 @@ Table UserUnit{
   deletedBy integer
 
    Indexes {
-    (user_id, unit_id, role_id, deletedAt) [unique]
+    (userId, unitId, roleId, deletedAt) [unique]
     publicId [unique]
 
   }
@@ -148,45 +145,179 @@ Table UserUnitRole {
     publicId [unique]
   }
 }
+//// Finance
+Table Fee {
+  id integer [primary key]
+  publicId GUID [not null]
+  neighId integer [not null]
+  ////basic
+  name text [not null]
+  description text
+  amount integer
+  type text [not null]
+  ////schedule
+  cronSchedule text
+  cronDescription text
+  startDate datetime
+  endDate datetime
+  lastExecutionDate datetime
+  //
+  statusId integer [not null]
 
-////relationships
-Ref neigh_streets: Neigh_Street.neighborhood_id > Neighborhood.id
-Ref role_user: User.role_id > UserRole.id
-Ref status_user: User.status_id > UserStatus.id
+  createdAt datetime [not null]
+  createdBy integer
+  updatedAt datetime [not null]
+  updatedBy integer
+  deletedAt datetime
+  deletedBy integer
 
-Ref unit_type: Unit.type_id > UnitType.id
-Ref unit_status: Unit.status_id > UnitStatus.id
-Ref unit_street: Unit.street_id > Neigh_Street.id
+  Indexes {
+    publicId [unique]
+  }
+}
 
-Ref userunit_user: User.id < UserUnit.user_id
-Ref userunit_unit: Unit.id < UserUnit.unit_id
-Ref userunit_role: UserUnitRole.id < UserUnit.role_id
+Table FeeStatus{
+  id integer [primary key]
+  publicId GUID [not null]
 
-// Auditoría: Neighborhood
+  name text
+  displayName text
+
+  Indexes {
+    publicId [unique]
+  }
+}
+
+Table Charge {
+  id integer [primary key]
+  publicId GUID [not null]
+  feeId integer [not null]
+  unitId integer [not null]
+  amount integer [not null]
+  statusId integer [not null]
+  dueDate datetime [not null]
+  cancelationReason text
+  canceledBy integer
+
+  createdAt datetime [not null]
+  createdBy integer
+  updatedAt datetime [not null]
+  updatedBy integer
+  deletedAt datetime
+  deletedBy integer
+
+  Indexes {
+    publicId [unique]
+  }
+}
+
+Table ChargeStatus {
+  id integer [primary key]
+  publicId GUID [not null]
+  name text [not null]
+  displayName text [not null]
+
+  Indexes {
+    publicId [unique]
+  }
+}
+
+Table Payment{
+  id integer [primary key]
+  publicId GUID [not null]
+
+  chargeId integer [not null]
+  amount integer [not null]
+  evidenceUrl text
+  statusId integer [not null]
+  paymentDate datetime [not null]
+  userId integer [not null]
+  adminNotes text
+
+  createdAt datetime [not null]
+  createdBy integer
+  updatedAt datetime [not null]
+  updatedBy integer
+  deletedAt datetime
+  deletedBy integer
+
+  Indexes {
+    publicId [unique]
+  }
+}
+
+Table PaymentStatus {
+  id integer [primary key]
+  publicId GUID [not null]
+  name text [not null]
+  displayName text [not null]
+
+  Indexes {
+    publicId [unique]
+  }
+}
+
+////relationships (Anteriores se mantienen igual...)
+Ref neigh_streets: Neigh_Street.neighborhoodId > Neighborhood.id
+Ref role_user: User.roleId > UserRole.id
+Ref status_user: User.statusId > UserStatus.id
+
+Ref unit_type: Unit.typeId > UnitType.id
+Ref unit_status: Unit.statusId > UnitStatus.id
+Ref unit_street: Unit.streetId > Neigh_Street.id
+
+Ref userunit_user: User.id < UserUnit.userId
+Ref userunit_unit: Unit.id < UserUnit.unitId
+Ref userunit_role: UserUnitRole.id < UserUnit.roleId
+
+// Auditorías previas...
 Ref neigh_created: Neighborhood.createdBy > User.id
 Ref neigh_updated: Neighborhood.updatedBy > User.id
 Ref neigh_deleted: Neighborhood.deletedBy > User.id
 
-// Auditoría: Neigh_Street
 Ref street_created: Neigh_Street.createdBy > User.id
 Ref street_updated: Neigh_Street.updatedBy > User.id
 Ref street_deleted: Neigh_Street.deletedBy > User.id
 
-// Auditoría: User (Auto-referencia para tracking de usuarios)
 Ref user_created: User.createdBy > User.id
 Ref user_updated: User.updatedBy > User.id
 Ref user_deleted: User.deletedBy > User.id
 
-// Auditoría: Unit
 Ref unit_created: Unit.createdBy > User.id
 Ref unit_updated: Unit.updatedBy > User.id
 Ref unit_deleted: Unit.deletedBy > User.id
 
-// Auditoría: UserUnit
 Ref userunit_created: UserUnit.createdBy > User.id
 Ref userunit_updated: UserUnit.updatedBy > User.id
 Ref userunit_deleted: UserUnit.deletedBy > User.id
 
+// Finanzas principales
+Ref fee_neigh: Fee.neighId > Neighborhood.id
+Ref fee_status: FeeStatus.id < Fee.statusId
+Ref fee_charge: Charge.feeId < Fee.id
+Ref charge_unit: Charge.unitId > Unit.id
+Ref charge_status: Charge.statusId > ChargeStatus.id
+Ref paymen_status: Payment.statusId > PaymentStatus.id
+Ref payment_charge: Payment.chargeId > Charge.id
+
+// Relaciones específicas de negocio financiero
+Ref payment_user: Payment.userId > User.id              // Quién reportó el pago
+Ref charge_canceled_user: Charge.canceledBy > User.id   // Admin que canceló el cargo
+
+// Auditoría: Fee
+Ref fee_created: Fee.createdBy > User.id
+Ref fee_updated: Fee.updatedBy > User.id
+Ref fee_deleted: Fee.deletedBy > User.id
+
+// Auditoría: Charge
+Ref charge_created: Charge.createdBy > User.id
+Ref charge_updated: Charge.updatedBy > User.id
+Ref charge_deleted: Charge.deletedBy > User.id
+
+// Auditoría: Payment
+Ref payment_created: Payment.createdBy > User.id
+Ref payment_updated: Payment.updatedBy > User.id
+Ref payment_deleted: Payment.deletedBy > User.id
 
 //data
 Records UserRole(id, name, displayName){
@@ -212,5 +343,27 @@ Records UserUnitRole(id, name, displayName){
   1,'owner','Dueño'
   2,'family','Familiar'
   3,'tenant','Inquilino'
+}
+
+Records FeeStatus(id,  name, displayName){
+  1,'active','Activo'
+  2,'paused','En pausa'
+  3,'cancelled','Cancelado'
+  4,'scheduled','Agendado'
+  5,'completed','Completado'
+}
+
+Records ChargeStatus(id, name, displayName){
+1,'pending','Pendiente'
+2,'in_review','En revisión'
+3,'paid','Pagado'
+4,'cancelled','Cancelado'
+}
+
+Records PaymentStatus(id, name, displayName){
+1,'pending','Pendiente'
+2,'approved','Aprobado'
+3, 'rejected','Rechazado'
+4, 'canceled','Cancelado'
 }
 
