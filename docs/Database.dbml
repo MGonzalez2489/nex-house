@@ -1,0 +1,216 @@
+Table Neighborhood {
+  id integer [primary key]
+  publicId GUID [not null]
+  name text [not null]
+  isActive bool [not null]
+
+  createdAt datetime [not null]
+  createdBy integer
+  updatedAt datetime [not null]
+  updatedBy integer
+  deletedAt datetime
+  deletedBy integer
+
+  Indexes {
+    publicId [unique]
+  }
+}
+Table Neigh_Street {
+  id integer [primary key]
+  publicId GUID [not null]
+  name text [not null]
+
+  neighborhood_id integer [not null]
+  createdAt datetime [not null]
+  createdBy integer
+  updatedAt datetime [not null]
+  updatedBy integer
+  deletedAt datetime
+  deletedBy integer
+
+  Indexes {
+    publicId [unique]
+  }
+}
+//Users
+Table User {
+  id integer [primary key]
+  publicId GUID [not null]
+
+  firstName text
+  lastName text
+  email text [unique, not null]
+  phone text
+  password text [not null]
+
+  role_id integer [not null]
+  status_id integer [not null]
+  createdAt datetime [not null]
+  createdBy integer
+  updatedAt datetime [not null]
+  updatedBy integer
+  deletedAt datetime
+  deletedBy integer
+
+  Indexes {
+    publicId [unique]
+  }
+}
+Table UserRole {
+  id integer [primary key]
+  publicId GUID [not null]
+  name text 
+  displayName text
+
+  Indexes {
+    publicId [unique]
+  }
+}
+Table UserStatus {
+  id integer [primary key]
+  publicId GUID [not null]
+  name text
+  displayName text
+
+  Indexes {
+    publicId [unique]
+  }
+}
+//units
+Table Unit {
+  id integer [primary key]
+  publicId GUID [not null]
+  street_id integer [not null]
+  type_id integer [not null]
+  status_id integer [not null]
+  identifier text [not null]
+  createdAt datetime [not null]
+  createdBy integer
+  updatedAt datetime [not null]
+  updatedBy integer
+  deletedAt datetime
+  deletedBy integer
+
+  Indexes {
+    publicId [unique]
+  }
+}
+Table UnitType {
+  id integer [primary key]
+  publicId GUID [not null]
+  name text
+  displayName text
+
+  Indexes {
+    publicId [unique]
+  }
+}
+Table UnitStatus {
+  id integer [primary key]
+  publicId GUID [not null]
+  name text
+  displayName text
+
+  Indexes {
+    publicId [unique]
+  }
+}
+
+Table UserUnit{
+   id integer [primary key]
+  publicId GUID [not null]
+   user_id integer [not null]
+   unit_id integer [not null]
+   role_id integer [not null]
+   isCurrentOccupant bool [not null]
+
+    createdAt datetime [not null]
+  createdBy integer
+  updatedAt datetime [not null]
+  updatedBy integer
+  deletedAt datetime
+  deletedBy integer
+
+   Indexes {
+    (user_id, unit_id, role_id, deletedAt) [unique]
+    publicId [unique]
+
+  }
+}
+
+Table UserUnitRole {
+  id integer [primary key]
+  publicId GUID [not null]
+  name text
+  displayName text
+
+  Indexes {
+    publicId [unique]
+  }
+}
+
+////relationships
+Ref neigh_streets: Neigh_Street.neighborhood_id > Neighborhood.id
+Ref role_user: User.role_id > UserRole.id
+Ref status_user: User.status_id > UserStatus.id
+
+Ref unit_type: Unit.type_id > UnitType.id
+Ref unit_status: Unit.status_id > UnitStatus.id
+Ref unit_street: Unit.street_id > Neigh_Street.id
+
+Ref userunit_user: User.id < UserUnit.user_id
+Ref userunit_unit: Unit.id < UserUnit.unit_id
+Ref userunit_role: UserUnitRole.id < UserUnit.role_id
+
+// Auditoría: Neighborhood
+Ref neigh_created: Neighborhood.createdBy > User.id
+Ref neigh_updated: Neighborhood.updatedBy > User.id
+Ref neigh_deleted: Neighborhood.deletedBy > User.id
+
+// Auditoría: Neigh_Street
+Ref street_created: Neigh_Street.createdBy > User.id
+Ref street_updated: Neigh_Street.updatedBy > User.id
+Ref street_deleted: Neigh_Street.deletedBy > User.id
+
+// Auditoría: User (Auto-referencia para tracking de usuarios)
+Ref user_created: User.createdBy > User.id
+Ref user_updated: User.updatedBy > User.id
+Ref user_deleted: User.deletedBy > User.id
+
+// Auditoría: Unit
+Ref unit_created: Unit.createdBy > User.id
+Ref unit_updated: Unit.updatedBy > User.id
+Ref unit_deleted: Unit.deletedBy > User.id
+
+// Auditoría: UserUnit
+Ref userunit_created: UserUnit.createdBy > User.id
+Ref userunit_updated: UserUnit.updatedBy > User.id
+Ref userunit_deleted: UserUnit.deletedBy > User.id
+
+
+//data
+Records UserRole(id, name, displayName){
+  1,'root','ROOT'
+  2,'admin','Administrador'
+  3,'resident','Residente'
+}
+Records UserStatus(id, name, displayName){
+  1,'active','Activo'
+  2,'inactive','Inactivo'
+  3,'pending-completion','Pendiente'
+}
+Records UnitStatus(id, name, displayName){
+  1,'occupied','Ocupado'
+  2,'vacant','Sin habitar'
+  3,'rented','En renta'
+}
+Records UnitType(id, name, displayName){
+  1,'house','Casa'
+  2,'apartment','Departamento'
+}
+Records UserUnitRole(id, name, displayName){
+  1,'owner','Dueño'
+  2,'family','Familiar'
+  3,'tenant','Inquilino'
+}
+
