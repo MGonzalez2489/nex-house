@@ -257,6 +257,82 @@ Table PaymentStatus {
   }
 }
 
+Table Transactions {
+  id integer [primary key]
+  publicId GUID [not null]
+
+  
+  neighId integer [not null]
+  typeId integer [not null]
+  sourceTypeId integer [not null]
+  evidenceId integer
+  reversedById integer
+  categoryId integer [not null]
+  paymentId integer
+ 
+  amount integer [not null]
+  transactionDate datetime [not null]
+  name text [not null]
+  description text
+
+  createdAt datetime [not null]
+  createdBy integer
+  updatedAt datetime [not null]
+  updatedBy integer
+  deletedAt datetime
+  deletedBy integer
+
+
+  Indexes {
+    publicId [unique]
+  }
+}
+
+Table TransactionCategory {
+  id integer [primary key]
+  publicId GUID [not null]
+  neighId integer [not null]
+
+  name text [not null]
+  displayName text [not null]
+  icon text [not null]
+  color text [not null]
+  forTransactionTypeId integer [not null]
+
+  updatedAt datetime [not null]
+  updatedBy integer
+
+  Indexes {
+    publicId [unique]
+  }
+}
+
+Table TransactionType {
+  id integer [primary key]
+  publicId GUID [not null]
+
+  name text 
+  displayName text
+
+  Indexes {
+    publicId [unique]
+  }
+}
+
+Table TransactionSource {
+  id integer [primary key]
+  publicId GUID [not null]
+
+  name text 
+  displayName text
+
+  Indexes {
+    publicId [unique]
+  }
+}
+
+
+
 ////relationships (Anteriores se mantienen igual...)
 Ref neigh_streets: Neigh_Street.neighborhoodId > Neighborhood.id
 Ref role_user: User.roleId > UserRole.id
@@ -319,6 +395,20 @@ Ref payment_created: Payment.createdBy > User.id
 Ref payment_updated: Payment.updatedBy > User.id
 Ref payment_deleted: Payment.deletedBy > User.id
 
+// Auditoría: Transactions
+Ref trans_created: Transactions.createdBy > User.id
+Ref trans_updated: Transactions.updatedBy > User.id
+Ref trans_deleted: Transactions.deletedBy > User.id
+
+Ref trans_neigh: Transactions.neighId > Neighborhood.id
+Ref: Transactions.paymentId > Payment.id
+Ref trans_type: Transactions.typeId > TransactionType.id
+Ref trans_source: Transactions.sourceTypeId > TransactionSource.id
+Ref trans_cat: Transactions.categoryId > TransactionCategory.id
+Ref trans_rev: Transactions.id < Transactions.reversedById
+Ref cat_trans_type: TransactionCategory.forTransactionTypeId > TransactionType.id
+Ref transcat_updated: TransactionCategory.updatedBy > User.id
+
 //data
 Records UserRole(id, name, displayName){
   1,'root','ROOT'
@@ -367,3 +457,19 @@ Records PaymentStatus(id, name, displayName){
 4, 'canceled','Cancelado'
 }
 
+Records TransactionCategory(id, name, displayName, icon, color, forTransactionTypeId){
+1,'maintenance','Mantenimiento','maintenance','#10b981',1
+2,'utilities','Servicios Públicos','utilities','#f59e0b',2
+3,'repairs','Reparaciones y Mejoras','repairs','#3b82f6',2
+4,'security','Seguridad','security','#ef4444',2
+5,'events','Eventos y Amenidades','events','#8b5cf6',2
+}
+
+Records TransactionSource(id, name, displayName){
+1,'payment','Pago'
+2,'direct','Directo'
+}
+Records TransactionType(id, name, displayName){
+1,'income','Ingreso'
+2,'expense','Gasto'
+}
