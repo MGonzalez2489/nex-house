@@ -356,6 +356,28 @@ Table File {
   }
 }
 
+Table Session {
+  id integer [primary key]
+  publicId GUID [not null]
+  userId integer [not null]
+  refreshTokenHash text [not null]
+  socketId varchar(255)
+  browser text
+  browserVersion text
+  os text
+  device text
+  ipAddress text
+  expiresAt datetime [not null]
+  revoked bool [not null, default: false]
+  createdAt datetime [not null]
+  lastActivity datetime [not null]
+
+  Indexes {
+    publicId [unique]
+    userId
+  }
+}
+
 
 //relationships
 Ref neigh_streets: Neigh_Street.neighborhoodId > Neighborhood.id
@@ -391,7 +413,7 @@ Ref userunit_updated: UserUnit.updatedBy > User.id
 Ref userunit_deleted: UserUnit.deletedBy > User.id
 
 Ref fee_neigh: Fee.neighId > Neighborhood.id
-Ref fee_status: FeeStatus.id < Fee.statusId
+Ref fee_status: Fee.statusId > FeeStatus.id
 Ref fee_charge: Charge.feeId < Fee.id
 Ref charge_unit: Charge.unitId > Unit.id
 Ref charge_status: Charge.statusId > ChargeStatus.id
@@ -429,9 +451,12 @@ Ref trans_cat: Transactions.categoryId > TransactionCategory.id
 Ref trans_rev: Transactions.id < Transactions.reversedById
 Ref cat_trans_type: TransactionCategory.forTransactionTypeId > TransactionType.id
 Ref transcat_updated: TransactionCategory.updatedBy > User.id
+Ref transcat_neigh: TransactionCategory.neighId > Neighborhood.id
 
 Ref trans_file: Transactions.evidenceId < File.id
 Ref pay_file: Payment.evidenceId < File.id
+
+Ref session_user: Session.userId > User.id [delete: cascade]
 
 //data
 Records UserRole(id, name, displayName){
