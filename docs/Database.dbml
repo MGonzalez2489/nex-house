@@ -228,7 +228,7 @@ Table Payment{
 
   chargeId integer [not null]
   amount integer [not null]
-  evidenceUrl text
+  evidenceId integer
   statusId integer [not null]
   paymentDate datetime [not null]
   userId integer [not null]
@@ -331,9 +331,33 @@ Table TransactionSource {
   }
 }
 
+// Others
+Table File {
+  id integer [primary key]
+  publicId GUID [not null]
+
+  originalName text [not null]
+  fileName text [not null]
+  mimeType text [not null]
+  size bigint [not null]
+  url text [not null]
+  extension text 
+
+  createdAt datetime [not null]
+  createdBy integer
+  updatedAt datetime [not null]
+  updatedBy integer
+  deletedAt datetime
+  deletedBy integer
 
 
-////relationships (Anteriores se mantienen igual...)
+  Indexes {
+    publicId [unique]
+  }
+}
+
+
+//relationships
 Ref neigh_streets: Neigh_Street.neighborhoodId > Neighborhood.id
 Ref role_user: User.roleId > UserRole.id
 Ref status_user: User.statusId > UserStatus.id
@@ -346,7 +370,6 @@ Ref userunit_user: User.id < UserUnit.userId
 Ref userunit_unit: Unit.id < UserUnit.unitId
 Ref userunit_role: UserUnitRole.id < UserUnit.roleId
 
-// Auditorías previas...
 Ref neigh_created: Neighborhood.createdBy > User.id
 Ref neigh_updated: Neighborhood.updatedBy > User.id
 Ref neigh_deleted: Neighborhood.deletedBy > User.id
@@ -367,7 +390,6 @@ Ref userunit_created: UserUnit.createdBy > User.id
 Ref userunit_updated: UserUnit.updatedBy > User.id
 Ref userunit_deleted: UserUnit.deletedBy > User.id
 
-// Finanzas principales
 Ref fee_neigh: Fee.neighId > Neighborhood.id
 Ref fee_status: FeeStatus.id < Fee.statusId
 Ref fee_charge: Charge.feeId < Fee.id
@@ -376,29 +398,28 @@ Ref charge_status: Charge.statusId > ChargeStatus.id
 Ref paymen_status: Payment.statusId > PaymentStatus.id
 Ref payment_charge: Payment.chargeId > Charge.id
 
-// Relaciones específicas de negocio financiero
 Ref payment_user: Payment.userId > User.id              // Quién reportó el pago
 Ref charge_canceled_user: Charge.canceledBy > User.id   // Admin que canceló el cargo
 
-// Auditoría: Fee
 Ref fee_created: Fee.createdBy > User.id
 Ref fee_updated: Fee.updatedBy > User.id
 Ref fee_deleted: Fee.deletedBy > User.id
 
-// Auditoría: Charge
 Ref charge_created: Charge.createdBy > User.id
 Ref charge_updated: Charge.updatedBy > User.id
 Ref charge_deleted: Charge.deletedBy > User.id
 
-// Auditoría: Payment
 Ref payment_created: Payment.createdBy > User.id
 Ref payment_updated: Payment.updatedBy > User.id
 Ref payment_deleted: Payment.deletedBy > User.id
 
-// Auditoría: Transactions
 Ref trans_created: Transactions.createdBy > User.id
 Ref trans_updated: Transactions.updatedBy > User.id
 Ref trans_deleted: Transactions.deletedBy > User.id
+
+Ref file_created: File.createdBy > User.id
+Ref file_updated: File.updatedBy > User.id
+Ref file_deleted: File.deletedBy > User.id
 
 Ref trans_neigh: Transactions.neighId > Neighborhood.id
 Ref: Transactions.paymentId > Payment.id
@@ -408,6 +429,9 @@ Ref trans_cat: Transactions.categoryId > TransactionCategory.id
 Ref trans_rev: Transactions.id < Transactions.reversedById
 Ref cat_trans_type: TransactionCategory.forTransactionTypeId > TransactionType.id
 Ref transcat_updated: TransactionCategory.updatedBy > User.id
+
+Ref trans_file: Transactions.evidenceId < File.id
+Ref pay_file: Payment.evidenceId < File.id
 
 //data
 Records UserRole(id, name, displayName){
