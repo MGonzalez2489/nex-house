@@ -1,7 +1,8 @@
 import { Exclude } from 'class-transformer';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { BaseTraceableEntity } from '../_base';
 import { Neighborhood } from './neighborhood.entity';
+import { UserUnit } from './user-unit.entity';
 import { UserRole } from './user_role.entity';
 import { UserStatus } from './user_status.entity';
 
@@ -48,8 +49,8 @@ export class User extends BaseTraceableEntity {
   @JoinColumn({ name: 'statusId' })
   status: UserStatus;
 
-  // @OneToMany(() => UnitAssignment, (assignment) => assignment.user)
-  // assignments: UnitAssignment[];
+  @OneToMany(() => UserUnit, (units) => units.user)
+  units: UserUnit[];
 
   //virtual properties
   get fullName(): string {
