@@ -3,8 +3,8 @@ import { BaseEntity } from './_base.entity';
 
 export abstract class BaseCatalog extends BaseEntity {
   @Column()
-  displayName: string;
+  name: string;
 
   @Column({ nullable: true })
-  description: string;
+  displayName: string;
 }

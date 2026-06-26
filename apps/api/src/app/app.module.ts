@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { getDatabaseConfig } from '../database';
+import { DatabaseSeederService, getDatabaseConfig } from '../database';
 import { Neighborhood, User } from '../database/entities';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -20,6 +20,6 @@ import { AppService } from './app.service';
     TypeOrmModule.forFeature([Neighborhood, User]),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, DatabaseSeederService],
 })
 export class AppModule {}
