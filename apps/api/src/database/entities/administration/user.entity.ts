@@ -55,4 +55,20 @@ export class User extends BaseTraceableEntity {
   get fullName(): string {
     return `${this.firstName || ''} ${this.lastName || ''}`.trim();
   }
+
+  // ==========================================
+  // Audit
+  // ==========================================
+
+  @ManyToOne(() => User, { nullable: true })
+  @JoinColumn({ name: 'createdBy' })
+  creator: User;
+
+  @ManyToOne(() => User, { nullable: true })
+  @JoinColumn({ name: 'updatedBy' })
+  updater: User;
+
+  @ManyToOne(() => User, { nullable: true })
+  @JoinColumn({ name: 'deletedBy' })
+  deleter: User;
 }
