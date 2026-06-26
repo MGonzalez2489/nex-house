@@ -2,8 +2,19 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
+    "baseUrl": ".",
     "module": "commonjs",
-    "moduleResolution": "node10","types": ["jest", "node"]
+    "moduleResolution": "node10",
+    "types": ["jest", "node"],
+    "paths": {
+      "@nexhouse/shared-domain/enums": [
+        "../../libs/shared-domain/src/lib/enums/index.ts"
+      ],
+      "@nexhouse/shared-domain/interfaces": [
+        "../../libs/shared-domain/src/lib/interfaces/index.ts"
+      ],
+      "@core/*": ["src/_core/*"]
+    }
   },
   "include": [
     "jest.config.ts",

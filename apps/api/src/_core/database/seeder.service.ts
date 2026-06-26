@@ -27,6 +27,7 @@ import {
 } from './seeds';
 
 type CatalogRegistry = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   entity: EntityTarget<any>;
   data: Partial<BaseCatalog>[];
 };

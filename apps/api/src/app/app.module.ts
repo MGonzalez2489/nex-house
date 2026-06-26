@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { DatabaseSeederService, getDatabaseConfig } from '../database';
-import { Neighborhood, User } from '../database/entities';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { CatalogsModule } from 'src/catalogs';
+import { DatabaseSeederService, getDatabaseConfig } from '../_core/database';
+import { Neighborhood, User } from '../_core/database/entities';
 
 @Module({
   imports: [
@@ -18,8 +17,9 @@ import { AppService } from './app.service';
     }),
     //TODO: move this entity imports
     TypeOrmModule.forFeature([Neighborhood, User]),
+    CatalogsModule,
   ],
-  controllers: [AppController],
-  providers: [AppService, DatabaseSeederService],
+  controllers: [],
+  providers: [DatabaseSeederService],
 })
 export class AppModule {}

@@ -17,6 +17,9 @@
       "@nexhouse/shared-domain": ["./libs/shared-domain/src/index.ts"],
       "@nexhouse/shared-domain/enums": [
         "./libs/shared-domain/src/lib/enums/index.ts"
+      ],
+      "@nexhouse/shared-domain/interfaces": [
+        "./libs/shared-domain/src/lib/interfaces/index.ts"
       ]
     }
   },

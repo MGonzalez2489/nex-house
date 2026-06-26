@@ -2,18 +2,24 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
+    "baseUrl": ".",
     "module": "commonjs",
-    "types": [
-      "node"
-    ],
+    "types": ["node"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "target": "es2021",
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "paths": {
+      "@nexhouse/shared-domain/enums": [
+        "../../libs/shared-domain/src/lib/enums/index.ts"
+      ],
+      "@nexhouse/shared-domain/interfaces": [
+        "../../libs/shared-domain/src/lib/interfaces/index.ts"
+      ],
+      "@core/*": ["src/_core/*"]
+    }
   },
-  "include": [
-    "src/**/*.ts"
-  ],
+  "include": ["src/**/*.ts"],
   "exclude": [
     "jest.config.ts",
     "jest.config.cts",
