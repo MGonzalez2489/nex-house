@@ -6,18 +6,12 @@ export class Neighborhood extends BaseTraceableEntity {
   @Column({ unique: true })
   name: string;
 
-  @Column({ unique: true })
-  slug: string;
-
   @Column({ type: 'text' })
   address: string;
 
-  // @Column({
-  //   type: 'enum',
-  //   enum: NeighborhoodStatusEnum,
-  //   default: NeighborhoodStatusEnum.ACTIVE,
-  // })
-  // status: NeighborhoodStatusEnum;
+  @Column({ default: false })
+  isActive: boolean;
+
   //
   // @OneToMany(() => HousingUnit, (unit) => unit.neighborhood)
   // units: HousingUnit[];
