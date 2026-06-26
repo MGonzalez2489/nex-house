@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { getDatabaseConfig } from '../database';
+import { Neighborhood, User } from '../database/entities';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { getDatabaseConfig } from '../database';
-import { Neighborhood } from '../database/entities';
 
 @Module({
   imports: [
@@ -16,7 +16,8 @@ import { Neighborhood } from '../database/entities';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => getDatabaseConfig(config),
     }),
-    TypeOrmModule.forFeature([Neighborhood]),
+    //TODO: move this entity imports
+    TypeOrmModule.forFeature([Neighborhood, User]),
   ],
   controllers: [AppController],
   providers: [AppService],
