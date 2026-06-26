@@ -14,7 +14,10 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "paths": {
-      "shared-domain": ["./libs/shared-domain/src/index.ts"]
+      "@nexhouse/shared-domain": ["./libs/shared-domain/src/index.ts"],
+      "@nexhouse/shared-domain/enums": [
+        "./libs/shared-domain/src/lib/enums/index.ts"
+      ]
     }
   },
   "exclude": ["node_modules", "tmp"]
