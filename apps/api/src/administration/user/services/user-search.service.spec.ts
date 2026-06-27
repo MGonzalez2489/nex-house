@@ -1,9 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository, FindOptionsRelations } from 'typeorm';
+import { Repository, FindOptionsRelations, SelectQueryBuilder } from 'typeorm';
 import { NotFoundException, Logger } from '@nestjs/common';
 import { UserSearchService } from './user-search.service';
 import { User } from '@core/database';
+import { SearchUserDto } from '../dtos';
+import * as paginationUtils from '@core/utils';
+
+jest.mock('@core/utils', () => ({
+  ...jest.requireActual('@core/utils'),
+  paginateQuery: jest.fn(),
+}));
 
 describe('UserSearchService', () => {
   let service: UserSearchService;
@@ -47,6 +54,109 @@ describe('UserSearchService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  describe('findAll', () => {
+    let mockQueryBuilder: jest.Mocked<SelectQueryBuilder<User>>;
+    let mockSearchUserDto: SearchUserDto;
+
+    const mockUserList: User[] = [
+      {
+        id: 1,
+        firstName: 'Manuel',
+        lastName: 'Gonzalez',
+        email: 'dev@nexhouse.com',
+      } as User,
+    ];
+
+    const mockPaginationResult = {
+      data: mockUserList,
+      meta: { total: 1, page: 1, lastPage: 1, limit: 10 },
+    };
+
+    beforeEach(() => {
+      mockQueryBuilder = {
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        addSelect: jest.fn().mockReturnThis(),
+        addOrderBy: jest.fn().mockReturnThis(),
+      } as unknown as jest.Mocked<SelectQueryBuilder<User>>;
+
+      mockRepository.createQueryBuilder = jest
+        .fn()
+        .mockReturnValue(mockQueryBuilder);
+
+      mockSearchUserDto = {
+        first: 0,
+        rows: 10,
+        sortField: 'firstName',
+        sortOrder: 1,
+        showAll: false,
+      };
+
+      jest.mocked(paginationUtils.paginateQuery).mockReset();
+    });
+
+    it('should retrieve a paginated structure when options.raw is omitted or false', async () => {
+      jest
+        .mocked(paginationUtils.paginateQuery)
+        .mockResolvedValue(mockPaginationResult);
+
+      const result = await service.findAll(1, mockSearchUserDto);
+
+      expect(mockRepository.createQueryBuilder).toHaveBeenCalledWith('users');
+      expect(mockQueryBuilder.leftJoinAndSelect).toHaveBeenCalledTimes(3); // neighborhood, units, unit
+      expect(mockQueryBuilder.where).toHaveBeenCalledWith(
+        'neighborhood.id = :neighborhoodId',
+        { neighborhoodId: 1 },
+      );
+
+      expect(result).toEqual(mockPaginationResult);
+    });
+
+    it('should bypass the metadata wrapper and return a raw array when options.raw is true', async () => {
+      jest
+        .mocked(paginationUtils.paginateQuery)
+        .mockResolvedValue(mockPaginationResult);
+
+      const result = await service.findAll(1, mockSearchUserDto, { raw: true });
+
+      expect(result).toEqual(mockUserList);
+      expect(Array.isArray(result)).toBe(true);
+    });
+
+    it('should correctly inject exact match filters for role and status if present', async () => {
+      jest
+        .mocked(paginationUtils.paginateQuery)
+        .mockResolvedValue(mockPaginationResult);
+      mockSearchUserDto.role = 'ADMIN';
+      mockSearchUserDto.status = 'ACTIVE';
+
+      await service.findAll(1, mockSearchUserDto);
+
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'users.role = :role',
+        { role: 'ADMIN' },
+      );
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'users.status = :status',
+        { status: 'ACTIVE' },
+      );
+    });
+
+    it('should dynamically parse globalFilter string into multiple nested words brackets', async () => {
+      jest
+        .mocked(paginationUtils.paginateQuery)
+        .mockResolvedValue(mockPaginationResult);
+      mockSearchUserDto.globalFilter = 'Manuel Unit10';
+
+      await service.findAll(1, mockSearchUserDto);
+
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        expect.any(Object),
+      );
+    });
   });
 
   describe('findByPublicId', () => {
@@ -167,22 +277,3 @@ describe('UserSearchService', () => {
     });
   });
 });
-
-// import { Test, TestingModule } from '@nestjs/testing';
-// import { UserSearchService } from './user-search.service';
-//
-// describe('UserSearchService', () => {
-//   let service: UserSearchService;
-//
-//   beforeEach(async () => {
-//     const module: TestingModule = await Test.createTestingModule({
-//       providers: [UserSearchService],
-//     }).compile();
-//
-//     service = module.get<UserSearchService>(UserSearchService);
-//   });
-//
-//   it('should be defined', () => {
-//     expect(service).toBeDefined();
-//   });
-// });
