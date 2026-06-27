@@ -1,5 +1,5 @@
 import { Repository, SelectQueryBuilder, ObjectLiteral } from 'typeorm';
-import { paginate, paginateQuery } from './pagination.util'; // Adjust path accordingly
+import { paginate, paginateQuery } from './pagination.util';
 import { SearchDto } from '@core/dtos';
 
 class MockEntity implements ObjectLiteral {
