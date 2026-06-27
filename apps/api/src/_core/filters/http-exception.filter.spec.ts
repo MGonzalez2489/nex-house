@@ -9,6 +9,7 @@ import { HttpExceptionFilter } from './http-exception.filter';
 describe('GlobalExceptionFilter', () => {
   let filter: HttpExceptionFilter;
   let mockArgumentsHost: Partial<ArgumentsHost>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let mockResponse: any;
 
   beforeEach(() => {
