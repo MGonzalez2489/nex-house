@@ -3,15 +3,16 @@
  * This is only a minimal backend to get started.
  */
 
+import { HttpExceptionFilter } from '@core/filters';
+import { TransformInterceptor } from '@core/interceptors';
 import {
   ClassSerializerInterceptor,
   Logger,
   ValidationPipe,
 } from '@nestjs/common';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { NestFactory, Reflector } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app/app.module';
-import { TransformInterceptor } from '@core/interceptors';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -21,6 +22,7 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   app.useGlobalInterceptors(new TransformInterceptor());
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   app.useGlobalPipes(
     new ValidationPipe({
