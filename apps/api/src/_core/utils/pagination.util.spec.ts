@@ -127,7 +127,6 @@ describe('Pagination Utilities', () => {
       );
     });
     it('should use default pagination values when DTO properties are missing', async () => {
-      // Pasamos un objeto vacío para forzar los fallbacks (?? 0, ?? 10, || 'createdAt')
       const emptyDto = new SearchDto();
       await paginateQuery(mockQueryBuilder, emptyDto);
 
@@ -147,7 +146,6 @@ describe('Pagination Utilities', () => {
       };
       await paginateQuery(mockQueryBuilder, dtoWithDot);
 
-      // Valida el camino verdadero del ternario (sortField.includes('.'))
       expect(mockQueryBuilder.addOrderBy).toHaveBeenCalledWith(
         'neighborhood.name',
         'ASC',
@@ -164,7 +162,6 @@ describe('Pagination Utilities', () => {
       };
       await paginateQuery(mockQueryBuilder, dtoShowAll);
 
-      // Valida que llame a getManyAndCount directo sin ejecutar .skip() ni .take()
       expect(mockQueryBuilder.getManyAndCount).toHaveBeenCalled();
     });
   });
