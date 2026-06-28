@@ -16,6 +16,9 @@
       "@nexhouse/shared-domain/interfaces": [
         "../../libs/shared-domain/src/lib/interfaces/index.ts"
       ],
+      "@nexhouse/shared-domain/models": [
+        "../../libs/shared-domain/src/lib/models/index.ts"
+      ],
       "@core/*": ["src/_core/*"],
       "@administration/*": ["src/administration/*"]
     }

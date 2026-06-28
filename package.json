@@ -5,7 +5,8 @@
   "scripts": {
     "prepare": "husky",
     "lint": "eslint . --ext .ts,.html",
-    "lint:fix": "eslint . --ext .ts,.html --fix"
+    "lint:fix": "eslint . --ext .ts,.html --fix",
+    "test-api:cov": "nx test api --coverage"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.1.0",
@@ -52,6 +53,7 @@
     "@nestjs/common": "^11.0.0",
     "@nestjs/config": "^4.0.4",
     "@nestjs/core": "^11.0.0",
+    "@nestjs/jwt": "^11.0.2",
     "@nestjs/mapped-types": "^2.1.1",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.0",

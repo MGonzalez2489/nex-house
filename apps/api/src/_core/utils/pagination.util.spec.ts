@@ -86,7 +86,7 @@ describe('Pagination Utilities', () => {
         addOrderBy: jest.fn().mockReturnThis(),
         skip: jest.fn().mockReturnThis(),
         take: jest.fn().mockReturnThis(),
-        getManyAndCount: jest.fn(),
+        getManyAndCount: jest.fn().mockResolvedValue([[], 0]),
       } as unknown as jest.Mocked<SelectQueryBuilder<MockEntity>>;
     });
 
@@ -125,6 +125,47 @@ describe('Pagination Utilities', () => {
       ).rejects.toThrow(
         new Error('QueryBuilder must have a main alias execution context'),
       );
+    });
+    it('should use default pagination values when DTO properties are missing', async () => {
+      // Pasamos un objeto vacío para forzar los fallbacks (?? 0, ?? 10, || 'createdAt')
+      const emptyDto = new SearchDto();
+      await paginateQuery(mockQueryBuilder, emptyDto);
+
+      expect(mockQueryBuilder.addOrderBy).toHaveBeenCalledWith(
+        'mockEntity.createdAt',
+        'DESC',
+      );
+    });
+
+    it('should correctly format order column when sortField contains a dot relation', async () => {
+      const dtoWithDot = {
+        sortField: 'neighborhood.name',
+        sortOrder: 1,
+        first: 0,
+        showAll: true,
+        rows: 10,
+      };
+      await paginateQuery(mockQueryBuilder, dtoWithDot);
+
+      // Valida el camino verdadero del ternario (sortField.includes('.'))
+      expect(mockQueryBuilder.addOrderBy).toHaveBeenCalledWith(
+        'neighborhood.name',
+        'ASC',
+      );
+    });
+
+    it('should bypass skip and take criteria when showAll is explicitly true', async () => {
+      const dtoShowAll = {
+        showAll: true,
+        first: 0,
+        rows: 10,
+        sortField: undefined,
+        sortOrder: undefined,
+      };
+      await paginateQuery(mockQueryBuilder, dtoShowAll);
+
+      // Valida que llame a getManyAndCount directo sin ejecutar .skip() ni .take()
+      expect(mockQueryBuilder.getManyAndCount).toHaveBeenCalled();
     });
   });
 });
