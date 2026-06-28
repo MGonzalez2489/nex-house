@@ -20,7 +20,8 @@
         "../../libs/shared-domain/src/lib/models/index.ts"
       ],
       "@core/*": ["src/_core/*"],
-      "@administration/*": ["src/administration/*"]
+      "@administration/*": ["src/administration/*"],
+      "@auth/*": ["src/auth/*"]
     }
   },
   "include": ["src/**/*.ts"],

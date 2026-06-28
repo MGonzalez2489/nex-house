@@ -5,7 +5,8 @@ import { CatalogsModule } from 'src/catalogs';
 import { DatabaseSeederService, getDatabaseConfig } from '../_core/database';
 import { Neighborhood, User } from '../_core/database/entities';
 import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from 'src/auth/guards';
+import { AuthModule } from '@auth/auth.module';
+import { JwtAuthGuard } from '@auth/guards';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { JwtAuthGuard } from 'src/auth/guards';
     }),
     //TODO: move this entity imports
     TypeOrmModule.forFeature([Neighborhood, User]),
+    AuthModule,
     CatalogsModule,
   ],
   controllers: [],
