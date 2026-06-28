@@ -4,6 +4,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CatalogsModule } from 'src/catalogs';
 import { DatabaseSeederService, getDatabaseConfig } from '../_core/database';
 import { Neighborhood, User } from '../_core/database/entities';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from 'src/auth/guards';
 
 @Module({
   imports: [
@@ -20,6 +22,12 @@ import { Neighborhood, User } from '../_core/database/entities';
     CatalogsModule,
   ],
   controllers: [],
-  providers: [DatabaseSeederService],
+  providers: [
+    DatabaseSeederService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}
