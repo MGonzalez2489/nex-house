@@ -7,6 +7,7 @@ import { Neighborhood, User } from '../_core/database/entities';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthModule } from '@auth/auth.module';
 import { JwtAuthGuard } from '@auth/guards';
+import { NeighborhoodModule } from '@administration/neighborhood/neighborhood.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { JwtAuthGuard } from '@auth/guards';
     TypeOrmModule.forFeature([Neighborhood, User]),
     AuthModule,
     CatalogsModule,
+    NeighborhoodModule,
   ],
   controllers: [],
   providers: [
