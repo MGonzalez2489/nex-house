@@ -1,19 +1,25 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { NeighborhoodController } from './neighborhood.controller';
-import { NeighborhoodSearchService } from '../services';
+import { NeighborhoodSearchService, NeighborhoodService } from '../services';
 import { SearchDto } from '@core/dtos';
 import { PaginatedResult } from '@core/utils';
-import { Neighborhood } from '@core/database';
+import { Neighborhood, User } from '@core/database';
+import { CreateNeighborhoodDto } from '../dtos';
 
 describe('NeighborhoodController', () => {
   let controller: NeighborhoodController;
   let mockSearchService: jest.Mocked<NeighborhoodSearchService>;
+  let mockNeighborhoodService: jest.Mocked<NeighborhoodService>;
+
+  const mockUser = { id: 100 } as User;
 
   const mockNeighborhood = {
     id: 1,
     publicId: 'c9b0a7ed-20a2-4a0b-bf84-cf9537bc2c42',
-    name: 'Residencial Del Real',
+    name: 'residencial del real',
+    createdBy: 100,
+    streets: [{ id: 10, name: 'calle primera', neighborhoodId: 1 }],
   } as Neighborhood;
 
   const mockPaginationResult: PaginatedResult<Neighborhood> = {
@@ -21,11 +27,26 @@ describe('NeighborhoodController', () => {
     meta: { total: 1, page: 1, lastPage: 1, limit: 10 },
   };
 
+  // const mockNeighborhood = {
+  //   id: 1,
+  //   publicId: 'c9b0a7ed-20a2-4a0b-bf84-cf9537bc2c42',
+  //   name: 'Residencial Del Real',
+  // } as Neighborhood;
+  //
+  // const mockPaginationResult: PaginatedResult<Neighborhood> = {
+  //   data: [mockNeighborhood],
+  //   meta: { total: 1, page: 1, lastPage: 1, limit: 10 },
+  // };
+
   beforeEach(async () => {
     mockSearchService = {
       findAll: jest.fn(),
       findByPublicId: jest.fn(),
     } as unknown as jest.Mocked<NeighborhoodSearchService>;
+
+    mockNeighborhoodService = {
+      create: jest.fn(),
+    } as unknown as jest.Mocked<NeighborhoodService>;
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [NeighborhoodController],
@@ -33,6 +54,10 @@ describe('NeighborhoodController', () => {
         {
           provide: NeighborhoodSearchService,
           useValue: mockSearchService,
+        },
+        {
+          provide: NeighborhoodService,
+          useValue: mockNeighborhoodService,
         },
       ],
     }).compile();
@@ -82,6 +107,25 @@ describe('NeighborhoodController', () => {
           `Neighborhood profile with identity "${missingUuid}" does not exist.`,
         ),
       );
+    });
+  });
+
+  describe('create', () => {
+    it('should delegate payload records to the service layer and yield a 201 response status map', async () => {
+      const createDto: CreateNeighborhoodDto = {
+        name: 'Residencial Del Real',
+        streets: ['Calle Primera'],
+      };
+
+      mockNeighborhoodService.create.mockResolvedValue(mockNeighborhood);
+
+      const result = await controller.create(createDto, mockUser);
+
+      expect(mockNeighborhoodService.create).toHaveBeenCalledWith(
+        createDto,
+        mockUser,
+      );
+      expect(result).toEqual(mockNeighborhood);
     });
   });
 });
