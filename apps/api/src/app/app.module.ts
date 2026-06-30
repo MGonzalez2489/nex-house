@@ -8,6 +8,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthModule } from '@auth/auth.module';
 import { JwtAuthGuard } from '@auth/guards';
 import { NeighborhoodModule } from '@administration/neighborhood/neighborhood.module';
+import { CryptoService } from '@core/services';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { NeighborhoodModule } from '@administration/neighborhood/neighborhood.mo
   controllers: [],
   providers: [
     DatabaseSeederService,
+    CryptoService,
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
