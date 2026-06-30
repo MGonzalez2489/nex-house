@@ -130,7 +130,7 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
     };
 
     const exists = await this.userRepository.exists({
-      where: { email: superAdminEnv.email },
+      where: { email: superAdminEnv.email.toLowerCase() },
     });
     if (exists) {
       return;
