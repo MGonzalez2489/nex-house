@@ -8,9 +8,11 @@ import {
 import { NeighborhoodService } from './neighborhood.service';
 import { Neighborhood, NeighStreet, User } from '@core/database';
 import { CreateNeighborhoodDto } from '../dtos';
+import { NeighStreetService } from './neigh-street.service';
 
 describe('NeighborhoodService', () => {
   let service: NeighborhoodService;
+  let mockNeighStreetService: jest.Mocked<NeighStreetService>;
   let mockDataSource: jest.Mocked<DataSource>;
   let mockQueryRunner: jest.Mocked<QueryRunner>;
 
@@ -49,6 +51,10 @@ describe('NeighborhoodService', () => {
       createQueryRunner: jest.fn().mockReturnValue(mockQueryRunner),
     } as unknown as jest.Mocked<DataSource>;
 
+    mockNeighStreetService = {
+      createMany: jest.fn(),
+    } as unknown as jest.Mocked<NeighStreetService>;
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         NeighborhoodService,
@@ -56,6 +62,7 @@ describe('NeighborhoodService', () => {
           provide: DataSource,
           useValue: mockDataSource,
         },
+        { provide: NeighStreetService, useValue: mockNeighStreetService },
       ],
     }).compile();
 
@@ -73,9 +80,10 @@ describe('NeighborhoodService', () => {
   describe('create', () => {
     it('should create a neighborhood and its streets atomically inside a successful transaction', async () => {
       (mockQueryRunner.manager.findOne as jest.Mock).mockResolvedValue(null);
-      (mockQueryRunner.manager.save as jest.Mock)
-        .mockResolvedValueOnce(mockSavedNeighborhood)
-        .mockResolvedValueOnce(mockSavedStreets);
+      (mockQueryRunner.manager.save as jest.Mock).mockResolvedValue(
+        mockSavedNeighborhood,
+      );
+      mockNeighStreetService.createMany.mockResolvedValue(mockSavedStreets);
 
       const result = await service.create(mockDto, mockUser);
 
@@ -91,6 +99,31 @@ describe('NeighborhoodService', () => {
         {
           where: { name: 'residencial del real' },
         },
+      );
+      expect(result).toEqual({
+        ...mockSavedNeighborhood,
+        streets: mockSavedStreets,
+      });
+    });
+
+    it('should delegate street creation to NeighStreetService inside the transaction', async () => {
+      (mockQueryRunner.manager.findOne as jest.Mock).mockResolvedValue(null);
+      (mockQueryRunner.manager.save as jest.Mock).mockResolvedValue(
+        mockSavedNeighborhood,
+      );
+
+      mockNeighStreetService.createMany.mockResolvedValue(mockSavedStreets);
+
+      const result = await service.create(mockDto, mockUser);
+
+      expect(mockQueryRunner.commitTransaction).toHaveBeenCalled();
+
+      expect(mockNeighStreetService.createMany).toHaveBeenCalledWith(
+        [
+          { name: 'calle primera', neighborhoodId: 1 },
+          { name: 'calle segunda', neighborhoodId: 1 },
+        ],
+        mockQueryRunner.manager,
       );
       expect(result).toEqual({
         ...mockSavedNeighborhood,

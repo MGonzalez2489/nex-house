@@ -6,13 +6,17 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
-import { CreateNeighborhoodDto } from '../dtos';
 import { DataSource } from 'typeorm';
+import { CreateNeighborhoodDto } from '../dtos';
+import { NeighStreetService } from './neigh-street.service';
 
 @Injectable()
 export class NeighborhoodService {
   private readonly logger = new Logger(NeighborhoodService.name);
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(
+    private readonly dataSource: DataSource,
+    private readonly streetService: NeighStreetService,
+  ) {}
 
   /**
    * Orchestrates the multi-entity atomic creation of a neighborhood and its associated street catalog.
@@ -63,13 +67,9 @@ export class NeighborhoodService {
         neighborhoodId: savedNeighborhood.id,
       }));
 
-      const streetEntities = queryRunner.manager.create(
-        NeighStreet,
+      const savedStreets = await this.streetService.createMany(
         sanitizedStreetsPayload,
-      );
-      const savedStreets = await queryRunner.manager.save(
-        NeighStreet,
-        streetEntities,
+        queryRunner.manager,
       );
 
       await queryRunner.commitTransaction();
