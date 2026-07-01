@@ -10,6 +10,8 @@ import { SearchDto } from '@core/dtos';
 import { PaginatedResult } from '@core/utils';
 import { Neighborhood, NeighStreet, User } from '@core/database';
 import { CreateNeighborhoodDto } from '../dtos';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Reflector } from '@nestjs/core';
 
 describe('NeighborhoodController', () => {
   let controller: NeighborhoodController;
@@ -68,8 +70,9 @@ describe('NeighborhoodController', () => {
           provide: NeighborhoodService,
           useValue: mockNeighborhoodService,
         },
-
         { provide: NeighStreetService, useValue: mockNeighStreetService },
+        { provide: CACHE_MANAGER, useValue: {} },
+        { provide: Reflector, useValue: new Reflector() },
       ],
     }).compile();
 

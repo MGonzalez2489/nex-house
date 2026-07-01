@@ -1,14 +1,18 @@
-import { Neighborhood, NeighStreet, User } from '@core/database';
+import { Neighborhood, User } from '@core/database';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
   BadRequestException,
   ConflictException,
+  Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
+import { Cache } from 'cache-manager';
 import { DataSource } from 'typeorm';
 import { CreateNeighborhoodDto } from '../dtos';
 import { NeighStreetService } from './neigh-street.service';
+import { NeighborhoodSearchService } from './neighborhood-search.service';
 
 @Injectable()
 export class NeighborhoodService {
@@ -16,6 +20,8 @@ export class NeighborhoodService {
   constructor(
     private readonly dataSource: DataSource,
     private readonly streetService: NeighStreetService,
+    private readonly searchService: NeighborhoodSearchService,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
 
   /**
@@ -67,14 +73,17 @@ export class NeighborhoodService {
         neighborhoodId: savedNeighborhood.id,
       }));
 
-      const savedStreets = await this.streetService.createMany(
+      await this.streetService.createMany(
         sanitizedStreetsPayload,
         queryRunner.manager,
       );
 
       await queryRunner.commitTransaction();
 
-      return { ...savedNeighborhood, streets: savedStreets };
+      //clear findAllCache
+      await this.clearNeighborhoodsCache();
+
+      return this.searchService.findByPublicId(savedNeighborhood.publicId);
     } catch (error) {
       await queryRunner.rollbackTransaction();
 
@@ -93,6 +102,26 @@ export class NeighborhoodService {
       );
     } finally {
       await queryRunner.release();
+    }
+  }
+
+  private async clearNeighborhoodsCache(): Promise<void> {
+    try {
+      const store = (this.cacheManager as any).store;
+
+      // TODO: use key patern on prod
+      if (store && typeof store.keys === 'function') {
+        const keys = await store.keys('cache:/api/neighborhood*');
+        for (const key of keys) {
+          await this.cacheManager.del(key);
+        }
+      } else {
+        // Fallback para in-memory cache básico
+        await this.cacheManager.clear();
+      }
+      this.logger.log('🧹 Neighborhoods cache successfully evicted.');
+    } catch (error) {
+      this.logger.error(`Failed to evict cache: ${error.message}`);
     }
   }
 }

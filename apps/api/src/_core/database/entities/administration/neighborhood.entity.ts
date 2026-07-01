@@ -8,9 +8,6 @@ export class Neighborhood extends BaseTraceableEntity {
   @Column({ unique: true })
   name: string;
 
-  @Column({ type: 'text' })
-  address: string;
-
   @Column({ default: true })
   isActive: boolean;
 

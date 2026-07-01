@@ -1,20 +1,25 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { DataSource, QueryRunner } from 'typeorm';
+import { Neighborhood, NeighStreet, User } from '@core/database';
 import {
   BadRequestException,
   ConflictException,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { NeighborhoodService } from './neighborhood.service';
-import { Neighborhood, NeighStreet, User } from '@core/database';
+import { Test, TestingModule } from '@nestjs/testing';
+import { DataSource, QueryRunner } from 'typeorm';
 import { CreateNeighborhoodDto } from '../dtos';
 import { NeighStreetService } from './neigh-street.service';
+import { NeighborhoodSearchService } from './neighborhood-search.service';
+import { NeighborhoodService } from './neighborhood.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 describe('NeighborhoodService', () => {
   let service: NeighborhoodService;
   let mockNeighStreetService: jest.Mocked<NeighStreetService>;
+  let mockSearchService: jest.Mocked<NeighborhoodSearchService>;
   let mockDataSource: jest.Mocked<DataSource>;
   let mockQueryRunner: jest.Mocked<QueryRunner>;
+
+  let mockCacheManager: any;
 
   const mockUser = { id: 100 } as User;
   const mockDto: CreateNeighborhoodDto = {
@@ -55,6 +60,18 @@ describe('NeighborhoodService', () => {
       createMany: jest.fn(),
     } as unknown as jest.Mocked<NeighStreetService>;
 
+    mockSearchService = {
+      findByPublicId: jest.fn(),
+    } as unknown as jest.Mocked<NeighborhoodSearchService>;
+
+    mockCacheManager = {
+      store: {
+        keys: jest.fn().mockResolvedValue([]),
+      },
+      del: jest.fn().mockResolvedValue(undefined),
+      clear: jest.fn().mockResolvedValue(undefined),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         NeighborhoodService,
@@ -63,6 +80,11 @@ describe('NeighborhoodService', () => {
           useValue: mockDataSource,
         },
         { provide: NeighStreetService, useValue: mockNeighStreetService },
+        {
+          provide: NeighborhoodSearchService,
+          useValue: mockSearchService,
+        },
+        { provide: CACHE_MANAGER, useValue: mockCacheManager },
       ],
     }).compile();
 
@@ -83,6 +105,10 @@ describe('NeighborhoodService', () => {
       (mockQueryRunner.manager.save as jest.Mock).mockResolvedValue(
         mockSavedNeighborhood,
       );
+      (mockSearchService.findByPublicId as jest.Mock).mockResolvedValue({
+        ...mockSavedNeighborhood,
+        streets: mockSavedStreets,
+      });
       mockNeighStreetService.createMany.mockResolvedValue(mockSavedStreets);
 
       const result = await service.create(mockDto, mockUser);
@@ -100,6 +126,9 @@ describe('NeighborhoodService', () => {
           where: { name: 'residencial del real' },
         },
       );
+      expect(mockCacheManager.store.keys).toHaveBeenCalledWith(
+        'cache:/api/neighborhood*',
+      );
       expect(result).toEqual({
         ...mockSavedNeighborhood,
         streets: mockSavedStreets,
@@ -111,6 +140,11 @@ describe('NeighborhoodService', () => {
       (mockQueryRunner.manager.save as jest.Mock).mockResolvedValue(
         mockSavedNeighborhood,
       );
+
+      (mockSearchService.findByPublicId as jest.Mock).mockResolvedValue({
+        ...mockSavedNeighborhood,
+        streets: mockSavedStreets,
+      });
 
       mockNeighStreetService.createMany.mockResolvedValue(mockSavedStreets);
 

@@ -11,6 +11,7 @@ import {
   Patch,
   Post,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   NeighborhoodSearchService,
@@ -20,10 +21,13 @@ import {
 import { Neighborhood, NeighStreet, User } from '@core/database';
 import { SearchDto } from '@core/dtos';
 import { PaginatedResult } from '@core/utils';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateNeighborhoodDto } from '../dtos';
 import { CurrentUser } from '@core/decorators';
+import { HttpCacheInterceptor } from '@core/interceptors';
+import { CacheTTL } from '@nestjs/cache-manager';
 
+@ApiTags('Neighborhood')
 @Controller('neighborhood')
 export class NeighborhoodController {
   constructor(
@@ -72,6 +76,8 @@ export class NeighborhoodController {
    * @returns Structured object wrapping data arrays and pagination headers.
    */
   @Get()
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheTTL(60 * 5) //5 mins cache
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get a paginated list of neighborhoods' })
   @ApiResponse({

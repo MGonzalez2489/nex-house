@@ -14,6 +14,8 @@ import {
 } from '@core/database';
 import { BaseCatalog } from '@core/database/entities/_base';
 import { TestingModule, Test } from '@nestjs/testing';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Reflector } from '@nestjs/core';
 
 describe('CatalogsController', () => {
   let controller: CatalogsController;
@@ -31,6 +33,8 @@ describe('CatalogsController', () => {
           provide: CatalogsService,
           useValue: mockCatalogsService,
         },
+        { provide: CACHE_MANAGER, useValue: {} },
+        { provide: Reflector, useValue: new Reflector() },
       ],
     }).compile();
 
