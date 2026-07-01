@@ -9,6 +9,7 @@ import { AuthModule } from '@auth/auth.module';
 import { JwtAuthGuard } from '@auth/guards';
 import { NeighborhoodModule } from '@administration/neighborhood/neighborhood.module';
 import { CryptoService } from '@core/services';
+import { ApiCacheModule } from '@core/api-cache.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { CryptoService } from '@core/services';
     }),
     //TODO: move this entity imports
     TypeOrmModule.forFeature([Neighborhood, User]),
+    ApiCacheModule,
     AuthModule,
     CatalogsModule,
     NeighborhoodModule,

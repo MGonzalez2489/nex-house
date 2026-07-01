@@ -10,12 +10,21 @@ import {
   UserStatus,
   UserUnitRole,
 } from '@core/database';
-import { Controller, Get, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  UseInterceptors,
+} from '@nestjs/common';
 import { CatalogsService } from '../services';
 import { BaseCatalog } from '@core/database/entities/_base';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 
+@ApiTags('Catalogs')
 @Controller('catalogs')
+@UseInterceptors(CacheInterceptor)
 export class CatalogsController {
   constructor(private readonly service: CatalogsService) {}
 
@@ -26,6 +35,7 @@ export class CatalogsController {
    */
   @Get('user_roles')
   @HttpCode(HttpStatus.OK)
+  @CacheTTL(60 * 60 * 24) //TTL 24 hours
   @ApiOperation({ summary: 'Retrieve user roles catalog data' })
   @ApiResponse({
     status: 200,
@@ -41,6 +51,7 @@ export class CatalogsController {
    * @returns An array mapping user state boundaries.
    */
   @Get('user_statuses')
+  @CacheTTL(60 * 60 * 24) //TTL 24 hours
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Retrieve user statuses catalog data' })
   @ApiResponse({
@@ -57,6 +68,7 @@ export class CatalogsController {
    * @returns An array mapping tenant unit relation roles.
    */
   @Get('user_unit_roles')
+  @CacheTTL(60 * 60 * 24) //TTL 24 hours
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Retrieve user unit roles catalog data' })
   @ApiResponse({
@@ -73,6 +85,7 @@ export class CatalogsController {
    * @returns An array mapping property status values.
    */
   @Get('unit_statuses')
+  @CacheTTL(60 * 60 * 24) //TTL 24 hours
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Retrieve unit statuses catalog data' })
   @ApiResponse({
@@ -89,6 +102,7 @@ export class CatalogsController {
    * @returns An array mapping structural unit layout schemas.
    */
   @Get('unit_types')
+  @CacheTTL(60 * 60 * 24) //TTL 24 hours
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Retrieve unit types catalog data' })
   @ApiResponse({
@@ -105,6 +119,7 @@ export class CatalogsController {
    * @returns An array mapping system interaction environments.
    */
   @Get('transaction_sources')
+  @CacheTTL(60 * 60 * 24) //TTL 24 hours
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Retrieve transaction sources catalog data' })
   @ApiResponse({
@@ -121,6 +136,7 @@ export class CatalogsController {
    * @returns An array mapping ledger classification constants.
    */
   @Get('transaction_types')
+  @CacheTTL(60 * 60 * 24) //TTL 24 hours
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Retrieve transaction types catalog data' })
   @ApiResponse({
@@ -137,6 +153,7 @@ export class CatalogsController {
    * @returns An array mapping payment execution states.
    */
   @Get('payment_statuses')
+  @CacheTTL(60 * 60 * 24) //TTL 24 hours
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Retrieve payment statuses catalog data' })
   @ApiResponse({
@@ -153,6 +170,7 @@ export class CatalogsController {
    * @returns An array mapping fee balance states.
    */
   @Get('fee_statuses')
+  @CacheTTL(60 * 60 * 24) //TTL 24 hours
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Retrieve fee statuses catalog data' })
   @ApiResponse({
@@ -169,6 +187,7 @@ export class CatalogsController {
    * @returns An array mapping compound charge lifecycles.
    */
   @Get('charge_statuses')
+  @CacheTTL(60 * 60 * 24) //TTL 24 hours
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Retrieve charge statuses catalog data' })
   @ApiResponse({

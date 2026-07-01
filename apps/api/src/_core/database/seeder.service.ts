@@ -125,7 +125,7 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
 
   private async seedSuperAdmin() {
     const superAdminEnv = {
-      email: this.configService.get<string>('SUPER_ADMIN_USER') || '',
+      email: this.configService.get<string>('SUPER_ADM N_USER') || '',
       pwd: this.configService.get<string>('SUPER_ADMIN_PWD') || '',
     };
 
