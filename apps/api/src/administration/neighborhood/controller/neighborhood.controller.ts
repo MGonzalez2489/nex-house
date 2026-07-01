@@ -24,7 +24,10 @@ import { PaginatedResult } from '@core/utils';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateNeighborhoodDto } from '../dtos';
 import { CurrentUser } from '@core/decorators';
-import { HttpCacheInterceptor } from '@core/interceptors';
+import {
+  HttpCacheInterceptor,
+  IdempotencyInterceptor,
+} from '@core/interceptors';
 import { CacheTTL } from '@nestjs/cache-manager';
 
 @ApiTags('Neighborhood')
@@ -47,6 +50,7 @@ export class NeighborhoodController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new neighborhood' })
+  @UseInterceptors(IdempotencyInterceptor)
   @ApiResponse({
     status: 201,
     description: 'Neighborhood created successfully.',
@@ -133,6 +137,7 @@ export class NeighborhoodController {
    */
   @Post(':publicId/streets')
   @HttpCode(HttpStatus.CREATED)
+  @UseInterceptors(IdempotencyInterceptor)
   @ApiOperation({ summary: 'Add new streets to an existing neighborhood' })
   @ApiResponse({
     status: 201,
@@ -170,6 +175,7 @@ export class NeighborhoodController {
    */
   @Patch('streets/:publicId')
   @HttpCode(HttpStatus.OK)
+  @UseInterceptors(IdempotencyInterceptor)
   @ApiOperation({ summary: 'Update a specific street name' })
   @ApiResponse({
     status: 200,
@@ -194,6 +200,7 @@ export class NeighborhoodController {
    */
   @Delete('streets/:publicId')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @UseInterceptors(IdempotencyInterceptor)
   @ApiOperation({ summary: 'Remove a street from a neighborhood permanently' })
   @ApiResponse({
     status: 24,
