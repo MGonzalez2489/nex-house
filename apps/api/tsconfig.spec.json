@@ -16,6 +16,9 @@
       "@nexhouse/shared-domain/models": [
         "../../libs/shared-domain/src/lib/models/index.ts"
       ],
+      "@nexhouse/shared-domain/utils": [
+        "../../libs/shared-domain/src/lib/utils/index.ts"
+      ],
       "@core/*": ["src/_core/*"],
       "@administration/*": ["src/administration/*"],
       "@auth/*": ["src/auth/*"]

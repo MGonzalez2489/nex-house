@@ -1,15 +1,16 @@
+import { NeighborhoodModule } from '@administration/neighborhood/neighborhood.module';
+import { AuthModule } from '@auth/auth.module';
+import { JwtAuthGuard } from '@auth/guards';
+import { ApiCacheModule } from '@core/api-cache.module';
+import { NeighborhoodScopeGuard } from '@core/guards';
+import { CryptoService } from '@core/services';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CatalogsModule } from 'src/catalogs';
 import { DatabaseSeederService, getDatabaseConfig } from '../_core/database';
 import { Neighborhood, User } from '../_core/database/entities';
-import { APP_GUARD } from '@nestjs/core';
-import { AuthModule } from '@auth/auth.module';
-import { JwtAuthGuard } from '@auth/guards';
-import { NeighborhoodModule } from '@administration/neighborhood/neighborhood.module';
-import { CryptoService } from '@core/services';
-import { ApiCacheModule } from '@core/api-cache.module';
 
 @Module({
   imports: [
