@@ -1,8 +1,8 @@
 import { NeighborhoodModule } from '@administration/neighborhood/neighborhood.module';
+import { UserModule } from '@administration/user/user.module';
 import { AuthModule } from '@auth/auth.module';
 import { JwtAuthGuard } from '@auth/guards';
 import { ApiCacheModule } from '@core/api-cache.module';
-import { NeighborhoodScopeGuard } from '@core/guards';
 import { CryptoService } from '@core/services';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -28,6 +28,7 @@ import { Neighborhood, User } from '../_core/database/entities';
     AuthModule,
     CatalogsModule,
     NeighborhoodModule,
+    UserModule,
   ],
   controllers: [],
   providers: [

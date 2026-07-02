@@ -5,10 +5,12 @@ import { UserService } from '../services/user.service';
 import { CreateUserDto } from '../dtos';
 import { User, Neighborhood } from '@core/database';
 import { NeighborhoodScopeGuard } from '@core/guards';
+import { UserSearchService } from '../services';
 
 describe('UserController', () => {
   let controller: UserController;
   let mockUserService: jest.Mocked<UserService>;
+  let mockSearchService: jest.Mocked<UserSearchService>;
 
   const mockUser = { id: 1, neighborhoodId: 10 } as User;
   const mockNeigh = { id: 10 } as Neighborhood;
@@ -34,7 +36,10 @@ describe('UserController', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UserController],
-      providers: [{ provide: UserService, useValue: mockUserService }],
+      providers: [
+        { provide: UserService, useValue: mockUserService },
+        { provide: UserSearchService, useValue: mockSearchService },
+      ],
     })
       .overrideGuard(NeighborhoodScopeGuard)
       .useValue({ canActivate: () => true })
@@ -70,22 +75,3 @@ describe('UserController', () => {
     });
   });
 });
-
-// import { Test, TestingModule } from '@nestjs/testing';
-// import { UserController } from './user.controller';
-//
-// describe('UserController', () => {
-//   let controller: UserController;
-//
-//   beforeEach(async () => {
-//     const module: TestingModule = await Test.createTestingModule({
-//       controllers: [UserController],
-//     }).compile();
-//
-//     controller = module.get<UserController>(UserController);
-//   });
-//
-//   it('should be defined', () => {
-//     expect(controller).toBeDefined();
-//   });
-// });

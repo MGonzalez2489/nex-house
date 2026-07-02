@@ -106,7 +106,7 @@ describe('UserSearchService', () => {
       const result = await service.findAll(1, mockSearchUserDto);
 
       expect(mockRepository.createQueryBuilder).toHaveBeenCalledWith('users');
-      expect(mockQueryBuilder.leftJoinAndSelect).toHaveBeenCalledTimes(3); // neighborhood, units, unit
+      expect(mockQueryBuilder.leftJoinAndSelect).toHaveBeenCalledTimes(4); // neighborhood, units, unit
       expect(mockQueryBuilder.where).toHaveBeenCalledWith(
         'neighborhood.id = :neighborhoodId',
         { neighborhoodId: 1 },

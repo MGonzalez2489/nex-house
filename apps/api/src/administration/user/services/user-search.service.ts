@@ -70,6 +70,7 @@ export class UserSearchService {
       .leftJoinAndSelect('users.neighborhood', 'neighborhood')
       .leftJoinAndSelect('users.units', 'units')
       .leftJoinAndSelect('units.unit', 'unit')
+      .leftJoinAndSelect('unit.street', 'street')
       .where('neighborhood.id = :neighborhoodId', {
         neighborhoodId,
       });
@@ -82,6 +83,7 @@ export class UserSearchService {
     if (status) {
       query.andWhere('users.status = :status', { status });
     }
+    //TODO: analize if street should be an ID
 
     if (globalFilter) {
       const globalFilterWords = globalFilter
@@ -108,7 +110,7 @@ export class UserSearchService {
                     .orWhere(`users.phone LIKE :${paramName}`, {
                       [paramName]: `%${word}%`,
                     })
-                    .orWhere(`unit.streetName LIKE :${paramName}`, {
+                    .orWhere(`street.name LIKE :${paramName}`, {
                       [paramName]: `%${word}%`,
                     })
                     .orWhere(`unit.identifier LIKE :${paramName}`, {

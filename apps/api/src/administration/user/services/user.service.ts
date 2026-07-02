@@ -5,8 +5,9 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
-import { CreateUserDto } from '../dtos';
+import { CreateUserDto, UpdateUserDto } from '../dtos';
 import {
   NeighStreet,
   Unit,
@@ -208,6 +209,171 @@ export class UserService {
       throw new InternalServerErrorException(
         'Atomic operation failed during creation sequences.',
       );
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  /**
+   * Updates an existing user profile and optionally modifies unit assignments.
+   * Resolves unique constraint validations and manages atomic database states.
+   * * @param neighId Active neighborhood identifier context.
+   * @param userPublicId Public unique identifier of the user to be updated.
+   * @param dto Partial updates including credentials, roles, or unit associations.
+   * @param currentUser Actor session executing the update operation.
+   */
+  async update(
+    neighId: number,
+    userPublicId: string,
+    dto: UpdateUserDto,
+    currentUser: User,
+  ): Promise<User> {
+    const existingUser = await this.repository.findOne({
+      where: { publicId: userPublicId, neighborhoodId: neighId },
+      relations: { role: true, status: true },
+    });
+
+    if (!existingUser) {
+      throw new NotFoundException(
+        'Target user profile not found in this neighborhood.',
+      );
+    }
+
+    if (dto.email) {
+      const formatedEmail = dto.email.trim().toLowerCase();
+      if (formatedEmail !== existingUser.email) {
+        const existsEmail = await this.repository.exists({
+          where: { email: formatedEmail },
+        });
+        if (existsEmail) {
+          throw new ConflictException(`Email ${dto.email} already in use.`);
+        }
+        existingUser.email = formatedEmail;
+      }
+    }
+
+    if (dto.phone) {
+      const formatedPhone = formatPhone(dto.phone);
+      if (formatedPhone !== existingUser.phone) {
+        if (!validatePhone(formatedPhone)) {
+          throw new BadRequestException('User phone format not valid.');
+        }
+        const existsPhone = await this.repository.exists({
+          where: { phone: formatedPhone },
+        });
+        if (existsPhone) {
+          throw new ConflictException(`Phone ${dto.phone} already in use.`);
+        }
+        existingUser.phone = formatedPhone;
+      }
+    }
+
+    let updatedRole = existingUser.role;
+    if (dto.roleId && dto.roleId !== existingUser.role?.publicId) {
+      const role = await this.catalogsService.findByPublicId(
+        UserRole,
+        dto.roleId,
+      );
+      if (!role) {
+        throw new BadRequestException(
+          'Target user role catalog record not found.',
+        );
+      }
+      updatedRole = role;
+    }
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      if (dto.firstName) existingUser.firstName = dto.firstName.trim();
+      if (dto.lastName) existingUser.lastName = dto.lastName.trim();
+      existingUser.role = updatedRole;
+
+      const savedUser = await queryRunner.manager.save(User, existingUser);
+
+      // Handle unit assignment updates if provided
+      if (dto.assignUnits) {
+        const unitDto = dto.assignUnits;
+        let targetUnit: Unit | null = null;
+
+        if (unitDto.unitId) {
+          targetUnit = await queryRunner.manager.findOne(Unit, {
+            where: { publicId: unitDto.unitId },
+          });
+        } else if (unitDto.unitIdentifier) {
+          const street = await queryRunner.manager.findOne(NeighStreet, {
+            where: { publicId: unitDto.streetId },
+          });
+
+          if (!street) {
+            throw new BadRequestException(
+              'Target neighborhood street not found.',
+            );
+          }
+
+          // Create new unit if it does not exist under that identifier
+          const newUnit = queryRunner.manager.create(Unit, {
+            streetId: street.id,
+            identifier: unitDto.unitIdentifier,
+            neighborhoodId: neighId,
+          });
+          targetUnit = await queryRunner.manager.save(newUnit);
+        }
+
+        if (!targetUnit) {
+          throw new BadRequestException(
+            'Invalid unit state allocation parameters.',
+          );
+        }
+
+        const userUnitRole = await this.catalogsService.findByPublicId(
+          UserUnitRole,
+          unitDto.userUnitRoleId,
+        );
+        if (!userUnitRole) {
+          throw new BadRequestException(
+            'Target unit assignment role not found.',
+          );
+        }
+
+        // Deactivate previous active unit allocations if necessary
+        if (unitDto.isOccupant) {
+          await queryRunner.manager.update(
+            UserUnit,
+            { userId: savedUser.id, isCurrentOccupant: true },
+            { isCurrentOccupant: false },
+          );
+        }
+
+        // Create the new assignment record
+        const assignment = queryRunner.manager.create(UserUnit, {
+          unitId: targetUnit.id,
+          userId: savedUser.id,
+          createdBy: currentUser.id,
+          userUnitRole,
+          isCurrentOccupant: unitDto.isOccupant,
+        });
+
+        await queryRunner.manager.save(assignment);
+      }
+
+      await queryRunner.commitTransaction();
+      return await this.searchService.findByPublicId(savedUser.publicId);
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      this.logger.error(
+        `🔴 Transaction failed during user update sequence: ${error.message}`,
+      );
+
+      if (
+        error instanceof ConflictException ||
+        error instanceof BadRequestException
+      ) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Atomic update operation failed.');
     } finally {
       await queryRunner.release();
     }
