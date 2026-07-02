@@ -1,6 +1,11 @@
 import { BaseCatalog } from '@core/database/entities/_base';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { EntityManager, EntityTarget, FindOptionsWhere } from 'typeorm';
+import {
+  EntityManager,
+  EntityTarget,
+  FindManyOptions,
+  FindOptionsWhere,
+} from 'typeorm';
 
 @Injectable()
 export class CatalogsService {
@@ -11,8 +16,11 @@ export class CatalogsService {
    * @param entity The target catalog entity class.
    * @returns A promise that resolves to an array of entity instances.
    */
-  async findAll<T extends BaseCatalog>(entity: EntityTarget<T>): Promise<T[]> {
-    return this.entityManager.find(entity);
+  async findAll<T extends BaseCatalog>(
+    entity: EntityTarget<T>,
+    findOptions?: FindManyOptions<T>,
+  ): Promise<T[]> {
+    return this.entityManager.find(entity, findOptions);
   }
 
   /**

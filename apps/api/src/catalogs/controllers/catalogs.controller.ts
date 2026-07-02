@@ -21,6 +21,8 @@ import { CatalogsService } from '../services';
 import { BaseCatalog } from '@core/database/entities/_base';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
+import { UserRoleEnum } from '@nexhouse/shared-domain/enums';
+import { Not } from 'typeorm';
 
 @ApiTags('Catalogs')
 @Controller('catalogs')
@@ -42,7 +44,9 @@ export class CatalogsController {
     description: 'Catalog records fetched successfully.',
   })
   async findUserRoles(): Promise<BaseCatalog[]> {
-    return this.service.findAll(UserRole);
+    return this.service.findAll(UserRole, {
+      where: { name: Not(UserRoleEnum.SUPERADMIN) },
+    });
   }
 
   /**
