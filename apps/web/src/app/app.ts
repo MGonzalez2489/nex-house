@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ButtonModule } from 'primeng/button';
 
 @Component({
-  imports: [],
+  imports: [ButtonModule],
   selector: 'app-root',
   templateUrl: './app.html',
   styleUrl: './app.css',
