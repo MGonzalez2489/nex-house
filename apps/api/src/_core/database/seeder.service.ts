@@ -1,4 +1,7 @@
+import { CryptoService } from '@core/services';
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, EntityTarget, Repository } from 'typeorm';
 import {
   ChargeStatus,
@@ -26,10 +29,6 @@ import {
   UserStatusSeed,
   UserUnitRoleSeed,
 } from './seeds';
-import { ConfigService } from '@nestjs/config';
-import { InjectRepository } from '@nestjs/typeorm';
-import { UserRoleEnum } from '@nexhouse/shared-domain/enums';
-import { CryptoService } from '@core/services';
 
 type CatalogRegistry = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -125,7 +124,7 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
 
   private async seedSuperAdmin() {
     const superAdminEnv = {
-      email: this.configService.get<string>('SUPER_ADM N_USER') || '',
+      email: this.configService.get<string>('SUPER_ADMIN_USER') || '',
       pwd: this.configService.get<string>('SUPER_ADMIN_PWD') || '',
     };
 

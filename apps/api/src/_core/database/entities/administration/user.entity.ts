@@ -14,7 +14,7 @@ export class User extends BaseTraceableEntity {
   @Column({ nullable: true })
   lastName: string;
 
-  @Column({ unique: true })
+  @Column({ unique: true, nullable: false })
   email: string;
 
   @Column({ nullable: true })

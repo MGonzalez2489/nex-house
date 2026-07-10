@@ -1,20 +1,22 @@
-import { ChangeDetectionStrategy, Component } from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import {
   FormControl,
   FormGroup,
   ReactiveFormsModule,
   Validators,
 } from "@angular/forms";
+import { Router, RouterLink } from "@angular/router";
 import { LoginForm } from "./login-form";
-import { RouterLink } from "@angular/router";
 
+import { AuthStore } from "@auth/auth.store";
+import { FormValidationErrorComponent } from "@shared/components/forms";
 import { ButtonModule } from "primeng/button";
 import { Checkbox } from "primeng/checkbox";
-import { InputTextModule } from "primeng/inputtext";
-import { PasswordModule } from "primeng/password";
 import { IconFieldModule } from "primeng/iconfield";
 import { InputIconModule } from "primeng/inputicon";
-import { FormValidationErrorComponent } from "@shared/components/forms";
+import { InputTextModule } from "primeng/inputtext";
+import { PasswordModule } from "primeng/password";
+import { Login } from "@nexhouse/shared-domain/interfaces";
 
 @Component({
   selector: "app-login-page",
@@ -35,6 +37,9 @@ import { FormValidationErrorComponent } from "@shared/components/forms";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginPage {
+  protected readonly store = inject(AuthStore);
+  private readonly router = inject(Router);
+
   protected readonly form = new FormGroup<LoginForm>({
     email: new FormControl("admin@test.com", {
       nonNullable: true,
@@ -47,6 +52,17 @@ export class LoginPage {
   });
 
   async doSubmit() {
-    console.log("submit");
+    this.form.markAllAsTouched();
+    if (this.form.invalid) {
+      return;
+    }
+
+    const request: Login = this.form.getRawValue();
+    const response = await this.store.login(request);
+
+    if (response) {
+      console.log("login");
+      // this.router.navigateByUrl(`/${DASHBOARD_ROUTES_ENUM.HOME}`);
+    }
   }
 }

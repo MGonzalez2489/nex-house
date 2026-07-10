@@ -89,65 +89,10 @@ export class SessionService {
     );
 
     return {
+      user,
       token: accessToken,
       refreshToken,
       exp: accessTokenExpInSeconds,
     };
   }
-
-  // async createSession(
-  //   user: User,
-  //   userAgent: string,
-  //   ip: string,
-  //   rememberMe = false,
-  //   existingSocket?: string,
-  // ): Promise<SessionModel> {
-  //   const agentData = UAParser.UAParser(userAgent);
-  //
-  //   const expiresAt = new Date(
-  //     Date.now() + (rememberMe ? 30 : 7) * 24 * 60 * 60 * 1000,
-  //   );
-  //
-  //   const session = this.repository.create({
-  //     userId: user.id,
-  //     refreshTokenHash: '',
-  //     browser: agentData.browser.name,
-  //     browserVersion: agentData.browser.version,
-  //     os: agentData.os.name,
-  //     device: agentData.device.model || 'Desktop',
-  //     ipAddress: ip,
-  //     expiresAt,
-  //     socketId: existingSocket,
-  //   });
-  //
-  //   const savedSession = await this.repository.save(session);
-  //
-  //   const refreshPayload = {
-  //     sub: user.publicId,
-  //     session: savedSession.publicId,
-  //   };
-  //   const refreshToken = this.jwtService.sign(refreshPayload, {
-  //     expiresIn: rememberMe ? '30d' : '7d',
-  //   });
-  //
-  //   savedSession.refreshTokenHash = await this.cryptoService.hash(refreshToken);
-  //   await this.repository.save(savedSession);
-  //
-  //   const accessToken = this.jwtService.sign(
-  //     {
-  //       email: user.email,
-  //       sub: user.publicId,
-  //       session: savedSession.publicId,
-  //     },
-  //     {
-  //       expiresIn: '15m',
-  //     },
-  //   );
-  //
-  //   return {
-  //     token: accessToken,
-  //     refreshToken,
-  //     exp: this.jwtService.decode(accessToken).exp,
-  //   };
-  // }
 }

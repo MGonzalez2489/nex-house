@@ -69,6 +69,7 @@
     "webpack-dev-server": "^5.2.1"
   },
   "dependencies": {
+    "@angular-architects/ngrx-toolkit": "^21.0.1",
     "@angular/common": "~21.2.0",
     "@angular/compiler": "~21.2.0",
     "@angular/core": "~21.2.0",
@@ -120,6 +121,16 @@
     "esbuild@0.28.1": true,
     "lmdb@3.5.1": true,
     "msgpackr-extract@3.0.4": true,
-    "fsevents@2.3.2": true
+    "fsevents@2.3.3": true
+  },
+  "overrides": {
+    "@angular-architects/ngrx-toolkit": {
+      "@angular/common": "$@angular/common",
+      "@angular/core": "$@angular/core"
+    },
+    "@ngrx/signals": {
+      "@angular/common": "$@angular/common",
+      "@angular/core": "$@angular/core"
+    }
   }
 }
