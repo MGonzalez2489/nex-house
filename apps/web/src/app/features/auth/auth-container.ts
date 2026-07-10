@@ -2,13 +2,10 @@ import { ChangeDetectionStrategy, Component } from "@angular/core";
 import { RouterOutlet } from "@angular/router";
 
 @Component({
-  selector: "app-root",
-  templateUrl: "./app.html",
-  styleUrl: "./app.css",
+  selector: "app-auth-container",
   imports: [RouterOutlet],
+  templateUrl: "./auth-container.html",
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class App {
-  protected title = "web";
-}
+export class AuthContainer {}
