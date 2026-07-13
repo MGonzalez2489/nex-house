@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Headers as NestHeaders,
@@ -13,11 +14,13 @@ import { SessionModel } from '@nexhouse/shared-domain/models';
 import { LoginDto } from '../dtos';
 import { AuthService } from '../services';
 
-import { Public } from '@core/decorators';
+import { CurrentUser, Public } from '@core/decorators';
+import { UserToModelMapper } from '@core/mappers';
 import {
   Request as ExpressRequest,
   Response as ExpressResponse,
 } from 'express';
+import { User } from '@core/database';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -40,5 +43,14 @@ export class AuthController {
     const session = await this.authService.login(loginDto, userAgent, ip);
 
     return session;
+  }
+
+  @Get('me')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'User identity' })
+  async me(@CurrentUser() user: User) {
+    const response = await this.authService.getFreshProfileUser(user);
+
+    return UserToModelMapper(response);
   }
 }

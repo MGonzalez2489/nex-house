@@ -1,6 +1,3 @@
-import { inject } from "@angular/core";
-import { APP_CONSTANTS } from "@core/constants";
-import { SessionModel, UserModel } from "@nexhouse/shared-domain/models";
 import {
   setError,
   setLoaded,
@@ -9,17 +6,21 @@ import {
   withDevtools,
   withReset,
 } from "@angular-architects/ngrx-toolkit";
+import { computed, inject } from "@angular/core";
+import { APP_CONSTANTS } from "@core/constants";
+import { SessionModel, UserModel } from "@nexhouse/shared-domain/models";
 
+import { Login } from "@nexhouse/shared-domain/interfaces";
 import {
   patchState,
   signalStore,
+  withComputed,
   withMethods,
   withProps,
   withState,
 } from "@ngrx/signals";
-import { AuthService } from "./services";
-import { Login } from "@nexhouse/shared-domain/interfaces";
 import { lastValueFrom } from "rxjs";
+import { AuthService } from "../services";
 
 interface AuthState {
   user: UserModel | undefined;
@@ -48,6 +49,9 @@ export const AuthStore = signalStore(
   withProps(() => ({
     _authService: inject(AuthService),
   })),
+  withComputed(({ user, token }) => ({
+    isAuthenticated: computed(() => !!token() && !!user()),
+  })),
   withMethods((store) => ({
     loadSession: (newSession: SessionModel) => {
       localStorage.setItem(APP_CONSTANTS.TOKEN_STORAGE_KEY, newSession.token);
@@ -64,7 +68,6 @@ export const AuthStore = signalStore(
       // store._socketService.connect(newSession.token);
     },
   })),
-
   withMethods((store) => {
     return {
       login: async (dto: Login): Promise<boolean> => {
@@ -77,6 +80,33 @@ export const AuthStore = signalStore(
           console.log("error", error);
           patchState(store, setError(error));
           return false;
+        }
+      },
+      restoreSession: async (): Promise<UserModel | null> => {
+        patchState(store, setLoading());
+        try {
+          const res = await lastValueFrom(store._authService.me());
+
+          patchState(store, { user: res.data }, setLoaded());
+          return res.data;
+        } catch (error) {
+          console.log("error", error);
+          patchState(store, setError(error));
+          return null;
+        }
+      },
+      logout: async () => {
+        patchState(store, setLoading());
+        try {
+          // await lastValueFrom(store._authService.logout());
+
+          console.log("logout store");
+          localStorage.clear();
+          patchState(store, { user: undefined }, setLoaded());
+          store.resetState();
+        } catch (error) {
+          patchState(store, setError(error));
+          return undefined;
         }
       },
     };

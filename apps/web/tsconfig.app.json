@@ -17,8 +17,10 @@
         "../../libs/shared-domain/src/lib/utils/index.ts"
       ],
       "@core/*": ["./src/app/_core/*"],
+      "@stores/*": ["./src/app/stores/*"],
       "@shared/*": ["./src/app/_shared/*"],
-      "@auth/*": ["./src/app/features/auth/*"]
+      "@auth/*": ["./src/app/features/auth/*"],
+      "@dashboard/*": ["./src/app/features/dashboard/*"]
     }
   },
   "include": ["src/**/*.ts"],

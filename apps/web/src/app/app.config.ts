@@ -1,30 +1,41 @@
 import {
   ApplicationConfig,
+  inject,
+  provideAppInitializer,
   provideBrowserGlobalErrorListeners,
-} from '@angular/core';
-import { provideRouter, withComponentInputBinding } from '@angular/router';
-import { appRoutes } from './app.routes';
+} from "@angular/core";
+import { provideRouter, withComponentInputBinding } from "@angular/router";
+import { appRoutes } from "./app.routes";
 import {
   provideHttpClient,
   withFetch,
   withInterceptors,
-} from '@angular/common/http';
-import { providePrimeNG } from 'primeng/config';
-import { NxPreset } from './theme/preset';
+} from "@angular/common/http";
+import { providePrimeNG } from "primeng/config";
+import { NxPreset } from "./theme/preset";
+import { StartupStore } from "@stores/startup.store";
+import { authInterceptor, ErrorInterceptor } from "@core/interceptors";
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(appRoutes, withComponentInputBinding()),
-    provideHttpClient(withFetch(), withInterceptors([])),
+    provideHttpClient(
+      withFetch(),
+      withInterceptors([authInterceptor, ErrorInterceptor]),
+    ),
+    provideAppInitializer(() => {
+      const startupStore = inject(StartupStore);
+      return startupStore.initializeApp();
+    }),
     providePrimeNG({
       theme: {
         preset: NxPreset,
         options: {
-          darkModeSelector: 'none',
+          darkModeSelector: "none",
           cssLayer: {
-            name: 'primeng',
-            order: 'theme, base, primeng',
+            name: "primeng",
+            order: "theme, base, primeng",
           },
         },
       },

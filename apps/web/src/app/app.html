@@ -1,3 +1,66 @@
 <main>
-  <router-outlet />
+  <!-- loading and error -->
+  @if (sStore.status() === "LOADING" || sStore.status() === "ERROR") {
+    <div
+      class="fixed inset-0 z-9999 flex flex-col items-center justify-center bg-white transition-opacity duration-500"
+      [class.opacity-0]="sStore.status() === 'READY'"
+    >
+      <div
+        class="w-20 h-20 bg-linear-to-tr from-indigo-600 to-violet-500 rounded-3xl flex items-center justify-center shadow-2xl shadow-indigo-200 animate-bounce"
+      >
+        <span class="text-white font-black text-3xl italic">NH</span>
+      </div>
+
+      @if (sStore.status() === "LOADING") {
+        <div class="mt-8 flex flex-col items-center">
+          <p
+            class="text-slate-400 font-black text-[10px] uppercase tracking-[0.3em]"
+          >
+            Iniciando Experiencia
+          </p>
+          <div class="mt-4 w-48 h-1 bg-slate-100 rounded-full overflow-hidden">
+            <div
+              class="h-full bg-indigo-600 animate-[loading_2s_ease-in-out_infinite]"
+            ></div>
+          </div>
+        </div>
+      }
+
+      @if (sStore.status() === "ERROR") {
+        <div class="mt-8 text-center px-6">
+          <p class="text-red-500 font-bold text-sm">
+            Hubo un problema al conectar
+          </p>
+          <button
+            (click)="sStore.initializeApp()"
+            class="mt-4 px-6 py-2 bg-slate-800 text-white rounded-xl text-xs font-bold uppercase"
+          >
+            Reintentar
+          </button>
+        </div>
+      }
+    </div>
+  }
+
+  @if (sStore.status() === "READY" && !isRouteLoaded()) {
+    <div
+      class="fixed inset-0 z-9999 flex flex-col items-center justify-center bg-white transition-opacity duration-500 ease-in-out"
+      [class.opacity-0]="sStore.status() === 'READY' && isRouteLoaded()"
+      [class.pointer-events-none]="sStore.status() === 'READY'"
+    >
+      <div
+        class="w-20 h-20 bg-linear-to-tr from-indigo-600 to-violet-500 rounded-3xl flex items-center justify-center shadow-2xl animate-bounce"
+      >
+        <span class="text-white font-black text-3xl italic">NH</span>
+      </div>
+
+      <p
+        class="mt-4 text-slate-400 font-bold text-[10px] uppercase tracking-widest"
+      >
+        Preparando NexHouse
+      </p>
+    </div>
+  }
+
+  <router-outlet (activate)="onActivate()" />
 </main>

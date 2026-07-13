@@ -1,5 +1,11 @@
-import { ChangeDetectionStrategy, Component } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+} from "@angular/core";
 import { RouterOutlet } from "@angular/router";
+import { StartupStore } from "@stores/startup.store";
 
 @Component({
   selector: "app-root",
@@ -11,4 +17,10 @@ import { RouterOutlet } from "@angular/router";
 })
 export class App {
   protected title = "web";
+
+  protected readonly sStore = inject(StartupStore);
+  protected isRouteLoaded = signal(false);
+  onActivate() {
+    this.isRouteLoaded.set(true);
+  }
 }

@@ -8,7 +8,9 @@ import {
 import { Router, RouterLink } from "@angular/router";
 import { LoginForm } from "./login-form";
 
-import { AuthStore } from "@auth/auth.store";
+import { AuthStore } from "@auth/store";
+import { DASHBOARD_ROUTES_ENUM } from "@dashboard/index";
+import { Login } from "@nexhouse/shared-domain/interfaces";
 import { FormValidationErrorComponent } from "@shared/components/forms";
 import { ButtonModule } from "primeng/button";
 import { Checkbox } from "primeng/checkbox";
@@ -16,7 +18,6 @@ import { IconFieldModule } from "primeng/iconfield";
 import { InputIconModule } from "primeng/inputicon";
 import { InputTextModule } from "primeng/inputtext";
 import { PasswordModule } from "primeng/password";
-import { Login } from "@nexhouse/shared-domain/interfaces";
 
 @Component({
   selector: "app-login-page",
@@ -61,8 +62,7 @@ export class LoginPage {
     const response = await this.store.login(request);
 
     if (response) {
-      console.log("login");
-      // this.router.navigateByUrl(`/${DASHBOARD_ROUTES_ENUM.HOME}`);
+      this.router.navigateByUrl(`/${DASHBOARD_ROUTES_ENUM.HOME}`);
     }
   }
 }
