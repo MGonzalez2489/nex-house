@@ -1,3 +1,34 @@
 /* You can add global styles to this file, and also import other style files */
-@import 'tailwindcss' source('../src');
-@import 'primeicons/primeicons.css';
+@import "tailwindcss" source("../src");
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@import "primeicons/primeicons.css";
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+/* html { */
+/*   font-family: "Inter", sans-serif; */
+/* } */
+/**/
+/* .thin-scroll::-webkit-scrollbar { */
+/*   width: 6px; */
+/* } */
+/* .thin-scroll::-webkit-scrollbar-track { */
+/*   background: transparent; */
+/* } */
+/* .thin-scroll::-webkit-scrollbar-thumb { */
+/*   background: rgba(148, 163, 184, 0.4); */
+/*   border-radius: 9999px; */
+/* } */
+/* .thin-scroll::-webkit-scrollbar-thumb:hover { */
+/*   background: rgba(148, 163, 184, 0.6); */
+/* } */

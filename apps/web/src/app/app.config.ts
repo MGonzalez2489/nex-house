@@ -32,7 +32,7 @@ export const appConfig: ApplicationConfig = {
       theme: {
         preset: NxPreset,
         options: {
-          darkModeSelector: "none",
+          darkModeSelector: ".dark",
           cssLayer: {
             name: "primeng",
             order: "theme, base, primeng",

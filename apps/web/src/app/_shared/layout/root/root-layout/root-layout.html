@@ -1,0 +1,284 @@
+<body
+  class="h-screen w-screen overflow-hidden bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 antialiased"
+>
+  <div class="flex h-full w-full flex-col">
+    <!-- ============ TOPBAR ============ -->
+    <app-nav-bar />
+
+    <!-- ============ CUERPO: sidebar + contenido ============ -->
+    <div class="relative flex flex-1 min-h-0">
+      <!-- Overlay móvil -->
+      <div
+        id="overlay"
+        class="hidden fixed inset-0 bg-slate-900/50 z-40 lg:hidden"
+      ></div>
+
+      <!-- ============ SIDEBAR ============ -->
+      <app-sidebar [items]="menu()" />
+
+      <!-- ============ CONTENIDO PRINCIPAL ============ -->
+      <main class="flex-1 min-w-0 overflow-y-auto thin-scroll">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+          <router-outlet />
+          <div class="hidden">
+            <div>
+              <h1
+                class="text-xl sm:text-2xl font-display font-semibold text-slate-900 dark:text-white"
+              >
+                Buen día, Ana 👋
+              </h1>
+              <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                Este es el resumen de tu espacio de trabajo hoy.
+              </p>
+            </div>
+
+            <!-- Tarjetas de estadísticas -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+              <div
+                class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4"
+              >
+                <p
+                  class="text-xs font-medium text-slate-500 dark:text-slate-400"
+                >
+                  Proyectos activos
+                </p>
+                <p
+                  class="text-2xl font-semibold text-slate-900 dark:text-white mt-1"
+                >
+                  12
+                </p>
+              </div>
+              <div
+                class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4"
+              >
+                <p
+                  class="text-xs font-medium text-slate-500 dark:text-slate-400"
+                >
+                  Tareas pendientes
+                </p>
+                <p
+                  class="text-2xl font-semibold text-slate-900 dark:text-white mt-1"
+                >
+                  27
+                </p>
+              </div>
+              <div
+                class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4"
+              >
+                <p
+                  class="text-xs font-medium text-slate-500 dark:text-slate-400"
+                >
+                  Miembros del equipo
+                </p>
+                <p
+                  class="text-2xl font-semibold text-slate-900 dark:text-white mt-1"
+                >
+                  9
+                </p>
+              </div>
+              <div
+                class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4"
+              >
+                <p
+                  class="text-xs font-medium text-slate-500 dark:text-slate-400"
+                >
+                  Completado este mes
+                </p>
+                <p
+                  class="text-2xl font-semibold text-cyan-600 dark:text-cyan-400 mt-1"
+                >
+                  84%
+                </p>
+              </div>
+            </div>
+
+            <!-- Bloque de contenido -->
+            <div
+              class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5"
+            >
+              <h2
+                class="text-sm font-semibold text-slate-800 dark:text-white mb-3"
+              >
+                Actividad reciente
+              </h2>
+              <ul class="divide-y divide-slate-100 dark:divide-slate-800">
+                <li class="py-3 flex items-center gap-3">
+                  <div
+                    class="h-8 w-8 rounded-full bg-cyan-50 dark:bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center text-xs font-semibold shrink-0"
+                  >
+                    JP
+                  </div>
+                  <p
+                    class="text-sm text-slate-600 dark:text-slate-300 min-w-0 truncate"
+                  >
+                    Juan actualizó el estado de
+                    <span class="font-medium text-slate-800 dark:text-white"
+                      >"Landing page v2"</span
+                    >
+                  </p>
+                  <span class="ml-auto text-xs text-slate-400 shrink-0"
+                    >10:24</span
+                  >
+                </li>
+                <li class="py-3 flex items-center gap-3">
+                  <div
+                    class="h-8 w-8 rounded-full bg-fuchsia-50 dark:bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400 flex items-center justify-center text-xs font-semibold shrink-0"
+                  >
+                    LR
+                  </div>
+                  <p
+                    class="text-sm text-slate-600 dark:text-slate-300 min-w-0 truncate"
+                  >
+                    Laura comentó en
+                    <span class="font-medium text-slate-800 dark:text-white"
+                      >"Sprint 14"</span
+                    >
+                  </p>
+                  <span class="ml-auto text-xs text-slate-400 shrink-0"
+                    >09:02</span
+                  >
+                </li>
+                <li class="py-3 flex items-center gap-3">
+                  <div
+                    class="h-8 w-8 rounded-full bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xs font-semibold shrink-0"
+                  >
+                    MG
+                  </div>
+                  <p
+                    class="text-sm text-slate-600 dark:text-slate-300 min-w-0 truncate"
+                  >
+                    Mario cerró 3 tareas en
+                    <span class="font-medium text-slate-800 dark:text-white"
+                      >"Onboarding"</span
+                    >
+                  </p>
+                  <span class="ml-auto text-xs text-slate-400 shrink-0"
+                    >Ayer</span
+                  >
+                </li>
+              </ul>
+            </div>
+
+            <p
+              class="text-xs text-slate-400 dark:text-slate-500 text-center pb-4"
+            >
+              Prueba redimensionar la ventana o usar el botón ☰ del topbar para
+              ver el comportamiento responsive del sidebar.
+            </p>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+
+<!---->
+<!-- <div class="flex h-auto"> -->
+<!--   <app-sidebar class="h-full hidden lg:flex lg:shrink-0" /> -->
+<!---->
+<!--   <div class="flex flex-col flex-1 w-0 overflow-hidden md:m-3 bg-red-100"> -->
+<!--     <main class="flex-1 relative overflow-y-auto focus:outline-none"> -->
+<!--       <div class="max-w-500 mx-auto h-full"> -->
+<!--         <router-outlet></router-outlet> -->
+<!--       </div> -->
+<!--     </main> -->
+<!--   </div> -->
+<!-- </div> -->
+
+<!-- <p-drawer -->
+<!--   [visible]="sessionService.sidebarVisible()" -->
+<!--   class="lg:hidden" -->
+<!--   blockScroll="true" -->
+<!--   [closeOnEscape]="true" -->
+<!--   showCloseIcon="false" -->
+<!--   [pt]="{ header: 'hidden', content: 'p-0', root: 'w-auto' }" -->
+<!--   (visibleChange)="sessionService.sidebarVisible.set($event)" -->
+<!-- > -->
+<!--   <app-sidebar -->
+<!--     class="h-full" -->
+<!--     (logout)="sessionService.logout()" -->
+<!--     (navigate)="sessionService.sidebarVisible.set(false)" -->
+<!--   /> -->
+<!-- </p-drawer> -->
+
+<script>
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("overlay");
+  const toggleBtn = document.getElementById("sidebarToggle");
+
+  const isDesktop = () => window.matchMedia("(min-width: 1024px)").matches;
+
+  function setMobileOpen(open) {
+    sidebar.classList.toggle("sidebar-open", open);
+    overlay.classList.toggle("hidden", !open);
+  }
+  function setDesktopCollapsed(collapsed) {
+    sidebar.classList.toggle("sidebar-collapsed", collapsed);
+  }
+
+  toggleBtn.addEventListener("click", () => {
+    if (isDesktop()) {
+      setDesktopCollapsed(!sidebar.classList.contains("sidebar-collapsed"));
+    } else {
+      setMobileOpen(!sidebar.classList.contains("sidebar-open"));
+    }
+  });
+
+  overlay.addEventListener("click", () => setMobileOpen(false));
+
+  // Cierra el drawer móvil al navegar (clic en un link del sidebar)
+  sidebar.querySelectorAll("nav a").forEach((link) => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      sidebar
+        .querySelectorAll(".nav-item")
+        .forEach((i) => i.classList.remove("active"));
+      link.classList.add("active");
+      if (!isDesktop()) setMobileOpen(false);
+    });
+  });
+
+  // Ajusta el estado correcto al cambiar de tamaño de ventana
+  window.addEventListener("resize", () => {
+    if (isDesktop()) {
+      overlay.classList.add("hidden");
+      sidebar.classList.remove("sidebar-open");
+    } else {
+      sidebar.classList.remove("sidebar-collapsed");
+    }
+  });
+
+  // Escape cierra el drawer móvil
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") setMobileOpen(false);
+  });
+
+  // Dropdown de notificaciones
+  const notifBtn = document.getElementById("notifBtn");
+  const notifDropdown = document.getElementById("notifDropdown");
+  notifBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    notifDropdown.classList.toggle("hidden");
+    document.getElementById("userMenu").classList.add("hidden");
+  });
+
+  // Menú de usuario (ayuda / logout)
+  const userMenuBtn = document.getElementById("userMenuBtn");
+  const userMenu = document.getElementById("userMenu");
+  userMenuBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    userMenu.classList.toggle("hidden");
+    notifDropdown.classList.add("hidden");
+  });
+
+  document.addEventListener("click", () => {
+    notifDropdown.classList.add("hidden");
+    userMenu.classList.add("hidden");
+  });
+
+  // Toggle de tema claro/oscuro
+  const themeToggle = document.getElementById("themeToggle");
+  themeToggle.addEventListener("click", () => {
+    document.documentElement.classList.toggle("dark");
+  });
+</script>

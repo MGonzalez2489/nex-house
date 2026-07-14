@@ -2,6 +2,7 @@ import { Route } from "@angular/router";
 import { AuthGuard } from "@auth/guards";
 import { DASHBOARD_ROUTES_ENUM } from "@dashboard/index";
 import { MainLayout } from "@shared/layout";
+import { NEIGHBORHOOD_ROUTES_ENUM } from "./features/neighborhoods";
 
 export const appRoutes: Route[] = [
   //public routes
@@ -21,6 +22,13 @@ export const appRoutes: Route[] = [
         loadChildren: () =>
           import("./features/dashboard/dashboard.routes").then(
             (m) => m.DASHBOARD_ROUTES,
+          ),
+      },
+      {
+        path: NEIGHBORHOOD_ROUTES_ENUM.HOME,
+        loadChildren: () =>
+          import("./features/neighborhoods/neighborhood.routes").then(
+            (m) => m.NEIGHBORHOOD_ROUTES,
           ),
       },
     ],

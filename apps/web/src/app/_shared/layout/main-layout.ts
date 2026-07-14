@@ -5,11 +5,11 @@ import {
   inject,
   Type,
 } from "@angular/core";
-import { AuthStore } from "@auth/store";
+import { SessionService } from "@core/services";
 import { UserRoleEnum } from "@nexhouse/shared-domain/enums";
 import { AdminLayout } from "./admin";
 import { ResidentLayout } from "./resident";
-import { RootLayout } from "./admin/root-layout/root-layout";
+import { RootLayout } from "./root/root-layout/root-layout";
 
 @Component({
   selector: "app-main-layout",
@@ -20,7 +20,7 @@ import { RootLayout } from "./admin/root-layout/root-layout";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MainLayout {
-  protected readonly store = inject(AuthStore);
+  protected readonly store = inject(SessionService);
 
   //
   protected activeLayout!: Type<any>;

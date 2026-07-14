@@ -70,9 +70,11 @@ export class AuthService {
 
     return this.sessionService.createSession(user, userAgent, ip);
   }
+  async refreshAuthentication(token: string, userAgent: string) {
+    return this.sessionService.refreshSession(token, userAgent);
+  }
 
   async getFreshProfileUser(user: User) {
-    console.log('USER ------------------->', user);
     if (user.role.name === UserRoleEnum.SUPERADMIN) return user;
 
     return this.userSearchService.findByPublicId(

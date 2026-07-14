@@ -8,6 +8,7 @@ import {
   Post,
   Req,
   Res,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SessionModel } from '@nexhouse/shared-domain/models';
@@ -52,5 +53,27 @@ export class AuthController {
     const response = await this.authService.getFreshProfileUser(user);
 
     return UserToModelMapper(response);
+  }
+
+  @Public()
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  async refresh(
+    @Req() request: ExpressRequest,
+    @NestHeaders('user-agent') userAgent: string,
+    @Res({ passthrough: true }) response: ExpressResponse,
+  ) {
+    const oldToken = request.cookies['refresh_token'];
+
+    if (!oldToken) {
+      throw new UnauthorizedException('No refresh token provided');
+    }
+
+    const { refreshToken, ...sessionData } =
+      await this.authService.refreshAuthentication(oldToken, userAgent);
+
+    // this.createCookie(response, refreshToken);
+
+    return sessionData;
   }
 }

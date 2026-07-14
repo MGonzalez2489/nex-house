@@ -1,5 +1,5 @@
 import { NxSession, User } from '@core/database';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -94,5 +94,54 @@ export class SessionService {
       refreshToken,
       exp: accessTokenExpInSeconds,
     };
+  }
+
+  /**
+   * Refreshes an existing session by validating the refresh token.
+   * @param refreshToken The raw token from the cookie.
+   * @returns A new session model with updated tokens.
+   */
+  async refreshSession(
+    refreshToken: string,
+    userAgent: string,
+  ): Promise<SessionModel> {
+    let payload: any;
+
+    try {
+      // 1. Verify JWT
+      payload = this.jwtService.verify(refreshToken);
+    } catch (e) {
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
+
+    //find existing db session
+    const session = await this.repository.findOne({
+      where: { publicId: payload.session, revoked: false },
+      relations: { user: true },
+    });
+
+    if (!session || session.expiresAt < new Date()) {
+      throw new UnauthorizedException('Session expired or invalid');
+    }
+
+    // 3. Does it match?
+    const isMatch = await this.cryptoService.compare(
+      refreshToken,
+      session.refreshTokenHash,
+    );
+
+    if (!isMatch) {
+      // Maybe we'll require revoque all existing sessions
+      throw new UnauthorizedException('Token reuse detected');
+    }
+    // this.cancelActiveSessions(session.user.id, userAgent);
+
+    return this.createSession(
+      session.user,
+      userAgent,
+      session.ipAddress,
+      true, // O basado en la expiración original
+      session?.socketId || undefined,
+    );
   }
 }
