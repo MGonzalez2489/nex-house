@@ -201,84 +201,84 @@
 <!--   /> -->
 <!-- </p-drawer> -->
 
-<script>
-  const sidebar = document.getElementById("sidebar");
-  const overlay = document.getElementById("overlay");
-  const toggleBtn = document.getElementById("sidebarToggle");
-
-  const isDesktop = () => window.matchMedia("(min-width: 1024px)").matches;
-
-  function setMobileOpen(open) {
-    sidebar.classList.toggle("sidebar-open", open);
-    overlay.classList.toggle("hidden", !open);
-  }
-  function setDesktopCollapsed(collapsed) {
-    sidebar.classList.toggle("sidebar-collapsed", collapsed);
-  }
-
-  toggleBtn.addEventListener("click", () => {
-    if (isDesktop()) {
-      setDesktopCollapsed(!sidebar.classList.contains("sidebar-collapsed"));
-    } else {
-      setMobileOpen(!sidebar.classList.contains("sidebar-open"));
-    }
-  });
-
-  overlay.addEventListener("click", () => setMobileOpen(false));
-
-  // Cierra el drawer móvil al navegar (clic en un link del sidebar)
-  sidebar.querySelectorAll("nav a").forEach((link) => {
-    link.addEventListener("click", (e) => {
-      e.preventDefault();
-      sidebar
-        .querySelectorAll(".nav-item")
-        .forEach((i) => i.classList.remove("active"));
-      link.classList.add("active");
-      if (!isDesktop()) setMobileOpen(false);
-    });
-  });
-
-  // Ajusta el estado correcto al cambiar de tamaño de ventana
-  window.addEventListener("resize", () => {
-    if (isDesktop()) {
-      overlay.classList.add("hidden");
-      sidebar.classList.remove("sidebar-open");
-    } else {
-      sidebar.classList.remove("sidebar-collapsed");
-    }
-  });
-
-  // Escape cierra el drawer móvil
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") setMobileOpen(false);
-  });
-
-  // Dropdown de notificaciones
-  const notifBtn = document.getElementById("notifBtn");
-  const notifDropdown = document.getElementById("notifDropdown");
-  notifBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    notifDropdown.classList.toggle("hidden");
-    document.getElementById("userMenu").classList.add("hidden");
-  });
-
-  // Menú de usuario (ayuda / logout)
-  const userMenuBtn = document.getElementById("userMenuBtn");
-  const userMenu = document.getElementById("userMenu");
-  userMenuBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    userMenu.classList.toggle("hidden");
-    notifDropdown.classList.add("hidden");
-  });
-
-  document.addEventListener("click", () => {
-    notifDropdown.classList.add("hidden");
-    userMenu.classList.add("hidden");
-  });
-
-  // Toggle de tema claro/oscuro
-  const themeToggle = document.getElementById("themeToggle");
-  themeToggle.addEventListener("click", () => {
-    document.documentElement.classList.toggle("dark");
-  });
-</script>
+<!-- <script> -->
+<!--   const sidebar = document.getElementById("sidebar"); -->
+<!--   const overlay = document.getElementById("overlay"); -->
+<!--   const toggleBtn = document.getElementById("sidebarToggle"); -->
+<!---->
+<!--   const isDesktop = () => window.matchMedia("(min-width: 1024px)").matches; -->
+<!---->
+<!--   function setMobileOpen(open) { -->
+<!--     sidebar.classList.toggle("sidebar-open", open); -->
+<!--     overlay.classList.toggle("hidden", !open); -->
+<!--   } -->
+<!--   function setDesktopCollapsed(collapsed) { -->
+<!--     sidebar.classList.toggle("sidebar-collapsed", collapsed); -->
+<!--   } -->
+<!---->
+<!--   toggleBtn.addEventListener("click", () => { -->
+<!--     if (isDesktop()) { -->
+<!--       setDesktopCollapsed(!sidebar.classList.contains("sidebar-collapsed")); -->
+<!--     } else { -->
+<!--       setMobileOpen(!sidebar.classList.contains("sidebar-open")); -->
+<!--     } -->
+<!--   }); -->
+<!---->
+<!--   overlay.addEventListener("click", () => setMobileOpen(false)); -->
+<!---->
+<!--   // Cierra el drawer móvil al navegar (clic en un link del sidebar) -->
+<!--   sidebar.querySelectorAll("nav a").forEach((link) => { -->
+<!--     link.addEventListener("click", (e) => { -->
+<!--       e.preventDefault(); -->
+<!--       sidebar -->
+<!--         .querySelectorAll(".nav-item") -->
+<!--         .forEach((i) => i.classList.remove("active")); -->
+<!--       link.classList.add("active"); -->
+<!--       if (!isDesktop()) setMobileOpen(false); -->
+<!--     }); -->
+<!--   }); -->
+<!---->
+<!--   // Ajusta el estado correcto al cambiar de tamaño de ventana -->
+<!--   window.addEventListener("resize", () => { -->
+<!--     if (isDesktop()) { -->
+<!--       overlay.classList.add("hidden"); -->
+<!--       sidebar.classList.remove("sidebar-open"); -->
+<!--     } else { -->
+<!--       sidebar.classList.remove("sidebar-collapsed"); -->
+<!--     } -->
+<!--   }); -->
+<!---->
+<!--   // Escape cierra el drawer móvil -->
+<!--   document.addEventListener("keydown", (e) => { -->
+<!--     if (e.key === "Escape") setMobileOpen(false); -->
+<!--   }); -->
+<!---->
+<!--   // Dropdown de notificaciones -->
+<!--   const notifBtn = document.getElementById("notifBtn"); -->
+<!--   const notifDropdown = document.getElementById("notifDropdown"); -->
+<!--   notifBtn.addEventListener("click", (e) => { -->
+<!--     e.stopPropagation(); -->
+<!--     notifDropdown.classList.toggle("hidden"); -->
+<!--     document.getElementById("userMenu").classList.add("hidden"); -->
+<!--   }); -->
+<!---->
+<!--   // Menú de usuario (ayuda / logout) -->
+<!--   const userMenuBtn = document.getElementById("userMenuBtn"); -->
+<!--   const userMenu = document.getElementById("userMenu"); -->
+<!--   userMenuBtn.addEventListener("click", (e) => { -->
+<!--     e.stopPropagation(); -->
+<!--     userMenu.classList.toggle("hidden"); -->
+<!--     notifDropdown.classList.add("hidden"); -->
+<!--   }); -->
+<!---->
+<!--   document.addEventListener("click", () => { -->
+<!--     notifDropdown.classList.add("hidden"); -->
+<!--     userMenu.classList.add("hidden"); -->
+<!--   }); -->
+<!---->
+<!--   // Toggle de tema claro/oscuro -->
+<!--   const themeToggle = document.getElementById("themeToggle"); -->
+<!--   themeToggle.addEventListener("click", () => { -->
+<!--     document.documentElement.classList.toggle("dark"); -->
+<!--   }); -->
+<!-- </script> -->

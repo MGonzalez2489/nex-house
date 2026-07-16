@@ -42,7 +42,7 @@ export class LoginPage {
   private readonly router = inject(Router);
 
   protected readonly form = new FormGroup<LoginForm>({
-    email: new FormControl("admin@test.com", {
+    email: new FormControl("root@test.com", {
       nonNullable: true,
       validators: [Validators.required, Validators.email],
     }),

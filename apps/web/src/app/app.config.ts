@@ -14,7 +14,11 @@ import {
 import { providePrimeNG } from "primeng/config";
 import { NxPreset } from "./theme/preset";
 import { StartupStore } from "@stores/startup.store";
-import { authInterceptor, ErrorInterceptor } from "@core/interceptors";
+import {
+  authInterceptor,
+  ErrorInterceptor,
+  idempotencyInterceptor,
+} from "@core/interceptors";
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -22,13 +26,18 @@ export const appConfig: ApplicationConfig = {
     provideRouter(appRoutes, withComponentInputBinding()),
     provideHttpClient(
       withFetch(),
-      withInterceptors([authInterceptor, ErrorInterceptor]),
+      withInterceptors([
+        authInterceptor,
+        ErrorInterceptor,
+        idempotencyInterceptor,
+      ]),
     ),
     provideAppInitializer(() => {
       const startupStore = inject(StartupStore);
       return startupStore.initializeApp();
     }),
     providePrimeNG({
+      inputVariant: "filled",
       theme: {
         preset: NxPreset,
         options: {

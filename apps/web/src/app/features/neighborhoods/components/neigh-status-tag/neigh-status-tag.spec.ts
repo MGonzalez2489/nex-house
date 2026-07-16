@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
-import { NeighborhoodsContainer } from "./neighborhoods-container";
+import { NeighStatusTag } from "./neigh-status-tag";
 
-describe("NeighborhoodsContainer", () => {
-  let component: NeighborhoodsContainer;
-  let fixture: ComponentFixture<NeighborhoodsContainer>;
+describe("NeighStatusTag", () => {
+  let component: NeighStatusTag;
+  let fixture: ComponentFixture<NeighStatusTag>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [NeighborhoodsContainer],
+      imports: [NeighStatusTag],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(NeighborhoodsContainer);
+    fixture = TestBed.createComponent(NeighStatusTag);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

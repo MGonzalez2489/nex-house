@@ -1,0 +1,224 @@
+<div class="max-w-2xl mx-auto pb-24 lg:pb-6">
+  <!-- Header -->
+  <div class="flex items-center gap-3 mb-6">
+    <p-button
+      class="hidden"
+      (click)="cancel()"
+      icon="pi pi-arrow-left"
+      severity="secondary"
+      variant="outlined"
+      size="small"
+    />
+
+    <div>
+      <h1
+        class="text-xl sm:text-2xl font-display font-semibold text-slate-900 dark:text-white"
+      >
+        Nuevo fraccionamiento
+      </h1>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+        Registra la información básica y las calles que lo componen.
+      </p>
+    </div>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-5">
+    <!-- Información general -->
+    <p-panel>
+      <ng-template #header>
+        <h2 class="text-sm font-semibold">Información general</h2>
+      </ng-template>
+
+      <!-- Nombre -->
+      <div class="form-control">
+        <label class="form-label" for="name">Nombre del fraccionamiento</label>
+        <input
+          pInputText
+          id="name"
+          type="text"
+          formControlName="name"
+          placeholder="Ej. Residencial San Agustín"
+          fluid
+          [invalid]="form.controls.name.invalid && form.controls.name.touched"
+          [attr.aria-invalid]="
+            form.controls.name.invalid && form.controls.name.touched
+          "
+          [attr.aria-describedby]="
+            form.controls.name.touched && form.controls.name.errors
+              ? 'name-error'
+              : null
+          "
+        />
+      </div>
+      <!-- <div> -->
+      <!--   <label -->
+      <!--     for="name" -->
+      <!--     class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5" -->
+      <!--   > -->
+      <!--     Nombre del fraccionamiento -->
+      <!--   </label> -->
+      <!--   <input -->
+      <!--     id="name" -->
+      <!--     type="text" -->
+      <!--     formControlName="name" -->
+      <!--     placeholder="Ej. Residencial San Agustín" -->
+      <!--     class="w-full rounded-lg border bg-slate-50 dark:bg-slate-800 px-3.5 py-2.5 text-sm text-slate-800 dark:text-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/40 focus:border-cyan-500 transition" -->
+      <!--     [class.border-rose-400]=" -->
+      <!--       nameControl.invalid && (nameControl.touched || submitted()) -->
+      <!--     " -->
+      <!--     [class.border-slate-200]=" -->
+      <!--       !(nameControl.invalid && (nameControl.touched || submitted())) -->
+      <!--     " -->
+      <!--     [class.dark:border-slate-700]=" -->
+      <!--       !(nameControl.invalid && (nameControl.touched || submitted())) -->
+      <!--     " -->
+      <!--   /> -->
+      <!---->
+      <!--   @if (nameControl.invalid && (nameControl.touched || submitted())) { -->
+      <!--     <p class="text-xs text-rose-500 mt-1.5"> -->
+      <!--       @if (nameControl.hasError("required")) { -->
+      <!--         El nombre es obligatorio. -->
+      <!--       } @else if (nameControl.hasError("minlength")) { -->
+      <!--         Debe tener al menos 3 caracteres. -->
+      <!--       } -->
+      <!--     </p> -->
+      <!--   } -->
+      <!-- </div> -->
+
+      <!-- Activo (toggle) -->
+      <!-- <div class="flex items-start justify-between gap-4 pt-1"> -->
+      <!--   <div> -->
+      <!--     <p class="text-sm font-medium text-slate-700 dark:text-slate-300"> -->
+      <!--       Fraccionamiento activo -->
+      <!--     </p> -->
+      <!--     <p class="text-xs text-slate-400 mt-0.5"> -->
+      <!--       Los fraccionamientos inactivos no aparecerán disponibles para su -->
+      <!--       asignación. -->
+      <!--     </p> -->
+      <!--   </div> -->
+      <!---->
+      <!--   <label -->
+      <!--     class="relative inline-flex items-center cursor-pointer shrink-0" -->
+      <!--   > -->
+      <!--     <input -->
+      <!--       type="checkbox" -->
+      <!--       formControlName="active" -->
+      <!--       class="sr-only peer" -->
+      <!--     /> -->
+      <!--     <div -->
+      <!--       class="w-11 h-6 rounded-full bg-slate-200 dark:bg-slate-700 peer-checked:bg-cyan-600 transition-colors" -->
+      <!--     ></div> -->
+      <!--     <div -->
+      <!--       class="absolute left-0.5 top-0.5 h-5 w-5 bg-white rounded-full shadow-sm transition-transform peer-checked:translate-x-5" -->
+      <!--     ></div> -->
+      <!--   </label> -->
+      <!-- </div> -->
+    </p-panel>
+
+    <!-- Calles -->
+    <p-panel>
+      <ng-template #header>
+        <div>
+          <h2 class="text-sm font-semibold text-slate-800 dark:text-white">
+            Calles
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">
+            Agrega todas las calles que pertenecen a este fraccionamiento.
+          </p>
+        </div>
+      </ng-template>
+      <ng-template #icons>
+        <p-badge [value]="streets.length" severity="secondary" />
+      </ng-template>
+
+      <div class="space-y-4">
+        <div formArrayName="streets" class="space-y-2.5">
+          @for (street of streets.controls; track $index) {
+            <div class="flex items-start gap-2">
+              <div class="flex-1 min-w-0">
+                <input
+                  pInputText
+                  fluid
+                  type="text"
+                  [formControlName]="$index"
+                  placeholder="Ej. Calle Hacienda del Sol"
+                />
+                <!-- <input -->
+                <!--   type="text" -->
+                <!--   [formControlName]="$index" -->
+                <!--   placeholder="Ej. Calle Hacienda del Sol" -->
+                <!--   class="w-full rounded-lg border bg-slate-50 dark:bg-slate-800 px-3.5 py-2.5 text-sm text-slate-800 dark:text-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/40 focus:border-cyan-500 transition" -->
+                <!--   [class.border-rose-400]=" -->
+                <!--     street.invalid && (street.touched || submitted()) -->
+                <!--   " -->
+                <!--   [class.border-slate-200]=" -->
+                <!--     !(street.invalid && (street.touched || submitted())) -->
+                <!--   " -->
+                <!--   [class.dark:border-slate-700]=" -->
+                <!--     !(street.invalid && (street.touched || submitted())) -->
+                <!--   " -->
+                <!-- /> -->
+                <!-- @if (street.invalid && (street.touched || submitted())) { -->
+                <!--   <p class="text-xs text-rose-500 mt-1.5"> -->
+                <!--     Escribe el nombre de la calle. -->
+                <!--   </p> -->
+                <!-- } -->
+              </div>
+              <p-button
+                (click)="removeStreet($index)"
+                aria-label="Eliminar calle"
+                icon="pi pi-trash"
+                severity="secondary"
+                variant="outlined"
+              />
+            </div>
+          }
+        </div>
+
+        <p-button
+          (click)="addStreet()"
+          icon="pi pi-plus"
+          label="Agregar calle"
+          fluid
+          size="small"
+          severity="secondary"
+          variant="outlined"
+        />
+      </div>
+    </p-panel>
+
+    <!-- Acciones -->
+    <div class="hidden lg:flex items-center justify-end gap-3">
+      <p-button
+        label="Cancelar"
+        (click)="cancel()"
+        [disabled]="store.loading()"
+        severity="secondary"
+        variant="outlined"
+      />
+      <p-button [loading]="store.loading()" label="Guardar" type="submit" />
+    </div>
+  </form>
+
+  <!-- Barra de acciones fija en mobile -->
+  <div
+    class="lg:hidden fixed bottom-0 left-0 right-0 z-30 border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur px-4 py-3 flex items-center gap-3"
+  >
+    <p-button
+      label="Cancelar"
+      (click)="cancel()"
+      [disabled]="store.loading()"
+      severity="secondary"
+      variant="outlined"
+      fluid
+      class="flex-1"
+    />
+
+    <p-button
+      [loading]="store.loading()"
+      label="Guardar"
+      class="flex-1"
+      fluid
+    />
+  </div>
+</div>

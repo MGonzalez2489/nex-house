@@ -1,5 +1,11 @@
-import { ChangeDetectionStrategy, Component, signal } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+} from "@angular/core";
 import { RouterOutlet } from "@angular/router";
+import { NeighborhoodsStore } from "@neighborhoods/neighborhood.store";
 import { NavBar, Sidebar, SideItem } from "@shared/layout/components";
 
 @Component({
@@ -11,7 +17,9 @@ import { NavBar, Sidebar, SideItem } from "@shared/layout/components";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RootLayout {
-  menu = signal<SideItem[]>([
+  private readonly neighStore = inject(NeighborhoodsStore);
+
+  readonly menu = signal<SideItem[]>([
     {
       title: "Menú",
       items: [

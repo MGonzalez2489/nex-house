@@ -20,7 +20,8 @@
       "@stores/*": ["./src/app/stores/*"],
       "@shared/*": ["./src/app/_shared/*"],
       "@auth/*": ["./src/app/features/auth/*"],
-      "@dashboard/*": ["./src/app/features/dashboard/*"]
+      "@dashboard/*": ["./src/app/features/dashboard/*"],
+      "@neighborhoods/*": ["./src/app/features/neighborhoods/*"]
     }
   },
   "include": ["src/**/*.ts"],

@@ -17,6 +17,7 @@ export const appRoutes: Route[] = [
     component: MainLayout,
     canActivate: [AuthGuard],
     children: [
+      { path: "", redirectTo: "dashboard", pathMatch: "full" },
       {
         path: DASHBOARD_ROUTES_ENUM.HOME,
         loadChildren: () =>
