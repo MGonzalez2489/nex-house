@@ -21,13 +21,22 @@
       </p>
     </div>
 
-    <p-button icon="pi pi-plus" label="Nuevo" (click)="onCreate()" />
+    <p-button
+      icon="pi pi-plus"
+      label="Nuevo"
+      (click)="onCreate()"
+      class="hidden md:block"
+    />
   </div>
 
-  <app-neigh-table-filters class="block" (filter)="onSearch($event)" />
+  <app-neigh-table-filters
+    class="block"
+    (filter)="onSearch($event)"
+    [isMobile]="sessionService.isMobile()"
+  />
 
   <!-- Lista de resultados -->
-  @if (false) {
+  @if (neighStore.entities().length === 0) {
     <div
       class="rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 py-14 flex flex-col items-center text-center px-4"
     >
@@ -48,6 +57,7 @@
       [items]="neighStore.entities()"
       [pagination]="neighStore.pagination()"
       [isLoading]="neighStore.loading()"
+      [isMobile]="sessionService.isMobile()"
     />
   }
 </div>

@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  input,
   OnInit,
   output,
   signal,
@@ -37,6 +38,8 @@ export class NeighTableFilters implements OnInit {
     { value: true, label: "Activos" },
     { value: false, label: "Inactivos" },
   ];
+
+  readonly isMobile = input<boolean>(false);
 
   protected filters = signal<SearchNeigh>({});
   protected filter = output<SearchNeigh>();

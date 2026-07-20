@@ -10,6 +10,7 @@ import { NeighborhoodsStore } from "@neighborhoods/neighborhood.store";
 import { SearchNeigh } from "@nexhouse/shared-domain/interfaces";
 import { Button } from "primeng/button";
 import { NeighborhoodsTable, NeighTableFilters } from "../../components";
+import { SessionService } from "@core/services";
 
 @Component({
   selector: "app-neigh-home-page",
@@ -22,6 +23,7 @@ import { NeighborhoodsTable, NeighTableFilters } from "../../components";
 export class NeighHomePage implements OnInit {
   private readonly router = inject(Router);
   protected readonly neighStore = inject(NeighborhoodsStore);
+  protected readonly sessionService = inject(SessionService);
 
   protected readonly entries = computed(() => this.neighStore.entities());
   protected readonly activeEntries = computed(
