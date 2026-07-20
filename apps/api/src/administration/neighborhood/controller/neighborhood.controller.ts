@@ -1,3 +1,11 @@
+import { Neighborhood, NeighStreet, User } from '@core/database';
+import { CurrentUser } from '@core/decorators';
+import {
+  HttpCacheInterceptor,
+  IdempotencyInterceptor,
+} from '@core/interceptors';
+import { PaginatedResult } from '@core/utils';
+import { CacheTTL } from '@nestjs/cache-manager';
 import {
   Body,
   Controller,
@@ -13,22 +21,13 @@ import {
   Query,
   UseInterceptors,
 } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CreateNeighborhoodDto, SearchNeighDto } from '../dtos';
 import {
   NeighborhoodSearchService,
   NeighborhoodService,
   NeighStreetService,
 } from '../services';
-import { Neighborhood, NeighStreet, User } from '@core/database';
-import { SearchDto } from '@core/dtos';
-import { PaginatedResult } from '@core/utils';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreateNeighborhoodDto } from '../dtos';
-import { CurrentUser } from '@core/decorators';
-import {
-  HttpCacheInterceptor,
-  IdempotencyInterceptor,
-} from '@core/interceptors';
-import { CacheTTL } from '@nestjs/cache-manager';
 
 @ApiTags('Neighborhood')
 @Controller('neighborhood')
@@ -89,7 +88,7 @@ export class NeighborhoodController {
     description: 'Returns a paginated list of neighborhoods.',
   })
   async findAll(
-    @Query() searchDto: SearchDto,
+    @Query() searchDto: SearchNeighDto,
   ): Promise<PaginatedResult<Neighborhood>> {
     return this.searchService.findAll(searchDto);
   }

@@ -47,6 +47,7 @@
     <app-neighborhoods-table
       [items]="neighStore.entities()"
       [pagination]="neighStore.pagination()"
+      [isLoading]="neighStore.loading()"
     />
   }
 </div>

@@ -1,3 +1,4 @@
+import { JsonPipe } from "@angular/common";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -12,15 +13,25 @@ import {
   Validators,
 } from "@angular/forms";
 import { Router } from "@angular/router";
+import { NEIGHBORHOOD_ROUTES_ENUM } from "@neighborhoods/neighborhood.routes";
 import { NeighborhoodsStore } from "@neighborhoods/neighborhood.store";
 import { Badge } from "primeng/badge";
 import { Button } from "primeng/button";
 import { InputTextModule } from "primeng/inputtext";
 import { Panel } from "primeng/panel";
+import { ToggleSwitchModule } from "primeng/toggleswitch";
 
 @Component({
   selector: "app-neigh-form-page",
-  imports: [ReactiveFormsModule, Button, Panel, InputTextModule, Badge],
+  imports: [
+    ReactiveFormsModule,
+    Button,
+    Panel,
+    InputTextModule,
+    Badge,
+    ToggleSwitchModule,
+    JsonPipe,
+  ],
   templateUrl: "./neigh-form-page.html",
   styleUrl: "./neigh-form-page.css",
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -82,14 +93,14 @@ export class NeighFormPage {
 
     this.saving.set(true);
     const { name, active, streets } = this.form.getRawValue();
-    console.log("active:", active);
     const response = await this.store.create({
       name,
       streets,
+      isActive: active,
     });
 
     if (response) {
-      console.log("response");
+      this.router.navigateByUrl(`/${NEIGHBORHOOD_ROUTES_ENUM.HOME}`);
     }
   }
 }

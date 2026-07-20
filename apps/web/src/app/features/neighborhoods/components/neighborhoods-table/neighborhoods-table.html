@@ -10,7 +10,7 @@
     [lazyLoadOnInit]="loadOnInit()"
     [paginator]="pagination()"
     [totalRecords]="pagination()?.total || 0"
-    [loading]="false"
+    [loading]="isLoading()"
     [showCurrentPageReport]="true"
     [showFirstLastIcon]="false"
     currentPageReportTemplate="{first} - {last} de {totalRecords}"
@@ -32,19 +32,6 @@
         <td>{{ item.streets.length }}</td>
         <td>
           <app-neigh-status-tag [isActive]="item.isActive" />
-          <!-- <span -->
-          <!--   class="text-xs font-medium px-2 py-0.5 rounded-full" -->
-          <!--   [class.bg-emerald-50]="item.isActive" -->
-          <!--   [class.text-emerald-600]="item.isActive" -->
-          <!--   [class.dark:bg-emerald-500/10]="item.isActive" -->
-          <!--   [class.dark:text-emerald-400]="item.isActive" -->
-          <!--   [class.bg-slate-100]="!item.isActive" -->
-          <!--   [class.text-slate-500]="!item.isActive" -->
-          <!--   [class.dark:bg-slate-800]="!item.isActive" -->
-          <!--   [class.dark:text-slate-400]="!item.isActive" -->
-          <!-- > -->
-          <!--   {{ item.isActive ? "Activo" : "Inactivo" }} -->
-          <!-- </span> -->
         </td>
         <td class="text-right">
           <p-button
@@ -62,132 +49,132 @@
 </div>
 
 <!-- Mobile: tarjetas -->
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:hidden">
-  @for (n of paginated(); track n.id) {
-    <div
-      class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 flex flex-col gap-3"
-    >
-      <div class="flex items-start justify-between gap-2">
-        <div class="min-w-0">
-          <p
-            class="text-sm font-semibold text-slate-800 dark:text-white truncate"
-          >
-            {{ n.name }}
-          </p>
-          <p class="text-xs text-slate-400 truncate">
-            {{ n.municipality }}
-          </p>
-        </div>
-        <span
-          class="shrink-0 text-[11px] font-medium px-2 py-0.5 rounded-full"
-          [class.bg-emerald-50]="n.active"
-          [class.text-emerald-600]="n.active"
-          [class.dark:bg-emerald-500/10]="n.active"
-          [class.dark:text-emerald-400]="n.active"
-          [class.bg-slate-100]="!n.active"
-          [class.text-slate-500]="!n.active"
-          [class.dark:bg-slate-800]="!n.active"
-          [class.dark:text-slate-400]="!n.active"
-        >
-          {{ n.active ? "Activo" : "Inactivo" }}
-        </span>
-      </div>
-      <div class="flex items-center justify-between text-xs text-slate-400">
-        <span>{{ n.streets.length }} calles</span>
-        <span>{{ n.createdAt }}</span>
-      </div>
-      <button
-        (click)="onView(n.id)"
-        class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-medium py-2 transition"
-      >
-        <i class="pi pi-sun"></i>
-
-        Ver detalles
-      </button>
-    </div>
-  }
-</div>
-
-<!-- Paginación -->
-<div class="flex items-center justify-between gap-3 px-1 hidden">
-  <p class="text-xs text-slate-400">{{ rangeLabel() }}</p>
-  <div class="flex items-center gap-1">
-    <button
-      (click)="goToPage(currentPage() - 1)"
-      [disabled]="currentPage() === 1"
-      class="h-8 w-8 inline-flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 disabled:opacity-40 disabled:cursor-not-allowed hover:enabled:bg-slate-50 dark:hover:enabled:bg-slate-800 transition"
-    >
-      <i class="pi pi-sun"></i>
-    </button>
-    <span class="text-xs text-slate-500 dark:text-slate-400 px-2"
-      >{{ currentPage() }} / {{ totalPages() }}</span
-    >
-    <button
-      (click)="goToPage(currentPage() + 1)"
-      [disabled]="currentPage() === totalPages()"
-      class="h-8 w-8 inline-flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 disabled:opacity-40 disabled:cursor-not-allowed hover:enabled:bg-slate-50 dark:hover:enabled:bg-slate-800 transition"
-    >
-      <i class="pi pi-sun"></i>
-    </button>
-  </div>
-</div>
-
-<!-- Desktop: tabla hidden -->
-<div
-  class="hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden"
->
-  <table class="w-full text-sm">
-    <thead>
-      <tr class="border-b border-slate-100 dark:border-slate-800">
-        <th class="px-5 py-3 font-medium">Nombre</th>
-        <th class="px-5 py-3 font-medium">Estado</th>
-        <th class="px-5 py-3 font-medium">Municipio</th>
-        <th class="px-5 py-3 font-medium">Calles</th>
-        <th class="px-5 py-3 font-medium">Registrado</th>
-        <th class="px-5 py-3 font-medium text-right">Acciones</th>
-      </tr>
-    </thead>
-    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-      @for (n of paginated(); track n.id) {
-        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
-          <td class="px-5 py-3.5 font-medium text-slate-800 dark:text-white">
-            {{ n.name }}
-          </td>
-          <td class="px-5 py-3.5">
-            <span
-              class="text-xs font-medium px-2 py-0.5 rounded-full"
-              [class.bg-emerald-50]="n.active"
-              [class.text-emerald-600]="n.active"
-              [class.dark:bg-emerald-500/10]="n.active"
-              [class.dark:text-emerald-400]="n.active"
-              [class.bg-slate-100]="!n.active"
-              [class.text-slate-500]="!n.active"
-              [class.dark:bg-slate-800]="!n.active"
-              [class.dark:text-slate-400]="!n.active"
-            >
-              {{ n.active ? "Activo" : "Inactivo" }}
-            </span>
-          </td>
-          <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400">
-            {{ n.municipality }}
-          </td>
-          <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400">
-            {{ n.streets.length }}
-          </td>
-          <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400">
-            {{ n.createdAt }}
-          </td>
-          <td class="px-5 py-3.5 text-right">
-            <button
-              (click)="onView(n.id)"
-              class="inline-flex items-center gap-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-300 text-xs font-medium px-2.5 py-1.5 transition"
-            >
-              <i class="pi pi-sun"></i>
-              Ver
-            </button>
-          </td>
-        </tr>
-      }
-    </tbody>
-  </table>
-</div>
+<!-- <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:hidden"> -->
+<!--   @for (n of paginated(); track n.id) { -->
+<!--     <div -->
+<!--       class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 flex flex-col gap-3" -->
+<!--     > -->
+<!--       <div class="flex items-start justify-between gap-2"> -->
+<!--         <div class="min-w-0"> -->
+<!--           <p -->
+<!--             class="text-sm font-semibold text-slate-800 dark:text-white truncate" -->
+<!--           > -->
+<!--             {{ n.name }} -->
+<!--           </p> -->
+<!--           <p class="text-xs text-slate-400 truncate"> -->
+<!--             {{ n.municipality }} -->
+<!--           </p> -->
+<!--         </div> -->
+<!--         <span -->
+<!--           class="shrink-0 text-[11px] font-medium px-2 py-0.5 rounded-full" -->
+<!--           [class.bg-emerald-50]="n.active" -->
+<!--           [class.text-emerald-600]="n.active" -->
+<!--           [class.dark:bg-emerald-500/10]="n.active" -->
+<!--           [class.dark:text-emerald-400]="n.active" -->
+<!--           [class.bg-slate-100]="!n.active" -->
+<!--           [class.text-slate-500]="!n.active" -->
+<!--           [class.dark:bg-slate-800]="!n.active" -->
+<!--           [class.dark:text-slate-400]="!n.active" -->
+<!--         > -->
+<!--           {{ n.active ? "Activo" : "Inactivo" }} -->
+<!--         </span> -->
+<!--       </div> -->
+<!--       <div class="flex items-center justify-between text-xs text-slate-400"> -->
+<!--         <span>{{ n.streets.length }} calles</span> -->
+<!--         <span>{{ n.createdAt }}</span> -->
+<!--       </div> -->
+<!--       <button -->
+<!--         (click)="onView(n.id)" -->
+<!--         class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-medium py-2 transition" -->
+<!--       > -->
+<!--         <i class="pi pi-sun"></i> -->
+<!---->
+<!--         Ver detalles -->
+<!--       </button> -->
+<!--     </div> -->
+<!--   } -->
+<!-- </div> -->
+<!---->
+<!-- <!-- Paginación -->
+<!-- <div class="flex items-center justify-between gap-3 px-1 hidden"> -->
+<!--   <p class="text-xs text-slate-400">{{ rangeLabel() }}</p> -->
+<!--   <div class="flex items-center gap-1"> -->
+<!--     <button -->
+<!--       (click)="goToPage(currentPage() - 1)" -->
+<!--       [disabled]="currentPage() === 1" -->
+<!--       class="h-8 w-8 inline-flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 disabled:opacity-40 disabled:cursor-not-allowed hover:enabled:bg-slate-50 dark:hover:enabled:bg-slate-800 transition" -->
+<!--     > -->
+<!--       <i class="pi pi-sun"></i> -->
+<!--     </button> -->
+<!--     <span class="text-xs text-slate-500 dark:text-slate-400 px-2" -->
+<!--       >{{ currentPage() }} / {{ totalPages() }}</span -->
+<!--     > -->
+<!--     <button -->
+<!--       (click)="goToPage(currentPage() + 1)" -->
+<!--       [disabled]="currentPage() === totalPages()" -->
+<!--       class="h-8 w-8 inline-flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 disabled:opacity-40 disabled:cursor-not-allowed hover:enabled:bg-slate-50 dark:hover:enabled:bg-slate-800 transition" -->
+<!--     > -->
+<!--       <i class="pi pi-sun"></i> -->
+<!--     </button> -->
+<!--   </div> -->
+<!-- </div> -->
+<!---->
+<!-- <!-- Desktop: tabla hidden -->
+<!-- <div -->
+<!--   class="hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden" -->
+<!-- > -->
+<!--   <table class="w-full text-sm"> -->
+<!--     <thead> -->
+<!--       <tr class="border-b border-slate-100 dark:border-slate-800"> -->
+<!--         <th class="px-5 py-3 font-medium">Nombre</th> -->
+<!--         <th class="px-5 py-3 font-medium">Estado</th> -->
+<!--         <th class="px-5 py-3 font-medium">Municipio</th> -->
+<!--         <th class="px-5 py-3 font-medium">Calles</th> -->
+<!--         <th class="px-5 py-3 font-medium">Registrado</th> -->
+<!--         <th class="px-5 py-3 font-medium text-right">Acciones</th> -->
+<!--       </tr> -->
+<!--     </thead> -->
+<!--     <tbody class="divide-y divide-slate-100 dark:divide-slate-800"> -->
+<!--       @for (n of paginated(); track n.id) { -->
+<!--         <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition"> -->
+<!--           <td class="px-5 py-3.5 font-medium text-slate-800 dark:text-white"> -->
+<!--             {{ n.name }} -->
+<!--           </td> -->
+<!--           <td class="px-5 py-3.5"> -->
+<!--             <span -->
+<!--               class="text-xs font-medium px-2 py-0.5 rounded-full" -->
+<!--               [class.bg-emerald-50]="n.active" -->
+<!--               [class.text-emerald-600]="n.active" -->
+<!--               [class.dark:bg-emerald-500/10]="n.active" -->
+<!--               [class.dark:text-emerald-400]="n.active" -->
+<!--               [class.bg-slate-100]="!n.active" -->
+<!--               [class.text-slate-500]="!n.active" -->
+<!--               [class.dark:bg-slate-800]="!n.active" -->
+<!--               [class.dark:text-slate-400]="!n.active" -->
+<!--             > -->
+<!--               {{ n.active ? "Activo" : "Inactivo" }} -->
+<!--             </span> -->
+<!--           </td> -->
+<!--           <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400"> -->
+<!--             {{ n.municipality }} -->
+<!--           </td> -->
+<!--           <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400"> -->
+<!--             {{ n.streets.length }} -->
+<!--           </td> -->
+<!--           <td class="px-5 py-3.5 text-slate-500 dark:text-slate-400"> -->
+<!--             {{ n.createdAt }} -->
+<!--           </td> -->
+<!--           <td class="px-5 py-3.5 text-right"> -->
+<!--             <button -->
+<!--               (click)="onView(n.id)" -->
+<!--               class="inline-flex items-center gap-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-300 text-xs font-medium px-2.5 py-1.5 transition" -->
+<!--             > -->
+<!--               <i class="pi pi-sun"></i> -->
+<!--               Ver -->
+<!--             </button> -->
+<!--           </td> -->
+<!--         </tr> -->
+<!--       } -->
+<!--     </tbody> -->
+<!--   </table> -->
+<!-- </div> -->

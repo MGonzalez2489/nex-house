@@ -21,6 +21,7 @@
   </div>
 
   @if (neighborhood(); as n) {
+    <!-- neigh info -->
     <p-panel class="block">
       <ng-template #header>
         <div>
@@ -29,7 +30,7 @@
           >
             {{ n.name }}
           </p>
-          <p class="text-sm text-slate-400 mt-0.5">munici</p>
+          <!-- <p class="text-sm text-slate-400 mt-0.5">munici</p> -->
         </div>
       </ng-template>
       <ng-template #icons>
@@ -39,6 +40,7 @@
         Registrado el {{ n.createdAt | date }}
       </p>
     </p-panel>
+    <!-- streets -->
     <p-panel class="block">
       <ng-template #header>
         <h2 class="text-sm font-semibold text-slate-800 dark:text-white mb-3">

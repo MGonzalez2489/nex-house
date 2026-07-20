@@ -144,4 +144,28 @@ export class SessionService {
       session?.socketId || undefined,
     );
   }
+
+  /**
+   * Revokes a session and invalidates the refresh token.
+   * @param refreshToken The token from the cookie.
+   */
+  async logout(refreshToken: string): Promise<void> {
+    try {
+      // 1.Verify token to get session ID
+      const payload = this.jwtService.verify(refreshToken);
+
+      // 2. Revoke session
+      await this.repository.update(
+        { publicId: payload.session },
+        {
+          revoked: true,
+          socketId: undefined,
+          lastActivity: new Date(),
+        },
+      );
+    } catch (e) {
+      // Si el token ya expiró o es inválido, no hacemos nada,
+      // pero igual limpiaremos la cookie en el controlador.
+    }
+  }
 }

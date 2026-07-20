@@ -61,6 +61,7 @@ export class NeighborhoodService {
 
       const neighborhoodInstance = queryRunner.manager.create(Neighborhood, {
         name: lookupName,
+        isActive: dto.isActive,
         createdBy: user.id,
       });
       const savedNeighborhood = await queryRunner.manager.save(

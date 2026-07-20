@@ -43,6 +43,8 @@ export class AuthController {
 
     const session = await this.authService.login(loginDto, userAgent, ip);
 
+    this.createCookie(response, session.refreshToken);
+
     return session;
   }
 
@@ -72,8 +74,42 @@ export class AuthController {
     const { refreshToken, ...sessionData } =
       await this.authService.refreshAuthentication(oldToken, userAgent);
 
-    // this.createCookie(response, refreshToken);
+    this.createCookie(response, refreshToken);
 
     return sessionData;
+  }
+
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'User logout' })
+  async logout(
+    @Req() request: ExpressRequest,
+    @Res({ passthrough: true }) response: ExpressResponse,
+  ) {
+    const refreshToken = request.cookies['refresh_token'];
+
+    if (refreshToken) {
+      await this.authService.logout(refreshToken);
+    }
+
+    // REMOVE cookie (overriding)
+    response.clearCookie('refresh_token', {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      path: '/',
+    });
+
+    return { message: 'Logged out successfully' };
+  }
+
+  private createCookie(response: ExpressResponse, refreshToken: string) {
+    response.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
   }
 }

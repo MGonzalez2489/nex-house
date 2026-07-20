@@ -74,6 +74,10 @@ export class AuthService {
     return this.sessionService.refreshSession(token, userAgent);
   }
 
+  async logout(refreshToken: string) {
+    return this.sessionService.logout(refreshToken);
+  }
+
   async getFreshProfileUser(user: User) {
     if (user.role.name === UserRoleEnum.SUPERADMIN) return user;
 

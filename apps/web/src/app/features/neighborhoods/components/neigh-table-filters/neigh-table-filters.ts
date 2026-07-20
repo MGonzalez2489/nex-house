@@ -55,7 +55,10 @@ export class NeighTableFilters implements OnInit {
           ...f,
           globalFilter:
             value.hint && value.hint !== "" ? value.hint : undefined,
-          isActive: value.active ? value.active : undefined,
+          isActive:
+            value.active !== undefined && value.active !== null
+              ? value.active
+              : undefined,
         }));
 
         this.filter.emit(this.filters());
