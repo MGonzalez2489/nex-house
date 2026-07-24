@@ -2,13 +2,15 @@ import { DatePipe } from "@angular/common";
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
+  effect,
   inject,
   input,
+  signal,
 } from "@angular/core";
 import { Router } from "@angular/router";
 import { NeighStatusTag } from "@neighborhoods/components";
 import { NeighborhoodsStore } from "@neighborhoods/neighborhood.store";
+import { NeighborhoodModel } from "@nexhouse/shared-domain/models";
 import { Button } from "primeng/button";
 import { Panel } from "primeng/panel";
 
@@ -24,13 +26,31 @@ export class NeighDetailsPage {
   private readonly router = inject(Router);
   private readonly store = inject(NeighborhoodsStore);
 
-  id = input<string>();
+  protected id = input<string>();
 
-  protected readonly neighborhood = computed(() =>
-    this.store.entities().find((f) => f.publicId === this.id()),
-  );
+  neighborhood = signal<NeighborhoodModel | undefined>(undefined);
+
+  constructor() {
+    effect(async () => {
+      const cId = this.id();
+      if (!cId) return;
+
+      const cN = await this.store.findById(cId);
+
+      if (cN) {
+        this.neighborhood.set(cN);
+      }
+    });
+  }
 
   back(): void {
     this.router.navigate(["/neighborhoods"]);
+  }
+  edit() {
+    this.router.navigate([
+      "/neighborhoods",
+      this.neighborhood()?.publicId,
+      "edit",
+    ]);
   }
 }

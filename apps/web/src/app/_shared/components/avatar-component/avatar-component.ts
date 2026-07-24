@@ -41,7 +41,7 @@ export class AvatarComponent {
     let r = "";
 
     const textArray = text.split(" ");
-    textArray.forEach((f) => (r += f[0]));
+    textArray.forEach((f) => (r.length < 2 ? (r += f[0]) : r));
 
     return r.toUpperCase();
   });

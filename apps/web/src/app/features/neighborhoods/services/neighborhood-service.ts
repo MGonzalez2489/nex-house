@@ -1,9 +1,10 @@
 import { inject, Injectable } from "@angular/core";
 import { RequestService } from "@core/services";
 import {
-  Search,
   ApiResponse,
   CreateNeighborhood,
+  Search,
+  UpdateNeighborhood,
 } from "@nexhouse/shared-domain/interfaces";
 import { NeighborhoodModel } from "@nexhouse/shared-domain/models";
 import { Observable } from "rxjs";
@@ -31,7 +32,7 @@ export class NeighborhoodService {
 
   update(
     id: string,
-    dto: CreateNeighborhood,
+    dto: UpdateNeighborhood,
   ): Observable<ApiResponse<NeighborhoodModel>> {
     return this.request.patch<NeighborhoodModel>(`${this.endpoint}/${id}`, dto);
   }

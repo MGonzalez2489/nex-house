@@ -1,19 +1,23 @@
+import { DatePipe } from "@angular/common";
 import {
   ChangeDetectionStrategy,
   Component,
   inject,
   input,
-  signal,
+  output,
 } from "@angular/core";
-import { Router } from "@angular/router";
-import { ApiPaginationMeta } from "@nexhouse/shared-domain/interfaces";
+import { Router, RouterLink } from "@angular/router";
+import {
+  ApiPaginationMeta,
+  SearchNeigh,
+} from "@nexhouse/shared-domain/interfaces";
 import { NeighborhoodModel } from "@nexhouse/shared-domain/models";
-import { DataViewerComponent } from "@shared/components";
+import { AvatarComponent, DataViewerComponent } from "@shared/components";
 import { TableColumn } from "@shared/components/data-viewer-component";
 import { Button } from "primeng/button";
-import { NeighStatusTag } from "../neigh-status-tag/neigh-status-tag";
-import { DatePipe } from "@angular/common";
 import { Panel } from "primeng/panel";
+import { NeighStatusTag } from "../neigh-status-tag/neigh-status-tag";
+import { TableLazyLoadEvent } from "primeng/table";
 
 @Component({
   selector: "app-neighborhoods-table",
@@ -24,6 +28,8 @@ import { Panel } from "primeng/panel";
     DatePipe,
     Panel,
     NeighStatusTag,
+    AvatarComponent,
+    RouterLink,
   ],
   templateUrl: "./neighborhoods-table.html",
   styleUrl: "./neighborhoods-table.css",
@@ -33,6 +39,7 @@ import { Panel } from "primeng/panel";
 export class NeighborhoodsTable {
   private readonly router = inject(Router);
 
+  readonly mode = input<"table" | "list">("table");
   protected readonly cols: TableColumn<NeighborhoodModel>[] = [
     { field: "name", header: "Nombre" },
     { field: "streets", header: "Calles" },
@@ -44,7 +51,16 @@ export class NeighborhoodsTable {
   readonly isLoading = input<boolean>(false);
   readonly isMobile = input<boolean>(false);
 
+  readonly paginate = output<Partial<SearchNeigh>>();
+
   onView(id: string): void {
     this.router.navigate(["/neighborhoods/", id]);
+  }
+
+  search(event: TableLazyLoadEvent) {
+    this.paginate.emit({
+      first: event.first,
+      rows: event.rows || 10,
+    });
   }
 }

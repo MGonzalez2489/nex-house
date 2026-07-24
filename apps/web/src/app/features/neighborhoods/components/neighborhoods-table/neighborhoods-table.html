@@ -3,7 +3,9 @@
   [columns]="cols"
   [isLoading]="isLoading()"
   [pagination]="pagination()"
-  [mode]="isMobile() ? 'list' : 'table'"
+  [mode]="mode()"
+  [isMobileView]="isMobile()"
+  (filter)="search($event)"
 >
   <ng-template #body let-neigh let-field="field">
     @switch (field) {
@@ -31,6 +33,40 @@
     />
   </ng-template>
   <ng-template #list>
+    <p-panel showHeader="false" [pt]="{ content: 'pt-4' }">
+      <ul class="divide-y divide-slate-100 dark:divide-slate-800">
+        @for (item of items(); track item.publicId) {
+          <a
+            href="#"
+            class="py-3 flex items-center gap-3"
+            [routerLink]="['/neighborhoods', item.publicId]"
+          >
+            <app-avatar-component [text]="item.name" />
+
+            <div
+              class="flex flex-col text-sm text-slate-600 dark:text-slate-300"
+            >
+              <p
+                class="text-sm min-w-0 truncate font-medium text-slate-800 dark:text-white capitalize"
+              >
+                {{ item.name }}
+              </p>
+              <p
+                class="text-sm text-slate-600 dark:text-slate-300 min-w-0 truncate"
+              >
+                {{ item.streets.length }}
+                {{ item.streets.length === 1 ? "Calle" : "Calles" }}
+              </p>
+            </div>
+            <span class="ml-auto text-xs text-slate-400 shrink-0">{{
+              item.createdAt | date
+            }}</span>
+          </a>
+        }
+      </ul>
+    </p-panel>
+  </ng-template>
+  <ng-template #mobile>
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:hidden">
       @for (n of items(); track n.publicId) {
         <p-panel>

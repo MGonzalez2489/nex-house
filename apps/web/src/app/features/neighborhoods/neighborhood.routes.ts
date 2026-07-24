@@ -4,6 +4,7 @@ export enum NEIGHBORHOOD_ROUTES_ENUM {
   HOME = "neighborhoods",
   NEW = "new",
   DETAILS = ":id",
+  UPDATE = ":id/edit",
 }
 
 export const NEIGHBORHOOD_ROUTES: Routes = [
@@ -26,6 +27,13 @@ export const NEIGHBORHOOD_ROUTES: Routes = [
     loadComponent: () =>
       import("./pages/neigh-details-page/neigh-details-page").then(
         (m) => m.NeighDetailsPage,
+      ),
+  },
+  {
+    path: NEIGHBORHOOD_ROUTES_ENUM.UPDATE,
+    loadComponent: () =>
+      import("./pages/neigh-form-page/neigh-form-page").then(
+        (m) => m.NeighFormPage,
       ),
   },
 ];

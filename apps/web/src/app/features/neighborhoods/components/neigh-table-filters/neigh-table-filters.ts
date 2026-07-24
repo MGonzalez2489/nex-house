@@ -1,12 +1,14 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  input,
+  computed,
+  inject,
   OnInit,
   output,
   signal,
 } from "@angular/core";
 import { FormControl, FormGroup, ReactiveFormsModule } from "@angular/forms";
+import { SessionService } from "@core/services";
 import { SearchNeigh } from "@nexhouse/shared-domain/interfaces";
 import { Button } from "primeng/button";
 import { IconFieldModule } from "primeng/iconfield";
@@ -33,13 +35,12 @@ import { debounceTime, distinctUntilChanged } from "rxjs";
   standalone: true,
 })
 export class NeighTableFilters implements OnInit {
+  protected readonly sessionService = inject(SessionService);
   protected readonly statusOptions: { value: any; label: string }[] = [
     { value: null, label: "Todos" },
     { value: true, label: "Activos" },
     { value: false, label: "Inactivos" },
   ];
-
-  readonly isMobile = input<boolean>(false);
 
   protected filters = signal<SearchNeigh>({});
   protected filter = output<SearchNeigh>();
@@ -49,6 +50,10 @@ export class NeighTableFilters implements OnInit {
       nonNullable: true,
     }),
   });
+
+  protected isSmallMid = computed(
+    () => this.sessionService.isMobile() || this.sessionService.isTablet(),
+  );
 
   ngOnInit(): void {
     this.form.valueChanges

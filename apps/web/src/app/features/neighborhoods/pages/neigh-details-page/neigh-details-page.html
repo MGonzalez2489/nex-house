@@ -1,23 +1,32 @@
 <div class="max-w-2xl mx-auto space-y-4">
-  <div class="flex items-center gap-3 mb-6">
-    <p-button
-      (click)="back()"
-      icon="pi pi-arrow-left"
-      severity="secondary"
-      variant="outlined"
-      size="small"
-    />
+  <div class="flex items-center justify-between gap-3 mb-6">
+    <div class="flex items-center gap-3">
+      <p-button
+        (click)="back()"
+        icon="pi pi-arrow-left"
+        severity="secondary"
+        variant="outlined"
+        size="small"
+      />
 
-    <div>
-      <h1
-        class="text-xl sm:text-2xl font-display font-semibold text-slate-900 dark:text-white"
-      >
-        Detalle del fraccionamiento
-      </h1>
-      <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-        Información registrada en la plataforma.
-      </p>
+      <div>
+        <h1
+          class="text-xl sm:text-2xl font-display font-semibold text-slate-900 dark:text-white"
+        >
+          Detalle del fraccionamiento
+        </h1>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+          Información registrada en la plataforma.
+        </p>
+      </div>
     </div>
+    <p-button
+      label="Editar"
+      icon="pi pi-pencil"
+      severity="info"
+      text
+      (click)="edit()"
+    />
   </div>
 
   @if (neighborhood(); as n) {

@@ -33,6 +33,7 @@ import {
   ApiPaginationMeta,
   CreateNeighborhood,
   Search,
+  UpdateNeighborhood,
 } from "@nexhouse/shared-domain/interfaces";
 import { AuthStore } from "@auth/store";
 
@@ -85,6 +86,23 @@ export const NeighborhoodsStore = signalStore(
         ),
       ),
     ),
+    findById: async (id: string) => {
+      const cExisting = store.entities().find((f) => f.publicId === id);
+      if (cExisting) return cExisting;
+
+      patchState(store, setLoading());
+
+      try {
+        const res = await lastValueFrom(store._neighService.getById(id));
+
+        patchState(store, addEntity(res.data, config), setLoaded());
+
+        return res.data;
+      } catch (error) {
+        patchState(store, setError(error));
+        return null;
+      }
+    },
     create: async (dto: CreateNeighborhood): Promise<boolean> => {
       patchState(store, setLoading());
 
@@ -99,7 +117,7 @@ export const NeighborhoodsStore = signalStore(
         return false;
       }
     },
-    update: async (id: string, dto: CreateNeighborhood): Promise<boolean> => {
+    update: async (id: string, dto: UpdateNeighborhood): Promise<boolean> => {
       patchState(store, setLoading());
 
       try {

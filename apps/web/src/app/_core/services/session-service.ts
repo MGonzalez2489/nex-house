@@ -42,8 +42,10 @@ export class SessionService {
   }
 
   //properties
-  user = computed(() => this.authStore.user());
-  isMobile = computed(() => this._viewSize() === "small");
+  readonly user = computed(() => this.authStore.user());
+  readonly isMobile = computed(() => this._viewSize() === "small");
+  readonly isTablet = computed(() => this._viewSize() === "medium");
+  readonly isDesktop = computed(() => this._viewSize() === "large");
 
   private getViewSize(width: number): ViewSize {
     if (width < TAILWIND_BREAKPOINTS.md) {

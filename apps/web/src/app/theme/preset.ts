@@ -87,7 +87,7 @@ export const NxPreset = definePreset(Aura, {
       columnTitle: {
         fontWeight: "500",
       },
-      row: {},
+
       bodyCell: {
         borderColor: "{slate.100}",
         padding: "0.875rem 1.25rem", // py-3.5 px-5 (14px/20px)
@@ -117,7 +117,6 @@ export const NxPreset = definePreset(Aura, {
           },
           row: {
             background: "{slate.900}",
-            hoverBackground: "red",
             // hoverBackground: "{slate.800}/50", // dark:hover:bg-slate-800/50
             // borderColor: '{slate.800}', // divide-slate-800
             color: "{slate.400}",

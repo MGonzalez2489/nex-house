@@ -17,7 +17,8 @@
         fluid
         formControlName="hint"
         pInputText
-        [class.bg-white]="isMobile()"
+        [class.bg-white]="isSmallMid()"
+        class="flex-1"
         placeholder="Buscar por nombre o municipio…"
       />
     </p-iconfield>
@@ -28,7 +29,7 @@
       optionValue="value"
       formControlName="active"
       aria-labelledby="basic"
-      class="hidden lg:block"
+      class="hidden lg:inline-block lg:flex-none"
     />
     <!-- button -->
     <p-button
@@ -36,7 +37,7 @@
       variant="outlined"
       severity="secondary"
       icon="pi pi-file-export"
-      class="hidden lg:block"
+      class="hidden lg:block lg:flex-none"
     />
   </form>
 </p-panel>
