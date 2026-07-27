@@ -47,6 +47,14 @@ export class SessionService {
   readonly isTablet = computed(() => this._viewSize() === "medium");
   readonly isDesktop = computed(() => this._viewSize() === "large");
 
+  readonly isSidebarOpen = signal<boolean>(false);
+
+  toggleSession(): void {
+    this.isSidebarOpen.set(!this.isSidebarOpen());
+  }
+  logout(): void {
+    this.authStore.logout();
+  }
   private getViewSize(width: number): ViewSize {
     if (width < TAILWIND_BREAKPOINTS.md) {
       return "small";

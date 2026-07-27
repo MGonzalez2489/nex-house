@@ -53,7 +53,7 @@
     <p-panel class="block">
       <ng-template #header>
         <h2 class="text-sm font-semibold text-slate-800 dark:text-white mb-3">
-          Calles ({{ n.streets.length }})
+          Calles / Secciones ({{ n.streets.length }})
         </h2>
       </ng-template>
       <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -63,7 +63,7 @@
           >
             <i class="pi pi-sun"></i>
 
-            <span class="truncate">{{ street.name }}</span>
+            <span class="truncate capitalize">{{ street.name }}</span>
           </li>
         }
       </ul>

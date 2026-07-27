@@ -72,15 +72,58 @@
       </div>
     </p-panel>
 
+    <!-- First admin info -->
+    <p-panel>
+      <ng-template #header>
+        <div>
+          <h2 class="text-sm font-semibold text-slate-800 dark:text-white">
+            Información del administrador
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+            eiusmod tempor incididunt ut labore...
+          </p>
+        </div>
+      </ng-template>
+
+      <!-- first admin email -->
+      <div class="form-control">
+        <label class="form-label" for="firstAdminEmail">Administrador</label>
+        <input
+          pInputText
+          id="firstAdminEmail"
+          type="email"
+          formControlName="firstAdminEmail"
+          placeholder="jhon@example.com"
+          fluid
+          [invalid]="
+            form.controls.firstAdminEmail.invalid &&
+            form.controls.firstAdminEmail.touched
+          "
+          [attr.aria-invalid]="
+            form.controls.firstAdminEmail.invalid &&
+            form.controls.firstAdminEmail.touched
+          "
+          [attr.aria-describedby]="
+            form.controls.firstAdminEmail.touched &&
+            form.controls.firstAdminEmail.errors
+              ? 'firstAdminEmail-error'
+              : null
+          "
+        />
+      </div>
+    </p-panel>
+
     <!-- Calles -->
     <p-panel>
       <ng-template #header>
         <div>
           <h2 class="text-sm font-semibold text-slate-800 dark:text-white">
-            Calles
+            Calles / Secciones
           </h2>
           <p class="text-xs text-slate-400 mt-0.5">
-            Agrega todas las calles que pertenecen a este fraccionamiento.
+            Agrega todas las calles o secciones que pertenecen a este
+            fraccionamiento.
           </p>
         </div>
       </ng-template>

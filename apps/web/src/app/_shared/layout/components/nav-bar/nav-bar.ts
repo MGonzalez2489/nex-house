@@ -2,8 +2,10 @@ import {
   ChangeDetectionStrategy,
   Component,
   effect,
+  inject,
   signal,
 } from "@angular/core";
+import { SessionService } from "@core/services";
 import { Button } from "primeng/button";
 
 @Component({
@@ -15,13 +17,15 @@ import { Button } from "primeng/button";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NavBar {
-  darkMode = signal<boolean>(
+  protected readonly darkMode = signal<boolean>(
     typeof window !== "undefined"
       ? window.localStorage.getItem("theme") === "dark" ||
           (!("theme" in window.localStorage) &&
             window.matchMedia("(prefers-color-scheme: dark)").matches)
       : false,
   );
+
+  protected readonly sessionService = inject(SessionService);
 
   constructor() {
     effect(() => {
@@ -37,11 +41,7 @@ export class NavBar {
     this.darkMode.update((dark) => !dark);
   }
 
-  // isDarkMode = signal(true);
-
-  // darkMode() {
-  //   const element = document.querySelector("html");
-  //   element?.classList.toggle("dark");
-  //   this.isDarkMode.set(!this.isDarkMode());
-  // }
+  toggleSidebar() {
+    this.sessionService.toggleSession();
+  }
 }

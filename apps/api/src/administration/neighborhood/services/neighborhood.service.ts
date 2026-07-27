@@ -14,6 +14,7 @@ import { DataSource } from 'typeorm';
 import { CreateNeighborhoodDto, UpdateNeighborhoodDto } from '../dtos';
 import { NeighStreetService } from './neigh-street.service';
 import { NeighborhoodSearchService } from './neighborhood-search.service';
+import { UserSearchService, UserService } from '@administration/user/services';
 
 @Injectable()
 export class NeighborhoodService {
@@ -22,6 +23,8 @@ export class NeighborhoodService {
     private readonly dataSource: DataSource,
     private readonly streetService: NeighStreetService,
     private readonly searchService: NeighborhoodSearchService,
+    private readonly userService: UserService,
+    private readonly userSearchService: UserSearchService,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
 
@@ -42,6 +45,13 @@ export class NeighborhoodService {
       );
     }
 
+    const existingAdmin = await this.userSearchService.findByEmail(
+      dto.adminEmail,
+    );
+    if (existingAdmin) {
+      throw new ConflictException(`User ${dto.adminEmail} already exists.`);
+    }
+
     const sanitizedName = dto.name.trim();
     const lookupName = sanitizedName.toLocaleLowerCase();
 
@@ -60,6 +70,7 @@ export class NeighborhoodService {
         );
       }
 
+      //neighborhood
       const neighborhoodInstance = queryRunner.manager.create(Neighborhood, {
         name: lookupName,
         isActive: dto.isActive,
@@ -70,6 +81,7 @@ export class NeighborhoodService {
         neighborhoodInstance,
       );
 
+      //streets
       const sanitizedStreetsPayload = dto.streets.map((street) => ({
         name: street.name.trim().toLocaleLowerCase(),
         neighborhoodId: savedNeighborhood.id,
@@ -81,10 +93,19 @@ export class NeighborhoodService {
         queryRunner.manager,
       );
 
+      //user service
+      await this.userService.createFirstAdmin(
+        savedNeighborhood.id,
+        dto.adminEmail,
+        user,
+        queryRunner.manager,
+      );
+
       await queryRunner.commitTransaction();
 
       //clear findAllCache
       await this.clearNeighborhoodsCache();
+      //TODO: send confirmation email to the first admin user
 
       return this.searchService.findByPublicId(savedNeighborhood.publicId);
     } catch (error) {
@@ -244,6 +265,7 @@ export class NeighborhoodService {
           );
         }
 
+        //TODO: double check if exists units related to the street
         if (streetsToRemoveIds.length > 0) {
           await this.streetService.removeMany(
             streetsToRemoveIds, // Assuming streetService.removeMany takes an array of IDs

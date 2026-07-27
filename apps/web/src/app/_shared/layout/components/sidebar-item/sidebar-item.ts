@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, input } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  input,
+  output,
+} from "@angular/core";
 import { RouterLink, RouterLinkActive } from "@angular/router";
 import { SideItem } from "./side-item";
 
@@ -12,4 +17,6 @@ import { SideItem } from "./side-item";
 })
 export class SidebarItem {
   item = input.required<SideItem>();
+
+  navigate = output();
 }

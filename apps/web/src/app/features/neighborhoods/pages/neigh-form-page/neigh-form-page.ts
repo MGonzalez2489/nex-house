@@ -18,7 +18,6 @@ import { Router } from "@angular/router";
 import { NEIGHBORHOOD_ROUTES_ENUM } from "@neighborhoods/neighborhood.routes";
 import { NeighborhoodsStore } from "@neighborhoods/neighborhood.store";
 import {
-  CreateNeighborhood,
   CreateNeighStreet,
   UpdateNeighborhood,
   UpdateNeighStreet,
@@ -57,6 +56,10 @@ export class NeighFormPage implements OnInit {
     name: this.fb.nonNullable.control("", [
       Validators.required,
       Validators.minLength(3),
+    ]),
+    firstAdminEmail: this.fb.nonNullable.control("", [
+      Validators.required,
+      Validators.email,
     ]),
     active: this.fb.nonNullable.control(true),
     streets: this.fb.array<
@@ -154,10 +157,10 @@ export class NeighFormPage implements OnInit {
   }
 
   private async create() {
-    const { name, active, streets } = this.form.getRawValue();
+    const { name, active, streets, firstAdminEmail } = this.form.getRawValue();
     const response = await this.store.create({
       name,
-      // Map the form values to CreateNeighStreet, only including name for new streets
+      adminEmail: firstAdminEmail,
       streets: streets.map((streetFormValue) => {
         return { name: streetFormValue.name };
       }),

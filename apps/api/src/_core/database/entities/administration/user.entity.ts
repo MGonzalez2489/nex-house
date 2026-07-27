@@ -8,7 +8,7 @@ import { UserStatus } from './user_status.entity';
 
 @Entity('users')
 export class User extends BaseTraceableEntity {
-  @Column()
+  @Column({ nullable: true })
   firstName: string;
 
   @Column({ nullable: true })
@@ -35,6 +35,9 @@ export class User extends BaseTraceableEntity {
   @Column()
   @Exclude()
   statusId: number;
+
+  @Column({ default: false })
+  isFirstAdmin: boolean;
 
   //relationshipts
   @ManyToOne(() => Neighborhood)

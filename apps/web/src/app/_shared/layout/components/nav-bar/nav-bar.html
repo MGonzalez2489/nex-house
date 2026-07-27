@@ -3,7 +3,13 @@
 >
   <!-- Izquierda: toggle + brand -->
   <div class="flex items-center gap-2 min-w-0">
-    <p-button icon="pi pi-bars" text severity="secondary" />
+    <p-button
+      icon="pi pi-bars"
+      text
+      severity="secondary"
+      (click)="toggleSidebar()"
+      class="md:hidden"
+    />
 
     <div class="flex items-center gap-2 min-w-0">
       <div
