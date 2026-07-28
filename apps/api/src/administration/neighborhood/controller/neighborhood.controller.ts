@@ -97,6 +97,30 @@ export class NeighborhoodController {
     return this.searchService.findAll(searchDto);
   }
 
+  @Get('mine')
+  @ApiOperation({ summary: 'Return assigned neighborhood.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns the neighborhood details.',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Target neighborhood record could not be located.',
+  })
+  async findMine(@CurrentUser() user: User): Promise<Neighborhood> {
+    console.log('-----------------------------------------------');
+    const neighborhood = await this.searchService.findById(
+      user.neighborhoodId,
+      { streets: true },
+    );
+
+    if (!neighborhood) {
+      throw new NotFoundException(`Neighborhood not assigned.`);
+    }
+
+    return neighborhood;
+  }
+
   /**
    * Resolves specific tenant configuration structures mapped exclusively against cross-boundary UUID tokens.
    *

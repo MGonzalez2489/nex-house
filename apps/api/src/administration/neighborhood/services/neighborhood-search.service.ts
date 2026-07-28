@@ -103,6 +103,13 @@ export class NeighborhoodSearchService {
     return this.findOneByCriteria({ name }, relations);
   }
 
+  async findById(
+    id: number,
+    relations?: FindOptionsRelations<Neighborhood>,
+  ): Promise<Neighborhood | null> {
+    return this.findOneByCriteria({ id }, relations);
+  }
+
   /**
    * Dynamic isolation helper querying database rows via granular configuration schemas.
    */

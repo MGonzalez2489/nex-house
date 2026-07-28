@@ -39,10 +39,4 @@ export class RootLayout {
       ],
     },
   ]);
-  toggleSide(event: any) {
-    const cValue = this.sessionService.isSidebarOpen();
-    if (event !== cValue) {
-      this.sessionService.toggleSession();
-    }
-  }
 }

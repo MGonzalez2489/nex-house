@@ -20,6 +20,10 @@ export class NeighborhoodService {
     return this.request.get<NeighborhoodModel[]>(this.endpoint, dto);
   }
 
+  getMine() {
+    return this.request.get<NeighborhoodModel>(`${this.endpoint}/mine`);
+  }
+
   getById(id: string): Observable<ApiResponse<NeighborhoodModel>> {
     return this.request.get<NeighborhoodModel>(`${this.endpoint}/${id}`);
   }

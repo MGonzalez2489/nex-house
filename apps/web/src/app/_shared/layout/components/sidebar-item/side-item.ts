@@ -4,4 +4,5 @@ export type SideItem = {
   title: string;
 
   items?: SideItem[];
+  isDisabled?: boolean;
 };

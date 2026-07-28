@@ -38,8 +38,13 @@
 
             <div class="min-w-0 text-left">
               <p class="text-sm font-medium text-white truncate">
-                {{ user().fullName }}
+                @if (user().fullName !== "null") {
+                  {{ user().fullName }}
+                } @else {
+                  {{ user().email }}
+                }
               </p>
+
               <p class="text-xs text-slate-400 truncate">
                 {{ user().role.displayName }}
               </p>

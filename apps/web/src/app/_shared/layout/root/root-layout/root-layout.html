@@ -45,11 +45,11 @@
   [closeOnEscape]="true"
   [pt]="{ header: 'hidden', content: 'p-0', root: 'w-auto' }"
   showCloseIcon="false"
-  (visibleChange)="toggleSide($event)"
+  (visibleChange)="sessionService.toggleSession($event)"
 >
   @if (sessionService.user(); as user) {
     <app-sidebar
-      (navigate)="toggleSide(false)"
+      (navigate)="sessionService.toggleSession(false)"
       (logout)="sessionService.logout()"
       [items]="menu()"
       [user]="user"

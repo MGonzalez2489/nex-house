@@ -49,8 +49,15 @@ export class SessionService {
 
   readonly isSidebarOpen = signal<boolean>(false);
 
-  toggleSession(): void {
-    this.isSidebarOpen.set(!this.isSidebarOpen());
+  toggleSession(value?: boolean): void {
+    if (value) {
+      const cValue = this.isSidebarOpen();
+      if (cValue !== value) {
+        this.isSidebarOpen.set(value);
+      }
+    } else {
+      this.isSidebarOpen.set(!this.isSidebarOpen());
+    }
   }
   logout(): void {
     this.authStore.logout();
