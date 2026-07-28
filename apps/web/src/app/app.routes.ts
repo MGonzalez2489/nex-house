@@ -3,6 +3,9 @@ import { AuthGuard } from "@auth/guards";
 import { DASHBOARD_ROUTES_ENUM } from "@dashboard/index";
 import { MainLayout } from "@shared/layout";
 import { NEIGHBORHOOD_ROUTES_ENUM } from "./features/neighborhoods";
+import { AccessGuard } from "@core/guards";
+import { UserRoleEnum } from "@nexhouse/shared-domain/enums";
+import { PAGES_ROUTES_ENUM, UnauthorizedPage } from "./pages";
 
 export const appRoutes: Route[] = [
   //public routes
@@ -27,6 +30,7 @@ export const appRoutes: Route[] = [
       },
       {
         path: NEIGHBORHOOD_ROUTES_ENUM.HOME,
+        canActivate: [AccessGuard([UserRoleEnum.SUPERADMIN])],
         loadChildren: () =>
           import("./features/neighborhoods/neighborhood.routes").then(
             (m) => m.NEIGHBORHOOD_ROUTES,
@@ -34,6 +38,7 @@ export const appRoutes: Route[] = [
       },
     ],
   },
+  { path: PAGES_ROUTES_ENUM.UNAUTHORIZED, component: UnauthorizedPage },
   {
     path: "**",
     redirectTo: "/auth/login",
