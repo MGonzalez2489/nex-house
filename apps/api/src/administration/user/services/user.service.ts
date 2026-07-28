@@ -18,14 +18,14 @@ import {
   UserUnitRole,
 } from '@core/database';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, DeepPartial, Repository } from 'typeorm';
+import { DataSource, DeepPartial, EntityManager, Repository } from 'typeorm';
 import {
   formatPhone,
   generateRandomString,
   validatePhone,
 } from '@nexhouse/shared-domain/utils';
 import { CatalogsService } from 'src/catalogs/services';
-import { UserStatusEnum } from '@nexhouse/shared-domain/enums';
+import { UserRoleEnum, UserStatusEnum } from '@nexhouse/shared-domain/enums';
 import { CryptoService } from '@core/services';
 import { isProd } from '@core/utils';
 import { UserSearchService } from './user-search.service';
@@ -110,8 +110,7 @@ export class UserService {
       );
     }
 
-    const pwd = isProd ? generateRandomString(10) : '1234';
-    const hashedPassword = await this.cryptoService.hash(pwd);
+    const hashedPassword = await this.generateDefaultPassword();
 
     // 3. Begin ACID Transaction block
     const queryRunner = this.dataSource.createQueryRunner();
@@ -212,6 +211,49 @@ export class UserService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async createFirstAdmin(
+    neighId: number,
+    email: string,
+    creator: User,
+    entityManager: EntityManager,
+  ) {
+    const hashedPassword = await this.generateDefaultPassword();
+
+    const role = await this.catalogsService.findByName(
+      UserRole,
+      UserRoleEnum.ADMIN,
+    );
+    if (!role) {
+      throw new BadRequestException(
+        'Target user role catalog record not found.',
+      );
+    }
+
+    const status = await this.catalogsService.findByName(
+      UserStatus,
+      UserStatusEnum.PENDING,
+    );
+    if (!status) {
+      throw new BadRequestException(
+        'Target pending user status catalog record not found.',
+      );
+    }
+
+    const formatedEmail = email.trim().toLowerCase();
+    const nUser: DeepPartial<User> = {
+      email: formatedEmail,
+      role,
+      status,
+      createdBy: creator.id,
+      neighborhoodId: neighId,
+      password: hashedPassword,
+      isFirstAdmin: true,
+    };
+
+    const newUser = entityManager.create(User, nUser);
+    return await entityManager.save(newUser);
   }
 
   /**
@@ -377,5 +419,10 @@ export class UserService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  private async generateDefaultPassword() {
+    const pwd = isProd ? generateRandomString(10) : '1234';
+    return await this.cryptoService.hash(pwd);
   }
 }

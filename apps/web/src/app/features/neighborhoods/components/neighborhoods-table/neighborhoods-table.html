@@ -1,0 +1,125 @@
+<app-data-viewer-component
+  [data]="items()"
+  [columns]="cols"
+  [isLoading]="isLoading()"
+  [pagination]="pagination()"
+  [mode]="mode()"
+  [isMobileView]="isMobile()"
+  (filter)="search($event)"
+>
+  <ng-template #body let-neigh let-field="field">
+    @switch (field) {
+      @case ("name") {
+        <div class="text-slate-800 dark:text-white capitalize">
+          {{ neigh.name }}
+        </div>
+      }
+      @case ("streets") {
+        <p>{{ neigh.streets.length }}</p>
+      }
+      @case ("isActive") {
+        <app-neigh-status-tag [isActive]="neigh.isActive" />
+      }
+    }
+  </ng-template>
+  <ng-template #actions let-neigh>
+    <p-button
+      label="Ver"
+      icon="pi pi-search"
+      severity="secondary"
+      text
+      size="small"
+      (click)="onView(neigh.publicId)"
+    />
+  </ng-template>
+  <ng-template #list>
+    <p-panel showHeader="false" [pt]="{ content: 'pt-4' }">
+      <ul class="divide-y divide-slate-100 dark:divide-slate-800">
+        @for (item of items(); track item.publicId) {
+          <a
+            href="#"
+            class="py-3 flex items-center gap-3"
+            [routerLink]="['/neighborhoods', item.publicId]"
+          >
+            <app-avatar-component [text]="item.name" />
+
+            <div
+              class="flex flex-col text-sm text-slate-600 dark:text-slate-300"
+            >
+              <p
+                class="text-sm min-w-0 truncate font-medium text-slate-800 dark:text-white capitalize"
+              >
+                {{ item.name }}
+              </p>
+              <p
+                class="text-sm text-slate-600 dark:text-slate-300 min-w-0 truncate"
+              >
+                {{ item.streets.length }}
+                {{ item.streets.length === 1 ? "Calle" : "Calles" }}
+              </p>
+            </div>
+            <span class="ml-auto text-xs text-slate-400 shrink-0">{{
+              item.createdAt | date
+            }}</span>
+          </a>
+        }
+      </ul>
+    </p-panel>
+  </ng-template>
+  <ng-template #mobile>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:hidden">
+      @for (n of items(); track n.publicId) {
+        <p-panel>
+          <ng-template #header>
+            <div class="flex items-center justify-between w-full gap-2">
+              <div class="min-w-0">
+                <p
+                  class="text-sm font-semibold text-slate-800 dark:text-white truncate capitalize"
+                >
+                  {{ n.name }}
+                </p>
+                <p class="text-xs text-slate-400 truncate">municipality</p>
+              </div>
+              <app-neigh-status-tag [isActive]="n.isActive" />
+            </div>
+          </ng-template>
+          <div class="flex items-center justify-between text-xs text-slate-400">
+            <span>{{ n.streets.length }} calles</span>
+            <span>{{ n.createdAt | date }}</span>
+          </div>
+          <ng-template #footer>
+            <p-button
+              label="Ver detalles"
+              icon="pi pi-arrow-right"
+              iconPos="right"
+              severity="secondary"
+              variant="outlined"
+              size="small"
+              fluid
+            />
+          </ng-template>
+        </p-panel>
+      }
+    </div>
+  </ng-template>
+</app-data-viewer-component>
+
+<!-- Mobile: tarjetas -->
+<!---->
+<!-- <!-- Paginación -->
+<!-- <div class="flex items-center justify-between gap-3 px-1"> -->
+<!--   <p class="text-xs text-slate-400">range label</p> -->
+<!--   <div class="flex items-center gap-1"> -->
+<!--     <button -->
+<!--       class="h-8 w-8 inline-flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 disabled:opacity-40 disabled:cursor-not-allowed hover:enabled:bg-slate-50 dark:hover:enabled:bg-slate-800 transition" -->
+<!--     > -->
+<!--       <i class="pi pi-sun"></i> -->
+<!--     </button> -->
+<!--     <span class="text-xs text-slate-500 dark:text-slate-400 px-2">5 / 30</span> -->
+<!--     <button -->
+<!--       class="h-8 w-8 inline-flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 disabled:opacity-40 disabled:cursor-not-allowed hover:enabled:bg-slate-50 dark:hover:enabled:bg-slate-800 transition" -->
+<!--     > -->
+<!--       <i class="pi pi-sun"></i> -->
+<!--     </button> -->
+<!--   </div> -->
+<!-- </div> -->

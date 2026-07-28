@@ -1,5 +1,5 @@
 import { NxSession, User } from '@core/database';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -89,65 +89,83 @@ export class SessionService {
     );
 
     return {
+      user,
       token: accessToken,
       refreshToken,
       exp: accessTokenExpInSeconds,
     };
   }
 
-  // async createSession(
-  //   user: User,
-  //   userAgent: string,
-  //   ip: string,
-  //   rememberMe = false,
-  //   existingSocket?: string,
-  // ): Promise<SessionModel> {
-  //   const agentData = UAParser.UAParser(userAgent);
-  //
-  //   const expiresAt = new Date(
-  //     Date.now() + (rememberMe ? 30 : 7) * 24 * 60 * 60 * 1000,
-  //   );
-  //
-  //   const session = this.repository.create({
-  //     userId: user.id,
-  //     refreshTokenHash: '',
-  //     browser: agentData.browser.name,
-  //     browserVersion: agentData.browser.version,
-  //     os: agentData.os.name,
-  //     device: agentData.device.model || 'Desktop',
-  //     ipAddress: ip,
-  //     expiresAt,
-  //     socketId: existingSocket,
-  //   });
-  //
-  //   const savedSession = await this.repository.save(session);
-  //
-  //   const refreshPayload = {
-  //     sub: user.publicId,
-  //     session: savedSession.publicId,
-  //   };
-  //   const refreshToken = this.jwtService.sign(refreshPayload, {
-  //     expiresIn: rememberMe ? '30d' : '7d',
-  //   });
-  //
-  //   savedSession.refreshTokenHash = await this.cryptoService.hash(refreshToken);
-  //   await this.repository.save(savedSession);
-  //
-  //   const accessToken = this.jwtService.sign(
-  //     {
-  //       email: user.email,
-  //       sub: user.publicId,
-  //       session: savedSession.publicId,
-  //     },
-  //     {
-  //       expiresIn: '15m',
-  //     },
-  //   );
-  //
-  //   return {
-  //     token: accessToken,
-  //     refreshToken,
-  //     exp: this.jwtService.decode(accessToken).exp,
-  //   };
-  // }
+  /**
+   * Refreshes an existing session by validating the refresh token.
+   * @param refreshToken The raw token from the cookie.
+   * @returns A new session model with updated tokens.
+   */
+  async refreshSession(
+    refreshToken: string,
+    userAgent: string,
+  ): Promise<SessionModel> {
+    let payload: any;
+
+    try {
+      // 1. Verify JWT
+      payload = this.jwtService.verify(refreshToken);
+    } catch (e) {
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
+
+    //find existing db session
+    const session = await this.repository.findOne({
+      where: { publicId: payload.session, revoked: false },
+      relations: { user: true },
+    });
+
+    if (!session || session.expiresAt < new Date()) {
+      throw new UnauthorizedException('Session expired or invalid');
+    }
+
+    // 3. Does it match?
+    const isMatch = await this.cryptoService.compare(
+      refreshToken,
+      session.refreshTokenHash,
+    );
+
+    if (!isMatch) {
+      // Maybe we'll require revoque all existing sessions
+      throw new UnauthorizedException('Token reuse detected');
+    }
+    // this.cancelActiveSessions(session.user.id, userAgent);
+
+    return this.createSession(
+      session.user,
+      userAgent,
+      session.ipAddress,
+      true, // O basado en la expiración original
+      session?.socketId || undefined,
+    );
+  }
+
+  /**
+   * Revokes a session and invalidates the refresh token.
+   * @param refreshToken The token from the cookie.
+   */
+  async logout(refreshToken: string): Promise<void> {
+    try {
+      // 1.Verify token to get session ID
+      const payload = this.jwtService.verify(refreshToken);
+
+      // 2. Revoke session
+      await this.repository.update(
+        { publicId: payload.session },
+        {
+          revoked: true,
+          socketId: undefined,
+          lastActivity: new Date(),
+        },
+      );
+    } catch (e) {
+      // Si el token ya expiró o es inválido, no hacemos nada,
+      // pero igual limpiaremos la cookie en el controlador.
+    }
+  }
 }

@@ -1,5 +1,4 @@
 import { Neighborhood } from '@core/database';
-import { SearchDto } from '@core/dtos';
 import { PaginatedResult, paginateQuery } from '@core/utils';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,6 +8,7 @@ import {
   FindOptionsWhere,
   Repository,
 } from 'typeorm';
+import { SearchNeighDto } from '../dtos';
 
 @Injectable()
 export class NeighborhoodSearchService {
@@ -28,7 +28,7 @@ export class NeighborhoodSearchService {
    * Activated internally when the options payload explicitly passes raw: true.
    */
   async findAll(
-    filters: SearchDto,
+    filters: SearchNeighDto,
     options: { raw: true },
   ): Promise<Neighborhood[]>;
 
@@ -37,7 +37,7 @@ export class NeighborhoodSearchService {
    * Standard access path for consumer controllers.
    */
   async findAll(
-    filters: SearchDto,
+    filters: SearchNeighDto,
     options?: { raw?: false },
   ): Promise<PaginatedResult<Neighborhood>>;
 
@@ -45,10 +45,10 @@ export class NeighborhoodSearchService {
    * Core matrix querying handling conditional global strings tokens, dynamic relations maps, and output formatting.
    */
   async findAll(
-    search: SearchDto,
+    search: SearchNeighDto,
     options?: { raw?: boolean },
   ): Promise<PaginatedResult<Neighborhood> | Neighborhood[]> {
-    const { globalFilter } = search;
+    const { globalFilter, isActive } = search;
 
     const query = this.repository
       .createQueryBuilder('neighborhood')
@@ -62,6 +62,10 @@ export class NeighborhoodSearchService {
           });
         }),
       );
+    }
+
+    if (isActive !== undefined && isActive !== null) {
+      query.andWhere('neighborhood.isActive = :isActive', { isActive });
     }
 
     const result = await paginateQuery(query, search);
@@ -97,6 +101,13 @@ export class NeighborhoodSearchService {
     relations?: FindOptionsRelations<Neighborhood>,
   ): Promise<Neighborhood | null> {
     return this.findOneByCriteria({ name }, relations);
+  }
+
+  async findById(
+    id: number,
+    relations?: FindOptionsRelations<Neighborhood>,
+  ): Promise<Neighborhood | null> {
+    return this.findOneByCriteria({ id }, relations);
   }
 
   /**

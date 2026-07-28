@@ -1,0 +1,34 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../dist/out-tsc",
+    "module": "commonjs",
+    "target": "es2016",
+    "types": ["jest", "node"],
+    "moduleResolution": "node10",
+    "paths": {
+      "@nexhouse/shared-domain/enums": [
+        "../../libs/shared-domain/src/lib/enums/index.ts"
+      ],
+      "@nexhouse/shared-domain/interfaces": [
+        "../../libs/shared-domain/src/lib/interfaces/index.ts"
+      ],
+      "@nexhouse/shared-domain/models": [
+        "../../libs/shared-domain/src/lib/models/index.ts"
+      ],
+      "@nexhouse/shared-domain/utils": [
+        "../../libs/shared-domain/src/lib/utils/index.ts"
+      ],
+      "@core/*": ["./src/app/_core/*"],
+      "@shared/*": ["./src/app/_shared/*"],
+      "@auth/*": ["./src/app/features/auth/*"]
+    }
+  },
+  "files": ["src/test-setup.ts"],
+  "include": [
+    "jest.config.ts",
+    "src/**/*.test.ts",
+    "src/**/*.spec.ts",
+    "src/**/*.d.ts"
+  ]
+}

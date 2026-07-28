@@ -9,6 +9,7 @@ import { UserSearchService } from '@administration/user/services';
 import { UserRoleEnum, UserStatusEnum } from '@nexhouse/shared-domain/enums';
 import { CryptoService } from '@core/services';
 import { SessionService } from './session.service';
+import { User } from '@core/database';
 
 @Injectable()
 export class AuthService {
@@ -68,5 +69,26 @@ export class AuthService {
     }
 
     return this.sessionService.createSession(user, userAgent, ip);
+  }
+  async refreshAuthentication(token: string, userAgent: string) {
+    return this.sessionService.refreshSession(token, userAgent);
+  }
+
+  async logout(refreshToken: string) {
+    return this.sessionService.logout(refreshToken);
+  }
+
+  async getFreshProfileUser(user: User) {
+    if (user.role.name === UserRoleEnum.SUPERADMIN) return user;
+
+    return this.userSearchService.findByPublicId(
+      user.publicId,
+      user.neighborhoodId,
+      {
+        neighborhood: true,
+        role: true,
+        status: true,
+      },
+    );
   }
 }

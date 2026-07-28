@@ -1,0 +1,58 @@
+<body
+  class="h-screen w-screen overflow-hidden bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 antialiased"
+>
+  <div class="flex h-full w-full flex-col">
+    <!-- ============ TOPBAR ============ -->
+    <app-nav-bar />
+
+    <!-- ============ CUERPO: sidebar + contenido ============ -->
+    <div class="relative flex flex-1 min-h-0">
+      <!-- Overlay móvil -->
+      <div
+        id="overlay"
+        class="hidden fixed inset-0 bg-slate-900/50 z-40 lg:hidden"
+      ></div>
+
+      <!-- ============ SIDEBAR ============ -->
+      @if (!sessionService.isMobile() && sessionService.user(); as user) {
+        <app-sidebar
+          [items]="menu()"
+          [user]="user"
+          (logout)="sessionService.logout()"
+        />
+      }
+
+      <!-- ============ CONTENIDO PRINCIPAL ============ -->
+      <main class="flex-1 min-w-0 overflow-y-auto thin-scroll">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+          <router-outlet />
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+
+<!-- <p-drawer [visible]="sessionService.isSidebarOpen()" header="Drawer"> -->
+<!--   @if (sessionService.user(); as user) { -->
+<!--     <app-sidebar [items]="menu()" [user]="user" /> -->
+<!--   } -->
+<!-- </p-drawer> -->
+
+<p-drawer
+  [visible]="sessionService.isSidebarOpen()"
+  class="lg:hidden"
+  blockScroll="true"
+  [closeOnEscape]="true"
+  [pt]="{ header: 'hidden', content: 'p-0', root: 'w-auto' }"
+  showCloseIcon="false"
+  (visibleChange)="sessionService.toggleSession($event)"
+>
+  @if (sessionService.user(); as user) {
+    <app-sidebar
+      (navigate)="sessionService.toggleSession(false)"
+      (logout)="sessionService.logout()"
+      [items]="menu()"
+      [user]="user"
+    />
+  }
+</p-drawer>

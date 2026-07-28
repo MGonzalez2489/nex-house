@@ -1,0 +1,109 @@
+<aside
+  id="sidebar"
+  class="sidebar-openn lg:sidebar-open shrink-0 h-full bg-slate-900 flex flex-col overflow-hidden"
+>
+  <div class="flex flex-col h-full w-72">
+    <!-- Navegación (sección superior) -->
+    <nav class="flex-1 overflow-y-auto thin-scroll px-4 pt-5 pb-3">
+      @for (item of items(); track item.title) {
+        @if (item.items && item.items.length > 0) {
+          <p
+            class="px-3 mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500"
+          >
+            {{ item.title }}
+          </p>
+          <ul class="space-y-1">
+            @for (child of item.items; track child.title) {
+              <li>
+                <app-sidebar-item (navigate)="navigate.emit()" [item]="child" />
+              </li>
+            }
+          </ul>
+        } @else {
+          <app-sidebar-item [item]="item" />
+        }
+      }
+    </nav>
+
+    <!-- Sección inferior: usuario, ayuda, logout -->
+    <div class="border-t border-white/10 px-3 py-3 shrink-0">
+      <div class="relative">
+        <button
+          id="userMenuBtn"
+          (click)="toggleUserMenu()"
+          class="w-full flex items-center justify-between gap-3 px-2 py-2 rounded-lg hover:bg-white/5 transition"
+        >
+          <div class="flex gap-3">
+            <app-avatar-component [text]="user().fullName" />
+
+            <div class="min-w-0 text-left">
+              <p class="text-sm font-medium text-white truncate">
+                @if (user().fullName !== "null") {
+                  {{ user().fullName }}
+                } @else {
+                  {{ user().email }}
+                }
+              </p>
+
+              <p class="text-xs text-slate-400 truncate">
+                {{ user().role.displayName }}
+              </p>
+            </div>
+          </div>
+          <div class="block">
+            <i class="pi pi-chevron-up text-sm text-slate-500"></i>
+          </div>
+        </button>
+
+        @if (isUserMenuOpen()) {
+          <div
+            id="userMenu"
+            class="absolute bottom-full left-0 mb-2 w-full rounded-xl border border-white/10 bg-slate-800 shadow-xl overflow-hidden"
+          >
+            <a
+              href="#"
+              class="flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-200 hover:bg-white/5 transition"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
+              Ayuda y soporte
+            </a>
+            <a
+              href="#"
+              (click)="logout.emit()"
+              class="flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-rose-300 hover:bg-rose-500/10 transition border-t border-white/5"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+              Cerrar sesión
+            </a>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</aside>

@@ -1,0 +1,43 @@
+<p-panel
+  showHeader="false"
+  [pt]="{
+    root: 'border-0 lg:border bg-transparent lg:bg-white lg:dark:bg-slate-900',
+    content: 'p-0 lg:p-4',
+  }"
+>
+  <form
+    [formGroup]="form"
+    class="flex flex-col lg:flex-row lg:items-center gap-3 text-xs"
+  >
+    <!-- search input -->
+    <p-iconfield class="w-full">
+      <p-inputicon class="pi pi-search" />
+      <input
+        type="text"
+        fluid
+        formControlName="hint"
+        pInputText
+        [class.bg-white]="isSmallMid()"
+        class="flex-1"
+        placeholder="Buscar por nombre o municipio…"
+      />
+    </p-iconfield>
+    <!-- filter by state -->
+    <p-selectbutton
+      [options]="statusOptions"
+      optionLabel="label"
+      optionValue="value"
+      formControlName="active"
+      aria-labelledby="basic"
+      class="hidden lg:inline-block lg:flex-none"
+    />
+    <!-- button -->
+    <p-button
+      label="Exportar"
+      variant="outlined"
+      severity="secondary"
+      icon="pi pi-file-export"
+      class="hidden lg:block lg:flex-none"
+    />
+  </form>
+</p-panel>

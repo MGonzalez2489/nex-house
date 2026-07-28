@@ -1,12 +1,26 @@
-import { CreateNeighborhood } from '@nexhouse/shared-domain/interfaces';
-import { ArrayMinSize, IsArray, IsString } from 'class-validator';
+import {
+  CreateNeighborhood,
+  CreateNeighStreet,
+} from '@nexhouse/shared-domain/interfaces';
+import {
+  ArrayMinSize,
+  IsArray,
+  IsBoolean,
+  IsEmail,
+  IsString,
+} from 'class-validator';
 
 export class CreateNeighborhoodDto implements CreateNeighborhood {
   @IsString()
   name: string;
 
+  @IsEmail()
+  adminEmail: string;
+
   @IsArray()
-  @IsString({ each: true })
   @ArrayMinSize(1)
-  streets: string[];
+  streets: CreateNeighStreet[];
+
+  @IsBoolean()
+  isActive: boolean;
 }

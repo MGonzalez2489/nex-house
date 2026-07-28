@@ -1,0 +1,35 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../dist/out-tsc",
+    "types": [],
+    "paths": {
+      "@nexhouse/shared-domain/enums": [
+        "../../libs/shared-domain/src/lib/enums/index.ts"
+      ],
+      "@nexhouse/shared-domain/interfaces": [
+        "../../libs/shared-domain/src/lib/interfaces/index.ts"
+      ],
+      "@nexhouse/shared-domain/models": [
+        "../../libs/shared-domain/src/lib/models/index.ts"
+      ],
+      "@nexhouse/shared-domain/utils": [
+        "../../libs/shared-domain/src/lib/utils/index.ts"
+      ],
+      "@core/*": ["./src/app/_core/*"],
+      "@stores/*": ["./src/app/stores/*"],
+      "@shared/*": ["./src/app/_shared/*"],
+      "@auth/*": ["./src/app/features/auth/*"],
+      "@dashboard/*": ["./src/app/features/dashboard/*"],
+      "@neighborhoods/*": ["./src/app/features/neighborhoods/*"]
+    }
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": [
+    "src/**/*.spec.ts",
+    "src/**/*.test.ts",
+    "jest.config.ts",
+    "jest.config.cts",
+    "src/test-setup.ts"
+  ]
+}
