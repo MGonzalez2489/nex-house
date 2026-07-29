@@ -1,5 +1,6 @@
-import { Neighborhood, NeighStreet, User } from '@core/database';
+import { Neighborhood, Unit, User } from '@core/database';
 import { CurrentUser } from '@core/decorators';
+import { SearchDto } from '@core/dtos';
 import {
   HttpCacheInterceptor,
   IdempotencyInterceptor,
@@ -9,7 +10,6 @@ import { CacheTTL } from '@nestjs/cache-manager';
 import {
   Body,
   Controller,
-  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -30,7 +30,7 @@ import {
 import {
   NeighborhoodSearchService,
   NeighborhoodService,
-  NeighStreetService,
+  NeighUnitsService,
 } from '../services';
 
 @ApiTags('Neighborhood')
@@ -39,7 +39,7 @@ export class NeighborhoodController {
   constructor(
     private readonly searchService: NeighborhoodSearchService,
     private readonly service: NeighborhoodService,
-    private readonly streetService: NeighStreetService,
+    private readonly unitService: NeighUnitsService,
   ) {}
 
   /**
@@ -77,86 +77,6 @@ export class NeighborhoodController {
   }
 
   /**
-   * Exposes a public query-driven endpoint returning validated, paginated listings of neighborhood profiles.
-   *
-   * @param searchDto Injected query payload processing validation and bounds criteria.
-   * @returns Structured object wrapping data arrays and pagination headers.
-   */
-  @Get()
-  @UseInterceptors(HttpCacheInterceptor)
-  @CacheTTL(60 * 5) //5 mins cache
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Get a paginated list of neighborhoods' })
-  @ApiResponse({
-    status: 200,
-    description: 'Returns a paginated list of neighborhoods.',
-  })
-  async findAll(
-    @Query() searchDto: SearchNeighDto,
-  ): Promise<PaginatedResult<Neighborhood>> {
-    return this.searchService.findAll(searchDto);
-  }
-
-  @Get('mine')
-  @ApiOperation({ summary: 'Return assigned neighborhood.' })
-  @ApiResponse({
-    status: 200,
-    description: 'Returns the neighborhood details.',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Target neighborhood record could not be located.',
-  })
-  async findMine(@CurrentUser() user: User): Promise<Neighborhood> {
-    console.log('-----------------------------------------------');
-    const neighborhood = await this.searchService.findById(
-      user.neighborhoodId,
-      { streets: true },
-    );
-
-    if (!neighborhood) {
-      throw new NotFoundException(`Neighborhood not assigned.`);
-    }
-
-    return neighborhood;
-  }
-
-  /**
-   * Resolves specific tenant configuration structures mapped exclusively against cross-boundary UUID tokens.
-   *
-   * @param publicId String UUID validated inline prior to interceptor handoff.
-   * @throws NotFoundException if the service layer resolves a null pointer reference.
-   * @returns Completed entity mapping profiles.
-   */
-  @Get(':publicId')
-  @ApiOperation({ summary: 'Return a neighborhood by publicId.' })
-  @ApiResponse({
-    status: 200,
-    description: 'Returns the neighborhood details.',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Target neighborhood record could not be located.',
-  })
-  async findOne(
-    @Param('publicId', ParseUUIDPipe) publicId: string,
-  ): Promise<Neighborhood> {
-    const neighborhood = await this.searchService.findByPublicId(publicId);
-
-    if (!neighborhood) {
-      throw new NotFoundException(
-        `Neighborhood profile with identity "${publicId}" does not exist.`,
-      );
-    }
-
-    return neighborhood;
-  }
-
-  /////////////////////////
-  // NEIGH streets
-  ////////////////////////
-
-  /**
    * Updates an existing neighborhood and its associated streets.
    * Handles street additions, updates, and removals within a transaction.
    *
@@ -192,29 +112,5 @@ export class NeighborhoodController {
     @CurrentUser() user: User,
   ): Promise<Neighborhood> {
     return await this.service.update(publicId, updateNeighborhoodDto, user);
-  }
-
-  /**
-   * Evicts a street data row permanently from persistence layouts.
-   *
-   * @param streetUuid Specific target street secure token identifier to remove.
-   */
-  @Delete('streets/:publicId')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @UseInterceptors(IdempotencyInterceptor)
-  @ApiOperation({ summary: 'Remove a street from a neighborhood permanently' })
-  @ApiResponse({
-    status: 24,
-    description: 'Street entry successfully removed from structural pools.',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Target street record could not be located.',
-  })
-  async removeStreet(
-    @Param('publicId', ParseUUIDPipe) publicId: string,
-    @CurrentUser() user: User,
-  ): Promise<void> {
-    await this.streetService.remove(publicId, user.id);
   }
 }

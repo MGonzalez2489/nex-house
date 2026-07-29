@@ -4,6 +4,7 @@ import { Exclude } from 'class-transformer';
 import { NeighStreet } from './neigh_street.entity';
 import { UnitType } from './unit_type.entity';
 import { User } from './user.entity';
+import { Neighborhood } from './neighborhood.entity';
 
 @Entity('units')
 export class Unit extends BaseTraceableEntity {
@@ -18,6 +19,10 @@ export class Unit extends BaseTraceableEntity {
   @Exclude()
   typeId: number;
 
+  @Column()
+  @Exclude()
+  neighborhoodId: number;
+
   //relationshipts
   @ManyToOne(() => NeighStreet)
   @JoinColumn({ name: 'streetId' })
@@ -26,6 +31,10 @@ export class Unit extends BaseTraceableEntity {
   @ManyToOne(() => UnitType)
   @JoinColumn({ name: 'typeId' })
   type: UnitType;
+
+  @ManyToOne(() => Neighborhood, (n) => n.streets)
+  @JoinColumn({ name: 'neighborhoodId' })
+  neighborhood: Neighborhood;
 
   // ==========================================
   // Audit

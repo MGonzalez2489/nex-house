@@ -6,6 +6,7 @@ import { NEIGHBORHOOD_ROUTES_ENUM } from "./features/neighborhoods";
 import { AccessGuard } from "@core/guards";
 import { UserRoleEnum } from "@nexhouse/shared-domain/enums";
 import { PAGES_ROUTES_ENUM, UnauthorizedPage } from "./pages";
+import { RESIDENT_ROUTES_ENUM } from "./features/residents";
 
 export const appRoutes: Route[] = [
   //public routes
@@ -34,6 +35,14 @@ export const appRoutes: Route[] = [
         loadChildren: () =>
           import("./features/neighborhoods/neighborhood.routes").then(
             (m) => m.NEIGHBORHOOD_ROUTES,
+          ),
+      },
+      {
+        path: RESIDENT_ROUTES_ENUM.HOME,
+        canActivate: [AccessGuard([UserRoleEnum.ADMIN])],
+        loadChildren: () =>
+          import("./features/residents/resident.routes").then(
+            (m) => m.RESIDENT_ROUTES,
           ),
       },
     ],

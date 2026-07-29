@@ -11,6 +11,8 @@ export const UserToModelMapper = (user: User): UserModel => {
     fullName: `${user.firstName} ${user.lastName ?? ''}`.trim(),
     phone: user.phone,
     status: CatalogToModelMapper(user.status),
+
     neighborhood: undefined,
+    publicId: user.publicId,
   };
 };

@@ -7,6 +7,8 @@ import {
 } from "@angular/core";
 import { RouterOutlet } from "@angular/router";
 import { SessionService } from "@core/services";
+import { DASHBOARD_ROUTES_ENUM } from "@dashboard/dashboard.routes";
+import { RESIDENT_ROUTES_ENUM } from "@residents/resident.routes";
 import { NavBar, Sidebar, SideItem } from "@shared/layout/components";
 import { CatalogsStore } from "@stores/catalogs.store";
 import { ContextStore } from "@stores/context.store";
@@ -31,7 +33,7 @@ export class AdminLayout implements OnInit {
       title: "",
       items: [
         {
-          route: "/dashboard",
+          route: `/${DASHBOARD_ROUTES_ENUM.HOME}`,
           icon: "pi pi-home",
           title: "Dashboard",
         },
@@ -41,7 +43,7 @@ export class AdminLayout implements OnInit {
       title: "Administración",
       items: [
         {
-          route: "/neighborhoods",
+          route: `/${RESIDENT_ROUTES_ENUM.HOME}`,
           icon: "pi pi-users",
           title: "Residentes",
         },
@@ -59,5 +61,7 @@ export class AdminLayout implements OnInit {
     //TODO: is required to move this?
     this.catStore.loadCatalogs();
     this.contextStore.loadNeighborhood();
+    this.contextStore.loadUnits();
+    this.contextStore.loadStreets();
   }
 }

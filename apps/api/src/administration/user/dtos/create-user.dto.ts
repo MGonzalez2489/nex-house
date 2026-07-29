@@ -1,25 +1,30 @@
 import { CreateUser } from '@nexhouse/shared-domain/interfaces';
-import { IsEmail, IsOptional, IsString } from 'class-validator';
-import { UserAssignUnitDto } from './user-assign-unit.dto';
+import { IsBoolean, IsEmail, IsOptional, IsString } from 'class-validator';
 
 export class CreateUserDto implements CreateUser {
-  @IsString()
-  @IsOptional()
-  firstName: string;
-
-  @IsString()
-  @IsOptional()
-  lastName: string;
-
   @IsEmail()
   email: string;
 
   @IsString()
   @IsOptional()
-  phone: string;
-
+  unitId?: string;
   @IsString()
-  roleId: string;
+  @IsOptional()
+  streetId?: string;
+  @IsString()
+  @IsOptional()
+  unitTypeId?: string;
+  @IsString()
+  @IsOptional()
+  unitIdentifier?: string;
+  @IsString()
+  @IsOptional()
+  userRoleId: string;
+  @IsString()
+  @IsOptional()
+  unitRoleId: string;
 
-  assignUnits: UserAssignUnitDto;
+  @IsBoolean()
+  @IsOptional()
+  isCurrentOccupant: boolean;
 }

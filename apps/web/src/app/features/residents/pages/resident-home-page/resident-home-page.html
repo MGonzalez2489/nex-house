@@ -1,0 +1,40 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div
+    class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+  >
+    <div>
+      <div class="flex items-center gap-2 flex-wrap">
+        <h1
+          class="text-xl sm:text-2xl font-display font-semibold text-slate-900 dark:text-white"
+        >
+          Residentes
+        </h1>
+        <span
+          class="text-xs font-medium text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 rounded-full px-2 py-0.5"
+        >
+          stats
+        </span>
+      </div>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+        Busca, filtra y administra los fraccionamientos de la plataforma.
+      </p>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <p-button icon="pi pi-filter" text class="hidden md:block" />
+      <p-button
+        icon="pi pi-plus"
+        label="Nuevo"
+        (click)="create()"
+        class="hidden md:block"
+      />
+    </div>
+  </div>
+
+  <app-residents-table
+    [isLoading]="store.loading()"
+    [items]="store.entities()"
+    [pagination]="store.pagination()"
+  />
+</div>

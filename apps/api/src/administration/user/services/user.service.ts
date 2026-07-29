@@ -11,6 +11,7 @@ import { CreateUserDto, UpdateUserDto } from '../dtos';
 import {
   NeighStreet,
   Unit,
+  UnitType,
   User,
   UserRole,
   UserStatus,
@@ -72,27 +73,10 @@ export class UserService {
       throw new ConflictException(`Email ${dto.email} already in use.`);
     }
 
-    let phone: string | undefined = undefined;
-    if (dto.phone) {
-      const formatedPhone = formatPhone(dto.phone);
-
-      if (!validatePhone(formatedPhone)) {
-        throw new BadRequestException('User phone format not valid.');
-      }
-
-      const existsPhone = await this.repository.exists({
-        where: { phone: formatedPhone },
-      });
-      if (existsPhone) {
-        throw new ConflictException(`Phone ${dto.phone} already in use.`);
-      }
-      phone = formatedPhone;
-    }
-
     // 2. Resolve catalogs OUTSIDE the transaction to minimize database lock-time (Performance boost)
     const role = await this.catalogsService.findByPublicId(
       UserRole,
-      dto.roleId,
+      dto.userRoleId,
     );
     if (!role) {
       throw new BadRequestException(
@@ -120,10 +104,7 @@ export class UserService {
     try {
       // Create and persist the new User entity
       const nUser: DeepPartial<User> = {
-        firstName: dto.firstName ? dto.firstName.trim() : '',
-        lastName: dto.lastName ? dto.lastName.trim() : '',
         email: formatedEmail,
-        phone,
         role,
         status,
         createdBy: currentUser.id,
@@ -136,15 +117,14 @@ export class UserService {
 
       // Handle Unit resolution or creation
       let targetUnit: Unit | null = null;
-      const unitDto = dto.assignUnits;
 
-      if (unitDto.unitId) {
+      if (dto.unitId) {
         targetUnit = await queryRunner.manager.findOne(Unit, {
-          where: { publicId: unitDto.unitId },
+          where: { publicId: dto.unitId },
         });
-      } else if (unitDto.unitIdentifier) {
+      } else if (dto.unitIdentifier) {
         const street = await queryRunner.manager.findOne(NeighStreet, {
-          where: { publicId: unitDto.streetId },
+          where: { publicId: dto.streetId },
         });
 
         if (!street) {
@@ -153,10 +133,19 @@ export class UserService {
           );
         }
 
+        const unitType = await queryRunner.manager.findOne(UnitType, {
+          where: { publicId: dto.unitTypeId },
+        });
+
+        if (!street) {
+          throw new BadRequestException(`Invalid unit type.`);
+        }
+
         const newUnit = queryRunner.manager.create(Unit, {
           streetId: street.id,
-          identifier: unitDto.unitIdentifier,
+          identifier: dto.unitIdentifier,
           neighborhoodId: neighId,
+          typeId: unitType.id,
         });
         targetUnit = await queryRunner.manager.save(newUnit);
       }
@@ -170,7 +159,7 @@ export class UserService {
       // Map dynamic relational role assignations
       const userUnitRole = await this.catalogsService.findByPublicId(
         UserUnitRole,
-        unitDto.userUnitRoleId,
+        dto.unitRoleId,
       );
       if (!userUnitRole) {
         throw new BadRequestException('Target unit assignment role not found.');
@@ -181,7 +170,7 @@ export class UserService {
         userId: savedUser.id,
         createdBy: currentUser.id,
         userUnitRole,
-        isCurrentOccupant: unitDto.isOccupant,
+        isCurrentOccupant: dto.isCurrentOccupant,
       });
 
       await queryRunner.manager.save(assignment);
@@ -311,10 +300,10 @@ export class UserService {
     }
 
     let updatedRole = existingUser.role;
-    if (dto.roleId && dto.roleId !== existingUser.role?.publicId) {
+    if (dto.userRoleId && dto.userRoleId !== existingUser.role?.publicId) {
       const role = await this.catalogsService.findByPublicId(
         UserRole,
-        dto.roleId,
+        dto.userRoleId,
       );
       if (!role) {
         throw new BadRequestException(
@@ -336,70 +325,65 @@ export class UserService {
       const savedUser = await queryRunner.manager.save(User, existingUser);
 
       // Handle unit assignment updates if provided
-      if (dto.assignUnits) {
-        const unitDto = dto.assignUnits;
-        let targetUnit: Unit | null = null;
+      let targetUnit: Unit | null = null;
 
-        if (unitDto.unitId) {
-          targetUnit = await queryRunner.manager.findOne(Unit, {
-            where: { publicId: unitDto.unitId },
-          });
-        } else if (unitDto.unitIdentifier) {
-          const street = await queryRunner.manager.findOne(NeighStreet, {
-            where: { publicId: unitDto.streetId },
-          });
-
-          if (!street) {
-            throw new BadRequestException(
-              'Target neighborhood street not found.',
-            );
-          }
-
-          // Create new unit if it does not exist under that identifier
-          const newUnit = queryRunner.manager.create(Unit, {
-            streetId: street.id,
-            identifier: unitDto.unitIdentifier,
-            neighborhoodId: neighId,
-          });
-          targetUnit = await queryRunner.manager.save(newUnit);
-        }
-
-        if (!targetUnit) {
-          throw new BadRequestException(
-            'Invalid unit state allocation parameters.',
-          );
-        }
-
-        const userUnitRole = await this.catalogsService.findByPublicId(
-          UserUnitRole,
-          unitDto.userUnitRoleId,
-        );
-        if (!userUnitRole) {
-          throw new BadRequestException(
-            'Target unit assignment role not found.',
-          );
-        }
-
-        // Deactivate previous active unit allocations if necessary
-        if (unitDto.isOccupant) {
-          await queryRunner.manager.update(
-            UserUnit,
-            { userId: savedUser.id, isCurrentOccupant: true },
-            { isCurrentOccupant: false },
-          );
-        }
-
-        // Create the new assignment record
-        const assignment = queryRunner.manager.create(UserUnit, {
-          unitId: targetUnit.id,
-          userId: savedUser.id,
-          createdBy: currentUser.id,
-          userUnitRole,
-          isCurrentOccupant: unitDto.isOccupant,
+      if (dto.unitId) {
+        targetUnit = await queryRunner.manager.findOne(Unit, {
+          where: { publicId: dto.unitId },
+        });
+      } else if (dto.unitIdentifier) {
+        const street = await queryRunner.manager.findOne(NeighStreet, {
+          where: { publicId: dto.streetId },
         });
 
-        await queryRunner.manager.save(assignment);
+        if (!street) {
+          throw new BadRequestException(
+            'Target neighborhood street not found.',
+          );
+        }
+
+        // Create new unit if it does not exist under that identifier
+        const newUnit = queryRunner.manager.create(Unit, {
+          streetId: street.id,
+          identifier: dto.unitIdentifier,
+          neighborhoodId: neighId,
+        });
+        targetUnit = await queryRunner.manager.save(newUnit);
       }
+
+      if (!targetUnit) {
+        throw new BadRequestException(
+          'Invalid unit state allocation parameters.',
+        );
+      }
+
+      const userUnitRole = await this.catalogsService.findByPublicId(
+        UserUnitRole,
+        dto.unitRoleId,
+      );
+      if (!userUnitRole) {
+        throw new BadRequestException('Target unit assignment role not found.');
+      }
+
+      // Deactivate previous active unit allocations if necessary
+      if (dto.isCurrentOccupant) {
+        await queryRunner.manager.update(
+          UserUnit,
+          { userId: savedUser.id, isCurrentOccupant: true },
+          { isCurrentOccupant: false },
+        );
+      }
+
+      // Create the new assignment record
+      const assignment = queryRunner.manager.create(UserUnit, {
+        unitId: targetUnit.id,
+        userId: savedUser.id,
+        createdBy: currentUser.id,
+        userUnitRole,
+        isCurrentOccupant: dto.isCurrentOccupant,
+      });
+
+      await queryRunner.manager.save(assignment);
 
       await queryRunner.commitTransaction();
       return await this.searchService.findByPublicId(savedUser.publicId);

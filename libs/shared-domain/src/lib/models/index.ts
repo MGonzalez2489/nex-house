@@ -7,3 +7,6 @@ export * from './neighborhood.model';
 export * from './neigh-street.model';
 
 export * from './_base-catalog.model';
+
+export * from './unit.model';
+export * from './unit-type.model';

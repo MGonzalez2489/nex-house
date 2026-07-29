@@ -4,7 +4,10 @@
  */
 
 import { HttpExceptionFilter } from '@core/filters';
-import { TransformInterceptor } from '@core/interceptors';
+import {
+  NeighborhoodInterceptor,
+  TransformInterceptor,
+} from '@core/interceptors';
 import {
   ClassSerializerInterceptor,
   Logger,

@@ -1,0 +1,274 @@
+<div class="max-w-2xl mx-auto pb-24 lg:pb-6">
+  <!-- Header -->
+  <div class="flex items-center gap-3 mb-6">
+    <p-button
+      class="hidden"
+      icon="pi pi-arrow-left"
+      severity="secondary"
+      variant="outlined"
+      size="small"
+    />
+
+    <div>
+      <h1
+        class="text-xl sm:text-2xl font-display font-semibold text-slate-900 dark:text-white"
+      >
+        {{ id() ? "Actualizar" : "Nuevo" }} residente
+      </h1>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+        Registra la información básica y las calles que lo componen.
+      </p>
+    </div>
+  </div>
+
+  <form class="space-y-5" [formGroup]="form" (submit)="submit()">
+    <!-- Información general -->
+    <p-panel>
+      <ng-template #header>
+        <h2 class="text-sm font-semibold">Información general</h2>
+      </ng-template>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 md:gap-x-3">
+        <!-- Nombre -->
+        <div class="form-control col-span-2">
+          <label class="form-label" for="email">Correo Electrónico</label>
+          <input
+            pInputText
+            id="email"
+            type="email"
+            formControlName="email"
+            placeholder="Jhon@example.com"
+            fluid
+            [invalid]="
+              form.controls.email.invalid && form.controls.email.touched
+            "
+            [attr.aria-invalid]="
+              form.controls.email.invalid && form.controls.email.touched
+            "
+            [attr.aria-describedby]="
+              form.controls.email.touched && form.controls.email.errors
+                ? 'email-error'
+                : null
+            "
+          />
+          <app-form-validation-error
+            id="email-errors"
+            [touched]="form.controls.email.touched"
+            [errors]="form.controls.email.errors"
+            label="Email"
+          />
+        </div>
+        <!-- User Role -->
+        <div class="form-control">
+          <label class="form-label" for="userRole">Rol</label>
+          <p-select
+            [options]="catStore.UserRoles()"
+            formControlName="userRoleId"
+            optionLabel="displayName"
+            optionValue="publicId"
+            placeholder="Rol"
+            fluid
+          />
+        </div>
+      </div>
+    </p-panel>
+
+    <!-- Unit Info -->
+    <p-panel>
+      <!-- header -->
+      <ng-template #header>
+        <div>
+          <h2 class="text-sm font-semibold text-slate-800 dark:text-white">
+            Información de la unidad
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+          </p>
+        </div>
+      </ng-template>
+
+      <ng-template #icons>
+        @if (isNewUnit()) {
+          <p-button
+            text
+            label="Buscar existente"
+            size="small"
+            severity="info"
+            (click)="isNewUnit.set(false)"
+          />
+        } @else {
+          <p-button
+            text
+            label="Registrar nueva"
+            size="small"
+            severity="info"
+            (click)="isNewUnit.set(true)"
+          />
+        }
+      </ng-template>
+
+      <!-- first admin email -->
+      @if (isNewUnit()) {
+        <section class="grid grid-cols-1 md:grid-cols-3 md:gap-x-3">
+          <!-- street -->
+          <div class="form-control col-span-2">
+            <label class="form-label" for="streetId">Calle</label>
+            <p-select
+              [options]="contextStore.streets()"
+              formControlName="streetId"
+              optionLabel="name"
+              optionValue="publicId"
+              placeholder="Calle"
+              fluid
+            >
+              <ng-template #selectedItem let-selectedOption>
+                @if (selectedOption) {
+                  <div class="flex items-center gap-2">
+                    <div>
+                      <span class="capitalize">
+                        {{ selectedOption.name }}
+                      </span>
+                    </div>
+                  </div>
+                }
+              </ng-template>
+              <ng-template let-street #item>
+                <div class="flex items-center gap-2">
+                  <span class="capitalize">{{ street.name }}</span>
+                </div>
+              </ng-template>
+            </p-select>
+          </div>
+
+          <!-- identifier -->
+          <div class="form-control">
+            <label class="form-label" for="identifier">Identificador</label>
+            <input
+              pInputText
+              id="identifier"
+              type="text"
+              formControlName="unitIdentifier"
+              placeholder="#15234, #102-A"
+              fluid
+            />
+          </div>
+        </section>
+        <section>
+          <!-- unit type -->
+          <div class="space-y-4">
+            @for (type of catStore.UnitTypes(); track type.publicId) {
+              @let selected = form.value.unitTypeId === type.publicId;
+              <button
+                [class.bg-cyan-50]="selected"
+                [class.border-cyan-300]="selected"
+                [class.dark:bg-cyan-700]="selected"
+                (click)="form.patchValue({ unitTypeId: type.publicId })"
+                class="flex w-full items-center justify-between gap-4 border p-4 hover:cursor-pointer hover:border-cyan-500 rounded-lg"
+              >
+                <div class="text-left">
+                  <p
+                    class="text-sm font-medium text-slate-700 dark:text-slate-300"
+                  >
+                    {{ type.displayName }}
+                  </p>
+                  <p class="text-xs text-slate-600 dark:text-slate-200 mt-0.5">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
+                    do eiusmod tempor incididunt ut labore...
+                  </p>
+                </div>
+                @if (selected) {
+                  <i class="pi pi-check-circle"></i>
+                }
+              </button>
+            }
+          </div>
+        </section>
+      } @else {
+        <p-select
+          fluid
+          placeholder="Buscar unidad"
+          [options]="contextStore.units()"
+          formControlName="unitId"
+          optionValue="publicId"
+        >
+          <ng-template #selectedItem let-selectedOption>
+            @if (selectedOption) {
+              <div class="flex items-center gap-2">
+                <div>
+                  {{ selectedOption.identifier }},
+                  <span class="capitalize">
+                    {{ selectedOption.street?.name }}
+                  </span>
+                </div>
+              </div>
+            }
+          </ng-template>
+          <ng-template let-unit #item>
+            <div class="flex items-center gap-2">
+              <div>
+                {{ unit.identifier }},
+                <span class="capitalize">{{ unit.street?.name }}</span>
+              </div>
+            </div>
+          </ng-template>
+        </p-select>
+      }
+    </p-panel>
+
+    <!-- Unit user relation info -->
+    <p-panel>
+      <ng-template #header>
+        <h2 class="text-sm font-semibold">Relación con la unidad</h2>
+      </ng-template>
+      <div class="grid grid-cols-1 md:grid-cols-3 md:gap-x-3">
+        <!-- UserUnitRole -->
+        <div class="form-control col-span-2">
+          <label class="form-label" for="email">Relación</label>
+          <p-select
+            [options]="catStore.UserUnitRoles()"
+            formControlName="unitRoleId"
+            optionLabel="displayName"
+            optionValue="publicId"
+            placeholder="Relación con la unidad"
+            fluid
+          />
+        </div>
+
+        <div class="form-control flex items-end pb-2 gap-2">
+          <label class="form-label m-1!" for="isCurrentOccupant"
+            >Habita la unidad</label
+          >
+          <p-toggleswitch
+            id="isCurrentOccupant"
+            formControlName="isCurrentOccupant"
+          />
+        </div>
+      </div>
+    </p-panel>
+
+    <!-- Acciones -->
+    <div class="hidden lg:flex items-center justify-end gap-3">
+      <p-button
+        label="Cancelar"
+        severity="secondary"
+        variant="outlined"
+        (click)="cancel()"
+      />
+      <p-button label="Guardar" type="submit" />
+    </div>
+    <div
+      class="lg:hidden fixed bottom-0 left-0 right-0 z-30 border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur px-4 py-3 flex items-center gap-3"
+    >
+      <p-button
+        label="Cancelar"
+        severity="secondary"
+        variant="outlined"
+        fluid
+        (click)="cancel()"
+        class="flex-1"
+      />
+
+      <p-button label="Guardar" class="flex-1" fluid type="submit" />
+    </div>
+  </form>
+</div>

@@ -6,11 +6,12 @@ import { ApiCacheModule } from '@core/api-cache.module';
 import { CryptoService } from '@core/services';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CatalogsModule } from 'src/catalogs';
 import { DatabaseSeederService, getDatabaseConfig } from '../_core/database';
 import { Neighborhood, User } from '../_core/database/entities';
+import { NeighborhoodInterceptor } from '@core/interceptors';
 
 @Module({
   imports: [
@@ -37,6 +38,10 @@ import { Neighborhood, User } from '../_core/database/entities';
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: NeighborhoodInterceptor,
     },
   ],
 })

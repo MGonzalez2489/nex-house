@@ -6,7 +6,11 @@ import {
   Search,
   UpdateNeighborhood,
 } from "@nexhouse/shared-domain/interfaces";
-import { NeighborhoodModel } from "@nexhouse/shared-domain/models";
+import {
+  NeighborhoodModel,
+  NeighStreetModel,
+  UnitModel,
+} from "@nexhouse/shared-domain/models";
 import { Observable } from "rxjs";
 
 @Injectable({
@@ -39,5 +43,21 @@ export class NeighborhoodService {
     dto: UpdateNeighborhood,
   ): Observable<ApiResponse<NeighborhoodModel>> {
     return this.request.patch<NeighborhoodModel>(`${this.endpoint}/${id}`, dto);
+  }
+
+  //units
+  getUnits() {
+    return this.request.get<UnitModel[]>(`${this.endpoint}/units`, {
+      rows: 10,
+      showAll: true,
+      first: 0,
+    });
+  }
+  getStreets() {
+    return this.request.get<NeighStreetModel[]>(`${this.endpoint}/streets`, {
+      rows: 10,
+      showAll: true,
+      first: 0,
+    });
   }
 }

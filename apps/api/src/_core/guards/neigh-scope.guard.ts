@@ -1,3 +1,4 @@
+import { User } from '@core/database';
 import {
   CanActivate,
   ExecutionContext,
@@ -9,17 +10,15 @@ import {
 export class NeighborhoodScopeGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
-    const user = request.user; // Cargado previamente por tu AuthGuard
+    const user: User = request.user; // loaded from AuthGuard
 
-    // Obtener neighId desde los URL params (ej. /neighborhood/:neighId/users)
     const neighIdParam = request.params.neighborhoodId;
 
     if (!user || !neighIdParam) {
       throw new ForbiddenException('Missing security context parameters.');
     }
 
-    // Convertir a número y validar el scope estructural
-    if (Number(neighIdParam) !== user.neighborhoodId) {
+    if (neighIdParam !== user.neighborhood.publicId) {
       throw new ForbiddenException('Forbidden neighborhood scope.');
     }
 

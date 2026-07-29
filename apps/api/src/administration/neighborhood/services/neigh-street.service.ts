@@ -1,7 +1,9 @@
 import { NeighStreet } from '@core/database';
+import { SearchDto } from '@core/dtos';
+import { paginateQuery } from '@core/utils';
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, In, Repository } from 'typeorm';
+import { Brackets, EntityManager, In, Repository } from 'typeorm';
 
 @Injectable()
 export class NeighStreetService {
@@ -151,5 +153,40 @@ export class NeighStreetService {
    */
   async findByPublicId(publicId: string): Promise<NeighStreet | null> {
     return await this.streetRepo.findOneBy({ publicId });
+  }
+
+  async findAll(neighborhoodId: number, filters: SearchDto) {
+    const query = this.streetRepo
+      .createQueryBuilder('street')
+      .where('street.neighborhoodId = :neighborhoodId', {
+        neighborhoodId,
+      });
+
+    const { globalFilter } = filters;
+
+    if (globalFilter) {
+      const globalFilterWords = globalFilter
+        .split(' ')
+        .filter((word) => word.length > 0);
+
+      if (globalFilterWords.length > 0) {
+        query.andWhere(
+          new Brackets((andQb) => {
+            globalFilterWords.forEach((word, index) => {
+              const paramName = `globalFilterWord${index}`;
+              andQb.andWhere(
+                new Brackets((orQb) => {
+                  orQb.where(`street.name LIKE :${paramName}`, {
+                    [paramName]: `%${word}%`,
+                  });
+                }),
+              );
+            });
+          }),
+        );
+      }
+    }
+    const result = await paginateQuery(query, filters);
+    return result;
   }
 }

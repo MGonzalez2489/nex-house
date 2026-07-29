@@ -10,6 +10,7 @@ import {
   withState,
 } from "@ngrx/signals";
 import { UserRoleEnum } from "@nexhouse/shared-domain/enums";
+import { ContextStore } from "./context.store";
 
 export type StartupStatus =
   | "IDLE"
@@ -29,6 +30,7 @@ export const StartupStore = signalStore(
   withReset(),
   withProps(() => ({
     _authStore: inject(AuthStore),
+    _contextStore: inject(ContextStore),
   })),
   withState<StartupState>({
     status: "IDLE",
@@ -63,9 +65,7 @@ export const StartupStore = signalStore(
         }
 
         if (user.role.name !== UserRoleEnum.SUPERADMIN) {
-          console.log("super admin");
-          // store._contextStore.setNeighborhoodId(user.neighborhoodId);
-          // await store._contextStore.loadNeighborhood();
+          await store._contextStore.loadNeighborhood();
         }
         store._finalizeInit();
         // store.setReady();

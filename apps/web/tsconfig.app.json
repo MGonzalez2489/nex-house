@@ -21,7 +21,8 @@
       "@shared/*": ["./src/app/_shared/*"],
       "@auth/*": ["./src/app/features/auth/*"],
       "@dashboard/*": ["./src/app/features/dashboard/*"],
-      "@neighborhoods/*": ["./src/app/features/neighborhoods/*"]
+      "@neighborhoods/*": ["./src/app/features/neighborhoods/*"],
+      "@residents/*": ["./src/app/features/residents/*"]
     }
   },
   "include": ["src/**/*.ts"],

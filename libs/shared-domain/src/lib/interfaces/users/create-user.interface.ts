@@ -1,15 +1,15 @@
-import { UserAssignUnit } from './user-assign-unit.interface';
-
 export interface CreateUser {
   //general
-  firstName?: string;
-  lastName?: string;
   email: string;
-  phone?: string;
 
-  //relationships
-  roleId: string;
+  //unit
+  unitId?: string;
 
-  //TODO: should it be array
-  assignUnits: UserAssignUnit;
+  streetId?: string;
+  unitTypeId?: string;
+  identifier?: string;
+  //roles
+  userRoleId: string;
+  unitRoleId: string;
+  isCurrentOccupant: boolean;
 }

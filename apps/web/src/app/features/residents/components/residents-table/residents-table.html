@@ -1,0 +1,39 @@
+<app-data-viewer-component
+  [data]="items()"
+  [columns]="cols"
+  [isLoading]="isLoading()"
+  [pagination]="pagination()"
+>
+  <ng-template #body let-user let-field="field">
+    @switch (field) {
+      @case ("fullName") {
+        @if (user.fullName) {
+          <div class="flex items-center gap-3">
+            <app-avatar-component [text]="user.fullName" />
+            <div class="text-slate-800 dark:text-white capitalize">
+              {{ user.fullName }}
+            </div>
+          </div>
+        } @else {
+          <div class="text-slate-800 dark:text-white capitalize">--</div>
+        }
+      }
+      @case ("email") {
+        <p>{{ user.email }}</p>
+      }
+      @case ("phone") {
+        <p>{{ user.phone }}</p>
+      }
+    }
+  </ng-template>
+  <ng-template #actions let-neigh>
+    <p-button
+      label="Ver"
+      icon="pi pi-search"
+      severity="secondary"
+      text
+      size="small"
+      (click)="onView(neigh.publicId)"
+    />
+  </ng-template>
+</app-data-viewer-component>

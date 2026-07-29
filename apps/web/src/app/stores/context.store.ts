@@ -1,35 +1,39 @@
 import {
-  withDevtools,
-  withReset,
-  withCallState,
+  setError,
   setLoaded,
   setLoading,
-  setError,
+  withCallState,
+  withDevtools,
+  withReset,
 } from "@angular-architects/ngrx-toolkit";
-import { inject, effect } from "@angular/core";
-import { AuthStore } from "@auth/store";
+import { inject } from "@angular/core";
 import { NeighborhoodService } from "@neighborhoods/services";
-import { NeighborhoodModel } from "@nexhouse/shared-domain/models";
-import { tapResponse } from "@ngrx/operators";
 import {
-  signalStore,
-  withState,
-  withProps,
-  withMethods,
+  NeighborhoodModel,
+  NeighStreetModel,
+  UnitModel,
+} from "@nexhouse/shared-domain/models";
+import {
   patchState,
-  withHooks,
+  signalStore,
+  withMethods,
+  withProps,
+  withState,
 } from "@ngrx/signals";
-import { rxMethod } from "@ngrx/signals/rxjs-interop";
-import { lastValueFrom, pipe, tap, switchMap } from "rxjs";
+import { lastValueFrom } from "rxjs";
 
 interface contextState {
   selectedId: string | undefined;
   neighborhood: NeighborhoodModel | undefined;
+  units: UnitModel[];
+  streets: NeighStreetModel[];
 }
 
 const initialState: contextState = {
   selectedId: undefined,
   neighborhood: undefined,
+  units: [],
+  streets: [],
 };
 
 export const ContextStore = signalStore(
@@ -61,6 +65,30 @@ export const ContextStore = signalStore(
         }
 
         patchState(store, { neighborhood: response.data }, setLoaded());
+        return response.data;
+      } catch (error) {
+        patchState(store, setError(error));
+        return undefined;
+      }
+    },
+    loadUnits: async () => {
+      patchState(store, setLoading());
+      try {
+        const response = await lastValueFrom(store._neighService.getUnits());
+
+        patchState(store, { units: response.data }, setLoaded());
+        return response.data;
+      } catch (error) {
+        patchState(store, setError(error));
+        return undefined;
+      }
+    },
+    loadStreets: async () => {
+      patchState(store, setLoading());
+      try {
+        const response = await lastValueFrom(store._neighService.getStreets());
+
+        patchState(store, { streets: response.data }, setLoaded());
         return response.data;
       } catch (error) {
         patchState(store, setError(error));

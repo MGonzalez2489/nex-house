@@ -1,0 +1,57 @@
+import { inject, Injectable } from "@angular/core";
+import { RequestService } from "@core/services";
+import {
+  SearchUser,
+  ApiResponse,
+  CreateUser,
+} from "@nexhouse/shared-domain/interfaces";
+import { UserModel } from "@nexhouse/shared-domain/models";
+import { Observable } from "rxjs";
+
+@Injectable({
+  providedIn: "root",
+})
+export class ResidentService {
+  private readonly request = inject(RequestService);
+
+  getAll(
+    neighborhood: string,
+    dto: SearchUser,
+  ): Observable<ApiResponse<UserModel[]>> {
+    return this.request.get<UserModel[]>(`${this.buildUrl(neighborhood)}`, dto);
+  }
+
+  getById(
+    neighborhood: string,
+    id: string,
+  ): Observable<ApiResponse<UserModel>> {
+    return this.request.get<UserModel>(`${this.buildUrl(neighborhood)}/${id}`);
+  }
+
+  create(
+    neighborhood: string,
+    dto: CreateUser,
+  ): Observable<ApiResponse<UserModel>> {
+    return this.request.post<UserModel>(this.buildUrl(neighborhood), dto);
+  }
+  //
+  // update(
+  //   neighborhood: string,
+  //   id: string,
+  //   dto: ICreateUser,
+  // ): Observable<ApiResponse<UserModel>> {
+  //   return this.request.patch<UserModel>(
+  //     `${this.buildUrl(neighborhood)}/${id}`,
+  //     dto,
+  //   );
+  // }
+
+  delete(neighborhood: string, id: string): Observable<ApiResponse<boolean>> {
+    return this.request.delete<boolean>(`${this.buildUrl(neighborhood)}/${id}`);
+  }
+
+  private buildUrl(neighborhood: string) {
+    return `/api/neighborhoods/${neighborhood}/users`;
+    // return `${this.endpoint}/${neighborhood}/users`;
+  }
+}
