@@ -68,9 +68,14 @@ export class UserSearchService {
     const query = this.repository
       .createQueryBuilder('users')
       .leftJoinAndSelect('users.neighborhood', 'neighborhood')
+      .leftJoinAndSelect('users.status', 'status')
+      .leftJoinAndSelect('users.role', 'role')
       .leftJoinAndSelect('users.units', 'units')
       .leftJoinAndSelect('units.unit', 'unit')
+      .leftJoinAndSelect('units.userUnitRole', 'userUnitRole')
       .leftJoinAndSelect('unit.street', 'street')
+      .leftJoinAndSelect('unit.type', 'unitType')
+
       .where('neighborhood.id = :neighborhoodId', {
         neighborhoodId,
       });
@@ -78,10 +83,10 @@ export class UserSearchService {
     const { globalFilter, role, status } = filters;
 
     if (role) {
-      query.andWhere('users.role = :role', { role });
+      query.andWhere('role = :role', { role });
     }
     if (status) {
-      query.andWhere('users.status = :status', { status });
+      query.andWhere('status = :status', { status });
     }
     //TODO: analize if street should be an ID
 

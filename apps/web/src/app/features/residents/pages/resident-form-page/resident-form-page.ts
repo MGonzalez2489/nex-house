@@ -99,8 +99,20 @@ export class ResidentFormPage {
 
       if (!loaded || streets.length === 0) return;
 
-      this.initCreate();
+      // this.initCreate();
       this.isLoadingComplete.set(true);
+    });
+
+    effect(() => {
+      const cId = this.id();
+      const cIsLoadingComp = this.isLoadingComplete();
+      if (!cIsLoadingComp) return;
+
+      if (cId) {
+        this.initUpdate();
+      } else {
+        this.initCreate();
+      }
     });
 
     effect(() => {
@@ -161,6 +173,22 @@ export class ResidentFormPage {
       unitTypeId: unitType?.publicId,
       unitRoleId: userUnitRole?.publicId,
       streetId: streets[0].publicId,
+    });
+  }
+
+  private initUpdate() {
+    const rId = this.id();
+    const cResident = this.residentStore
+      .entities()
+      .find((f) => f.publicId == rId);
+
+    if (!cResident) return;
+
+    this.form.patchValue({
+      email: cResident.email,
+      userRoleId: cResident.role?.publicId,
+      unitId: cResident.units[0]?.unit.publicId,
+      unitRoleId: cResident.units[0]?.userUnitRole.publicId,
     });
   }
 }

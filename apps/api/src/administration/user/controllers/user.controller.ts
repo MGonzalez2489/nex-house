@@ -16,6 +16,7 @@ import { CurrentNeigh, CurrentUser } from '@core/decorators';
 import { ApiOperation, ApiParam } from '@nestjs/swagger';
 import { CreateUserDto, SearchUserDto, UpdateUserDto } from '../dtos';
 import { NeighborhoodScopeGuard } from '@core/guards';
+import { UserToModelMapper } from '@core/mappers';
 
 @Controller('neighborhoods/:neighborhoodId/users')
 @UseGuards(NeighborhoodScopeGuard)
@@ -44,7 +45,13 @@ export class UserController {
     @Query() searchDto: SearchUserDto,
     @CurrentNeigh() neigh: Neighborhood,
   ) {
-    return await this.searchService.findAll(neigh.id, searchDto);
+    const response = await this.searchService.findAll(neigh.id, searchDto);
+
+    const mResponse = {
+      ...response,
+      data: response.data.map((f) => UserToModelMapper(f)),
+    };
+    return mResponse;
   }
 
   @Get(':publicId')
