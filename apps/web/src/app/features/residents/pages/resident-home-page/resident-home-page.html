@@ -21,7 +21,7 @@
       </p>
     </div>
 
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-3 hidden">
       <p-button icon="pi pi-filter" text class="hidden md:block" />
       <p-button
         icon="pi pi-plus"
@@ -32,9 +32,32 @@
     </div>
   </div>
 
-  <app-residents-table
-    [isLoading]="store.loading()"
-    [items]="store.entities()"
-    [pagination]="store.pagination()"
-  />
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+    <p-panel
+      header="Lista de registros"
+      class="col-span-2 overflow-x-auto"
+      [pt]="{ content: 'p-0' }"
+    >
+      <ng-template #icons>
+        <div class="flex items-center gap-3">
+          <app-resident-filters (filter)="onSearch($event)" />
+          <p-button
+            icon="pi pi-plus"
+            label="Nuevo"
+            size="small"
+            (click)="create()"
+            class="hidden md:block"
+          />
+        </div>
+      </ng-template>
+      <app-residents-table
+        [isLoading]="store.loading()"
+        [items]="store.entities()"
+        [pagination]="store.pagination()"
+        (paginate)="onSearch($event)"
+      />
+    </p-panel>
+    <app-resident-stats [stats]="store.stats()" />
+    <!-- <p-panel class="col-span-1">asdasdasd</p-panel> -->
+  </div>
 </div>

@@ -7,14 +7,14 @@ import {
   OnInit,
   signal,
 } from "@angular/core";
+import { FormsModule } from "@angular/forms";
 import { Router } from "@angular/router";
 import { SessionService } from "@core/services";
 import { NeighborhoodsStore } from "@neighborhoods/neighborhood.store";
 import { SearchNeigh } from "@nexhouse/shared-domain/interfaces";
 import { Button } from "primeng/button";
-import { NeighborhoodsTable, NeighTableFilters } from "../../components";
 import { SelectButtonModule } from "primeng/selectbutton";
-import { FormsModule } from "@angular/forms";
+import { NeighborhoodsTable, NeighTableFilters } from "../../components";
 
 @Component({
   selector: "app-neigh-home-page",

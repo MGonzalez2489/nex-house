@@ -3,9 +3,13 @@ import {
   Component,
   inject,
   input,
+  output,
 } from "@angular/core";
 import { Router } from "@angular/router";
-import { ApiPaginationMeta } from "@nexhouse/shared-domain/interfaces";
+import {
+  ApiPaginationMeta,
+  SearchUser,
+} from "@nexhouse/shared-domain/interfaces";
 import { UserModel } from "@nexhouse/shared-domain/models";
 import { RESIDENT_ROUTES_ENUM } from "@residents/resident.routes";
 import { AvatarComponent } from "@shared/components";
@@ -14,10 +18,17 @@ import {
   TableColumn,
 } from "@shared/components/data-viewer-component";
 import { Button } from "primeng/button";
+import { TableLazyLoadEvent } from "primeng/table";
+import { ResudentStatusComponent } from "../resident-status/resudent-status-component";
 
 @Component({
   selector: "app-residents-table",
-  imports: [DataViewerComponent, AvatarComponent, Button],
+  imports: [
+    DataViewerComponent,
+    AvatarComponent,
+    Button,
+    ResudentStatusComponent,
+  ],
   templateUrl: "./residents-table.html",
   styleUrl: "./residents-table.css",
   standalone: true,
@@ -29,10 +40,12 @@ export class ResidentsTable {
   readonly pagination = input<ApiPaginationMeta>();
   readonly isLoading = input<boolean>(false);
 
+  readonly paginate = output<Partial<SearchUser>>();
+
   protected readonly cols: TableColumn<UserModel>[] = [
     { field: "fullName", header: "Nombre(s)" },
     { field: "email", header: "Email" },
-    { field: "phone", header: "Teléfono" },
+    { field: "status", header: "Estatus" },
   ];
 
   onView(id: string): void {
@@ -42,5 +55,12 @@ export class ResidentsTable {
         id,
       );
     this.router.navigate([route]);
+  }
+
+  search(event: TableLazyLoadEvent) {
+    this.paginate.emit({
+      first: event.first,
+      rows: event.rows || 10,
+    });
   }
 }

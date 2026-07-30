@@ -1,0 +1,157 @@
+@if (stats(); as stats) {
+  <p-panel toggleable="true" header="Resumen">
+    <ng-template pTemplate="header">
+      <div class="flex items-center gap-2 font-semibold text-gray-700">
+        <i class="pi pi-chart-bar text-primary-500"></i>
+        <span>Estadísticas Generales</span>
+      </div>
+    </ng-template>
+
+    <div class="space-y-6">
+      <!-- 1. KPI MAIN  -->
+      <div
+        class="bg-linear-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl p-4 sm:p-5 flex items-center justify-between"
+      >
+        <div>
+          <span class="text-xs font-bold tracking-wider text-blue-600 uppercase"
+            >Total Registrar de Usuarios</span
+          >
+          <div class="text-3xl sm:text-4xl font-extrabold text-gray-900 mt-1">
+            {{ stats?.summary?.totalUsers }}
+          </div>
+        </div>
+        <div
+          class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center text-xl"
+        >
+          <i class="pi pi-users"></i>
+        </div>
+      </div>
+
+      <!-- 2. Grid de Distribución por Rol y Estado (Mobile First: 1 col, md: 2 cols) -->
+      <div class="grid grid-cols-1 md:grid-cols-1 gap-6">
+        <!-- Tarjeta: Distribución por Rol -->
+        <p-panel class="bg-gray-50/50">
+          <ng-template #header>
+            <div class="pt-4 pb-2">
+              <h3
+                class="text-sm font-semibold text-gray-700 flex items-center gap-2"
+              >
+                <i class="pi pi-id-card text-gray-400"></i>
+                Por Rol
+              </h3>
+            </div>
+          </ng-template>
+
+          <div class="space-y-2">
+            <!-- Administrador -->
+            <div
+              class="flex items-center justify-between p-2.5 bg-white rounded-lg border border-gray-100 shadow-2xs"
+            >
+              <div class="flex items-center gap-2.5">
+                <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                <span class="text-sm font-medium text-gray-600"
+                  >Administradores</span
+                >
+              </div>
+              <span
+                class="text-sm font-bold text-gray-800 px-2.5 py-0.5 rounded-md"
+              >
+                {{ stats?.byRole!["admin"] || 0 }}
+              </span>
+            </div>
+
+            <!-- Residente -->
+            <div
+              class="flex items-center justify-between p-2.5 bg-white rounded-lg border border-gray-100 shadow-2xs"
+            >
+              <div class="flex items-center gap-2.5">
+                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                <span class="text-sm font-medium text-gray-600"
+                  >Residentes</span
+                >
+              </div>
+              <span
+                class="text-sm font-bold text-gray-800 px-2.5 py-0.5 rounded-md"
+              >
+                {{ stats?.byRole!["resident"] || 0 }}
+              </span>
+            </div>
+          </div>
+        </p-panel>
+
+        <!-- Tarjeta: Distribución por Estado -->
+        <p-panel class="bg-gray-50/50">
+          <ng-template #header>
+            <div class="pt-4 pb-2">
+              <h3
+                class="text-sm font-semibold text-gray-700 flex items-center gap-2"
+              >
+                <i class="pi pi-sync text-gray-400"></i>
+                Por Estado
+              </h3>
+            </div>
+          </ng-template>
+
+          <div class="space-y-2">
+            <!-- Activo -->
+            <div
+              class="flex items-center justify-between p-2.5 bg-white rounded-lg border border-gray-100 shadow-2xs"
+            >
+              <div class="flex items-center gap-2">
+                <p-tag
+                  severity="success"
+                  value="Activo"
+                  [rounded]="true"
+                  icon="pi pi-check-circle"
+                ></p-tag>
+              </div>
+              <span
+                class="text-sm font-bold text-gray-800 px-2.5 py-0.5 rounded-md"
+              >
+                {{ stats?.byStatus!["active"] || 0 }}
+              </span>
+            </div>
+
+            <!-- Pendiente -->
+            <div
+              class="flex items-center justify-between p-2.5 bg-white rounded-lg border border-gray-100 shadow-2xs"
+            >
+              <div class="flex items-center gap-2">
+                <p-tag
+                  severity="warn"
+                  value="Pendiente"
+                  [rounded]="true"
+                  icon="pi pi-clock"
+                ></p-tag>
+              </div>
+              <span
+                class="text-sm font-bold text-gray-800 px-2.5 py-0.5 rounded-md"
+              >
+                {{ stats?.byStatus!["pending_completion"] || 0 }}
+              </span>
+            </div>
+
+            <!-- Inactivo -->
+            <div
+              class="flex items-center justify-between p-2.5 bg-white rounded-lg border border-gray-100 shadow-2xs"
+            >
+              <div class="flex items-center gap-2">
+                <p-tag
+                  severity="danger"
+                  value="Inactivo"
+                  [rounded]="true"
+                  icon="pi pi-ban"
+                ></p-tag>
+              </div>
+              <span
+                class="text-sm font-bold text-gray-800 px-2.5 py-0.5 rounded-md"
+              >
+                {{ stats?.byStatus!["inactive"] || 0 }}
+              </span>
+            </div>
+          </div>
+        </p-panel>
+      </div>
+    </div>
+  </p-panel>
+}

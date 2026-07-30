@@ -4,6 +4,7 @@ import {
   SearchUser,
   ApiResponse,
   CreateUser,
+  UserStats,
 } from "@nexhouse/shared-domain/interfaces";
 import { UserModel } from "@nexhouse/shared-domain/models";
 import { Observable } from "rxjs";
@@ -33,6 +34,12 @@ export class ResidentService {
     dto: CreateUser,
   ): Observable<ApiResponse<UserModel>> {
     return this.request.post<UserModel>(this.buildUrl(neighborhood), dto);
+  }
+
+  getStats(neighborhoodId: string): Observable<ApiResponse<UserStats>> {
+    return this.request.get<UserStats>(
+      `${this.buildUrl(neighborhoodId)}/stats`,
+    );
   }
   //
   // update(

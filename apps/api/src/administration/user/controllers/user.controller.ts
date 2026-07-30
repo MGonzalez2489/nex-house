@@ -10,7 +10,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { UserSearchService, UserService } from '../services';
+import { UserSearchService, UserService, UserStatsService } from '../services';
 import { User, Neighborhood } from '@core/database';
 import { CurrentNeigh, CurrentUser } from '@core/decorators';
 import { ApiOperation, ApiParam } from '@nestjs/swagger';
@@ -24,6 +24,7 @@ export class UserController {
   constructor(
     private readonly usersService: UserService,
     private readonly searchService: UserSearchService,
+    private readonly statsService: UserStatsService,
   ) {}
 
   @Post()
@@ -52,6 +53,11 @@ export class UserController {
       data: response.data.map((f) => UserToModelMapper(f)),
     };
     return mResponse;
+  }
+
+  @Get('stats')
+  async findStats(@CurrentNeigh() neigh: Neighborhood) {
+    return await this.statsService.getStats(neigh.id);
   }
 
   @Get(':publicId')

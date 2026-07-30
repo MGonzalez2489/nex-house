@@ -1,18 +1,20 @@
 import {
-  withDevtools,
-  withReset,
-  withCallState,
   setError,
   setLoaded,
   setLoading,
+  withCallState,
+  withDevtools,
+  withReset,
 } from "@angular-architects/ngrx-toolkit";
 import { inject } from "@angular/core";
 import {
   ApiPaginationMeta,
   CreateUser,
   SearchUser,
+  UserStats,
 } from "@nexhouse/shared-domain/interfaces";
 import { UserModel } from "@nexhouse/shared-domain/models";
+import { tapResponse } from "@ngrx/operators";
 import {
   patchState,
   signalStore,
@@ -27,11 +29,10 @@ import {
   setAllEntities,
   withEntities,
 } from "@ngrx/signals/entities";
-import { ContextStore } from "@stores/context.store";
-import { ResidentService } from "./services";
-import { tapResponse } from "@ngrx/operators";
 import { rxMethod } from "@ngrx/signals/rxjs-interop";
-import { pipe, tap, switchMap, lastValueFrom } from "rxjs";
+import { ContextStore } from "@stores/context.store";
+import { lastValueFrom, pipe, switchMap, tap } from "rxjs";
+import { ResidentService } from "./services";
 
 const config = entityConfig({
   entity: type<UserModel>(),
@@ -40,9 +41,11 @@ const config = entityConfig({
 
 interface ResidentState {
   pagination: ApiPaginationMeta | undefined;
+  stats: UserStats | undefined;
 }
 const initialState: ResidentState = {
   pagination: undefined,
+  stats: undefined,
 };
 
 export const ResidentStore = signalStore(
@@ -57,6 +60,31 @@ export const ResidentStore = signalStore(
     _contextStore: inject(ContextStore),
   })),
 
+  withMethods((store) => ({
+    loadStats: rxMethod<void>(
+      pipe(
+        tap(() => patchState(store, setLoading())),
+        switchMap(() => {
+          const nId = store._contextStore.neighborhood();
+          if (!nId) return [];
+
+          return store._residentService.getStats(nId.publicId).pipe(
+            tapResponse({
+              next: (response) =>
+                patchState(
+                  store,
+                  {
+                    stats: response.data,
+                  },
+                  setLoaded(),
+                ),
+              error: (err: Error) => patchState(store, setError(err)),
+            }),
+          );
+        }),
+      ),
+    ),
+  })),
   withMethods((store) => ({
     loadAll: rxMethod<SearchUser>(
       pipe(
@@ -94,6 +122,7 @@ export const ResidentStore = signalStore(
         );
         patchState(store, addEntity(response.data, config), setLoaded());
 
+        store.loadStats();
         return true;
       } catch (err) {
         patchState(store, setError(err));

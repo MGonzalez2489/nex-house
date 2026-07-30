@@ -159,6 +159,7 @@
             @for (type of catStore.UnitTypes(); track type.publicId) {
               @let selected = form.value.unitTypeId === type.publicId;
               <button
+                type="button"
                 [class.bg-cyan-50]="selected"
                 [class.border-cyan-300]="selected"
                 [class.dark:bg-cyan-700]="selected"
