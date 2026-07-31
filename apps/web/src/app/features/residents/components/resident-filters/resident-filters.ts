@@ -49,6 +49,4 @@ export class ResidentFilters implements OnInit {
         this.filter.emit(this.filters());
       });
   }
-
-  // protected readonly filters = signal<SearchUser>();
 }

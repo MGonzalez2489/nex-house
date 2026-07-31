@@ -22,7 +22,8 @@
       "@auth/*": ["./src/app/features/auth/*"],
       "@dashboard/*": ["./src/app/features/dashboard/*"],
       "@neighborhoods/*": ["./src/app/features/neighborhoods/*"],
-      "@residents/*": ["./src/app/features/residents/*"]
+      "@residents/*": ["./src/app/features/residents/*"],
+      "@units/*": ["./src/app/features/units/*"]
     }
   },
   "include": ["src/**/*.ts"],

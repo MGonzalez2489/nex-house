@@ -6,8 +6,10 @@ import { UnitToModelMapper } from './unit-to-model-mapper';
 export const UserUnitToModel = (userUnit: UserUnit): UserUnitModel => {
   return {
     isCurrentOccupant: userUnit.isCurrentOccupant,
-    userUnitRole: CatalogToModelMapper(userUnit.userUnitRole),
-    unit: UnitToModelMapper(userUnit.unit),
+    userUnitRole: userUnit.userUnitRole
+      ? CatalogToModelMapper(userUnit.userUnitRole)
+      : undefined,
+    unit: userUnit.unit ? UnitToModelMapper(userUnit.unit) : userUnit.unit,
     publicId: userUnit.publicId,
   };
 };

@@ -1,8 +1,10 @@
 import { NeighborhoodModule } from '@administration/neighborhood/neighborhood.module';
+import { UnitsModule } from '@administration/units';
 import { UserModule } from '@administration/user/user.module';
 import { AuthModule } from '@auth/auth.module';
 import { JwtAuthGuard } from '@auth/guards';
 import { ApiCacheModule } from '@core/api-cache.module';
+import { NeighborhoodInterceptor } from '@core/interceptors';
 import { CryptoService } from '@core/services';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -11,7 +13,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CatalogsModule } from 'src/catalogs';
 import { DatabaseSeederService, getDatabaseConfig } from '../_core/database';
 import { Neighborhood, User } from '../_core/database/entities';
-import { NeighborhoodInterceptor } from '@core/interceptors';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { NeighborhoodInterceptor } from '@core/interceptors';
     CatalogsModule,
     NeighborhoodModule,
     UserModule,
+    UnitsModule,
   ],
   controllers: [],
   providers: [

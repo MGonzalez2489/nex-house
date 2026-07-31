@@ -7,6 +7,7 @@ import { SessionModel } from '@nexhouse/shared-domain/models';
 import UAParser from 'ua-parser-js';
 import { CryptoService } from '@core/services';
 import { randomUUID } from 'crypto';
+import { UserToModelMapper } from '@core/mappers';
 
 @Injectable()
 export class SessionService {
@@ -89,7 +90,7 @@ export class SessionService {
     );
 
     return {
-      user,
+      user: UserToModelMapper(user),
       token: accessToken,
       refreshToken,
       exp: accessTokenExpInSeconds,

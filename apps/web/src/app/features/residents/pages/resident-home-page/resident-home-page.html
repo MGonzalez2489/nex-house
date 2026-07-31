@@ -10,19 +10,13 @@
         >
           Residentes
         </h1>
-        <span
-          class="text-xs font-medium text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 rounded-full px-2 py-0.5"
-        >
-          stats
-        </span>
       </div>
       <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
-        Busca, filtra y administra los fraccionamientos de la plataforma.
+        Busca, filtra y administra los redientes de la plataforma.
       </p>
     </div>
 
-    <div class="flex items-center gap-3 hidden">
-      <p-button icon="pi pi-filter" text class="hidden md:block" />
+    <div class="flex items-center gap-3">
       <p-button
         icon="pi pi-plus"
         label="Nuevo"
@@ -41,13 +35,6 @@
       <ng-template #icons>
         <div class="flex items-center gap-3">
           <app-resident-filters (filter)="onSearch($event)" />
-          <p-button
-            icon="pi pi-plus"
-            label="Nuevo"
-            size="small"
-            (click)="create()"
-            class="hidden md:block"
-          />
         </div>
       </ng-template>
       <app-residents-table

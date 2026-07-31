@@ -1,0 +1,41 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div
+    class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+  >
+    <div>
+      <div class="flex items-center gap-2 flex-wrap">
+        <h1
+          class="text-xl sm:text-2xl font-display font-semibold text-slate-900 dark:text-white"
+        >
+          Unidades
+        </h1>
+      </div>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+        Busca, filtra y administra las unidades de la plataforma.
+      </p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+    <p-panel
+      header="Lista de registros"
+      class="col-span-2 overflow-x-auto"
+      [pt]="{ content: 'p-0' }"
+    >
+      <ng-template #icons>
+        <app-units-filters (filter)="unitStore.loadAll($event)" />
+      </ng-template>
+      <app-units-table
+        [isLoading]="unitStore.loading()"
+        [items]="unitStore.entities()"
+        [pagination]="unitStore.pagination()"
+        (paginate)="unitStore.loadAll($event)"
+      />
+    </p-panel>
+
+    <p-panel class="col-span-1">
+      <app-units-stats />
+    </p-panel>
+  </div>
+</div>

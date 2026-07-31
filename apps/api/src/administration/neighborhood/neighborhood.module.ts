@@ -8,7 +8,6 @@ import { NeighborhoodController } from './controller';
 import { Neighborhood, NeighStreet, Unit, UserUnit } from '@core/database';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from '@administration/user/user.module';
-import { NeighUnitsService } from './services/neigh-units.service';
 import { NeighSearchController } from './controller/neigh-search.controller';
 
 @Module({
@@ -20,7 +19,6 @@ import { NeighSearchController } from './controller/neigh-search.controller';
     NeighborhoodSearchService,
     NeighborhoodService,
     NeighStreetService,
-    NeighUnitsService,
   ],
   controllers: [NeighborhoodController, NeighSearchController],
 })

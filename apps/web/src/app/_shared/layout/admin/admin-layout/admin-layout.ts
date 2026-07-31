@@ -12,6 +12,7 @@ import { RESIDENT_ROUTES_ENUM } from "@residents/resident.routes";
 import { NavBar, Sidebar, SideItem } from "@shared/layout/components";
 import { CatalogsStore } from "@stores/catalogs.store";
 import { ContextStore } from "@stores/context.store";
+import { UNIT_ROUTES_ENUM } from "@units/units.routes";
 import { DrawerModule } from "primeng/drawer";
 
 @Component({
@@ -48,10 +49,9 @@ export class AdminLayout implements OnInit {
           title: "Residentes",
         },
         {
-          route: "/neighborhoods",
+          route: `/${UNIT_ROUTES_ENUM.HOME}`,
           icon: "pi pi-building",
           title: "Unidades",
-          isDisabled: true,
         },
       ],
     },
@@ -61,7 +61,6 @@ export class AdminLayout implements OnInit {
     //TODO: is required to move this?
     this.catStore.loadCatalogs();
     this.contextStore.loadNeighborhood();
-    this.contextStore.loadUnits();
     this.contextStore.loadStreets();
   }
 }

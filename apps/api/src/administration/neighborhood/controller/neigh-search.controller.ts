@@ -17,11 +17,7 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SearchNeighDto } from '../dtos';
-import {
-  NeighborhoodSearchService,
-  NeighStreetService,
-  NeighUnitsService,
-} from '../services';
+import { NeighborhoodSearchService, NeighStreetService } from '../services';
 
 @ApiTags('Neighborhood')
 @Controller('neighborhood')
@@ -29,7 +25,6 @@ export class NeighSearchController {
   constructor(
     private readonly searchService: NeighborhoodSearchService,
     private readonly streetService: NeighStreetService,
-    private readonly unitService: NeighUnitsService,
   ) {}
 
   /**
@@ -74,14 +69,6 @@ export class NeighSearchController {
     }
 
     return neighborhood;
-  }
-
-  @Get('units')
-  async findUnits(
-    @Query() filters: SearchDto,
-    @CurrentUser() user: User,
-  ): Promise<PaginatedResult<Unit>> {
-    return this.unitService.findAll(user.neighborhoodId, filters);
   }
 
   @Get('streets')

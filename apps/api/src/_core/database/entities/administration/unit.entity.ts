@@ -1,10 +1,11 @@
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
-import { BaseTraceableEntity } from '../_base';
 import { Exclude } from 'class-transformer';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { BaseTraceableEntity } from '../_base';
 import { NeighStreet } from './neigh_street.entity';
-import { UnitType } from './unit_type.entity';
-import { User } from './user.entity';
 import { Neighborhood } from './neighborhood.entity';
+import { UnitType } from './unit_type.entity';
+import { UserUnit } from './user-unit.entity';
+import { User } from './user.entity';
 
 @Entity('units')
 export class Unit extends BaseTraceableEntity {
@@ -35,6 +36,9 @@ export class Unit extends BaseTraceableEntity {
   @ManyToOne(() => Neighborhood, (n) => n.streets)
   @JoinColumn({ name: 'neighborhoodId' })
   neighborhood: Neighborhood;
+
+  @OneToMany(() => UserUnit, (userUnit) => userUnit.unit)
+  userUnits: UserUnit[];
 
   // ==========================================
   // Audit

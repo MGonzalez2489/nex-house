@@ -1,46 +1,25 @@
-import { Neighborhood, Unit, User } from '@core/database';
+import { Neighborhood, User } from '@core/database';
 import { CurrentUser } from '@core/decorators';
-import { SearchDto } from '@core/dtos';
-import {
-  HttpCacheInterceptor,
-  IdempotencyInterceptor,
-} from '@core/interceptors';
-import { PaginatedResult } from '@core/utils';
-import { CacheTTL } from '@nestjs/cache-manager';
+import { IdempotencyInterceptor } from '@core/interceptors';
 import {
   Body,
   Controller,
-  Get,
   HttpCode,
   HttpStatus,
-  NotFoundException,
   Param,
   ParseUUIDPipe,
   Patch,
   Post,
-  Query,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import {
-  CreateNeighborhoodDto,
-  SearchNeighDto,
-  UpdateNeighborhoodDto,
-} from '../dtos';
-import {
-  NeighborhoodSearchService,
-  NeighborhoodService,
-  NeighUnitsService,
-} from '../services';
+import { CreateNeighborhoodDto, UpdateNeighborhoodDto } from '../dtos';
+import { NeighborhoodService } from '../services';
 
 @ApiTags('Neighborhood')
 @Controller('neighborhood')
 export class NeighborhoodController {
-  constructor(
-    private readonly searchService: NeighborhoodSearchService,
-    private readonly service: NeighborhoodService,
-    private readonly unitService: NeighUnitsService,
-  ) {}
+  constructor(private readonly service: NeighborhoodService) {}
 
   /**
    * Registers a fresh neighborhood configuration map alongside its relational street index catalogs.

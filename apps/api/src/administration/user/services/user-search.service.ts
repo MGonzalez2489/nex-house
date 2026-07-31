@@ -70,9 +70,9 @@ export class UserSearchService {
       .leftJoinAndSelect('users.neighborhood', 'neighborhood')
       .leftJoinAndSelect('users.status', 'status')
       .leftJoinAndSelect('users.role', 'role')
-      .leftJoinAndSelect('users.units', 'units')
-      .leftJoinAndSelect('units.unit', 'unit')
-      .leftJoinAndSelect('units.userUnitRole', 'userUnitRole')
+      .leftJoinAndSelect('users.userUnits', 'userUnits')
+      .leftJoinAndSelect('userUnits.unit', 'unit')
+      .leftJoinAndSelect('userUnits.userUnitRole', 'userUnitRole')
       .leftJoinAndSelect('unit.street', 'street')
       .leftJoinAndSelect('unit.type', 'unitType')
 

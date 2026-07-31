@@ -30,6 +30,7 @@ import { Panel } from "primeng/panel";
 import { Select } from "primeng/select";
 import { ToggleSwitch } from "primeng/toggleswitch";
 import { CreateResidentForm } from "./resident-form";
+import { UnitStore } from "@units/units.store";
 
 @Component({
   selector: "app-resident-form-page",
@@ -53,6 +54,7 @@ export class ResidentFormPage {
   protected readonly catStore = inject(CatalogsStore);
   protected readonly contextStore = inject(ContextStore);
   protected readonly residentStore = inject(ResidentStore);
+  protected readonly unitStore = inject(UnitStore);
   protected isNewUnit = signal<boolean>(false);
   private readonly isLoadingComplete = signal<boolean>(false);
 
@@ -146,9 +148,10 @@ export class ResidentFormPage {
       return;
     }
 
-    if (this.isNewUnit()) {
-      this.contextStore.loadUnits();
-    }
+    //TODO: update units on create
+    // if (this.isNewUnit()) {
+    //   this.contextStore.loadUnits();
+    // }
     this.router.navigateByUrl(`/${RESIDENT_ROUTES_ENUM.HOME}`);
   }
   cancel() {
@@ -187,8 +190,8 @@ export class ResidentFormPage {
     this.form.patchValue({
       email: cResident.email,
       userRoleId: cResident.role?.publicId,
-      unitId: cResident.units[0]?.unit.publicId,
-      unitRoleId: cResident.units[0]?.userUnitRole.publicId,
+      unitId: cResident.userUnits[0]?.unit.publicId,
+      unitRoleId: cResident.userUnits[0]?.userUnitRole.publicId,
     });
   }
 }

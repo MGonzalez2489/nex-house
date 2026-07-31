@@ -15,5 +15,5 @@ export interface UserModel extends BaseModel {
   role: UserRoleModel;
   status: UserStatusModel;
   neighborhood: NeighborhoodModel;
-  units: UserUnitModel[];
+  userUnits: UserUnitModel[];
 }

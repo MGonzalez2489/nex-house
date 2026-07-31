@@ -188,7 +188,7 @@
         <p-select
           fluid
           placeholder="Buscar unidad"
-          [options]="contextStore.units()"
+          [options]="unitStore.entities()"
           formControlName="unitId"
           optionValue="publicId"
         >

@@ -180,7 +180,11 @@ export class UserService {
       // TODO: Log Systemic Activity
 
       // Fetch the unified structural state from the read-only service representation
-      return await this.searchService.findByPublicId(savedUser.publicId);
+      return await this.searchService.findByPublicId(
+        savedUser.publicId,
+        neighId,
+        { status: true, role: true },
+      );
     } catch (error) {
       await queryRunner.rollbackTransaction();
 

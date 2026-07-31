@@ -11,7 +11,6 @@ import { NeighborhoodService } from "@neighborhoods/services";
 import {
   NeighborhoodModel,
   NeighStreetModel,
-  UnitModel,
 } from "@nexhouse/shared-domain/models";
 import {
   patchState,
@@ -25,14 +24,12 @@ import { lastValueFrom } from "rxjs";
 interface contextState {
   selectedId: string | undefined;
   neighborhood: NeighborhoodModel | undefined;
-  units: UnitModel[];
   streets: NeighStreetModel[];
 }
 
 const initialState: contextState = {
   selectedId: undefined,
   neighborhood: undefined,
-  units: [],
   streets: [],
 };
 
@@ -71,18 +68,7 @@ export const ContextStore = signalStore(
         return undefined;
       }
     },
-    loadUnits: async () => {
-      patchState(store, setLoading());
-      try {
-        const response = await lastValueFrom(store._neighService.getUnits());
 
-        patchState(store, { units: response.data }, setLoaded());
-        return response.data;
-      } catch (error) {
-        patchState(store, setError(error));
-        return undefined;
-      }
-    },
     loadStreets: async () => {
       patchState(store, setLoading());
       try {

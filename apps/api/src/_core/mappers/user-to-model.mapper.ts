@@ -19,6 +19,8 @@ export const UserToModelMapper = (user: User): UserModel => {
 
     status: CatalogToModelMapper(user.status),
     role: CatalogToModelMapper(user.role),
-    units: user.units ? user.units.map((f) => UserUnitToModel(f)) : user.units,
+    userUnits: user.userUnits
+      ? user.userUnits.map((f) => UserUnitToModel(f))
+      : [],
   };
 };

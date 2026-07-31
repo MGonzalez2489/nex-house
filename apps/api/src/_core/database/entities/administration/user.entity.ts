@@ -53,7 +53,7 @@ export class User extends BaseTraceableEntity {
   status: UserStatus;
 
   @OneToMany(() => UserUnit, (units) => units.user)
-  units: UserUnit[];
+  userUnits: UserUnit[];
 
   //virtual properties
   get fullName(): string {
