@@ -23,6 +23,7 @@ export class UnitsHomePage implements OnInit {
   protected readonly unitStore = inject(UnitStore);
 
   ngOnInit(): void {
+    this.unitStore.loadStats();
     this.unitStore.loadAll({
       rows: 10,
       first: 0,

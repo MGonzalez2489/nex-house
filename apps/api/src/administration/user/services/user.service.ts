@@ -11,6 +11,7 @@ import { CreateUserDto, UpdateUserDto } from '../dtos';
 import {
   NeighStreet,
   Unit,
+  UnitStatus,
   UnitType,
   User,
   UserRole,
@@ -26,7 +27,12 @@ import {
   validatePhone,
 } from '@nexhouse/shared-domain/utils';
 import { CatalogsService } from 'src/catalogs/services';
-import { UserRoleEnum, UserStatusEnum } from '@nexhouse/shared-domain/enums';
+import {
+  UnitStatusEnum,
+  UserRoleEnum,
+  UserStatusEnum,
+  UserUnitRoleEnum,
+} from '@nexhouse/shared-domain/enums';
 import { CryptoService } from '@core/services';
 import { isProd } from '@core/utils';
 import { UserSearchService } from './user-search.service';
@@ -137,8 +143,16 @@ export class UserService {
           where: { publicId: dto.unitTypeId },
         });
 
-        if (!street) {
+        if (!unitType) {
           throw new BadRequestException(`Invalid unit type.`);
+        }
+
+        const unitStatus = await queryRunner.manager.findOne(UnitStatus, {
+          where: { name: UnitStatusEnum.OCCUPIED },
+        });
+
+        if (!unitStatus) {
+          throw new BadRequestException(`Invalid unit status.`);
         }
 
         const newUnit = queryRunner.manager.create(Unit, {
@@ -146,6 +160,7 @@ export class UserService {
           identifier: dto.unitIdentifier,
           neighborhoodId: neighId,
           typeId: unitType.id,
+          statusId: unitStatus.id,
         });
         targetUnit = await queryRunner.manager.save(newUnit);
       }

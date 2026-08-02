@@ -21,4 +21,9 @@ export class UnitsController {
     };
     return mResponse;
   }
+
+  @Get('stats')
+  async findStats(@CurrentNeigh() neigh: Neighborhood) {
+    return this.searchService.findStats(neigh.id);
+  }
 }

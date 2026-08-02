@@ -6,7 +6,11 @@ import {
   setLoaded,
   setLoading,
 } from "@angular-architects/ngrx-toolkit";
-import { ApiPaginationMeta, Search } from "@nexhouse/shared-domain/interfaces";
+import {
+  ApiPaginationMeta,
+  Search,
+  UnitStats,
+} from "@nexhouse/shared-domain/interfaces";
 import { UnitModel } from "@nexhouse/shared-domain/models";
 import {
   patchState,
@@ -35,11 +39,11 @@ const config = entityConfig({
 
 interface UnitState {
   pagination: ApiPaginationMeta | undefined;
-  // stats: Unitstate | undefined;
+  stats: UnitStats | undefined;
 }
 const initialState: UnitState = {
   pagination: undefined,
-  // stats: undefined,
+  stats: undefined,
 };
 
 export const UnitStore = signalStore(
@@ -69,6 +73,29 @@ export const UnitStore = signalStore(
                   setAllEntities(response.data, config),
                   {
                     pagination: response.meta,
+                  },
+                  setLoaded(),
+                ),
+              error: (err: Error) => patchState(store, setError(err)),
+            }),
+          );
+        }),
+      ),
+    ),
+    loadStats: rxMethod<void>(
+      pipe(
+        tap(() => patchState(store, setLoading())),
+        switchMap(() => {
+          const nId = store._contextStore.neighborhood();
+          if (!nId) return [];
+
+          return store._service.getStats(nId.publicId).pipe(
+            tapResponse({
+              next: (response) =>
+                patchState(
+                  store,
+                  {
+                    stats: response.data,
                   },
                   setLoaded(),
                 ),

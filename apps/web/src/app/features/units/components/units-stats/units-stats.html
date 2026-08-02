@@ -1,1 +1,127 @@
-<p>units-stats works!</p>
+@if (stats(); as stats) {
+  <p-panel toggleable="true">
+    <ng-template #header>
+      <div class="flex items-center gap-2 font-semibold text-gray-700">
+        <i class="pi pi-chart-bar text-primary-500"></i>
+        <span>Estadísticas Generales</span>
+      </div>
+    </ng-template>
+
+    <div class="space-y-6">
+      <!-- tro -->
+      <div
+        class="bg-linear-to-r from-emerald-50 to-teal-50 border border-emerald-100 rounded-xl p-4 sm:p-5 flex items-center justify-between"
+      >
+        <div>
+          <span
+            class="text-xs font-bold tracking-wider text-emerald-600 uppercase"
+            >Total de Unidades</span
+          >
+          <div class="text-3xl sm:text-4xl font-extrabold text-gray-900 mt-1">
+            {{ stats?.summary?.totalUnits }}
+          </div>
+        </div>
+        <div
+          class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center text-xl"
+        >
+          <i class="pi pi-building"></i>
+        </div>
+      </div>
+      <!-- Grid de Métricas (1 col en mobile, 3 cols en desktop) -->
+      <div class="grid grid-cols-1 gap-6">
+        <!-- Tarjeta: Por Estado -->
+        <p-panel class="bg-gray-50/50">
+          <ng-template #header>
+            <div class="pt-4 pb-2">
+              <h3
+                class="text-sm font-semibold text-gray-700 flex items-center gap-2"
+              >
+                <i class="pi pi-flag text-gray-400"></i>
+                Por Estado
+              </h3>
+            </div>
+          </ng-template>
+          <div class="space-y-2">
+            @for (item of stats["byStatus"] | keyvalue; track item.key) {
+              <div
+                class="flex items-center justify-between p-2.5 bg-white rounded-lg border border-gray-100 shadow-2xs"
+              >
+                <span class="text-sm font-medium text-gray-600">{{
+                  item.key
+                }}</span>
+                <span
+                  class="text-sm font-bold text-gray-800 px-2.5 py-0.5 rounded-md"
+                >
+                  {{ item.value }}
+                </span>
+              </div>
+            }
+          </div>
+        </p-panel>
+
+        <!-- Tarjeta: Por Tipo -->
+        <p-panel class="bg-gray-50/50">
+          <ng-template #header>
+            <div class="pt-4 pb-2">
+              <h3
+                class="text-sm font-semibold text-gray-700 flex items-center gap-2"
+              >
+                <i class="pi pi-sitemap text-gray-400"></i>
+                Por Tipo
+              </h3>
+            </div>
+          </ng-template>
+
+          <div class="space-y-2">
+            @for (item of stats["byType"] | keyvalue; track item.key) {
+              <div
+                class="flex items-center justify-between p-2.5 bg-white rounded-lg border border-gray-100 shadow-2xs"
+              >
+                <span class="text-sm font-medium text-gray-600">{{
+                  item.key
+                }}</span>
+                <span
+                  class="text-sm font-bold text-gray-800 bg-gray-100 px-2.5 py-0.5 rounded-md"
+                >
+                  {{ item.value }}
+                </span>
+              </div>
+            }
+          </div>
+        </p-panel>
+
+        <!-- Tarjeta: Por Calle -->
+        <p-panel class="bg-gray-50/50">
+          <ng-template #header>
+            <div class="pt-4 pb-2">
+              <h3
+                class="text-sm font-semibold text-gray-700 flex items-center gap-2"
+              >
+                <i class="pi pi-map-marker text-gray-400"></i>
+                Por Calle
+              </h3>
+            </div>
+          </ng-template>
+
+          <div class="space-y-2 max-h-60 overflow-y-auto pr-1">
+            @for (item of stats["byStreet"] | keyvalue; track item.key) {
+              <div
+                class="flex items-center justify-between p-2.5 bg-white rounded-lg border border-gray-100 shadow-2xs"
+              >
+                <span
+                  class="text-sm font-medium text-gray-600 truncate pr-2 capitalize"
+                  >{{ item.key }}</span
+                >
+                <span
+                  class="text-sm font-bold text-gray-800 bg-gray-100 px-2.5 py-0.5 rounded-md"
+                >
+                  {{ item.value }}
+                </span>
+              </div>
+            }
+          </div>
+        </p-panel>
+      </div>
+    </div>
+  </p-panel>
+}

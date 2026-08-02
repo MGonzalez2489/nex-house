@@ -1,6 +1,6 @@
 import { inject, Injectable } from "@angular/core";
 import { RequestService } from "@core/services";
-import { Search } from "@nexhouse/shared-domain/interfaces";
+import { Search, UnitStats } from "@nexhouse/shared-domain/interfaces";
 import { UnitModel } from "@nexhouse/shared-domain/models";
 
 @Injectable({
@@ -12,6 +12,10 @@ export class UnitService {
 
   getAll(neighId: string, filters: Search) {
     return this.request.get<UnitModel[]>(this.getEndpoint(neighId), filters);
+  }
+
+  getStats(neighId: string) {
+    return this.request.get<UnitStats>(`${this.getEndpoint(neighId)}/stats`);
   }
 
   private getEndpoint(neighborhoodId: string): string {

@@ -34,8 +34,6 @@
       />
     </p-panel>
 
-    <p-panel class="col-span-1">
-      <app-units-stats />
-    </p-panel>
+    <app-units-stats [stats]="unitStore.stats()" />
   </div>
 </div>

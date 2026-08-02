@@ -1,6 +1,6 @@
 @if (stats(); as stats) {
-  <p-panel toggleable="true" header="Resumen">
-    <ng-template pTemplate="header">
+  <p-panel toggleable="true">
+    <ng-template #header>
       <div class="flex items-center gap-2 font-semibold text-gray-700">
         <i class="pi pi-chart-bar text-primary-500"></i>
         <span>Estadísticas Generales</span>
@@ -26,7 +26,6 @@
           <i class="pi pi-users"></i>
         </div>
       </div>
-
       <!-- 2. Grid de Distribución por Rol y Estado (Mobile First: 1 col, md: 2 cols) -->
       <div class="grid grid-cols-1 md:grid-cols-1 gap-6">
         <!-- Tarjeta: Distribución por Rol -->

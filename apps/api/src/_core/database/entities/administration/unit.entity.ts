@@ -6,6 +6,7 @@ import { Neighborhood } from './neighborhood.entity';
 import { UnitType } from './unit_type.entity';
 import { UserUnit } from './user-unit.entity';
 import { User } from './user.entity';
+import { UnitStatus } from './unit_status.entity';
 
 @Entity('units')
 export class Unit extends BaseTraceableEntity {
@@ -24,6 +25,10 @@ export class Unit extends BaseTraceableEntity {
   @Exclude()
   neighborhoodId: number;
 
+  @Column()
+  @Exclude()
+  statusId: number;
+
   //relationshipts
   @ManyToOne(() => NeighStreet)
   @JoinColumn({ name: 'streetId' })
@@ -39,6 +44,10 @@ export class Unit extends BaseTraceableEntity {
 
   @OneToMany(() => UserUnit, (userUnit) => userUnit.unit)
   userUnits: UserUnit[];
+
+  @ManyToOne(() => UnitStatus)
+  @JoinColumn({ name: 'statusId' })
+  status: UnitStatus;
 
   // ==========================================
   // Audit
