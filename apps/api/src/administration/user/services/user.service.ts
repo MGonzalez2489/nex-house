@@ -277,6 +277,10 @@ export class UserService {
     dto: UpdateUserDto,
     currentUser: User,
   ): Promise<User> {
+    const activeUserStatus = await this.catalogsService.findByName(
+      UserStatus,
+      UserStatusEnum.ACTIVE,
+    );
     const existingUser = await this.repository.findOne({
       where: { publicId: userPublicId, neighborhoodId: neighId },
       relations: { role: true, status: true },
@@ -286,19 +290,6 @@ export class UserService {
       throw new NotFoundException(
         'Target user profile not found in this neighborhood.',
       );
-    }
-
-    if (dto.email) {
-      const formatedEmail = dto.email.trim().toLowerCase();
-      if (formatedEmail !== existingUser.email) {
-        const existsEmail = await this.repository.exists({
-          where: { email: formatedEmail },
-        });
-        if (existsEmail) {
-          throw new ConflictException(`Email ${dto.email} already in use.`);
-        }
-        existingUser.email = formatedEmail;
-      }
     }
 
     if (dto.phone) {
@@ -317,7 +308,7 @@ export class UserService {
       }
     }
 
-    let updatedRole = existingUser.role;
+    let updatedRole;
     if (dto.userRoleId && dto.userRoleId !== existingUser.role?.publicId) {
       const role = await this.catalogsService.findByPublicId(
         UserRole,
@@ -338,7 +329,11 @@ export class UserService {
     try {
       if (dto.firstName) existingUser.firstName = dto.firstName.trim();
       if (dto.lastName) existingUser.lastName = dto.lastName.trim();
-      existingUser.role = updatedRole;
+      if (updatedRole) existingUser.role = updatedRole;
+
+      if (existingUser.statusId !== activeUserStatus.id) {
+        existingUser.status = activeUserStatus;
+      }
 
       const savedUser = await queryRunner.manager.save(User, existingUser);
 
@@ -369,42 +364,48 @@ export class UserService {
         targetUnit = await queryRunner.manager.save(newUnit);
       }
 
-      if (!targetUnit) {
-        throw new BadRequestException(
-          'Invalid unit state allocation parameters.',
+      //TODO: review this
+      if (targetUnit) {
+        const userUnitRole = await this.catalogsService.findByPublicId(
+          UserUnitRole,
+          dto.unitRoleId,
         );
+        if (!userUnitRole) {
+          throw new BadRequestException(
+            'Target unit assignment role not found.',
+          );
+        }
+
+        // Deactivate previous active unit allocations if necessary
+        if (dto.isCurrentOccupant) {
+          await queryRunner.manager.update(
+            UserUnit,
+            { userId: savedUser.id, isCurrentOccupant: true },
+            { isCurrentOccupant: false },
+          );
+        }
+
+        // Create the new assignment record
+        const assignment = queryRunner.manager.create(UserUnit, {
+          unitId: targetUnit.id,
+          userId: savedUser.id,
+          createdBy: currentUser.id,
+          userUnitRole,
+          isCurrentOccupant: dto.isCurrentOccupant,
+        });
+
+        await queryRunner.manager.save(assignment);
       }
-
-      const userUnitRole = await this.catalogsService.findByPublicId(
-        UserUnitRole,
-        dto.unitRoleId,
-      );
-      if (!userUnitRole) {
-        throw new BadRequestException('Target unit assignment role not found.');
-      }
-
-      // Deactivate previous active unit allocations if necessary
-      if (dto.isCurrentOccupant) {
-        await queryRunner.manager.update(
-          UserUnit,
-          { userId: savedUser.id, isCurrentOccupant: true },
-          { isCurrentOccupant: false },
-        );
-      }
-
-      // Create the new assignment record
-      const assignment = queryRunner.manager.create(UserUnit, {
-        unitId: targetUnit.id,
-        userId: savedUser.id,
-        createdBy: currentUser.id,
-        userUnitRole,
-        isCurrentOccupant: dto.isCurrentOccupant,
-      });
-
-      await queryRunner.manager.save(assignment);
 
       await queryRunner.commitTransaction();
-      return await this.searchService.findByPublicId(savedUser.publicId);
+      return await this.searchService.findByPublicId(
+        savedUser.publicId,
+        savedUser.neighborhoodId,
+        {
+          status: true,
+          role: true,
+        },
+      );
     } catch (error) {
       await queryRunner.rollbackTransaction();
       this.logger.error(

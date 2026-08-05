@@ -11,6 +11,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from "@angular/forms";
+import { UpdateUser } from "@nexhouse/shared-domain/interfaces";
 import { UserModel } from "@nexhouse/shared-domain/models";
 import { FormValidationErrorComponent } from "@shared/components/forms";
 import { Button } from "primeng/button";
@@ -35,6 +36,7 @@ export class OnboardingGeneralComponent {
   user = input<UserModel>();
 
   next = output();
+  doSubmit = output<UpdateUser>();
   prev = output();
 
   protected readonly form = new FormGroup({
@@ -62,10 +64,13 @@ export class OnboardingGeneralComponent {
     });
   }
 
-  doSubmit() {
+  onSubmit() {
     this.form.markAllAsTouched();
     if (this.form.invalid) return;
 
-    console.log("valid form");
+    if (this.form.dirty) this.doSubmit.emit(this.form.value as UpdateUser);
+    else {
+      this.next.emit();
+    }
   }
 }

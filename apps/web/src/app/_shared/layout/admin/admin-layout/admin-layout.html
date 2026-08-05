@@ -3,7 +3,7 @@
 >
   <div class="flex h-full w-full flex-col">
     <!-- ============ TOPBAR ============ -->
-    @if (sessionService.isUserActive()) {
+    @if (showNavComponentes()) {
       <app-nav-bar />
     }
 
@@ -16,7 +16,7 @@
       ></div>
 
       <!-- ============ SIDEBAR ============ -->
-      @if (sessionService.isUserActive()) {
+      @if (showNavComponentes()) {
         @if (!sessionService.isMobile() && sessionService.user(); as user) {
           <app-sidebar
             [items]="menu()"

@@ -10,11 +10,12 @@ import { ProfileStore } from "@stores/profile.store";
 import { ProgressBarModule } from "primeng/progressbar";
 import { StepperModule } from "primeng/stepper";
 import {
+  OnboardingFinishComponent,
   OnboardingGeneralComponent,
   OnboardingPwdChangeComponent,
   OnboardingWelcomeComponent,
 } from "../../components";
-import { ChangePassword } from "@nexhouse/shared-domain/interfaces";
+import { ChangePassword, UpdateUser } from "@nexhouse/shared-domain/interfaces";
 
 type onboardingStep = {
   order: number;
@@ -27,9 +28,10 @@ type onboardingStep = {
     StepperModule,
     ProgressBarModule,
     BrandComponent,
-    OnboardingPwdChangeComponent,
     OnboardingWelcomeComponent,
+    OnboardingPwdChangeComponent,
     OnboardingGeneralComponent,
+    OnboardingFinishComponent,
   ],
   templateUrl: "./onboarding-home-page.html",
   styleUrl: "./onboarding-home-page.css",
@@ -44,7 +46,7 @@ export class OnboardingHomePage {
     { order: 2, name: "general-form" },
     { order: 3, name: "thanks" },
   ];
-  protected readonly currentStep = signal<number>(1);
+  protected readonly currentStep = signal<number>(0);
 
   protected readonly currentProgress = computed(() => {
     const totalSteps = this.steps.length;
@@ -58,6 +60,12 @@ export class OnboardingHomePage {
     this.currentStep.set(newValue);
   }
 
+  protected async updateProfile(dto: UpdateUser) {
+    const response = await this.store.update(dto);
+    if (response) {
+      this.currentStep.set(3);
+    }
+  }
   protected async changePwd(dto: ChangePassword) {
     const response = await this.store.changePassword(dto);
 

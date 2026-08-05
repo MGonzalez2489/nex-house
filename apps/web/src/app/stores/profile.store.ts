@@ -8,7 +8,7 @@ import {
 } from "@angular-architects/ngrx-toolkit";
 import { inject } from "@angular/core";
 import { ProfileService } from "@core/services";
-import { ChangePassword } from "@nexhouse/shared-domain/interfaces";
+import { ChangePassword, UpdateUser } from "@nexhouse/shared-domain/interfaces";
 import { UserModel } from "@nexhouse/shared-domain/models";
 import {
   patchState,
@@ -64,6 +64,19 @@ export const ProfileStore = signalStore(
 
         cUser.requirePwdChange = response.data;
         patchState(store, { user: cUser }, setLoaded());
+
+        return response.data;
+      } catch (err) {
+        patchState(store, setError(err));
+        return false;
+      }
+    },
+    update: async (dto: UpdateUser) => {
+      patchState(store, setLoading());
+      try {
+        const response = await lastValueFrom(store._service.update(dto));
+
+        patchState(store, { user: response.data }, setLoaded());
 
         return response.data;
       } catch (err) {

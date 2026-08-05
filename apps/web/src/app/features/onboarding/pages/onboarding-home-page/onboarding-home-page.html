@@ -8,9 +8,8 @@
           <span
             id="progressLabel"
             class="text-xs font-medium text-slate-500 dark:text-slate-400"
-            >Paso {{ currentStep() + 1 }} de {{ steps.length - 1 }}</span
+            >Paso {{ currentStep() }} de {{ steps.length - 1 }}</span
           >
-          <pre>current: {{ currentStep() }}</pre>
           <span
             id="progressStepName"
             class="text-xs font-medium text-cyan-600 dark:text-cyan-400"
@@ -46,10 +45,23 @@
           <app-onboarding-general-component
             [user]="store.user()"
             class="block"
+            (doSubmit)="updateProfile($event)"
             (prev)="move(-1)"
+            (next)="move(1)"
           />
+        </ng-template>
+      </p-step-panel>
+      <p-step-panel [value]="3">
+        <ng-template #content let-activateCallback="activateCallback">
+          <app-onboarding-finish-component [user]="store.user()" />
         </ng-template>
       </p-step-panel>
     </p-step-panels>
   </p-stepper>
 </div>
+<p class="text-center text-xs text-slate-400 dark:text-slate-500 mt-6">
+  ¿Necesitas ayuda?
+  <a href="#" class="text-cyan-600 dark:text-cyan-400 hover:underline"
+    >Contáctanos</a
+  >
+</p>

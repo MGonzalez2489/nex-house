@@ -191,25 +191,24 @@
           [options]="unitStore.entities()"
           formControlName="unitId"
           optionValue="publicId"
+          appendTo="body"
         >
           <ng-template #selectedItem let-selectedOption>
             @if (selectedOption) {
               <div class="flex items-center gap-2">
-                <div>
-                  {{ selectedOption.identifier }},
-                  <span class="capitalize">
-                    {{ selectedOption.street?.name }}
-                  </span>
-                </div>
+                <span class="capitalize">
+                  {{ selectedOption.street?.name }},
+                </span>
+                <span>
+                  {{ selectedOption.identifier }}
+                </span>
               </div>
             }
           </ng-template>
           <ng-template let-unit #item>
             <div class="flex items-center gap-2">
-              <div>
-                {{ unit.identifier }},
-                <span class="capitalize">{{ unit.street?.name }}</span>
-              </div>
+              <span class="capitalize">{{ unit.street?.name }}, </span>
+              <span> {{ unit.identifier }} </span>
             </div>
           </ng-template>
         </p-select>

@@ -1,7 +1,7 @@
 import { inject, Injectable } from "@angular/core";
 import { RequestService } from "./request.service";
 import { UserModel } from "@nexhouse/shared-domain/models";
-import { ChangePassword } from "@nexhouse/shared-domain/interfaces";
+import { ChangePassword, UpdateUser } from "@nexhouse/shared-domain/interfaces";
 
 @Injectable({
   providedIn: "root",
@@ -15,10 +15,10 @@ export class ProfileService {
   }
 
   changePassword(dto: ChangePassword) {
-    const response = this.request.patch<boolean>(
-      `${this.endpoint}/password`,
-      dto,
-    );
-    return response;
+    return this.request.patch<boolean>(`${this.endpoint}/password`, dto);
+  }
+
+  update(dto: UpdateUser) {
+    return this.request.patch<UserModel>(this.endpoint, dto);
   }
 }

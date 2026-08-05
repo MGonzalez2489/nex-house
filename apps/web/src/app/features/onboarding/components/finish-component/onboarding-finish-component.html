@@ -1,0 +1,26 @@
+@if (user(); as user) {
+  <p-panel showHeader="false" class="pt-4">
+    <div class="text-center py-4">
+      <div
+        class="h-16 w-16 rounded-full bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center mx-auto mb-5"
+      >
+        <i
+          class="pi pi-check text-emerald-600 dark:text-emerald-400 text-2xl"
+        ></i>
+      </div>
+      <h1
+        class="font-display text-2xl capi font-semibold text-slate-900 dark:text-white"
+      >
+        ¡Todo listo,
+        <span id="doneName" class="capitalize">{{ user.firstName }}</span
+        >!
+      </h1>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">
+        Tu perfil se configuró correctamente. Ya puedes comenzar a usar Nimbus.
+      </p>
+      <div class="mt-12">
+        <p-button label="Ir al Dashboard" fluid (click)="goDashboard()" />
+      </div>
+    </div>
+  </p-panel>
+}

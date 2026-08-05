@@ -23,9 +23,11 @@
         } @else {
           <div class="text-slate-800 dark:text-white capitalize">--</div>
         }
-        <p class="text-xs text-slate-500 dark:text-slate-200">
-          {{ user.role.displayName }}
-        </p>
+        @if (!user.fullName) {
+          <p class="text-xs text-slate-500 dark:text-slate-200">
+            {{ user.role.displayName }}
+          </p>
+        }
       }
       @case ("email") {
         <p>{{ user.email }}</p>

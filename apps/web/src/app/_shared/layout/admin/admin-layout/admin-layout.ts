@@ -6,15 +6,17 @@ import {
   OnInit,
   signal,
 } from "@angular/core";
-import { RouterOutlet } from "@angular/router";
+import { Router, RouterOutlet } from "@angular/router";
 import { SessionService } from "@core/services";
 import { DASHBOARD_ROUTES_ENUM } from "@dashboard/dashboard.routes";
 import { UserStatusEnum } from "@nexhouse/shared-domain/enums";
+import { ONBOARDING_ROUTES_ENUM } from "@onboarding/onboarding.routes";
 import { RESIDENT_ROUTES_ENUM } from "@residents/resident.routes";
 import { NavBar, Sidebar, SideItem } from "@shared/layout/components";
 import { CatalogsStore } from "@stores/catalogs.store";
 import { ContextStore } from "@stores/context.store";
 import { UNIT_ROUTES_ENUM } from "@units/units.routes";
+import { UnitStore } from "@units/units.store";
 import { DrawerModule } from "primeng/drawer";
 
 @Component({
@@ -26,10 +28,22 @@ import { DrawerModule } from "primeng/drawer";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminLayout implements OnInit {
+  private readonly router = inject(Router);
   protected readonly sessionService = inject(SessionService);
   protected readonly catStore = inject(CatalogsStore);
   protected readonly contextStore = inject(ContextStore);
-  // protected readonly catStores = inject(CatalogsStore);
+  protected readonly unitStore = inject(UnitStore);
+
+  showNavComponentes = computed(() => {
+    const cUser = this.sessionService.user();
+
+    if (!cUser) return false;
+    const path = this.router.url;
+
+    if (path.includes(ONBOARDING_ROUTES_ENUM.HOME)) return false;
+
+    return cUser.status?.name === UserStatusEnum.ACTIVE;
+  });
 
   readonly menu = signal<SideItem[]>([
     {
@@ -64,5 +78,6 @@ export class AdminLayout implements OnInit {
     this.catStore.loadCatalogs();
     this.contextStore.loadNeighborhood();
     this.contextStore.loadStreets();
+    this.unitStore.loadAll({ showAll: true });
   }
 }

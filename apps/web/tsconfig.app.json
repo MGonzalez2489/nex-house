@@ -23,7 +23,8 @@
       "@dashboard/*": ["./src/app/features/dashboard/*"],
       "@neighborhoods/*": ["./src/app/features/neighborhoods/*"],
       "@residents/*": ["./src/app/features/residents/*"],
-      "@units/*": ["./src/app/features/units/*"]
+      "@units/*": ["./src/app/features/units/*"],
+      "@onboarding/*": ["./src/app/features/onboarding/*"]
     }
   },
   "include": ["src/**/*.ts"],
