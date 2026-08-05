@@ -14,11 +14,13 @@ export const UserToModelMapper = (user: User): UserModel => {
         : undefined,
     phone: user.phone,
 
+    requirePwdChange: user.requirePwdChange,
+
     neighborhood: undefined,
     publicId: user.publicId,
 
-    status: CatalogToModelMapper(user.status),
-    role: CatalogToModelMapper(user.role),
+    status: user.status ? CatalogToModelMapper(user.status) : user.status,
+    role: user.role ? CatalogToModelMapper(user.role) : user.role,
     userUnits: user.userUnits
       ? user.userUnits.map((f) => UserUnitToModel(f))
       : [],

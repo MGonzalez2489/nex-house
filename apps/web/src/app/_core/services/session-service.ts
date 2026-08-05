@@ -7,6 +7,8 @@ import {
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { AuthStore } from "@auth/store";
+import { UserStatusEnum } from "@nexhouse/shared-domain/enums";
+import { ProfileStore } from "@stores/profile.store";
 import { fromEvent, debounceTime, startWith } from "rxjs";
 
 export type ViewSize = "small" | "medium" | "large";
@@ -24,6 +26,7 @@ const TAILWIND_BREAKPOINTS = {
 })
 export class SessionService {
   //injects
+  private readonly profileStore = inject(ProfileStore);
   private readonly authStore = inject(AuthStore);
   readonly _viewSize: WritableSignal<ViewSize> = signal(
     this.getViewSize(window.innerWidth),
@@ -42,7 +45,15 @@ export class SessionService {
   }
 
   //properties
-  readonly user = computed(() => this.authStore.user());
+  readonly user = computed(() => this.profileStore.user());
+  readonly isUserActive = computed<boolean>(() => {
+    const cUser = this.user();
+    if (!cUser) return false;
+
+    if (cUser.status?.name !== UserStatusEnum.ACTIVE) return false;
+
+    return true;
+  });
   readonly isMobile = computed(() => this._viewSize() === "small");
   readonly isTablet = computed(() => this._viewSize() === "medium");
   readonly isDesktop = computed(() => this._viewSize() === "large");

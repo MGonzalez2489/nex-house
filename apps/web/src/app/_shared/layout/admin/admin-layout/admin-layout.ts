@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   inject,
   OnInit,
   signal,
@@ -8,6 +9,7 @@ import {
 import { RouterOutlet } from "@angular/router";
 import { SessionService } from "@core/services";
 import { DASHBOARD_ROUTES_ENUM } from "@dashboard/dashboard.routes";
+import { UserStatusEnum } from "@nexhouse/shared-domain/enums";
 import { RESIDENT_ROUTES_ENUM } from "@residents/resident.routes";
 import { NavBar, Sidebar, SideItem } from "@shared/layout/components";
 import { CatalogsStore } from "@stores/catalogs.store";

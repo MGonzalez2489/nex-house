@@ -1,0 +1,170 @@
+<p-panel>
+  <div
+    class="h-14 w-14 rounded-2xl bg-cyan-50 dark:bg-cyan-500/10 flex items-center justify-center mb-5"
+  >
+    <i class="pi pi-lock text-cyan-600 dark:text-cyan-400 text-2xl"></i>
+  </div>
+
+  <h1
+    class="font-display text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white leading-tight"
+  >
+    Actualiza tu contraseña
+  </h1>
+  <p class="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+    Por seguridad, es necesario que cambies tu contraseña temporal antes de
+    continuar.
+  </p>
+
+  @if (requirePwdChange()) {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-5">
+      <!-- current pwd -->
+      <div class="form-control">
+        <label class="form-label required" for="currentPwd"
+          >Contraseña actual
+        </label>
+        <p-password
+          [toggleMask]="true"
+          autocomplete="off"
+          fluid
+          id="currentPwd"
+          feedback="false"
+          formControlName="currentPwd"
+          placeholder="••••••••"
+          [invalid]="
+            form.controls.currentPwd.invalid && form.controls.currentPwd.touched
+          "
+          [attr.aria-invalid]="
+            form.controls.currentPwd.invalid && form.controls.currentPwd.touched
+          "
+          [attr.aria-describedby]="
+            form.controls.currentPwd.touched && form.controls.currentPwd.errors
+              ? 'currentPwd-error'
+              : null
+          "
+        />
+
+        <app-form-validation-error
+          id="currentPwd-errors"
+          [touched]="form.controls.currentPwd.touched"
+          [errors]="form.controls.currentPwd.errors"
+          label="Contraseña actual"
+        />
+      </div>
+      <!-- new pwd -->
+      <div class="form-control">
+        <label class="form-label required" for="newPwd"
+          >Nueva contraseña
+        </label>
+        <p-password
+          [toggleMask]="true"
+          autocomplete="off"
+          fluid
+          id="newPwd"
+          formControlName="newPwd"
+          placeholder="••••••••"
+          feedback="false"
+          [invalid]="
+            form.controls.newPwd.invalid && form.controls.newPwd.touched
+          "
+          [attr.aria-invalid]="
+            form.controls.newPwd.invalid && form.controls.newPwd.touched
+          "
+          [attr.aria-describedby]="
+            form.controls.newPwd.touched && form.controls.newPwd.errors
+              ? 'newPwd-error'
+              : null
+          "
+        />
+
+        <app-form-validation-error
+          id="newPwd-errors"
+          [touched]="form.controls.newPwd.touched"
+          [errors]="form.controls.newPwd.errors"
+          label="Nueva contraseña"
+        />
+      </div>
+      <!-- confirm pwd -->
+      <div class="form-control">
+        <label class="form-label required" for="confirmPwd"
+          >Confirmar nueva contraseña
+        </label>
+        <p-password
+          [toggleMask]="true"
+          autocomplete="off"
+          fluid
+          id="confirmPwd"
+          formControlName="confirmPwd"
+          feedback="false"
+          placeholder="••••••••"
+          [invalid]="
+            form.controls.confirmPwd.invalid && form.controls.confirmPwd.touched
+          "
+          [attr.aria-invalid]="
+            form.controls.confirmPwd.invalid && form.controls.confirmPwd.touched
+          "
+          [attr.aria-describedby]="
+            form.controls.confirmPwd.touched && form.controls.confirmPwd.errors
+              ? 'confirmPwd-error'
+              : null
+          "
+        />
+
+        <app-form-validation-error
+          id="confirmPwd-errors"
+          [touched]="form.controls.confirmPwd.touched"
+          [errors]="form.controls.confirmPwd.errors"
+          label="Confirmar nueva contraseña"
+        />
+      </div>
+
+      <div class="flex items-center gap-3 pt-2">
+        <p-button
+          label="Atrás"
+          icon="pi pi-arrow-left"
+          variant="outlined"
+          severity="secondary"
+          (click)="prev.emit()"
+        />
+
+        <p-button
+          label="Continuar"
+          icon="pi pi-arrow-right"
+          iconPos="right"
+          fluid
+          type="submit"
+          class="w-full"
+        />
+      </div>
+    </form>
+  } @else {
+    <div
+      class="mx-2 my-4 p-4 bg-emerald-50 border rounded-md flex items-center gap-3 border-emerald-400"
+    >
+      <i class="pi pi-info-circle text-2xl text-emerald-600"></i>
+      <h2>
+        Tu contraseña ha sido actualizada correctamente. Podras realizar este
+        proceso de nuevo en la sección
+        <span class="text-cyan-500 font-semibold">Perfil</span>.
+      </h2>
+    </div>
+
+    <div class="flex items-center gap-3 pt-2">
+      <p-button
+        label="Atrás"
+        icon="pi pi-arrow-left"
+        variant="outlined"
+        severity="secondary"
+        (click)="prev.emit()"
+      />
+
+      <p-button
+        label="Continuar"
+        icon="pi pi-arrow-right"
+        iconPos="right"
+        fluid
+        (click)="next.emit()"
+        class="w-full"
+      />
+    </div>
+  }
+</p-panel>

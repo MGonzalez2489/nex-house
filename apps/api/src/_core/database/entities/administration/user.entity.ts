@@ -24,6 +24,9 @@ export class User extends BaseTraceableEntity {
   @Exclude()
   password: string;
 
+  @Column({ default: true })
+  requirePwdChange: boolean;
+
   @Column({ nullable: true })
   @Exclude()
   neighborhoodId: number;

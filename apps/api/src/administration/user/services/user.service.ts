@@ -1,14 +1,4 @@
 import {
-  BadRequestException,
-  ConflictException,
-  ForbiddenException,
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
-import { CreateUserDto, UpdateUserDto } from '../dtos';
-import {
   NeighStreet,
   Unit,
   UnitStatus,
@@ -19,22 +9,31 @@ import {
   UserUnit,
   UserUnitRole,
 } from '@core/database';
+import { CryptoService } from '@core/services';
+import { isProd } from '@core/utils';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, DeepPartial, EntityManager, Repository } from 'typeorm';
+import {
+  UnitStatusEnum,
+  UserRoleEnum,
+  UserStatusEnum,
+} from '@nexhouse/shared-domain/enums';
 import {
   formatPhone,
   generateRandomString,
   validatePhone,
 } from '@nexhouse/shared-domain/utils';
 import { CatalogsService } from 'src/catalogs/services';
-import {
-  UnitStatusEnum,
-  UserRoleEnum,
-  UserStatusEnum,
-  UserUnitRoleEnum,
-} from '@nexhouse/shared-domain/enums';
-import { CryptoService } from '@core/services';
-import { isProd } from '@core/utils';
+import { DataSource, DeepPartial, EntityManager, Repository } from 'typeorm';
+import { CreateUserDto, UpdateUserDto } from '../dtos';
 import { UserSearchService } from './user-search.service';
 
 @Injectable()
@@ -422,6 +421,74 @@ export class UserService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  /**
+   * Changes the password for a specific user.
+   *
+   * @param publicId The public ID of the user to update.
+   * @param oldPassword The user's current password.
+   * @param newPassword The new password to set.
+   * @returns A promise that resolves to true if the password was successfully changed, false otherwise.
+   */
+  async changePassword(
+    publicId: string,
+    oldPassword: string,
+    newPassword: string,
+  ): Promise<boolean> {
+    const user = await this.repository.findOne({ where: { publicId } });
+
+    if (!user) {
+      this.logger.warn(`User with public ID '${publicId}' not found.`);
+      return false;
+    }
+
+    if (oldPassword === newPassword) {
+      this.logger.warn(
+        `Failed password change for user '${publicId}': New password cannot be the same as the old password.`,
+      );
+      return false;
+    }
+
+    // Verify the old password
+    const isOldPasswordValid = await this.cryptoService.compare(
+      oldPassword,
+      user.password,
+    );
+
+    if (!isOldPasswordValid) {
+      this.logger.warn(
+        `Failed password change for user '${publicId}': old password mismatch.`,
+      );
+      return false;
+    }
+
+    // if (!this.cryptoService.isPasswordStrong(newPassword)) {
+    //   this.logger.warn(
+    //     `Failed password change for user '${publicId}': New password does not meet strength requirements.`,
+    //   );
+    //   return false;
+    // }
+
+    // Hash the new password
+    const hashedNewPassword = await this.cryptoService.hash(newPassword);
+
+    // Update and save the user
+    user.password = hashedNewPassword;
+    user.requirePwdChange = false;
+    await this.repository.save(user);
+
+    this.logger.log(`Password for user '${publicId}' successfully changed.`);
+    return true;
+  }
+
+  async restorePwd(userId: number) {
+    const user = await this.repository.findOne({
+      where: { id: Number(userId) },
+    });
+    const pwd = await this.cryptoService.hash('1234');
+    user.password = pwd;
+    await this.repository.save(user);
   }
 
   private async generateDefaultPassword() {

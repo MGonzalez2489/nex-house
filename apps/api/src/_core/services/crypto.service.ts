@@ -5,6 +5,8 @@ import { randomBytes } from 'crypto';
 @Injectable()
 export class CryptoService {
   private readonly SALT_ROUNDS = 10;
+  private readonly PASSWORD_STRENGTH_REGEX =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
   /**
    * Generates a secure hash for a given plain text string.
@@ -31,5 +33,20 @@ export class CryptoService {
    */
   generateRandomToken(): string {
     return randomBytes(32).toString('hex');
+  }
+
+  /**
+   * Validates the strength of a given password using a predefined regex.
+   * The regex requires:
+   * - At least 8 characters long
+   * - At least one uppercase letter (A-Z)
+   * - At least one lowercase letter (a-z)
+   * - At least one digit (0-9)
+   * - At least one special character from the set [@$!%*?&]
+   * @param password The password string to validate.
+   * @returns True if the password meets the strength requirements, false otherwise.
+   */
+  isPasswordStrong(password: string): boolean {
+    return this.PASSWORD_STRENGTH_REGEX.test(password);
   }
 }

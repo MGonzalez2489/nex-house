@@ -1,6 +1,6 @@
 export const APP_CONSTANTS = {
   app: {
-    name: "NexHouse",
+    name: "Nimbus", //"NexHouse",
     logo: "assets/images/logo.svg",
     tagline: "Platform",
   },

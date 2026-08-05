@@ -11,6 +11,8 @@ export interface UserModel extends BaseModel {
   fullName: string;
   phone: string;
 
+  requirePwdChange: boolean;
+
   //relationships
   role: UserRoleModel;
   status: UserStatusModel;

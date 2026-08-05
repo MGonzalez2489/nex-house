@@ -1,8 +1,31 @@
-<div class="flex items-center gap-2">
+<div class="flex items-center justify-center gap-2 mb-8">
   <div
-    class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold italic"
+    class="h-9 w-9 rounded-lg bg-linear-to-br from-cyan-400 to-cyan-600 flex items-center justify-center shrink-0 shadow-sm shadow-cyan-500/30"
   >
-    NH
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="h-5 w-5 text-white"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2.2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z" />
+    </svg>
   </div>
-  <span class="font-bold text-slate-800">{{ constants.app.name }}</span>
+  <span
+    class="font-display font-semibold text-lg text-slate-900 dark:text-white tracking-tight"
+    >{{ constants.app.name }}</span
+  >
 </div>
+
+<!-- <div class="flex items-center gap-2"> -->
+<!--   <div -->
+<!--     class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold italic" -->
+<!--   > -->
+<!--     NH -->
+<!--   </div> -->
+<!--   <span class="font-bold text-slate-800">{{ constants.app.name }}</span> -->
+<!-- </div> -->

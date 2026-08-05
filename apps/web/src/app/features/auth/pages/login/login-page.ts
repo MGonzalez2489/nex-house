@@ -18,6 +18,7 @@ import { IconFieldModule } from "primeng/iconfield";
 import { InputIconModule } from "primeng/inputicon";
 import { InputTextModule } from "primeng/inputtext";
 import { PasswordModule } from "primeng/password";
+import { ProfileStore } from "@stores/profile.store";
 
 @Component({
   selector: "app-login-page",
@@ -40,6 +41,7 @@ import { PasswordModule } from "primeng/password";
 export class LoginPage {
   protected readonly store = inject(AuthStore);
   private readonly router = inject(Router);
+  private readonly profileStore = inject(ProfileStore);
 
   protected readonly form = new FormGroup<LoginForm>({
     email: new FormControl("root@test.com", {
@@ -62,6 +64,7 @@ export class LoginPage {
     const response = await this.store.login(request);
 
     if (response) {
+      await this.profileStore.load();
       this.router.navigateByUrl(`/${DASHBOARD_ROUTES_ENUM.HOME}`);
     }
   }

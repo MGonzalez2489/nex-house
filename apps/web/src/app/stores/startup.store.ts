@@ -11,6 +11,7 @@ import {
 } from "@ngrx/signals";
 import { UserRoleEnum } from "@nexhouse/shared-domain/enums";
 import { ContextStore } from "./context.store";
+import { ProfileStore } from "./profile.store";
 
 export type StartupStatus =
   | "IDLE"
@@ -31,6 +32,7 @@ export const StartupStore = signalStore(
   withProps(() => ({
     _authStore: inject(AuthStore),
     _contextStore: inject(ContextStore),
+    _profileStore: inject(ProfileStore),
   })),
   withState<StartupState>({
     status: "IDLE",
@@ -56,7 +58,7 @@ export const StartupStore = signalStore(
       patchState(store, { status: "LOADING" });
 
       try {
-        const user = await store._authStore.restoreSession();
+        const user = await store._profileStore.load();
 
         if (!user) {
           patchState(store, { status: "UNAUTHENTICATED" });
@@ -67,6 +69,8 @@ export const StartupStore = signalStore(
         if (user.role.name !== UserRoleEnum.SUPERADMIN) {
           await store._contextStore.loadNeighborhood();
         }
+
+        await store._profileStore.load();
         store._finalizeInit();
         // store.setReady();
       } catch (err) {
@@ -83,7 +87,7 @@ export const StartupStore = signalStore(
     return {
       onInit: (): void => {
         effect(() => {
-          const usr = store._authStore.user();
+          const usr = store._profileStore.user();
 
           if (usr) {
             store.setReady();

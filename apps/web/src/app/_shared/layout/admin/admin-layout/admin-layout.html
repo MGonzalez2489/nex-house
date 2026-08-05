@@ -3,7 +3,9 @@
 >
   <div class="flex h-full w-full flex-col">
     <!-- ============ TOPBAR ============ -->
-    <app-nav-bar />
+    @if (sessionService.isUserActive()) {
+      <app-nav-bar />
+    }
 
     <!-- ============ CUERPO: sidebar + contenido ============ -->
     <div class="relative flex flex-1 min-h-0">
@@ -14,12 +16,14 @@
       ></div>
 
       <!-- ============ SIDEBAR ============ -->
-      @if (!sessionService.isMobile() && sessionService.user(); as user) {
-        <app-sidebar
-          [items]="menu()"
-          [user]="user"
-          (logout)="sessionService.logout()"
-        />
+      @if (sessionService.isUserActive()) {
+        @if (!sessionService.isMobile() && sessionService.user(); as user) {
+          <app-sidebar
+            [items]="menu()"
+            [user]="user"
+            (logout)="sessionService.logout()"
+          />
+        }
       }
 
       <!-- ============ CONTENIDO PRINCIPAL ============ -->
