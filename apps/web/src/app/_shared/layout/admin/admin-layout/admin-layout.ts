@@ -6,7 +6,8 @@ import {
   OnInit,
   signal,
 } from "@angular/core";
-import { Router, RouterOutlet } from "@angular/router";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { NavigationEnd, Router, RouterOutlet } from "@angular/router";
 import { SessionService } from "@core/services";
 import { DASHBOARD_ROUTES_ENUM } from "@dashboard/dashboard.routes";
 import { UserStatusEnum } from "@nexhouse/shared-domain/enums";
@@ -34,16 +35,27 @@ export class AdminLayout implements OnInit {
   protected readonly contextStore = inject(ContextStore);
   protected readonly unitStore = inject(UnitStore);
 
+  private readonly currentUrl = signal(this.router.url);
+
   showNavComponentes = computed(() => {
     const cUser = this.sessionService.user();
 
     if (!cUser) return false;
-    const path = this.router.url;
+
+    const path = this.currentUrl();
 
     if (path.includes(ONBOARDING_ROUTES_ENUM.HOME)) return false;
 
     return cUser.status?.name === UserStatusEnum.ACTIVE;
   });
+
+  constructor() {
+    this.router.events.pipe(takeUntilDestroyed()).subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.currentUrl.set(event.urlAfterRedirects);
+      }
+    });
+  }
 
   readonly menu = signal<SideItem[]>([
     {
