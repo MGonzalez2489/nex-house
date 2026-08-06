@@ -36,6 +36,7 @@ import { PasswordModule } from "primeng/password";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OnboardingPwdChangeComponent {
+  isLoading = input.required<boolean>();
   user = input<UserModel>();
   next = output();
   doSubmit = output<ChangePassword>();

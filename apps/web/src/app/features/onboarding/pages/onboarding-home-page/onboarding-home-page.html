@@ -32,6 +32,7 @@
       <p-step-panel [value]="1">
         <ng-template #content let-activateCallback="activateCallback">
           <app-onboarding-pwd-change-component
+            [isLoading]="store.loading()"
             [user]="store.user()"
             class="block"
             (prev)="move(-1)"
@@ -43,6 +44,7 @@
       <p-step-panel [value]="2">
         <ng-template #content let-activateCallback="activateCallback">
           <app-onboarding-general-component
+            [isLoading]="store.loading()"
             [user]="store.user()"
             class="block"
             (doSubmit)="updateProfile($event)"
@@ -57,6 +59,7 @@
         </ng-template>
       </p-step-panel>
     </p-step-panels>
+    <app-form-feedback [callState]="store.callState()" />
   </p-stepper>
 </div>
 <p class="text-center text-xs text-slate-400 dark:text-slate-500 mt-6">

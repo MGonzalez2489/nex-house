@@ -33,6 +33,7 @@ import { Panel } from "primeng/panel";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OnboardingGeneralComponent {
+  isLoading = input.required<boolean>();
   user = input<UserModel>();
 
   next = output();

@@ -16,6 +16,7 @@ import {
   OnboardingWelcomeComponent,
 } from "../../components";
 import { ChangePassword, UpdateUser } from "@nexhouse/shared-domain/interfaces";
+import { FormFeedback } from "@shared/components/forms/form-feedback/form-feedback";
 
 type onboardingStep = {
   order: number;
@@ -32,6 +33,7 @@ type onboardingStep = {
     OnboardingPwdChangeComponent,
     OnboardingGeneralComponent,
     OnboardingFinishComponent,
+    FormFeedback,
   ],
   templateUrl: "./onboarding-home-page.html",
   styleUrl: "./onboarding-home-page.css",
