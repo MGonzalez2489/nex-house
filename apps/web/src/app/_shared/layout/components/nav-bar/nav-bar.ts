@@ -18,11 +18,16 @@ import { Button } from "primeng/button";
 })
 export class NavBar {
   protected readonly darkMode = signal<boolean>(
+    //light mode by default
     typeof window !== "undefined"
-      ? window.localStorage.getItem("theme") === "dark" ||
-          (!("theme" in window.localStorage) &&
-            window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ? window.localStorage.getItem("theme") === "dark"
       : false,
+    //system preference
+    // typeof window !== "undefined"
+    //   ? window.localStorage.getItem("theme") === "dark" ||
+    //       (!("theme" in window.localStorage) &&
+    //         window.matchMedia("(prefers-color-scheme: dark)").matches)
+    //   : false,
   );
 
   protected readonly sessionService = inject(SessionService);

@@ -1,5 +1,6 @@
 import { User } from '@core/database';
 import { CurrentUser, Public } from '@core/decorators';
+import { UserToModelMapper } from '@core/mappers';
 import {
   BadRequestException,
   Body,
@@ -10,7 +11,6 @@ import {
   InternalServerErrorException,
   Param,
   Patch,
-  Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ChangePasswordDto, UpdateUserDto } from '../dtos';
@@ -23,7 +23,7 @@ export class ProfileController {
   @Get()
   @ApiOperation({ summary: 'Get a user profile' })
   async get(@CurrentUser() user: User) {
-    return user;
+    return UserToModelMapper(user);
   }
 
   @Patch()
