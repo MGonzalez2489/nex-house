@@ -84,14 +84,13 @@
       >
     </div>
 
-    <p-button
-      label="Iniciar Sesión"
-      type="submit"
-      [loading]="store.loading()"
-      fluid
-      styleClass="rounded-xl"
-      size="large"
-    ></p-button>
+    <app-form-options
+      [submitFullWidth]="true"
+      [showCancel]="false"
+      [callState]="store.callState()"
+      submitLabel="Iniciar Sesión"
+      [isLoading]="store.loading()"
+    />
   </form>
 
   <div class="mt-8 pt-6 border-t border-slate-50 text-center">

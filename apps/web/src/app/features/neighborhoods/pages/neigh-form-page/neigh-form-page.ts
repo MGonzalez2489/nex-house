@@ -23,6 +23,7 @@ import {
   UpdateNeighStreet,
 } from "@nexhouse/shared-domain/interfaces";
 import { NeighborhoodModel } from "@nexhouse/shared-domain/models";
+import { FormOptions } from "@shared/components/forms";
 import { Badge } from "primeng/badge";
 import { Button } from "primeng/button";
 import { InputTextModule } from "primeng/inputtext";
@@ -38,6 +39,7 @@ import { ToggleSwitchModule } from "primeng/toggleswitch";
     InputTextModule,
     Badge,
     ToggleSwitchModule,
+    FormOptions,
   ],
   templateUrl: "./neigh-form-page.html",
   styleUrl: "./neigh-form-page.css",
@@ -108,7 +110,7 @@ export class NeighFormPage implements OnInit {
   }
 
   cancel(): void {
-    this.router.navigate(["/neighborhoods"]);
+    this.router.navigate([`/${NEIGHBORHOOD_ROUTES_ENUM.HOME}`]);
   }
 
   async ngOnInit() {
