@@ -38,7 +38,7 @@ export class ProfileController {
     if (!response) {
       throw new InternalServerErrorException('Used not created.');
     }
-    return response;
+    return UserToModelMapper(response);
   }
 
   @Patch('password')

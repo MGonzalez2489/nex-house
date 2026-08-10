@@ -17,6 +17,7 @@ import { FormValidationErrorComponent } from "@shared/components/forms";
 import { Button } from "primeng/button";
 import { InputTextModule } from "primeng/inputtext";
 import { Panel } from "primeng/panel";
+import { InputMaskModule } from "primeng/inputmask";
 
 @Component({
   selector: "app-onboarding-general-component",
@@ -26,6 +27,7 @@ import { Panel } from "primeng/panel";
     FormValidationErrorComponent,
     Panel,
     Button,
+    InputMaskModule,
   ],
   templateUrl: "./onboarding-general-component.html",
   styleUrl: "./onboarding-general-component.css",
@@ -69,7 +71,12 @@ export class OnboardingGeneralComponent {
     this.form.markAllAsTouched();
     if (this.form.invalid) return;
 
-    if (this.form.dirty) this.doSubmit.emit(this.form.value as UpdateUser);
+    const formValue = { ...this.form.value };
+    if (formValue.phone) {
+      formValue.phone = formValue.phone.replace(/[\D\s]/g, ""); // Remove all non-digits and whitespace
+    }
+
+    if (this.form.dirty) this.doSubmit.emit(formValue as UpdateUser);
     else {
       this.next.emit();
     }

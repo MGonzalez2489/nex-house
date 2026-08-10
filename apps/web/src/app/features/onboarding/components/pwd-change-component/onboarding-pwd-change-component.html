@@ -123,6 +123,7 @@
           icon="pi pi-arrow-left"
           variant="outlined"
           severity="secondary"
+          [disabled]="isLoading()"
           (click)="prev.emit()"
         />
 
@@ -133,6 +134,7 @@
           fluid
           type="submit"
           class="w-full"
+          [loading]="isLoading()"
         />
       </div>
     </form>

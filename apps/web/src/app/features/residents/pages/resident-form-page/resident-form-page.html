@@ -196,6 +196,12 @@
           <ng-template #selectedItem let-selectedOption>
             @if (selectedOption) {
               <div class="flex items-center gap-2">
+                @let icon =
+                  selectedOption.type?.name === "apartment"
+                    ? "pi-building"
+                    : "pi-home";
+                <i class="pi" [class]="icon"></i>
+
                 <span class="capitalize">
                   {{ selectedOption.street?.name }},
                 </span>
@@ -207,8 +213,29 @@
           </ng-template>
           <ng-template let-unit #item>
             <div class="flex items-center gap-2">
-              <span class="capitalize">{{ unit.street?.name }}, </span>
-              <span> {{ unit.identifier }} </span>
+              <div
+                [class.bg-emerald-100]="unit.type?.name === 'apartment'"
+                [class.bg-orange-100]="unit.type?.name !== 'apartment'"
+                class="size-10 rounded-full flex items-center justify-center"
+              >
+                @let icon =
+                  unit.type?.name === "apartment" ? "pi-building" : "pi-home";
+                <i
+                  [class.text-emerald-600]="unit.type?.name === 'apartment'"
+                  [class.text-orange-600]="unit.type?.name !== 'apartment'"
+                  class="pi text-xl"
+                  [class]="icon"
+                ></i>
+              </div>
+              <div class="flex flex-col gap-1">
+                <p>
+                  <span class="capitalize">{{ unit.street?.name }}, </span>
+                  <span> {{ unit.identifier }} </span>
+                </p>
+                <p class="text-xs text-slate-400 dark:text-slate-200">
+                  {{ unit.type?.displayName }}
+                </p>
+              </div>
             </div>
           </ng-template>
         </p-select>
