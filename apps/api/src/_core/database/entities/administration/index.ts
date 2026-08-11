@@ -1,6 +1,7 @@
 //neighborhood
 export * from './neighborhood.entity';
 export * from './neigh_street.entity';
+export * from './neigh_address.entity';
 
 //users
 export * from './user.entity';

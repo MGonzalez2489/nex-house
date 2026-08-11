@@ -1,8 +1,16 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+} from 'typeorm';
 import { BaseTraceableEntity } from '../_base';
 import { NeighStreet } from './neigh_street.entity';
 import { User } from './user.entity';
 import { Unit } from './unit.entity';
+import { NeighAddress } from './neigh_address.entity';
 
 @Entity('neighborhoods')
 export class Neighborhood extends BaseTraceableEntity {
@@ -13,6 +21,11 @@ export class Neighborhood extends BaseTraceableEntity {
   isActive: boolean;
 
   //relationships
+
+  @OneToOne(() => NeighAddress, (address) => address.neighborhood, {
+    cascade: true,
+  })
+  address: NeighAddress;
 
   @OneToMany(() => Unit, (unit) => unit.neighborhood)
   units: Unit[];

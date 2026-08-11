@@ -5,8 +5,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, EntityTarget, Repository } from 'typeorm';
 import {
   ChargeStatus,
+  City,
+  Country,
   FeeStatus,
   PaymentStatus,
+  State,
   TransactionSource,
   TransactionType,
   UnitStatus,
@@ -29,6 +32,11 @@ import {
   UserStatusSeed,
   UserUnitRoleSeed,
 } from './seeds';
+import {
+  CountrySeed,
+  StateSeed,
+  ChihuahuaCitiesSeed,
+} from './seeds/location.seed';
 
 type CatalogRegistry = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -43,6 +51,12 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Country)
+    private readonly countryRepository: Repository<Country>,
+    @InjectRepository(State)
+    private readonly stateRepository: Repository<State>,
+    @InjectRepository(City)
+    private readonly cityRepository: Repository<City>,
     private readonly entityManager: EntityManager,
     private readonly configService: ConfigService,
     private readonly cryptoService: CryptoService,
@@ -52,6 +66,57 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
     this.logger.log('Starting catalog seeding validation...');
     await this.seedAllCatalogs();
     await this.seedSuperAdmin();
+    await this.runLocationSeed();
+  }
+
+  async runLocationSeed() {
+    const existing = await this.countryRepository.count();
+    if (existing > 0) return;
+
+    // 1. Seed Country
+    for (const countryData of CountrySeed) {
+      let country = await this.countryRepository.findOneBy({
+        code: countryData.code,
+      });
+      if (!country) {
+        country = await this.countryRepository.save(countryData);
+      }
+    }
+
+    // 2. Seed States
+    const mexico = await this.countryRepository.findOneBy({ code: 'MX' });
+    for (const stateData of StateSeed) {
+      const exists = await this.stateRepository.findOneBy({
+        code: stateData.code,
+      });
+      if (!exists) {
+        await this.stateRepository.save({
+          name: stateData.name,
+          code: stateData.code,
+          displayName: stateData.displayName,
+          countryId: mexico.id,
+        });
+      }
+    }
+
+    // 3. Seed Cities (Chihuahua)
+    const chihuahuaState = await this.stateRepository.findOneBy({
+      code: 'CHH',
+    });
+    for (const cityData of ChihuahuaCitiesSeed) {
+      const exists = await this.cityRepository.findOneBy({
+        name: cityData.name,
+        displayName: cityData.displayName,
+        stateId: chihuahuaState.id,
+      });
+      if (!exists) {
+        await this.cityRepository.save({
+          name: cityData.name,
+          displayName: cityData.displayName,
+          stateId: chihuahuaState.id,
+        });
+      }
+    }
   }
 
   private async seedAllCatalogs() {

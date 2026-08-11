@@ -12,7 +12,13 @@ import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CatalogsModule } from 'src/catalogs';
 import { DatabaseSeederService, getDatabaseConfig } from '../_core/database';
-import { Neighborhood, User } from '../_core/database/entities';
+import {
+  City,
+  Country,
+  Neighborhood,
+  State,
+  User,
+} from '../_core/database/entities';
 
 @Module({
   imports: [
@@ -25,7 +31,7 @@ import { Neighborhood, User } from '../_core/database/entities';
       useFactory: (config: ConfigService) => getDatabaseConfig(config),
     }),
     //TODO: move this entity imports
-    TypeOrmModule.forFeature([Neighborhood, User]),
+    TypeOrmModule.forFeature([Country, State, City, Neighborhood, User]),
     ApiCacheModule,
     AuthModule,
     CatalogsModule,
