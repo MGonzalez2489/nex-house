@@ -21,7 +21,6 @@
       </p>
     </div>
   </div>
-
   <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-5">
     <!-- Información general -->
     <p-panel>
@@ -49,6 +48,12 @@
               : null
           "
         />
+        <app-form-validation-error
+          id="name-errors"
+          [touched]="form.controls.name.touched"
+          [errors]="form.controls.name.errors"
+          label="Nombre"
+        />
       </div>
 
       <!-- Activo (toggle) -->
@@ -71,7 +76,6 @@
         </label>
       </div>
     </p-panel>
-
     <!-- First admin info -->
     <p-panel>
       <ng-template #header>
@@ -111,9 +115,14 @@
               : null
           "
         />
+        <app-form-validation-error
+          id="firstAdminEmail-error"
+          [touched]="form.controls.firstAdminEmail.touched"
+          [errors]="form.controls.firstAdminEmail.errors"
+          label="Nombre"
+        />
       </div>
     </p-panel>
-
     <!-- Calles -->
     <p-panel>
       <ng-template #header>
@@ -143,9 +152,21 @@
                   type="text"
                   formControlName="name"
                   placeholder="Ej. Calle Hacienda del Sol"
+                  [invalid]="street.invalid && street.touched"
+                  [attr.aria-invalid]="street.invalid && street.touched"
+                  [attr.aria-describedby]="
+                    street.touched && street.errors ? 'street-error' : null
+                  "
                 />
                 <!-- Hidden input for publicId (if it exists) -->
                 <input type="hidden" formControlName="publicId" />
+
+                <app-form-validation-error
+                  id="street-error"
+                  [touched]="street.controls.name.touched"
+                  [errors]="street.controls.name.errors"
+                  label="Nombre"
+                />
               </div>
               <p-button
                 (click)="removeStreet($index)"
@@ -169,36 +190,12 @@
         />
       </div>
     </p-panel>
-
     <!-- Acciones -->
-    <div class="hidden lg:block">
-      <app-form-options
-        [showCancel]="true"
-        [callState]="store.callState()"
-        (doCancel)="cancel()"
-        [isLoading]="store.loading()"
-      />
-    </div>
-    <div
-      class="lg:hidden fixed bottom-0 left-0 right-0 z-30 border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur px-4 py-3 flex items-center gap-3"
-    >
-      <p-button
-        label="Cancelar"
-        (click)="cancel()"
-        [disabled]="store.loading()"
-        severity="secondary"
-        variant="outlined"
-        fluid
-        class="flex-1"
-      />
-
-      <p-button
-        [loading]="store.loading()"
-        label="Guardar"
-        class="flex-1"
-        fluid
-        type="submit"
-      />
-    </div>
+    <app-form-options
+      [showCancel]="true"
+      [callState]="store.callState()"
+      (doCancel)="cancel()"
+      [isLoading]="store.loading()"
+    />
   </form>
 </div>

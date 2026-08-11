@@ -23,7 +23,10 @@ import {
   UpdateNeighStreet,
 } from "@nexhouse/shared-domain/interfaces";
 import { NeighborhoodModel } from "@nexhouse/shared-domain/models";
-import { FormOptions } from "@shared/components/forms";
+import {
+  FormOptions,
+  FormValidationErrorComponent,
+} from "@shared/components/forms";
 import { Badge } from "primeng/badge";
 import { Button } from "primeng/button";
 import { InputTextModule } from "primeng/inputtext";
@@ -40,6 +43,7 @@ import { ToggleSwitchModule } from "primeng/toggleswitch";
     Badge,
     ToggleSwitchModule,
     FormOptions,
+    FormValidationErrorComponent,
   ],
   templateUrl: "./neigh-form-page.html",
   styleUrl: "./neigh-form-page.css",
@@ -122,6 +126,7 @@ export class NeighFormPage implements OnInit {
 
   async submit() {
     this.form.markAllAsTouched();
+    this.form.controls.streets.markAllAsTouched();
     if (this.form.invalid) {
       return;
     }
