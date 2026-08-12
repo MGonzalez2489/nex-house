@@ -33,6 +33,8 @@ import { InputTextModule } from "primeng/inputtext";
 import { Panel } from "primeng/panel";
 import { ToggleSwitchModule } from "primeng/toggleswitch";
 
+import { CatalogsStore } from "@stores/catalogs.store";
+import { SelectModule } from "primeng/select";
 @Component({
   selector: "app-neigh-form-page",
   imports: [
@@ -44,6 +46,7 @@ import { ToggleSwitchModule } from "primeng/toggleswitch";
     ToggleSwitchModule,
     FormOptions,
     FormValidationErrorComponent,
+    SelectModule,
   ],
   templateUrl: "./neigh-form-page.html",
   styleUrl: "./neigh-form-page.css",
@@ -54,6 +57,7 @@ export class NeighFormPage implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   protected readonly store = inject(NeighborhoodsStore);
+  protected readonly catStore = inject(CatalogsStore);
 
   readonly id = input<string>();
   readonly neighborhood = signal<NeighborhoodModel | undefined>(undefined);
@@ -63,6 +67,12 @@ export class NeighFormPage implements OnInit {
       Validators.required,
       Validators.minLength(3),
     ]),
+    //
+    countryId: this.fb.nonNullable.control("", [Validators.required]),
+    stateId: this.fb.nonNullable.control("", [Validators.required]),
+    cityId: this.fb.nonNullable.control("", [Validators.required]),
+    zipCode: this.fb.nonNullable.control("", [Validators.required]),
+    //
     firstAdminEmail: this.fb.nonNullable.control("", [
       Validators.required,
       Validators.email,
@@ -83,6 +93,27 @@ export class NeighFormPage implements OnInit {
     }>
   > {
     return this.form.controls.streets;
+  }
+
+  constructor() {
+    const cCountry = this.catStore.countries();
+    const cStates = this.catStore.states();
+    const cCities = this.catStore.cities();
+
+    if (cCountry.length === 0) return;
+    if (cStates.length === 0) return;
+    if (cCities.length === 0) return;
+
+    const mex = cCountry[0];
+    const chi = cStates.find((f) => f.name === "chihuahua");
+    const chic = cCities.find((f) => f.name === "chihuahua");
+
+    this.form.patchValue({
+      countryId: mex.publicId,
+      stateId: chi?.publicId,
+      cityId: chic?.publicId,
+    });
+    this.form.updateValueAndValidity();
   }
 
   private createStreetFormGroup(street?: CreateNeighStreet): FormGroup<{
@@ -164,7 +195,8 @@ export class NeighFormPage implements OnInit {
   }
 
   private async create() {
-    const { name, active, streets, firstAdminEmail } = this.form.getRawValue();
+    const { name, active, streets, firstAdminEmail, cityId, zipCode } =
+      this.form.getRawValue();
     const response = await this.store.create({
       name,
       adminEmail: firstAdminEmail,
@@ -172,6 +204,8 @@ export class NeighFormPage implements OnInit {
         return { name: streetFormValue.name };
       }),
       isActive: active,
+      cityId,
+      zipCode: zipCode,
     });
     return response;
   }

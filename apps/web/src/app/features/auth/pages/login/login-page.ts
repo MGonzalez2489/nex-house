@@ -15,7 +15,7 @@ import {
   FormOptions,
   FormValidationErrorComponent,
 } from "@shared/components/forms";
-import { ProfileStore } from "@stores/profile.store";
+import { StartupStore } from "@stores/startup.store";
 import { Checkbox } from "primeng/checkbox";
 import { IconFieldModule } from "primeng/iconfield";
 import { InputIconModule } from "primeng/inputicon";
@@ -43,7 +43,7 @@ import { PasswordModule } from "primeng/password";
 export class LoginPage {
   protected readonly store = inject(AuthStore);
   private readonly router = inject(Router);
-  private readonly profileStore = inject(ProfileStore);
+  private readonly startupStore = inject(StartupStore);
 
   protected readonly form = new FormGroup<LoginForm>({
     email: new FormControl("root@test.com", {
@@ -66,7 +66,7 @@ export class LoginPage {
     const response = await this.store.login(request);
 
     if (response) {
-      await this.profileStore.load();
+      await this.startupStore.initializeApp();
       this.router.navigateByUrl(`/${DASHBOARD_ROUTES_ENUM.HOME}`);
     }
   }

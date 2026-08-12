@@ -25,37 +25,73 @@
     <!-- Información general -->
     <p-panel>
       <ng-template #header>
-        <h2 class="text-sm font-semibold">Información general</h2>
+        <h2 class="text-sm text-slate-400 font-semibold">
+          Información general
+        </h2>
       </ng-template>
-
-      <!-- Nombre -->
-      <div class="form-control">
-        <label class="form-label" for="name">Nombre del fraccionamiento</label>
-        <input
-          pInputText
-          id="name"
-          type="text"
-          formControlName="name"
-          placeholder="Ej. Residencial San Agustín"
-          fluid
-          [invalid]="form.controls.name.invalid && form.controls.name.touched"
-          [attr.aria-invalid]="
-            form.controls.name.invalid && form.controls.name.touched
-          "
-          [attr.aria-describedby]="
-            form.controls.name.touched && form.controls.name.errors
-              ? 'name-error'
-              : null
-          "
-        />
-        <app-form-validation-error
-          id="name-errors"
-          [touched]="form.controls.name.touched"
-          [errors]="form.controls.name.errors"
-          label="Nombre"
-        />
+      <div class="grid grid-cols-1 md:grid-cols-2 md:gap-x-3">
+        <!-- Nombre -->
+        <div class="form-control">
+          <label class="form-label" for="name"
+            >Nombre del fraccionamiento</label
+          >
+          <input
+            pInputText
+            id="name"
+            type="text"
+            formControlName="name"
+            placeholder="Ej. Residencial San Agustín"
+            fluid
+            [invalid]="form.controls.name.invalid && form.controls.name.touched"
+            [attr.aria-invalid]="
+              form.controls.name.invalid && form.controls.name.touched
+            "
+            [attr.aria-describedby]="
+              form.controls.name.touched && form.controls.name.errors
+                ? 'name-error'
+                : null
+            "
+          />
+          <app-form-validation-error
+            id="name-errors"
+            [touched]="form.controls.name.touched"
+            [errors]="form.controls.name.errors"
+            label="Nombre"
+          />
+        </div>
+        <!-- first admin email -->
+        <div class="form-control">
+          <label class="form-label" for="firstAdminEmail">Administrador</label>
+          <input
+            pInputText
+            id="firstAdminEmail"
+            type="email"
+            formControlName="firstAdminEmail"
+            placeholder="jhon@example.com"
+            fluid
+            [invalid]="
+              form.controls.firstAdminEmail.invalid &&
+              form.controls.firstAdminEmail.touched
+            "
+            [attr.aria-invalid]="
+              form.controls.firstAdminEmail.invalid &&
+              form.controls.firstAdminEmail.touched
+            "
+            [attr.aria-describedby]="
+              form.controls.firstAdminEmail.touched &&
+              form.controls.firstAdminEmail.errors
+                ? 'firstAdminEmail-error'
+                : null
+            "
+          />
+          <app-form-validation-error
+            id="firstAdminEmail-error"
+            [touched]="form.controls.firstAdminEmail.touched"
+            [errors]="form.controls.firstAdminEmail.errors"
+            label="Nombre"
+          />
+        </div>
       </div>
-
       <!-- Activo (toggle) -->
       <div class="flex items-center justify-between gap-4 pt-1">
         <div>
@@ -76,12 +112,12 @@
         </label>
       </div>
     </p-panel>
-    <!-- First admin info -->
+    <!-- Location -->
     <p-panel>
       <ng-template #header>
         <div>
           <h2 class="text-sm font-semibold text-slate-800 dark:text-white">
-            Información del administrador
+            Localización
           </h2>
           <p class="text-xs text-slate-400 mt-0.5">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
@@ -89,38 +125,75 @@
           </p>
         </div>
       </ng-template>
-
-      <!-- first admin email -->
-      <div class="form-control">
-        <label class="form-label" for="firstAdminEmail">Administrador</label>
-        <input
-          pInputText
-          id="firstAdminEmail"
-          type="email"
-          formControlName="firstAdminEmail"
-          placeholder="jhon@example.com"
-          fluid
-          [invalid]="
-            form.controls.firstAdminEmail.invalid &&
-            form.controls.firstAdminEmail.touched
-          "
-          [attr.aria-invalid]="
-            form.controls.firstAdminEmail.invalid &&
-            form.controls.firstAdminEmail.touched
-          "
-          [attr.aria-describedby]="
-            form.controls.firstAdminEmail.touched &&
-            form.controls.firstAdminEmail.errors
-              ? 'firstAdminEmail-error'
-              : null
-          "
-        />
-        <app-form-validation-error
-          id="firstAdminEmail-error"
-          [touched]="form.controls.firstAdminEmail.touched"
-          [errors]="form.controls.firstAdminEmail.errors"
-          label="Nombre"
-        />
+      <div class="grid grid-cols-1 md:grid-cols-2 md:gap-x-3">
+        <!-- Country -->
+        <div class="form-control">
+          <label class="form-label" for="country">Pais</label>
+          <p-select
+            id="country"
+            [options]="catStore.countries()"
+            optionLabel="displayName"
+            optionValue="publicId"
+            placeholder="Select a City"
+            formControlName="countryId"
+            fluid
+          />
+        </div>
+        <!-- State -->
+        <div class="form-control">
+          <label class="form-label" for="state">Estado</label>
+          <p-select
+            id="state"
+            [options]="catStore.states()"
+            optionLabel="displayName"
+            optionValue="publicId"
+            formControlName="stateId"
+            placeholder="Select a City"
+            fluid
+          />
+        </div>
+        <!-- city -->
+        <div class="form-control">
+          <label class="form-label" for="city">Ciudad</label>
+          <p-select
+            id="city"
+            [options]="catStore.cities()"
+            optionLabel="displayName"
+            optionValue="publicId"
+            formControlName="cityId"
+            placeholder="Select a City"
+            fluid
+          />
+        </div>
+        <!-- ZipCode -->
+        <div class="form-control">
+          <label class="form-label" for="zipcode">Codigo Postal</label>
+          <input
+            pInputText
+            id="zipcode"
+            type="text"
+            formControlName="zipCode"
+            placeholder="11532"
+            fluid
+            [invalid]="
+              form.controls.zipCode.invalid && form.controls.zipCode.touched
+            "
+            [attr.aria-invalid]="
+              form.controls.zipCode.invalid && form.controls.zipCode.touched
+            "
+            [attr.aria-describedby]="
+              form.controls.zipCode.touched && form.controls.zipCode.errors
+                ? 'zipCode-error'
+                : null
+            "
+          />
+          <app-form-validation-error
+            id="zipCode-errors"
+            [touched]="form.controls.zipCode.touched"
+            [errors]="form.controls.zipCode.errors"
+            label="Codigo Postal"
+          />
+        </div>
       </div>
     </p-panel>
     <!-- Calles -->

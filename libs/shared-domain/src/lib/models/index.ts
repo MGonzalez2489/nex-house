@@ -5,6 +5,7 @@ export * from './user-status.model';
 
 export * from './neighborhood.model';
 export * from './neigh-street.model';
+export * from './neigh-address.model';
 
 export * from './_base-catalog.model';
 
@@ -13,3 +14,7 @@ export * from './unit-type.model';
 
 export * from './user-unit-role.model';
 export * from './user-unit.model';
+
+export * from './country.model';
+export * from './state.model';
+export * from './city.model';

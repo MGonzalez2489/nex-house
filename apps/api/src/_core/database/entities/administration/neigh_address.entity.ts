@@ -31,6 +31,6 @@ export class NeighAddress extends BaseTraceableEntity {
   @ManyToOne(() => City, (city) => city.addresses, {
     onDelete: 'RESTRICT',
   })
-  @JoinColumn({ name: 'city_id' })
+  @JoinColumn({ name: 'cityId' })
   city: City;
 }

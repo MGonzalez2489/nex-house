@@ -3,7 +3,6 @@ import {
   Component,
   computed,
   inject,
-  OnInit,
   signal,
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -14,10 +13,7 @@ import { UserStatusEnum } from "@nexhouse/shared-domain/enums";
 import { ONBOARDING_ROUTES_ENUM } from "@onboarding/onboarding.routes";
 import { RESIDENT_ROUTES_ENUM } from "@residents/resident.routes";
 import { NavBar, Sidebar, SideItem } from "@shared/layout/components";
-import { CatalogsStore } from "@stores/catalogs.store";
-import { ContextStore } from "@stores/context.store";
 import { UNIT_ROUTES_ENUM } from "@units/units.routes";
-import { UnitStore } from "@units/units.store";
 import { DrawerModule } from "primeng/drawer";
 
 @Component({
@@ -28,13 +24,9 @@ import { DrawerModule } from "primeng/drawer";
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AdminLayout implements OnInit {
+export class AdminLayout {
   private readonly router = inject(Router);
   protected readonly sessionService = inject(SessionService);
-  protected readonly catStore = inject(CatalogsStore);
-  protected readonly contextStore = inject(ContextStore);
-  protected readonly unitStore = inject(UnitStore);
-
   private readonly currentUrl = signal(this.router.url);
 
   showNavComponentes = computed(() => {
@@ -84,12 +76,4 @@ export class AdminLayout implements OnInit {
       ],
     },
   ]);
-
-  ngOnInit(): void {
-    //TODO: is required to move this?
-    this.catStore.loadCatalogs();
-    this.contextStore.loadNeighborhood();
-    this.contextStore.loadStreets();
-    this.unitStore.loadAll({ showAll: true });
-  }
 }

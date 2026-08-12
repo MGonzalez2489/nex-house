@@ -3,6 +3,9 @@ export interface CreateNeighborhood {
   streets: CreateNeighStreet[];
   isActive: boolean;
   adminEmail: string;
+
+  zipCode: string;
+  cityId: string;
 }
 
 export interface CreateNeighStreet {

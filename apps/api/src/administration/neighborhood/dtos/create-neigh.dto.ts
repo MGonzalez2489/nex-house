@@ -23,4 +23,10 @@ export class CreateNeighborhoodDto implements CreateNeighborhood {
 
   @IsBoolean()
   isActive: boolean;
+
+  @IsString()
+  zipCode: string;
+
+  @IsString()
+  cityId: string;
 }

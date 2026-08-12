@@ -15,7 +15,7 @@ import {
   withProps,
   withState,
 } from "@ngrx/signals";
-import { firstValueFrom } from "rxjs";
+import { firstValueFrom, lastValueFrom } from "rxjs";
 
 export interface CatalogsState {
   UserRoles: BaseCatalogModel[];
@@ -31,6 +31,11 @@ export interface CatalogsState {
   PaymentStatus: BaseCatalogModel[];
   FeeStatus: BaseCatalogModel[];
   ChargeStatus: BaseCatalogModel[];
+
+  //
+  countries: BaseCatalogModel[];
+  states: BaseCatalogModel[];
+  cities: BaseCatalogModel[];
 }
 
 export const CatalogsStore = signalStore(
@@ -48,12 +53,47 @@ export const CatalogsStore = signalStore(
     PaymentStatus: [],
     FeeStatus: [],
     ChargeStatus: [],
+
+    countries: [],
+    states: [],
+    cities: [],
   }),
   withProps(() => ({
     _service: inject(CatalogsService),
   })),
 
   withMethods((store) => ({
+    async loadRootCatalogs() {
+      patchState(store, setLoading());
+      try {
+        const c = await lastValueFrom(store._service.getCountries());
+        const mex = c.data.find((f) => f.name == "mexico");
+        if (!mex) {
+          console.log("no hay mexico");
+          throw "no hay mexico";
+        }
+        const s = await lastValueFrom(store._service.getStates(mex.publicId));
+        const chi = s.data.find((f) => f.name === "chihuahua");
+        if (!chi) {
+          console.log("no hay chihuahua");
+          throw "no hay chihuahua";
+        }
+
+        const cit = await lastValueFrom(store._service.getCities(chi.publicId));
+
+        patchState(
+          store,
+          {
+            countries: c.data,
+            states: s.data,
+            cities: cit.data,
+          },
+          setLoaded(),
+        );
+      } catch (e) {
+        patchState(store, setError(e));
+      }
+    },
     async loadCatalogs() {
       patchState(store, setLoading());
 

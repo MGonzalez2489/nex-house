@@ -58,4 +58,22 @@ export class CatalogsService {
       `${this.endpoint}/payment_statuses`,
     );
   }
+
+  //root
+
+  getCountries() {
+    return this.request.get<BaseCatalogModel[]>(`${this.endpoint}/countries`);
+  }
+
+  getStates(countryId: string) {
+    return this.request.get<BaseCatalogModel[]>(
+      `${this.endpoint}/states/${countryId}`,
+    );
+  }
+
+  getCities(stateId: string) {
+    return this.request.get<BaseCatalogModel[]>(
+      `${this.endpoint}/cities/${stateId}`,
+    );
+  }
 }

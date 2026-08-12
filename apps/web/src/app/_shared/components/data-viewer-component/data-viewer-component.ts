@@ -5,6 +5,7 @@ import {
   contentChild,
   input,
   output,
+  signal,
   TemplateRef,
   viewChild,
 } from "@angular/core";
@@ -14,10 +15,20 @@ import { TableLazyLoadEvent, TableModule, TablePageEvent } from "primeng/table";
 import { Table as PTable } from "primeng/table";
 import { NgTemplateOutlet } from "@angular/common";
 import { PaginatorModule, PaginatorState } from "primeng/paginator";
+import { Panel } from "primeng/panel";
+import { SelectButton } from "primeng/selectbutton";
+import { FormsModule } from "@angular/forms";
 
 @Component({
   selector: "app-data-viewer-component",
-  imports: [TableModule, NgTemplateOutlet, PaginatorModule],
+  imports: [
+    TableModule,
+    NgTemplateOutlet,
+    PaginatorModule,
+    Panel,
+    SelectButton,
+    FormsModule,
+  ],
   templateUrl: "./data-viewer-component.html",
   styleUrl: "./data-viewer-component.css",
   standalone: true,
@@ -25,7 +36,7 @@ import { PaginatorModule, PaginatorState } from "primeng/paginator";
 })
 export class DataViewerComponent<T> {
   // Inputs
-  mode = input<"table" | "list">("table");
+  // mode = input<"table" | "list">("table");
   data = input.required<T[]>();
   columns = input.required<TableColumn<T>[]>();
   isLoading = input.required<boolean>();
@@ -34,6 +45,13 @@ export class DataViewerComponent<T> {
   lazy = input<boolean>(true);
   loadOnInit = input<boolean>(false);
   isMobileView = input<boolean>(false);
+
+  dataTitle = input<string>("Lista de resultados");
+  protected readonly statusOptions: { value: any; icon: string }[] = [
+    { value: "table", icon: "pi pi-table" },
+    { value: "list", icon: "pi pi-list" },
+  ];
+  dataView = signal<"table" | "list">("table");
 
   //outputs
   filter = output<TableLazyLoadEvent>();
@@ -52,7 +70,7 @@ export class DataViewerComponent<T> {
     this.table().filterGlobal(value, mode);
   }
 
-  protected isTable = computed(() => this.mode() === "table");
+  protected isTable = computed(() => this.dataView() === "table");
 
   protected paginatorReport = computed(() => {
     const currentPagination = this.pagination();

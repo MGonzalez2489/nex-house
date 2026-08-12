@@ -22,20 +22,6 @@
     </div>
 
     <div class="flex items-center gap-3">
-      <p-selectbutton
-        [options]="statusOptions"
-        optionValue="value"
-        [(ngModel)]="dataView"
-        aria-labelledby="basic"
-        class="hidden lg:inline-block lg:flex-none"
-        size="small"
-        allowEmpty="false"
-      >
-        <ng-template #item let-item>
-          <i [class]="item.icon"></i>
-        </ng-template>
-      </p-selectbutton>
-
       <p-button
         [severity]="isFiltering() ? 'contrast' : 'secondary'"
         icon="pi pi-filter"
@@ -80,7 +66,6 @@
       [isLoading]="neighStore.loading()"
       [isMobile]="sessionService.isMobile()"
       (paginate)="onSearch($event)"
-      [mode]="dataView()"
     />
   }
 </div>

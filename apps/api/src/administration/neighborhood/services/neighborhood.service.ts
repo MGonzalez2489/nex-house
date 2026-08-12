@@ -1,4 +1,11 @@
-import { Neighborhood, NeighStreet, User } from '@core/database';
+import { UserSearchService, UserService } from '@administration/user/services';
+import {
+  City,
+  NeighAddress,
+  Neighborhood,
+  NeighStreet,
+  User,
+} from '@core/database';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
   BadRequestException,
@@ -10,11 +17,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Cache } from 'cache-manager';
+import { CatalogsService } from 'src/catalogs/services';
 import { DataSource } from 'typeorm';
 import { CreateNeighborhoodDto, UpdateNeighborhoodDto } from '../dtos';
 import { NeighStreetService } from './neigh-street.service';
 import { NeighborhoodSearchService } from './neighborhood-search.service';
-import { UserSearchService, UserService } from '@administration/user/services';
 
 @Injectable()
 export class NeighborhoodService {
@@ -25,6 +32,7 @@ export class NeighborhoodService {
     private readonly searchService: NeighborhoodSearchService,
     private readonly userService: UserService,
     private readonly userSearchService: UserSearchService,
+    private readonly catService: CatalogsService,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
 
@@ -51,6 +59,8 @@ export class NeighborhoodService {
     if (existingAdmin) {
       throw new ConflictException(`User ${dto.adminEmail} already exists.`);
     }
+    //location
+    const city = await this.catService.findByPublicId(City, dto.cityId);
 
     const sanitizedName = dto.name.trim();
     const lookupName = sanitizedName.toLocaleLowerCase();
@@ -81,6 +91,18 @@ export class NeighborhoodService {
         neighborhoodInstance,
       );
 
+      const neighAddress = queryRunner.manager.create(NeighAddress, {
+        zipCode: dto.zipCode,
+        cityId: city.id,
+        neighborhood: savedNeighborhood,
+        createdBy: user.id,
+      });
+
+      const savedNeighAddress = await queryRunner.manager.save(
+        NeighAddress,
+        neighAddress,
+      );
+
       //streets
       const sanitizedStreetsPayload = dto.streets.map((street) => ({
         name: street.name.trim().toLocaleLowerCase(),
@@ -107,7 +129,12 @@ export class NeighborhoodService {
       await this.clearNeighborhoodsCache();
       //TODO: send confirmation email to the first admin user
 
-      return this.searchService.findByPublicId(savedNeighborhood.publicId);
+      return this.searchService.findByPublicId(savedNeighborhood.publicId, {
+        streets: true,
+        address: {
+          city: true,
+        },
+      });
     } catch (error) {
       await queryRunner.rollbackTransaction();
 

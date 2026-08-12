@@ -12,6 +12,8 @@ import {
 import { UserRoleEnum } from "@nexhouse/shared-domain/enums";
 import { ContextStore } from "./context.store";
 import { ProfileStore } from "./profile.store";
+import { CatalogsStore } from "./catalogs.store";
+import { UnitStore } from "@units/units.store";
 
 export type StartupStatus =
   | "IDLE"
@@ -33,6 +35,8 @@ export const StartupStore = signalStore(
     _authStore: inject(AuthStore),
     _contextStore: inject(ContextStore),
     _profileStore: inject(ProfileStore),
+    _catalogsStore: inject(CatalogsStore),
+    _unitStore: inject(UnitStore),
   })),
   withState<StartupState>({
     status: "IDLE",
@@ -48,6 +52,24 @@ export const StartupStore = signalStore(
       }, 1000);
     },
   })),
+  withMethods((store) => ({
+    async _initRoot() {
+      await store._catalogsStore.loadRootCatalogs();
+      console.log("load all related to root");
+      // await store._profileStore.load();
+    },
+    async _initAdmin() {
+      await store._profileStore.load();
+      //
+      await Promise.all([
+        store._contextStore.loadNeighborhood(),
+        store._contextStore.loadStreets(),
+        store._catalogsStore.loadCatalogs(),
+        store._unitStore.loadAll({ showAll: true }),
+      ]);
+      //
+    },
+  })),
 
   withMethods((store) => ({
     async initializeApp() {
@@ -59,20 +81,25 @@ export const StartupStore = signalStore(
 
       try {
         const user = await store._profileStore.load();
+        const roleName = user?.role?.name;
 
-        if (!user) {
+        if (!user || !roleName) {
           patchState(store, { status: "UNAUTHENTICATED" });
           store._authStore.logout();
           return;
         }
 
-        if (user.role.name !== UserRoleEnum.SUPERADMIN) {
-          await store._contextStore.loadNeighborhood();
+        if (roleName === UserRoleEnum.SUPERADMIN) {
+          console.log("=== INIT ROOT ===");
+          await store._initRoot();
+        } else if (roleName === UserRoleEnum.ADMIN) {
+          console.log("=== INIT ADMIN ===");
+          await store._initAdmin();
+        } else {
+          console.log("=== INIT RESIDENT ===");
         }
 
-        await store._profileStore.load();
         store._finalizeInit();
-        // store.setReady();
       } catch (err) {
         console.error("== APP INITIALIZATION FAILED ==", err);
         patchState(store, {

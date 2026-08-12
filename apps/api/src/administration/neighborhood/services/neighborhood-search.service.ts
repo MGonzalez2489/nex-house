@@ -52,7 +52,10 @@ export class NeighborhoodSearchService {
 
     const query = this.repository
       .createQueryBuilder('neighborhood')
-      .leftJoinAndSelect('neighborhood.streets', 'streets');
+      .leftJoinAndSelect('neighborhood.streets', 'streets')
+      .leftJoinAndSelect('neighborhood.address', 'address')
+      .leftJoinAndSelect('address.city', 'city')
+      .leftJoinAndSelect('city.state', 'state');
 
     if (globalFilter) {
       query.andWhere(

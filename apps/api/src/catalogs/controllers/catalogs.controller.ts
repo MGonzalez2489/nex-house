@@ -1,7 +1,10 @@
 import {
   ChargeStatus,
+  City,
+  Country,
   FeeStatus,
   PaymentStatus,
+  State,
   TransactionSource,
   TransactionType,
   UnitStatus,
@@ -15,11 +18,13 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
+  ParseUUIDPipe,
   UseInterceptors,
 } from '@nestjs/common';
 import { CatalogsService } from '../services';
 import { BaseCatalog } from '@core/database/entities/_base';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { UserRoleEnum } from '@nexhouse/shared-domain/enums';
 import { Not } from 'typeorm';
@@ -200,5 +205,75 @@ export class CatalogsController {
   })
   async findChargeStatuses(): Promise<BaseCatalog[]> {
     return this.service.findAll(ChargeStatus);
+  }
+  /////////////////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * Retrieves all registered countries.
+   *
+   * @returns An array of countries.
+   */
+  @Get('countries')
+  @CacheTTL(60 * 60 * 24) //TTL 24 hours
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Retrieve countries catalog data' })
+  @ApiResponse({
+    status: 200,
+    description: 'Catalog records fetched successfully.',
+  })
+  async findCountries(): Promise<Country[]> {
+    return this.service.findAll(Country);
+  }
+
+  /**
+   * Retrieves states based on a specific country ID.
+   *
+   * @param countryId The ID of the country.
+   * @returns An array of states belonging to the specified country.
+   */
+  @Get('states/:countryId')
+  @CacheTTL(60 * 60 * 24) //TTL 24 hours
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Retrieve states by country ID' })
+  @ApiParam({
+    name: 'countryId',
+    type: 'UUID',
+    description: 'ID of the country to retrieve states for',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Catalog records fetched successfully.',
+  })
+  async findStatesByCountryId(
+    @Param('countryId', ParseUUIDPipe) countryId: string,
+  ): Promise<State[]> {
+    const country = await this.service.findByPublicId(Country, countryId);
+    return this.service.findAll(State, { where: { countryId: country.id } });
+  }
+
+  /**
+   * Retrieves cities based on a specific state ID.
+   *
+   * @param stateId The ID of the state.
+   * @returns An array of cities belonging to the specified state.
+   */
+  @Get('cities/:stateId')
+  @CacheTTL(60 * 60 * 24) //TTL 24 hours
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Retrieve cities by state ID' })
+  @ApiParam({
+    name: 'stateId',
+    type: 'UUID',
+    description: 'ID of the state to retrieve cities for',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Catalog records fetched successfully.',
+  })
+  async findCitiesByStateId(
+    @Param('stateId', ParseUUIDPipe) stateId: string,
+  ): Promise<City[]> {
+    const state = await this.service.findByPublicId(State, stateId);
+    return this.service.findAll(City, { where: { stateId: state.id } });
   }
 }

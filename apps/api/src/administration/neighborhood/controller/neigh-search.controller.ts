@@ -1,4 +1,4 @@
-import { Neighborhood, NeighStreet, Unit, User } from '@core/database';
+import { Neighborhood, NeighStreet, User } from '@core/database';
 import { CurrentUser } from '@core/decorators';
 import { SearchDto } from '@core/dtos';
 import { HttpCacheInterceptor } from '@core/interceptors';
@@ -18,6 +18,8 @@ import {
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SearchNeighDto } from '../dtos';
 import { NeighborhoodSearchService, NeighStreetService } from '../services';
+import { NeighborhoodToModelMapper } from '@core/mappers';
+import { NeighborhoodModel } from '@nexhouse/shared-domain/models';
 
 @ApiTags('Neighborhood')
 @Controller('neighborhood')
@@ -44,8 +46,13 @@ export class NeighSearchController {
   })
   async findAll(
     @Query() searchDto: SearchNeighDto,
-  ): Promise<PaginatedResult<Neighborhood>> {
-    return this.searchService.findAll(searchDto);
+  ): Promise<PaginatedResult<NeighborhoodModel>> {
+    const response = await this.searchService.findAll(searchDto);
+
+    return {
+      data: response.data.map((f) => NeighborhoodToModelMapper(f)),
+      meta: response.meta,
+    };
   }
 
   @Get('mine')

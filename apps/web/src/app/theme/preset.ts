@@ -1,7 +1,45 @@
-import { definePreset, palette } from "@primeuix/themes";
+import { definePreset } from "@primeuix/themes";
 import Aura from "@primeuix/themes/aura";
 export const NxPreset = definePreset(Aura, {
   components: {
+    select: {
+      colorScheme: {
+        light: {
+          root: {
+            // bg-slate-50
+            background: "{slate.50}",
+            // text-slate-800
+            color: "{slate.800}",
+            // border (color por defecto)
+            borderColor: "{slate.200}",
+            // placeholder:text-slate-400
+            placeholderColor: "{slate.400}",
+            // focus:border-cyan-500
+          },
+        },
+        dark: {
+          root: {
+            // dark:bg-slate-800
+            background: "{slate.800}",
+            // dark:text-slate-200
+            color: "{slate.200}",
+            // border (color en dark)
+            borderColor: "{slate.700}",
+            // placeholder:text-slate-400 (ajustar si es diferente en dark)
+            placeholderColor: "{slate.500}",
+            // focus:border-cyan-500
+            focusBorderColor: "{cyan.500}",
+            // focus:ring
+            focusRing: {
+              width: "2px",
+              color: "{cyan.500}",
+              offset: "2px",
+              style: "solid",
+            },
+          },
+        },
+      },
+    },
     inputtext: {
       root: {},
       colorScheme: {
@@ -45,7 +83,10 @@ export const NxPreset = definePreset(Aura, {
       colorScheme: {
         light: {
           header: {
-            color: "{text-slate-800}",
+            color: "{slate.500}",
+          },
+          title: {
+            fontWeight: "3px",
           },
         },
         dark: {

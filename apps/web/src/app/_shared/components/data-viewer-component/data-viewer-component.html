@@ -1,156 +1,184 @@
-@if (!isMobileView()) {
-  @if (isTable()) {
-    <div
-      class="hidden lg:block rounded-xl border-0 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900"
+<p-panel
+  [header]="dataTitle()"
+  [class.bg-transparent]="!isTable() || isMobileView()"
+  [class.border-0]="!isTable() || isMobileView()"
+  [pt]="{ content: 'p-0' }"
+  [showHeader]="!isMobileView()"
+>
+  <ng-template #icons>
+    <p-selectbutton
+      [options]="statusOptions"
+      optionValue="value"
+      [(ngModel)]="dataView"
+      aria-labelledby="basic"
+      class="hidden lg:inline-block lg:flex-none"
+      size="small"
+      allowEmpty="false"
     >
-      <div class="overflow-x-auto">
-        <p-table
-          #dt
-          [value]="data()"
-          [rows]="10"
-          [paginator]="false"
-          [breakpoint]="'960px'"
-          [lazy]="lazy()"
-          [lazyLoadOnInit]="loadOnInit()"
-          (onLazyLoad)="search($event)"
-          [loading]="isLoading()"
-        >
-          @if (captionTemplate()) {
-            <ng-template pTemplate="caption">
-              <ng-container
-                [ngTemplateOutlet]="captionTemplate()!"
-              ></ng-container>
-            </ng-template>
-          }
-          <ng-template pTemplate="header">
-            <tr>
-              @for (col of columns(); track col.field; let first = $first) {
-                <th
-                  [pSortableColumn]="col.sortable ? col.field : undefined"
-                  [style.width]="col.width"
-                  class="text-sm uppercase"
-                >
-                  <div class="flex items-center gap-2 uppercase text-xs">
-                    {{ col.header }}
-                    @if (col.sortable) {
-                      <p-sortIcon [field]="col.field" />
-                    }
-                  </div>
-                </th>
-              }
-              @if (showActions()) {
-                <th class="w-28 text-center uppercase text-xs">Acciones</th>
-              }
-            </tr>
-          </ng-template>
+      <ng-template #item let-item>
+        <i [class]="item.icon"></i>
+      </ng-template>
+    </p-selectbutton>
+  </ng-template>
 
-          <ng-template pTemplate="body" let-item>
-            <tr class="hover:bg-slate-50 transition-colors">
-              @for (col of columns(); track col.field) {
-                <td>
-                  <span class="p-column-title md:hidden">{{ col.header }}</span>
-                  <ng-container
-                    [ngTemplateOutlet]="bodyTemplate() || defaultTemplate"
-                    [ngTemplateOutletContext]="{
-                      $implicit: item,
-                      field: col.field,
-                    }"
-                  >
-                  </ng-container>
-                </td>
-              }
-              @if (showActions()) {
-                <td class="text-center">
-                  <span class="p-column-title font-bold md:hidden"
-                    >Acciones</span
-                  >
-                  <ng-container
-                    [ngTemplateOutlet]="actionsTemplate() || null"
-                    [ngTemplateOutletContext]="{ $implicit: item }"
-                  >
-                  </ng-container>
-                </td>
-              }
-            </tr>
-          </ng-template>
-
-          <ng-template #defaultTemplate let-item let-field="field">
-            <span class="text-slate-600 text-sm">{{ item[field] }}</span>
-          </ng-template>
-
-          <ng-template pTemplate="emptymessage">
-            <tr>
-              <td
-                [attr.colspan]="columns().length + (showActions() ? 1 : 0)"
-                class="p-8 text-center text-slate-400"
-              >
-                No se encontraron registros.
-              </td>
-            </tr>
-          </ng-template>
-
-          <ng-template #loadingbody let-columns="columns">
-            @if (loadingTemplate()) {
-              <ng-container
-                [ngTemplateOutlet]="loadingTemplate()!"
-                [ngTemplateOutletContext]="{ $implicit: columns }"
-              >
-              </ng-container>
-            } @else {
-              @for (row of [1, 2, 3]; track row) {
-                <tr>
-                  @for (col of columns; track col) {
-                    <td>
-                      <div
-                        class="h-4 bg-slate-100 rounded animate-pulse w-full"
-                      ></div>
-                    </td>
-                  }
-                  @if (showActions()) {
-                    <td>
-                      <div
-                        class="h-4 bg-slate-100 rounded animate-pulse w-full"
-                      ></div>
-                    </td>
-                  }
-                </tr>
-              }
+  @if (!isMobileView()) {
+    @if (isTable()) {
+      <div
+        class="hidden lg:block rounded-xl border-0 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900"
+      >
+        <div class="overflow-x-auto">
+          <p-table
+            #dt
+            [value]="data()"
+            [rows]="10"
+            [paginator]="false"
+            [breakpoint]="'960px'"
+            [lazy]="lazy()"
+            [lazyLoadOnInit]="loadOnInit()"
+            (onLazyLoad)="search($event)"
+            [loading]="isLoading()"
+          >
+            @if (captionTemplate()) {
+              <ng-template pTemplate="caption">
+                <ng-container
+                  [ngTemplateOutlet]="captionTemplate()!"
+                ></ng-container>
+              </ng-template>
             }
-          </ng-template>
-        </p-table>
+            <ng-template pTemplate="header">
+              <tr>
+                @for (col of columns(); track col.field; let first = $first) {
+                  <th
+                    [pSortableColumn]="col.sortable ? col.field : undefined"
+                    [style.width]="col.width"
+                    class="text-sm uppercase"
+                  >
+                    <div class="flex items-center gap-2 uppercase text-xs">
+                      {{ col.header }}
+                      @if (col.sortable) {
+                        <p-sortIcon [field]="col.field" />
+                      }
+                    </div>
+                  </th>
+                }
+                @if (showActions()) {
+                  <th class="w-28 text-center uppercase text-xs">Acciones</th>
+                }
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-item>
+              <tr class="hover:bg-slate-50 transition-colors">
+                @for (col of columns(); track col.field) {
+                  <td>
+                    <span class="p-column-title md:hidden">{{
+                      col.header
+                    }}</span>
+                    <ng-container
+                      [ngTemplateOutlet]="bodyTemplate() || defaultTemplate"
+                      [ngTemplateOutletContext]="{
+                        $implicit: item,
+                        field: col.field,
+                      }"
+                    >
+                    </ng-container>
+                  </td>
+                }
+                @if (showActions()) {
+                  <td class="text-center">
+                    <span class="p-column-title font-bold md:hidden"
+                      >Acciones</span
+                    >
+                    <ng-container
+                      [ngTemplateOutlet]="actionsTemplate() || null"
+                      [ngTemplateOutletContext]="{ $implicit: item }"
+                    >
+                    </ng-container>
+                  </td>
+                }
+              </tr>
+            </ng-template>
+
+            <ng-template #defaultTemplate let-item let-field="field">
+              <span class="text-slate-600 text-sm">{{ item[field] }}</span>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td
+                  [attr.colspan]="columns().length + (showActions() ? 1 : 0)"
+                  class="p-8 text-center text-slate-400"
+                >
+                  No se encontraron registros.
+                </td>
+              </tr>
+            </ng-template>
+
+            <ng-template #loadingbody let-columns="columns">
+              @if (loadingTemplate()) {
+                <ng-container
+                  [ngTemplateOutlet]="loadingTemplate()!"
+                  [ngTemplateOutletContext]="{ $implicit: columns }"
+                >
+                </ng-container>
+              } @else {
+                @for (row of [1, 2, 3]; track row) {
+                  <tr>
+                    @for (col of columns; track col) {
+                      <td>
+                        <div
+                          class="h-4 bg-slate-100 rounded animate-pulse w-full"
+                        ></div>
+                      </td>
+                    }
+                    @if (showActions()) {
+                      <td>
+                        <div
+                          class="h-4 bg-slate-100 rounded animate-pulse w-full"
+                        ></div>
+                      </td>
+                    }
+                  </tr>
+                }
+              }
+            </ng-template>
+          </p-table>
+        </div>
       </div>
-    </div>
-  } @else if (listTemplate()) {
-    <ng-container [ngTemplateOutlet]="listTemplate()!"></ng-container>
+    } @else if (listTemplate()) {
+      <ng-container [ngTemplateOutlet]="listTemplate()!"></ng-container>
+    } @else {
+      <p class="text-center text-slate-600">
+        No list view available conifgured for this data-viewer implementation
+      </p>
+    }
   } @else {
-    <p class="text-center text-slate-600">
-      No list view available conifgured for this data-viewer implementation
-    </p>
+    @if (mobileTemplate()) {
+      <ng-container [ngTemplateOutlet]="mobileTemplate()!"></ng-container>
+    } @else {
+      <p class="text-center text-slate-600">
+        No mobile view available conifgured for this data-viewer implementation
+      </p>
+    }
   }
-} @else {
-  @if (mobileTemplate()) {
-    <ng-container [ngTemplateOutlet]="mobileTemplate()!"></ng-container>
-  } @else {
-    <p class="text-center text-slate-600">
-      No mobile view available conifgured for this data-viewer implementation
+
+  <div class="flex items-center justify-start md:justify-between">
+    <p class="text-sm text-slate-600 dark:text-slate-400 ml-3 hidden md:block">
+      <span>
+        {{ paginatorReport().first }} - {{ paginatorReport().last }}
+      </span>
+      <span>{{ " de " + paginatorReport().totalRecords }}</span>
     </p>
-  }
-}
 
-<div class="flex items-center justify-start md:justify-between">
-  <p class="text-sm text-slate-600 dark:text-slate-400 ml-3 hidden md:block">
-    <span> {{ paginatorReport().first }} - {{ paginatorReport().last }} </span>
-    <span>{{ " de " + paginatorReport().totalRecords }}</span>
-  </p>
-
-  <p-paginator
-    class="bg-transparent"
-    (onPageChange)="changePage($event)"
-    [rows]="10"
-    showFirstLastIcon="false"
-    [first]="((pagination()?.page || 1) - 1) * 10"
-    [totalRecords]="pagination()?.total || 0"
-    showCurrentPageReport="false"
-    currentPageReportTemplate="{first} - {last} de {totalRecords}"
-  />
-</div>
+    <p-paginator
+      class="bg-transparent"
+      (onPageChange)="changePage($event)"
+      [rows]="10"
+      showFirstLastIcon="false"
+      [first]="((pagination()?.page || 1) - 1) * 10"
+      [totalRecords]="pagination()?.total || 0"
+      showCurrentPageReport="false"
+      currentPageReportTemplate="{first} - {last} de {totalRecords}"
+    />
+  </div>
+</p-panel>

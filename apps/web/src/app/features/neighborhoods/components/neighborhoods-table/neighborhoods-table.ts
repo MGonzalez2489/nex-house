@@ -39,7 +39,6 @@ import { TableLazyLoadEvent } from "primeng/table";
 export class NeighborhoodsTable {
   private readonly router = inject(Router);
 
-  readonly mode = input<"table" | "list">("table");
   protected readonly cols: TableColumn<NeighborhoodModel>[] = [
     { field: "name", header: "Nombre" },
     { field: "streets", header: "Calles" },
