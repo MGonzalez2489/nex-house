@@ -18,21 +18,14 @@
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-    <p-panel
-      header="Lista de registros"
-      class="col-span-2 overflow-x-auto"
-      [pt]="{ content: 'p-0' }"
-    >
-      <ng-template #icons>
-        <app-units-filters (filter)="unitStore.loadAll($event)" />
-      </ng-template>
-      <app-units-table
-        [isLoading]="unitStore.loading()"
-        [items]="unitStore.entities()"
-        [pagination]="unitStore.pagination()"
-        (paginate)="unitStore.loadAll($event)"
-      />
-    </p-panel>
+    <app-units-table
+      class="col-span-2"
+      [isLoading]="unitStore.loading()"
+      [items]="unitStore.entities()"
+      [pagination]="unitStore.pagination()"
+      (paginate)="unitStore.loadAll($event)"
+      (view)="view($event)"
+    />
 
     <app-units-stats [stats]="unitStore.stats()" />
   </div>

@@ -49,7 +49,6 @@ export class NeighHomePage {
   }
 
   onSearch(filters: SearchNeigh) {
-    console.log("entro a on searhc");
     this.neighStore.loadAll(filters);
   }
   onView(id: string) {

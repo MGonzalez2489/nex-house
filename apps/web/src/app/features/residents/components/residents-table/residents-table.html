@@ -1,5 +1,5 @@
 <!-- TODO: apply residentFilters -->
-<p-panel header="Residentes">
+<p-panel header="Residentes" class="overflow-x-auto">
   <ng-template #icons>
     <app-resident-filters (filter)="filter($event)" />
   </ng-template>
@@ -7,10 +7,8 @@
     [value]="items()"
     [paginator]="true"
     [rows]="pagination()?.limit || 10"
-    [tableStyle]="{ 'min-width': '50rem' }"
     showFirstLastIcon="false"
     #dt
-    [breakpoint]="'960px'"
     [paginator]="pagination()"
     [totalRecords]="pagination()?.total || 0"
     [loading]="isLoading()"

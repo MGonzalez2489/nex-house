@@ -1,38 +1,82 @@
-<app-data-viewer-component
-  [data]="items()"
-  [columns]="cols"
-  [isLoading]="isLoading()"
-  [pagination]="pagination()"
-  (filter)="search($event)"
->
-  <ng-template #body let-unit let-field="field">
-    @switch (field) {
-      <!-- @case ("street") { -->
-      <!--   <p class="text-slate-800 dark:text-white capitalize"> -->
-      <!--     {{ unit.street?.name }} -->
-      <!--   </p> -->
-      <!-- } -->
-      @case ("identifier") {
-        <p class="text-slate-800 dark:text-white capitalize">
-          {{ unit.street?.name }} - {{ unit.identifier }}
-        </p>
-        <p class="text-xs text-slate-500">{{ unit.type?.displayName }}</p>
+<p-panel header="Unidades" class="overflow-x-auto">
+  <ng-template #icons>
+    <app-units-filters (filter)="filter($event)" />
+  </ng-template>
+
+  <p-table
+    #dt
+    [value]="items()"
+    [rows]="pagination()?.limit || 10"
+    [paginator]="pagination() && items().length > 0"
+    [showPageLinks]="items().length > 0"
+    [totalRecords]="pagination()?.total || 0"
+    [loading]="isLoading()"
+    [showCurrentPageReport]="true"
+    [lazy]="true"
+    [lazyLoadOnInit]="true"
+    (onLazyLoad)="search($event)"
+    showFirstLastIcon="false"
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+    paginatorStyleClass="mt-5"
+  >
+    <ng-template #header>
+      @if (items().length > 0) {
+        <tr>
+          <th style="width: 5%"></th>
+          <th style="width: 55%">Identificador</th>
+          <th style="width: 30%">Habitantes</th>
+          <th style="width: 10%"></th>
+        </tr>
       }
-      @case ("userUnits") {
-        <p>
+    </ng-template>
+    <ng-template #body let-unit>
+      <tr>
+        <td>
+          <i
+            [class.pi-building]="unit.type?.name === 'apartment'"
+            [class.pi-home]="unit.type?.name !== 'apartment'"
+            class="pi text-2xl"
+          ></i>
+        </td>
+        <td>
+          <p class="text-slate-800 dark:text-white capitalize">
+            {{ unit.street?.name }} - {{ unit.identifier }}
+          </p>
+          <p class="text-xs text-slate-500">{{ unit.type?.displayName }}</p>
+        </td>
+
+        <td>
           {{ unit.userUnits.length }}
-        </p>
-      }
-    }
-  </ng-template>
-  <ng-template #actions let-neigh>
-    <p-button
-      label="Ver"
-      icon="pi pi-search"
-      severity="secondary"
-      text
-      size="small"
-      (click)="onView(neigh.publicId)"
-    />
-  </ng-template>
-</app-data-viewer-component>
+        </td>
+        <td>
+          <p-button
+            icon="pi pi-search"
+            severity="secondary"
+            text
+            size="small"
+            (click)="view.emit(unit.publicId)"
+          />
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="5">
+          <div class="py-14 flex flex-col items-center text-center px-4">
+            <div
+              class="h-12 w-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 mb-3"
+            >
+              <i class="pi pi-sun"></i>
+            </div>
+            <p class="text-sm font-medium text-slate-700 dark:text-slate-200">
+              No se encontraron unidades.
+            </p>
+            <p class="text-xs text-slate-400 mt-1">
+              Intenta con otros filtros o registra uno nuevo.
+            </p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</p-panel>

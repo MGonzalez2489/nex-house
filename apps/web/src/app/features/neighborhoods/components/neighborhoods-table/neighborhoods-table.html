@@ -1,4 +1,4 @@
-<p-panel header="Fraccionamientos">
+<p-panel header="Fraccionamientos" class="overflow-x-auto">
   <ng-template #icons>
     <app-neigh-table-filters class="block" (filter)="filter($event)" />
   </ng-template>
@@ -6,8 +6,6 @@
     #dt
     [value]="items()"
     [rows]="pagination()?.limit || 10"
-    [tableStyle]="{ 'min-width': '50rem' }"
-    [breakpoint]="'960px'"
     [paginator]="pagination() && items().length > 0"
     [showPageLinks]="items().length > 0"
     [totalRecords]="pagination()?.total || 0"
