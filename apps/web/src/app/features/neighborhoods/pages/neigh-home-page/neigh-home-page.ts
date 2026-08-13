@@ -4,26 +4,25 @@ import {
   computed,
   effect,
   inject,
-  OnInit,
   signal,
 } from "@angular/core";
-import { FormsModule } from "@angular/forms";
 import { Router } from "@angular/router";
 import { SessionService } from "@core/services";
+import { NEIGHBORHOOD_ROUTES_ENUM } from "@neighborhoods/neighborhood.routes";
 import { NeighborhoodsStore } from "@neighborhoods/neighborhood.store";
 import { SearchNeigh } from "@nexhouse/shared-domain/interfaces";
 import { Button } from "primeng/button";
-import { NeighborhoodsTable, NeighTableFilters } from "../../components";
+import { NeighborhoodsTable } from "../../components";
 
 @Component({
   selector: "app-neigh-home-page",
-  imports: [NeighborhoodsTable, NeighTableFilters, Button, FormsModule],
+  imports: [NeighborhoodsTable, Button],
   templateUrl: "./neigh-home-page.html",
   styleUrl: "./neigh-home-page.css",
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
 })
-export class NeighHomePage implements OnInit {
+export class NeighHomePage {
   private readonly router = inject(Router);
   protected readonly neighStore = inject(NeighborhoodsStore);
   protected readonly sessionService = inject(SessionService);
@@ -43,15 +42,17 @@ export class NeighHomePage implements OnInit {
     });
   }
 
-  ngOnInit(): void {
-    this.onSearch({});
-  }
-
   onCreate(): void {
-    this.router.navigate(["/neighborhoods/new"]);
+    this.router.navigate([
+      `/${NEIGHBORHOOD_ROUTES_ENUM.HOME}/${NEIGHBORHOOD_ROUTES_ENUM.NEW}`,
+    ]);
   }
 
   onSearch(filters: SearchNeigh) {
+    console.log("entro a on searhc");
     this.neighStore.loadAll(filters);
+  }
+  onView(id: string) {
+    this.router.navigate([`${NEIGHBORHOOD_ROUTES_ENUM.HOME}`, id]);
   }
 }

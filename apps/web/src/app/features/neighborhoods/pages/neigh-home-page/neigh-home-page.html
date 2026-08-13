@@ -21,53 +21,23 @@
       </p>
     </div>
 
-    <div class="flex items-center gap-3">
-      <p-button
-        [severity]="isFiltering() ? 'contrast' : 'secondary'"
-        icon="pi pi-filter"
-        text
-        class="hidden md:block"
-        (click)="isFiltering.set(!isFiltering())"
-      />
-      <p-button
-        icon="pi pi-plus"
-        label="Nuevo"
-        (click)="onCreate()"
-        class="hidden md:block"
-      />
-    </div>
+    <p-button
+      icon="pi pi-plus"
+      label="Nuevo"
+      (click)="onCreate()"
+      class="hidden md:block"
+    />
   </div>
 
-  @if (isFiltering()) {
-    <app-neigh-table-filters class="block" (filter)="onSearch($event)" />
-  }
-
   <!-- Lista de resultados -->
-  @if (neighStore.entities().length === 0) {
-    <div
-      class="rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 py-14 flex flex-col items-center text-center px-4"
-    >
-      <div
-        class="h-12 w-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 mb-3"
-      >
-        <i class="pi pi-sun"></i>
-      </div>
-      <p class="text-sm font-medium text-slate-700 dark:text-slate-200">
-        No se encontraron fraccionamientos
-      </p>
-      <p class="text-xs text-slate-400 mt-1">
-        Intenta con otros filtros o registra uno nuevo.
-      </p>
-    </div>
-  } @else {
-    <app-neighborhoods-table
-      [items]="entries()"
-      [pagination]="neighStore.pagination()"
-      [isLoading]="neighStore.loading()"
-      [isMobile]="sessionService.isMobile()"
-      (paginate)="onSearch($event)"
-    />
-  }
+  <app-neighborhoods-table
+    [items]="entries()"
+    [pagination]="neighStore.pagination()"
+    [isLoading]="neighStore.loading()"
+    [isMobile]="sessionService.isMobile()"
+    (paginate)="onSearch($event)"
+    (view)="onView($event)"
+  />
 </div>
 
 <div class="absolute right-4 bottom-4 md:hidden">

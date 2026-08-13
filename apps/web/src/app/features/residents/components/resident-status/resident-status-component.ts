@@ -9,14 +9,14 @@ import { UserStatusModel } from "@nexhouse/shared-domain/models";
 import { TagModule } from "primeng/tag";
 
 @Component({
-  selector: "app-resudent-status-component",
+  selector: "app-resident-status-component",
   imports: [TagModule],
-  templateUrl: "./resudent-status-component.html",
-  styleUrl: "./resudent-status-component.css",
+  templateUrl: "./resident-status-component.html",
+  styleUrl: "./resident-status-component.css",
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ResudentStatusComponent {
+export class ResidentStatusComponent {
   status = input.required<UserStatusModel>();
 
   severity = computed<

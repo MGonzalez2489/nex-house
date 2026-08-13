@@ -1,11 +1,15 @@
 <form [formGroup]="form" class="flex items-center gap-3">
-  <input
-    pInputText
-    placeholder="Buscar..."
-    pSize="small"
-    class="min-w-100 w-50"
-    formControlName="globalFilter"
-  />
+  <p-iconfield class="w-full">
+    <p-inputicon class="pi pi-search" />
+
+    <input
+      pInputText
+      placeholder="Buscar..."
+      pSize="small"
+      class="min-w-100 w-50"
+      formControlName="globalFilter"
+    />
+  </p-iconfield>
   <!-- TODO: implement extra filters -->
   <p-button
     icon="pi pi-filter"

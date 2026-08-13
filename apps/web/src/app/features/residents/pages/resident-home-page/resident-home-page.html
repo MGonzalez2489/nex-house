@@ -27,24 +27,15 @@
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-    <p-panel
-      header="Lista de registros"
-      class="col-span-2 overflow-x-auto"
-      [pt]="{ content: 'p-0' }"
-    >
-      <ng-template #icons>
-        <div class="flex items-center gap-3">
-          <app-resident-filters (filter)="onSearch($event)" />
-        </div>
-      </ng-template>
-      <app-residents-table
-        [isLoading]="store.loading()"
-        [items]="store.entities()"
-        [pagination]="store.pagination()"
-        (paginate)="onSearch($event)"
-      />
-    </p-panel>
+    <app-residents-table
+      class="col-span-2"
+      [isLoading]="store.loading()"
+      [items]="store.entities()"
+      [pagination]="store.pagination()"
+      (paginate)="onSearch($event)"
+      (view)="view($event)"
+    />
+
     <app-resident-stats [stats]="store.stats()" />
-    <!-- <p-panel class="col-span-1">asdasdasd</p-panel> -->
   </div>
 </div>

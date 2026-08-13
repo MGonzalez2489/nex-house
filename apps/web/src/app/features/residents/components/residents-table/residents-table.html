@@ -1,50 +1,61 @@
-<app-data-viewer-component
-  [data]="items()"
-  [columns]="cols"
-  [isLoading]="isLoading()"
-  [pagination]="pagination()"
-  (filter)="search($event)"
->
-  <ng-template #body let-user let-field="field">
-    @switch (field) {
-      @case ("fullName") {
-        @if (user.fullName) {
-          <div class="flex items-center gap-3">
-            <app-avatar-component [text]="user.fullName" />
-            <div class="flex flex-col">
-              <p class="text-slate-800 dark:text-white capitalize">
-                {{ user.fullName }}
-              </p>
-              <p class="text-xs text-slate-500 dark:text-slate-200">
-                {{ user.role.displayName }}
-              </p>
-            </div>
-          </div>
-        } @else {
-          <div class="text-slate-800 dark:text-white capitalize">--</div>
-        }
-        @if (!user.fullName) {
-          <p class="text-xs text-slate-500 dark:text-slate-200">
-            {{ user.role.displayName }}
-          </p>
-        }
-      }
-      @case ("email") {
-        <p>{{ user.email }}</p>
-      }
-      @case ("status") {
-        <app-resudent-status-component [status]="user.status" />
-      }
-    }
+<!-- TODO: apply residentFilters -->
+<p-panel header="Residentes">
+  <ng-template #icons>
+    <app-resident-filters (filter)="filter($event)" />
   </ng-template>
-  <ng-template #actions let-neigh>
-    <p-button
-      label="Ver"
-      icon="pi pi-search"
-      severity="secondary"
-      text
-      size="small"
-      (click)="onView(neigh.publicId)"
-    />
-  </ng-template>
-</app-data-viewer-component>
+  <p-table
+    [value]="items()"
+    [paginator]="true"
+    [rows]="pagination()?.limit || 10"
+    [tableStyle]="{ 'min-width': '50rem' }"
+    showFirstLastIcon="false"
+    #dt
+    [breakpoint]="'960px'"
+    [paginator]="pagination()"
+    [totalRecords]="pagination()?.total || 0"
+    [loading]="isLoading()"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+    paginatorStyleClass="mt-5"
+    [lazy]="true"
+    [lazyLoadOnInit]="true"
+    (onLazyLoad)="search($event)"
+  >
+    <ng-template #header>
+      <tr>
+        <th style="width: 10%"></th>
+        <th style="width: 30%">Nombre</th>
+        <th style="width: 25%">Rol</th>
+        <th style="width: 25%">Estatus</th>
+        <th style="width: 10%"></th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-user>
+      <tr>
+        <td>
+          <app-avatar-component [text]="user.fullName" />
+        </td>
+        <td>
+          <p class="font-semibold capitalize">{{ user.fullName ?? "--" }}</p>
+          <p class="text-sm text-slate-400">{{ user.email }}</p>
+        </td>
+
+        <td>
+          {{ user.role.displayName }}
+        </td>
+        <td>
+          <app-resident-status-component [status]="user.status" />
+        </td>
+        <td>
+          <p-button
+            icon="pi pi-search"
+            severity="secondary"
+            text
+            size="small"
+            (click)="view.emit(user.publicId)"
+          />
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</p-panel>

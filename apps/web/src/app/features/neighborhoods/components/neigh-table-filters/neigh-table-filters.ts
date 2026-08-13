@@ -14,14 +14,12 @@ import { Button } from "primeng/button";
 import { IconFieldModule } from "primeng/iconfield";
 import { InputIconModule } from "primeng/inputicon";
 import { InputTextModule } from "primeng/inputtext";
-import { Panel } from "primeng/panel";
 import { SelectButtonModule } from "primeng/selectbutton";
 import { debounceTime, distinctUntilChanged } from "rxjs";
 
 @Component({
   selector: "app-neigh-table-filters",
   imports: [
-    Panel,
     InputTextModule,
     Button,
     SelectButtonModule,

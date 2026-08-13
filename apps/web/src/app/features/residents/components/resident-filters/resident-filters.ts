@@ -8,12 +8,20 @@ import {
 import { FormControl, FormGroup, ReactiveFormsModule } from "@angular/forms";
 import { SearchUser } from "@nexhouse/shared-domain/interfaces";
 import { Button } from "primeng/button";
+import { IconFieldModule } from "primeng/iconfield";
+import { InputIconModule } from "primeng/inputicon";
 import { InputTextModule } from "primeng/inputtext";
 import { debounceTime, distinctUntilChanged } from "rxjs";
 
 @Component({
   selector: "app-resident-filters",
-  imports: [Button, InputTextModule, ReactiveFormsModule],
+  imports: [
+    Button,
+    InputTextModule,
+    ReactiveFormsModule,
+    IconFieldModule,
+    InputIconModule,
+  ],
   templateUrl: "./resident-filters.html",
   styleUrl: "./resident-filters.css",
   standalone: true,
