@@ -1,0 +1,27 @@
+<main class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 lg:pb-10">
+  @if (store.user(); as user) {
+    <!-- header -->
+    <div class="flex items-center justify-between gap-3 mb-6">
+      <div>
+        <h1
+          class="text-xl sm:text-2xl font-display font-semibold text-slate-900 dark:text-white"
+        >
+          Mi perfil
+        </h1>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+          Consulta y actualiza tu información personal.
+        </p>
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <app-profile-card [user]="user" class="block" />
+      <app-profile-info-form [user]="user" class="block" />
+      <app-profile-unit
+        class="block"
+        [userUnits]="user.userUnits"
+        [neighborhood]="user.neighborhood"
+      />
+    </div>
+  }
+</main>

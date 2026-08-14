@@ -3,37 +3,37 @@
 >
   <!-- Izquierda: toggle + brand -->
   <div class="flex items-center gap-2 min-w-0">
-    <p-button
-      icon="pi pi-bars"
-      text
-      severity="secondary"
-      (click)="toggleSidebar()"
-      class="md:hidden"
-    />
+    @if (!isResident()) {
+      <p-button
+        icon="pi pi-bars"
+        text
+        severity="secondary"
+        (click)="toggleSidebar()"
+        class="md:hidden"
+      />
+    }
 
-    <div class="flex items-center gap-2 min-w-0">
-      <div
-        class="h-8 w-8 rounded-lg bg-linear-to-br from-cyan-400 to-cyan-600 flex items-center justify-center shrink-0 shadow-sm shadow-cyan-500/30"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-4.5 w-4.5 text-white"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2.2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z" />
-        </svg>
-      </div>
-      <span
-        class="font-display font-semibold text-slate-900 dark:text-white tracking-tight truncate"
-        >Nimbus</span
-      >
-    </div>
+    <app-brand-component />
   </div>
+
+  <!-- middle -->
+  @if (isResident()) {
+    <div class="flex items-center gap-3">
+      <p-button label="Inicio" icon="pi pi-home" severity="secondary" text />
+      <p-button
+        label="Mi Fraccionamiento"
+        icon="pi pi-building"
+        severity="secondary"
+        text
+      />
+      <p-button
+        label="Enviar comprobante"
+        icon="pi pi-download"
+        severity="secondary"
+        text
+      />
+    </div>
+  }
 
   <!-- Derecha: acciones rápidas -->
   <div class="flex items-center gap-1 sm:gap-2 shrink-0">
@@ -115,62 +115,15 @@
     </div>
 
     <!-- Settings -->
-    <p-button icon="pi pi-cog" text severity="secondary" />
-    <!-- <button -->
-    <!--   data-tooltip="Configuración" -->
-    <!--   aria-label="Configuración" -->
-    <!--   class="h-9 w-9 inline-flex items-center justify-center rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-white transition" -->
-    <!-- > -->
-    <!--   <svg -->
-    <!--     xmlns="http://www.w3.org/2000/svg" -->
-    <!--     class="h-5 w-5" -->
-    <!--     viewBox="0 0 24 24" -->
-    <!--     fill="none" -->
-    <!--     stroke="currentColor" -->
-    <!--     stroke-width="2" -->
-    <!--     stroke-linecap="round" -->
-    <!--     stroke-linejoin="round" -->
-    <!--   > -->
-    <!--     <circle cx="12" cy="12" r="3" /> -->
-    <!--     <path -->
-    <!--       d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.14.36.4.66.73.86.3.2.66.31 1.04.31H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" -->
-    <!--     /> -->
-    <!--   </svg> -->
-    <!-- </button> -->
+    <p-button text (click)="menu.toggle($event)">
+      <app-avatar-component [text]="sessionService.user()?.fullName" />
+
+      <span
+        class="hidden sm:inline text-sm font-medium text-slate-700 dark:text-slate-200"
+        >{{ sessionService.user()?.firstName || "--" }}</span
+      >
+      <i class="pi pi-chevron-down text-sm text-slate-500"></i>
+    </p-button>
+    <p-menu #menu [model]="menuItems()" [popup]="true" appendTo="body" />
   </div>
 </header>
-
-<!-- <header -->
-<!--   class="h-16 bg-white flex items-center border-b px-3 justify-center sticky top-0 z-10" -->
-<!-- > -->
-<!--   <div class="w-full flex items-center justify-between"> -->
-<!--     <div class="flex items-center md:gap-1"> -->
-<!--       <app-brand-component /> -->
-<!--       <p-button severity="secondary" text class="lg:hidden"> </p-button> -->
-<!--     </div> -->
-<!---->
-<!--     <div class="flex items-center gap-4"> -->
-<!--       <div -->
-<!--         class="items-center gap-3 hover:cursor-pointer hover:bg-gray-200 md:p-3 hover:rounded-lg hidden lg:flex" -->
-<!--       > -->
-<!--         <div class="relative shrink-0"> -->
-<!--           <app-avatar-component shape="square" [text]="'aca todo'" /> -->
-<!--           <div -->
-<!--             class="absolute -bottom-1 right-0 w-4 h-4 border-2 border-white rounded-full" -->
-<!--           ></div> -->
-<!--         </div> -->
-<!---->
-<!--         <div class="flex flex-col leading-tight overflow-hidden"> -->
-<!--           <span -->
-<!--             class="text-slate-700 font-bold text-sm truncate hidden md:block" -->
-<!--             >name</span -->
-<!--           > -->
-<!--           <span -->
-<!--             class="text-slate-400 font-medium text-[10px] uppercase tracking-tighter hidden md:block" -->
-<!--             >last</span -->
-<!--           > -->
-<!--         </div> -->
-<!--       </div> -->
-<!--     </div> -->
-<!--   </div> -->
-<!-- </header> -->

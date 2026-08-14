@@ -18,7 +18,7 @@ import { FormFeedback } from "../form-feedback/form-feedback";
 })
 export class FormOptions {
   //general props
-  readonly callState = input.required<CallState>();
+  readonly callState = input<CallState>();
   readonly isLoading = input<boolean>(false);
 
   //submit options

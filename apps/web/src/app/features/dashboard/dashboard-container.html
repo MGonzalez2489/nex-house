@@ -1,1 +1,616 @@
-<p>dashboard-container works!</p>
+<!-- ============ CONTENIDO ============ -->
+<main class="space-y-6">
+  <!-- Saludo -->
+  <div>
+    <h1
+      class="text-xl sm:text-2xl font-display font-semibold text-slate-900 dark:text-white"
+    >
+      Hola, Ana 👋
+    </h1>
+    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+      Fraccionamiento Las Haciendas · Calle Hacienda del Sol #124
+    </p>
+  </div>
+
+  <!-- Indicadores rápidos -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+    <div
+      class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4"
+    >
+      <p class="text-xs font-medium text-slate-500 dark:text-slate-400">
+        Próximo pago
+      </p>
+      <p class="text-xl font-semibold text-slate-900 dark:text-white mt-1">
+        $1,250.00
+      </p>
+      <p class="text-xs text-amber-600 dark:text-amber-400 mt-0.5">
+        Vence 05 Sep
+      </p>
+    </div>
+    <div
+      class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4"
+    >
+      <p class="text-xs font-medium text-slate-500 dark:text-slate-400">
+        Estado de cuenta
+      </p>
+      <p
+        class="text-xl font-semibold text-emerald-600 dark:text-emerald-400 mt-1"
+      >
+        Al corriente
+      </p>
+      <p class="text-xs text-slate-400 mt-0.5">3 pagos seguidos</p>
+    </div>
+    <div
+      class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4"
+    >
+      <p class="text-xs font-medium text-slate-500 dark:text-slate-400">
+        Avisos nuevos
+      </p>
+      <p class="text-xl font-semibold text-slate-900 dark:text-white mt-1">3</p>
+      <p class="text-xs text-slate-400 mt-0.5">Esta semana</p>
+    </div>
+    <div
+      class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4"
+    >
+      <p class="text-xs font-medium text-slate-500 dark:text-slate-400">
+        Encuestas activas
+      </p>
+      <p class="text-xl font-semibold text-slate-900 dark:text-white mt-1">1</p>
+      <p class="text-xs text-slate-400 mt-0.5">Tu opinión cuenta</p>
+    </div>
+  </div>
+
+  <!-- Próximo pago (destacado) -->
+  <div
+    class="rounded-xl border border-cyan-200 dark:border-cyan-500/30 bg-linear-to-br from-cyan-50 to-white dark:from-cyan-500/10 dark:to-slate-900 p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+  >
+    <div class="flex items-start gap-3">
+      <div
+        class="h-11 w-11 rounded-xl bg-cyan-600 flex items-center justify-center text-white shrink-0"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <rect x="1" y="4" width="22" height="16" rx="2" />
+          <line x1="1" y1="10" x2="23" y2="10" />
+        </svg>
+      </div>
+      <div>
+        <p class="text-sm font-semibold text-slate-800 dark:text-white">
+          Mantenimiento — Septiembre 2026
+        </p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+          $1,250.00 MXN · vence el 05 de septiembre
+        </p>
+      </div>
+    </div>
+    <a
+      href="comprobante.html"
+      class="inline-flex items-center justify-center gap-2 rounded-lg bg-cyan-600 hover:bg-cyan-700 text-white text-sm font-medium px-4 py-2.5 shadow-sm shadow-cyan-600/20 transition shrink-0"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-4 w-4"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="7 10 12 15 17 10" />
+        <line x1="12" y1="15" x2="12" y2="3" />
+      </svg>
+      Enviar comprobante
+    </a>
+  </div>
+
+  <!-- Grid principal -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+    <!-- Columna principal -->
+    <div class="lg:col-span-2 space-y-5">
+      <!-- Últimos avisos -->
+      <div
+        class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-sm font-semibold text-slate-800 dark:text-white">
+            Últimos avisos
+          </h2>
+          <a
+            href="#"
+            class="text-xs font-medium text-cyan-600 dark:text-cyan-400 hover:underline"
+            >Ver todos</a
+          >
+        </div>
+        <ul class="divide-y divide-slate-100 dark:divide-slate-800">
+          <li class="py-3 flex items-start gap-3">
+            <div
+              class="h-9 w-9 rounded-lg bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4.5 w-4.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+                />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
+            </div>
+            <div class="min-w-0 flex-1">
+              <p class="text-sm font-medium text-slate-700 dark:text-slate-200">
+                Mantenimiento de alberca
+              </p>
+              <p class="text-xs text-slate-400 mt-0.5">
+                La alberca permanecerá cerrada del 12 al 14 de agosto por
+                mantenimiento.
+              </p>
+              <p class="text-[11px] text-slate-400 mt-1">
+                10 ago 2026 · Mantenimiento
+              </p>
+            </div>
+          </li>
+          <li class="py-3 flex items-start gap-3">
+            <div
+              class="h-9 w-9 rounded-lg bg-cyan-50 dark:bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center shrink-0"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4.5 w-4.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M12 2.69s-7 7.44-7 11.31a7 7 0 0 0 14 0c0-3.87-7-11.31-7-11.31z"
+                />
+              </svg>
+            </div>
+            <div class="min-w-0 flex-1">
+              <p class="text-sm font-medium text-slate-700 dark:text-slate-200">
+                Corte de agua programado
+              </p>
+              <p class="text-xs text-slate-400 mt-0.5">
+                Habrá corte de agua el 15 de agosto de 9:00 a 14:00 hrs por
+                trabajos de la red.
+              </p>
+              <p class="text-[11px] text-slate-400 mt-1">
+                08 ago 2026 · Servicios
+              </p>
+            </div>
+          </li>
+          <li class="py-3 flex items-start gap-3">
+            <div
+              class="h-9 w-9 rounded-lg bg-violet-50 dark:bg-violet-500/10 text-violet-600 dark:text-violet-400 flex items-center justify-center shrink-0"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4.5 w-4.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </div>
+            <div class="min-w-0 flex-1">
+              <p class="text-sm font-medium text-slate-700 dark:text-slate-200">
+                Junta vecinal mensual
+              </p>
+              <p class="text-xs text-slate-400 mt-0.5">
+                Te invitamos a la junta el próximo sábado en el salón de usos
+                múltiples.
+              </p>
+              <p class="text-[11px] text-slate-400 mt-1">
+                05 ago 2026 · Comunidad
+              </p>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Últimas encuestas -->
+      <div
+        class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-sm font-semibold text-slate-800 dark:text-white">
+            Últimas encuestas
+          </h2>
+          <a
+            href="#"
+            class="text-xs font-medium text-cyan-600 dark:text-cyan-400 hover:underline"
+            >Ver todas</a
+          >
+        </div>
+        <ul class="space-y-3">
+          <li
+            class="flex items-center justify-between gap-3 rounded-lg border border-slate-100 dark:border-slate-800 p-3"
+          >
+            <div class="min-w-0">
+              <p
+                class="text-sm font-medium text-slate-700 dark:text-slate-200 truncate"
+              >
+                ¿Apruebas la instalación de cámaras adicionales?
+              </p>
+              <p class="text-xs text-slate-400 mt-0.5">
+                Activa · cierra el 20 de agosto
+              </p>
+            </div>
+            <button
+              class="shrink-0 rounded-lg bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-medium px-3 py-1.5 transition"
+            >
+              Participar
+            </button>
+          </li>
+          <li
+            class="flex items-center justify-between gap-3 rounded-lg border border-slate-100 dark:border-slate-800 p-3"
+          >
+            <div class="min-w-0">
+              <p
+                class="text-sm font-medium text-slate-700 dark:text-slate-200 truncate"
+              >
+                Evaluación del servicio de seguridad Q2
+              </p>
+              <p class="text-xs text-slate-400 mt-0.5">
+                Cerrada · resultados disponibles
+              </p>
+            </div>
+            <button
+              class="shrink-0 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-xs font-medium px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+            >
+              Ver resultados
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Columna lateral -->
+    <div class="space-y-5">
+      <!-- Resumen de pagos -->
+      <div
+        class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-sm font-semibold text-slate-800 dark:text-white">
+            Resumen de pagos
+          </h2>
+          <a
+            href="#"
+            class="text-xs font-medium text-cyan-600 dark:text-cyan-400 hover:underline"
+            >Ver historial</a
+          >
+        </div>
+        <ul class="divide-y divide-slate-100 dark:divide-slate-800">
+          <li class="py-2.5 flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <p class="text-sm text-slate-700 dark:text-slate-200">
+                Agosto 2026
+              </p>
+              <p class="text-xs text-slate-400">Pagado el 03 ago</p>
+            </div>
+            <span
+              class="text-xs font-medium px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shrink-0"
+              >$1,250</span
+            >
+          </li>
+          <li class="py-2.5 flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <p class="text-sm text-slate-700 dark:text-slate-200">
+                Julio 2026
+              </p>
+              <p class="text-xs text-slate-400">Pagado el 02 jul</p>
+            </div>
+            <span
+              class="text-xs font-medium px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shrink-0"
+              >$1,250</span
+            >
+          </li>
+          <li class="py-2.5 flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <p class="text-sm text-slate-700 dark:text-slate-200">
+                Junio 2026
+              </p>
+              <p class="text-xs text-slate-400">Pagado el 01 jun</p>
+            </div>
+            <span
+              class="text-xs font-medium px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shrink-0"
+              >$1,250</span
+            >
+          </li>
+        </ul>
+      </div>
+
+      <!-- Accesos rápidos -->
+      <div
+        class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5"
+      >
+        <h2 class="text-sm font-semibold text-slate-800 dark:text-white mb-4">
+          Accesos rápidos
+        </h2>
+        <div class="grid grid-cols-2 gap-2.5">
+          <a
+            href="perfil.html"
+            class="flex flex-col items-center gap-2 rounded-lg border border-slate-100 dark:border-slate-800 hover:border-cyan-300 dark:hover:border-cyan-500/40 hover:bg-cyan-50/50 dark:hover:bg-cyan-500/5 p-3 text-center transition"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 text-slate-500 dark:text-slate-400"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            <span class="text-xs font-medium text-slate-600 dark:text-slate-300"
+              >Mi perfil</span
+            >
+          </a>
+          <a
+            href="fraccionamiento.html"
+            class="flex flex-col items-center gap-2 rounded-lg border border-slate-100 dark:border-slate-800 hover:border-cyan-300 dark:hover:border-cyan-500/40 hover:bg-cyan-50/50 dark:hover:bg-cyan-500/5 p-3 text-center transition"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 text-slate-500 dark:text-slate-400"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="4" y="2" width="16" height="20" rx="1" />
+              <line x1="9" y1="6" x2="9" y2="6.01" />
+              <line x1="15" y1="6" x2="15" y2="6.01" />
+              <line x1="9" y1="10" x2="9" y2="10.01" />
+              <line x1="15" y1="10" x2="15" y2="10.01" />
+            </svg>
+            <span class="text-xs font-medium text-slate-600 dark:text-slate-300"
+              >Fraccionamiento</span
+            >
+          </a>
+          <a
+            href="fraccionamiento.html#administradores"
+            class="flex flex-col items-center gap-2 rounded-lg border border-slate-100 dark:border-slate-800 hover:border-cyan-300 dark:hover:border-cyan-500/40 hover:bg-cyan-50/50 dark:hover:bg-cyan-500/5 p-3 text-center transition"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 text-slate-500 dark:text-slate-400"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            <span class="text-xs font-medium text-slate-600 dark:text-slate-300"
+              >Administradores</span
+            >
+          </a>
+          <a
+            href="comprobante.html"
+            class="flex flex-col items-center gap-2 rounded-lg border border-slate-100 dark:border-slate-800 hover:border-cyan-300 dark:hover:border-cyan-500/40 hover:bg-cyan-50/50 dark:hover:bg-cyan-500/5 p-3 text-center transition"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 text-slate-500 dark:text-slate-400"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            <span class="text-xs font-medium text-slate-600 dark:text-slate-300"
+              >Comprobante</span
+            >
+          </a>
+        </div>
+      </div>
+
+      <!-- Administradores (mini) -->
+      <div
+        class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-sm font-semibold text-slate-800 dark:text-white">
+            Administradores
+          </h2>
+          <a
+            href="fraccionamiento.html#administradores"
+            class="text-xs font-medium text-cyan-600 dark:text-cyan-400 hover:underline"
+            >Ver todos</a
+          >
+        </div>
+        <ul class="space-y-3">
+          <li class="flex items-center gap-3">
+            <div
+              class="h-9 w-9 rounded-full bg-linear-to-br from-cyan-400 to-cyan-600 flex items-center justify-center text-white text-xs font-semibold shrink-0"
+            >
+              CF
+            </div>
+            <div class="min-w-0">
+              <p
+                class="text-sm font-medium text-slate-700 dark:text-slate-200 truncate"
+              >
+                Carlos Fuentes
+              </p>
+              <p class="text-xs text-slate-400 truncate">
+                Administrador general
+              </p>
+            </div>
+          </li>
+          <li class="flex items-center gap-3">
+            <div
+              class="h-9 w-9 rounded-full bg-linear-to-br from-fuchsia-400 to-fuchsia-600 flex items-center justify-center text-white text-xs font-semibold shrink-0"
+            >
+              MI
+            </div>
+            <div class="min-w-0">
+              <p
+                class="text-sm font-medium text-slate-700 dark:text-slate-200 truncate"
+              >
+                Mariana Ibarra
+              </p>
+              <p class="text-xs text-slate-400 truncate">
+                Administración y cobranza
+              </p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ============ TAB BAR (mobile) ============ -->
+<nav
+  class="lg:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur safe-bottom"
+>
+  <div class="grid grid-cols-4">
+    <a
+      href="index.html"
+      class="tab-active flex flex-col items-center gap-1 py-2.5"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M3 9.5 12 3l9 6.5" />
+        <path d="M5 10v10h14V10" />
+      </svg>
+      <span class="text-[11px] font-medium">Inicio</span>
+    </a>
+    <a
+      href="fraccionamiento.html"
+      class="flex flex-col items-center gap-1 py-2.5 text-slate-400 dark:text-slate-500"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <rect x="4" y="2" width="16" height="20" rx="1" />
+        <line x1="9" y1="6" x2="9" y2="6.01" />
+        <line x1="15" y1="6" x2="15" y2="6.01" />
+        <line x1="9" y1="10" x2="9" y2="10.01" />
+        <line x1="15" y1="10" x2="15" y2="10.01" />
+      </svg>
+      <span class="text-[11px] font-medium">Fracc.</span>
+    </a>
+    <a
+      href="comprobante.html"
+      class="flex flex-col items-center gap-1 py-2.5 text-slate-400 dark:text-slate-500"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="7 10 12 15 17 10" />
+        <line x1="12" y1="15" x2="12" y2="3" />
+      </svg>
+      <span class="text-[11px] font-medium">Pagar</span>
+    </a>
+    <a
+      href="perfil.html"
+      class="flex flex-col items-center gap-1 py-2.5 text-slate-400 dark:text-slate-500"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+        <circle cx="12" cy="7" r="4" />
+      </svg>
+      <span class="text-[11px] font-medium">Perfil</span>
+    </a>
+  </div>
+</nav>
+
+<script>
+  document.getElementById("themeToggle").addEventListener("click", () => {
+    document.documentElement.classList.toggle("dark");
+  });
+
+  const notifDropdown = document.getElementById("notifDropdown");
+  const userMenu = document.getElementById("userMenu");
+
+  document.getElementById("notifBtn").addEventListener("click", (e) => {
+    e.stopPropagation();
+    userMenu.classList.add("hidden");
+    notifDropdown.classList.toggle("hidden");
+  });
+  document.getElementById("userMenuBtn").addEventListener("click", (e) => {
+    e.stopPropagation();
+    notifDropdown.classList.add("hidden");
+    userMenu.classList.toggle("hidden");
+  });
+  document.addEventListener("click", () => {
+    notifDropdown.classList.add("hidden");
+    userMenu.classList.add("hidden");
+  });
+</script>

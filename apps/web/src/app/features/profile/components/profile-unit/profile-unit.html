@@ -1,0 +1,20 @@
+<p-panel header="Domicilio registrado" class="space-y-4">
+  <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div>
+      <dt class="text-xs text-slate-400">Fraccionamiento</dt>
+      <dd class="text-sm text-slate-700 dark:text-slate-200 mt-0.5 capitalize">
+        {{ neighborhood().name }}
+      </dd>
+    </div>
+    <div>
+      <dt class="text-xs text-slate-400">Calle y número</dt>
+      <dd class="text-sm text-slate-700 dark:text-slate-200 mt-0.5 capitalize">
+        {{ current()?.street?.name }} {{ current()?.identifier }}
+      </dd>
+    </div>
+  </dl>
+  <p class="text-xs text-slate-400 mt-5">
+    ¿Necesitas actualizar tu domicilio? Contacta a un administrador desde la
+    sección de tu fraccionamiento.
+  </p>
+</p-panel>

@@ -9,6 +9,7 @@ import { PAGES_ROUTES_ENUM, UnauthorizedPage } from "./pages";
 import { RESIDENT_ROUTES_ENUM } from "./features/residents";
 import { UNIT_ROUTES_ENUM } from "@units/units.routes";
 import { ONBOARDING_ROUTES_ENUM } from "./features/onboarding";
+import { PROFILE_ROUTES_ENUM } from "@profile/profile.routes";
 
 export const appRoutes: Route[] = [
   //public routes
@@ -60,6 +61,13 @@ export const appRoutes: Route[] = [
         canActivate: [AccessGuard([UserRoleEnum.ADMIN])],
         loadChildren: () =>
           import("./features/units/units.routes").then((m) => m.UNIT_ROUTES),
+      },
+      {
+        path: PROFILE_ROUTES_ENUM.HOME,
+        loadChildren: () =>
+          import("./features/profile/profile.routes").then(
+            (m) => m.PROFILE_ROUTES,
+          ),
       },
     ],
   },

@@ -1,16 +1,22 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   effect,
   inject,
   signal,
 } from "@angular/core";
 import { SessionService } from "@core/services";
+import { UserRoleEnum } from "@nexhouse/shared-domain/enums";
+import { PROFILE_ROUTES_ENUM } from "@profile/profile.routes";
+import { AvatarComponent, BrandComponent } from "@shared/components";
+import { MenuItem } from "primeng/api";
 import { Button } from "primeng/button";
+import { MenuModule } from "primeng/menu";
 
 @Component({
   selector: "app-nav-bar",
-  imports: [Button],
+  imports: [Button, BrandComponent, MenuModule, AvatarComponent],
   templateUrl: "./nav-bar.html",
   styleUrl: "./nav-bar.css",
   standalone: true,
@@ -29,8 +35,22 @@ export class NavBar {
     //         window.matchMedia("(prefers-color-scheme: dark)").matches)
     //   : false,
   );
+  protected readonly menuItems = signal<MenuItem[]>([
+    {
+      label: "Mi Perfil",
+      icon: "pi pi-user",
+      routerLink: `/${PROFILE_ROUTES_ENUM.HOME}`,
+    },
+    { label: "Ayuda y soporte", icon: "pi pi-question-circle" },
+    { separator: true },
+    { label: "Cerrar sesión", icon: "pi pi-sign-out" },
+  ]);
 
   protected readonly sessionService = inject(SessionService);
+
+  isResident = computed(
+    () => this.sessionService.user()?.role?.name === UserRoleEnum.RESIDENT,
+  );
 
   constructor() {
     effect(() => {

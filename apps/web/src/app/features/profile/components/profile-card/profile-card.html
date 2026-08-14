@@ -1,0 +1,16 @@
+<p-panel showHeader="false" class="pt-5">
+  <div class="flex items-center gap-4">
+    <app-avatar-component size="xlarge" />
+
+    <div>
+      <p
+        class="text-base font-semibold text-slate-800 dark:text-white capitalize"
+      >
+        {{ user().fullName || "--" }}
+      </p>
+      <p class="text-sm text-slate-400 capitalize">
+        {{ user().role.displayName }} · {{ address() }}
+      </p>
+    </div>
+  </div>
+</p-panel>

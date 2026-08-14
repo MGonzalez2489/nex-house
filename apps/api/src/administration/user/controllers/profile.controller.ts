@@ -14,16 +14,29 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ChangePasswordDto, UpdateUserDto } from '../dtos';
-import { UserService } from '../services';
+import { UserSearchService, UserService } from '../services';
 
 @Controller('profile')
 export class ProfileController {
-  constructor(private readonly usersService: UserService) {}
+  constructor(
+    private readonly usersService: UserService,
+    private readonly userSearchService: UserSearchService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'Get a user profile' })
   async get(@CurrentUser() user: User) {
-    return UserToModelMapper(user);
+    const response = await this.userSearchService.findByPublicId(
+      user.publicId,
+      user.neighborhoodId,
+      {
+        neighborhood: true,
+        status: true,
+        role: true,
+        userUnits: { unit: { type: true, street: true } },
+      },
+    );
+    return UserToModelMapper(response);
   }
 
   @Patch()

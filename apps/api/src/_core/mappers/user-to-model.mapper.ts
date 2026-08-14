@@ -2,6 +2,7 @@ import { User } from '@core/database';
 import { UserModel } from '@nexhouse/shared-domain/models';
 import { CatalogToModelMapper } from './catalog-to-model.mapper';
 import { UserUnitToModel } from './user-unit.mapper';
+import { NeighborhoodToModelMapper } from './neighborhood-to-model.mapper';
 
 export const UserToModelMapper = (user: User): UserModel => {
   return {
@@ -16,7 +17,9 @@ export const UserToModelMapper = (user: User): UserModel => {
 
     requirePwdChange: user.requirePwdChange,
 
-    neighborhood: undefined,
+    neighborhood: user.neighborhood
+      ? NeighborhoodToModelMapper(user.neighborhood)
+      : null,
     publicId: user.publicId,
 
     status: user.status ? CatalogToModelMapper(user.status) : user.status,

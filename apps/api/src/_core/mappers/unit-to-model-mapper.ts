@@ -7,8 +7,8 @@ import { UserUnitToModel } from './user-unit.mapper';
 export const UnitToModelMapper = (unit: Unit): UnitModel => {
   return {
     identifier: unit.identifier,
-    type: CatalogToModelMapper(unit.type),
-    street: NeighStreetToModel(unit.street),
+    type: unit.type ? CatalogToModelMapper(unit.type) : unit.type,
+    street: unit.street ? NeighStreetToModel(unit.street) : unit.street,
     publicId: unit.publicId,
 
     userUnits: unit.userUnits

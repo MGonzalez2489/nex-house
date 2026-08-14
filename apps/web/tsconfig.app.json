@@ -24,7 +24,8 @@
       "@neighborhoods/*": ["./src/app/features/neighborhoods/*"],
       "@residents/*": ["./src/app/features/residents/*"],
       "@units/*": ["./src/app/features/units/*"],
-      "@onboarding/*": ["./src/app/features/onboarding/*"]
+      "@onboarding/*": ["./src/app/features/onboarding/*"],
+      "@profile/*": ["./src/app/features/profile/*"]
     }
   },
   "include": ["src/**/*.ts"],

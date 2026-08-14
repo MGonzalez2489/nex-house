@@ -59,8 +59,6 @@ export const StartupStore = signalStore(
       // await store._profileStore.load();
     },
     async _initAdmin() {
-      await store._profileStore.load();
-      //
       await Promise.all([
         store._contextStore.loadNeighborhood(),
         store._contextStore.loadStreets(),
