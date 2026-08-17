@@ -1,0 +1,33 @@
+<section class="size-10">
+  <div class="relative w-full h-full">
+    <div class="rounded-full overflow-hidden shadow-xl mx-auto w-full h-full">
+      <img
+        alt="Foto de perfil del usuario"
+        class="w-full h-full object-cover object-center"
+        [src]="avatarUrl()"
+      />
+    </div>
+
+    @if (editable()) {
+      <p-fileupload
+        accept="image/*"
+        chooseIcon="pi pi-upload"
+        chooseLabel=" "
+        chooseStyleClass="rounded-full! content-none!"
+        class="absolute bottom-0 right-3 h-2 w-2 md:h-10 md:w-10 flex items-center justify-center text-gray-600 bg-white border-2 border-white rounded-full shadow-md hover:bg-gray-50"
+        maxFileSize="1000000"
+        mode="basic"
+        name="avatar"
+        [auto]="true"
+        [chooseButtonProps]="{
+          severity: 'secondary',
+          label: '',
+          rounded: true,
+        }"
+        [pt]="{ pcChooseButton: { label: 'hidden' } }"
+        [url]="url()"
+        (onUpload)="onBasicUploadAuto()"
+      />
+    }
+  </div>
+</section>

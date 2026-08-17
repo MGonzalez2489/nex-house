@@ -10,6 +10,7 @@ export interface UserModel extends BaseModel {
   lastName: string;
   fullName: string;
   phone: string;
+  avatar: string;
 
   requirePwdChange: boolean;
 

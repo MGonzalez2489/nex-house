@@ -21,6 +21,7 @@ export const UserToModelMapper = (user: User): UserModel => {
       ? NeighborhoodToModelMapper(user.neighborhood)
       : null,
     publicId: user.publicId,
+    avatar: user.avatar,
 
     status: user.status ? CatalogToModelMapper(user.status) : user.status,
     role: user.role ? CatalogToModelMapper(user.role) : user.role,

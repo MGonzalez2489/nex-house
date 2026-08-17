@@ -15,6 +15,7 @@ import {
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ChangePasswordDto, UpdateUserDto } from '../dtos';
 import { UserSearchService, UserService } from '../services';
+import { UserRoleEnum } from '@nexhouse/shared-domain/enums';
 
 @Controller('profile')
 export class ProfileController {
@@ -26,11 +27,13 @@ export class ProfileController {
   @Get()
   @ApiOperation({ summary: 'Get a user profile' })
   async get(@CurrentUser() user: User) {
+    const loadNeigh = user.role?.name !== UserRoleEnum.SUPERADMIN;
+
     const response = await this.userSearchService.findByPublicId(
       user.publicId,
-      user.neighborhoodId,
+      loadNeigh ? user.neighborhoodId : undefined,
       {
-        neighborhood: true,
+        neighborhood: loadNeigh,
         status: true,
         role: true,
         userUnits: { unit: { type: true, street: true } },

@@ -43,7 +43,13 @@ export class NavBar {
     },
     { label: "Ayuda y soporte", icon: "pi pi-question-circle" },
     { separator: true },
-    { label: "Cerrar sesión", icon: "pi pi-sign-out" },
+    {
+      label: "Cerrar sesión",
+      icon: "pi pi-sign-out",
+      command: () => {
+        this.sessionService.logout();
+      },
+    },
   ]);
 
   protected readonly sessionService = inject(SessionService);

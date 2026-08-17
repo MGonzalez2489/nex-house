@@ -42,6 +42,9 @@ export class User extends BaseTraceableEntity {
   @Column({ default: false })
   isFirstAdmin: boolean;
 
+  @Column({ nullable: true })
+  avatar: string;
+
   //relationshipts
   @ManyToOne(() => Neighborhood)
   @JoinColumn({ name: 'neighborhoodId' })

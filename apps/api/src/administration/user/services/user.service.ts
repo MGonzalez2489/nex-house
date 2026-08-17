@@ -35,6 +35,7 @@ import { CatalogsService } from 'src/catalogs/services';
 import { DataSource, DeepPartial, EntityManager, Repository } from 'typeorm';
 import { CreateUserDto, UpdateUserDto } from '../dtos';
 import { UserSearchService } from './user-search.service';
+import { StorageService } from 'src/storage/storage.service';
 
 @Injectable()
 export class UserService {
@@ -46,6 +47,7 @@ export class UserService {
     private readonly catalogsService: CatalogsService,
     private readonly cryptoService: CryptoService,
     private readonly searchService: UserSearchService,
+    private readonly storageService: StorageService,
   ) {}
 
   /**
@@ -490,6 +492,35 @@ export class UserService {
     const pwd = await this.cryptoService.hash('1234');
     user.password = pwd;
     await this.repository.save(user);
+  }
+
+  async updateAvatar(userId: number, avatar?: Express.Multer.File) {
+    const profile = await this.repository.findOne({ where: { id: userId } });
+
+    if (!profile) {
+      throw new NotFoundException('Profile not found');
+    }
+
+    //TODO: use a default avatar img and make (?) user.avatar not null
+    //TODO: Think on a blob storage to handle uploads
+
+    if (
+      profile.avatar &&
+      avatar &&
+      !profile.avatar.includes('avatar-placeholder.webp')
+    ) {
+      this.storageService.deleteUploadFile(profile.avatar);
+    }
+
+    await this.repository.update(
+      { id: profile.id },
+      {
+        avatar: avatar ? `uploads/${avatar.filename}` : profile.avatar, // avatar?.filename,
+        // avatarFullPath: avatar ? avatar.path : '',
+      },
+    );
+
+    return this.repository.findOne({ where: { id: userId } });
   }
 
   private async generateDefaultPassword() {

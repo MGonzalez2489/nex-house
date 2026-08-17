@@ -5,12 +5,12 @@ import {
   input,
 } from "@angular/core";
 import { UserModel } from "@nexhouse/shared-domain/models";
-import { AvatarComponent } from "@shared/components";
+import { AvatarComponent, AvatarUploadComponent } from "@shared/components";
 import { Panel } from "primeng/panel";
 
 @Component({
   selector: "app-profile-card",
-  imports: [Panel, AvatarComponent],
+  imports: [Panel, AvatarComponent, AvatarUploadComponent],
   templateUrl: "./profile-card.html",
   styleUrl: "./profile-card.css",
   standalone: true,

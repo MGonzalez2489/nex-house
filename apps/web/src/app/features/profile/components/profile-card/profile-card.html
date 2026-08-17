@@ -1,6 +1,11 @@
 <p-panel showHeader="false" class="pt-5">
   <div class="flex items-center gap-4">
-    <app-avatar-component size="xlarge" />
+    <app-avatar-upload-component
+      [neighId]="user().neighborhood.publicId"
+      [avatar]="user().fullName"
+      [editable]="true"
+    />
+    <!-- <app-avatar-component size="xlarge" /> -->
 
     <div>
       <p

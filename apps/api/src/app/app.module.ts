@@ -12,6 +12,7 @@ import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CatalogsModule } from 'src/catalogs';
 import { DatabaseSeederService, getDatabaseConfig } from '../_core/database';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import {
   City,
   Country,
@@ -19,6 +20,8 @@ import {
   State,
   User,
 } from '../_core/database/entities';
+import { StorageModule } from 'src/storage/storage.module';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -30,10 +33,35 @@ import {
       inject: [ConfigService],
       useFactory: (config: ConfigService) => getDatabaseConfig(config),
     }),
+    ServeStaticModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        // const assetsConfig = configService.get<IAssetsConfiguration>(
+        //   ConfigNameEnum.assets,
+        // );
+        // const rootPath = join(
+        //   __dirname,
+        //   assetsConfig!.rootPath,
+        //   assetsConfig!.assetsPath,
+        //   // assetsConfig!.uploadsPath,
+        // );
+        // const serveRoot = join(
+        //   '/',
+        //   assetsConfig!.assetsPath,
+        //   // assetsConfig!.uploadsPath,
+        // );
+        return [
+          {
+            rootPath: join(__dirname, '..', 'client'),
+          },
+        ];
+      },
+    }),
     //TODO: move this entity imports
     TypeOrmModule.forFeature([Country, State, City, Neighborhood, User]),
     ApiCacheModule,
     AuthModule,
+    StorageModule,
     CatalogsModule,
     NeighborhoodModule,
     UserModule,
