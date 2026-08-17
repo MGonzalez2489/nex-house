@@ -30,6 +30,7 @@ export class AvatarComponent {
   ];
 
   text = input<string>();
+  url = input<string>();
 
   size = input<"normal" | "large" | "xlarge" | undefined>("normal");
 

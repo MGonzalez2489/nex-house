@@ -10,7 +10,7 @@ import {
   UserUnitRole,
 } from '@core/database';
 import { CryptoService } from '@core/services';
-import { isProd } from '@core/utils';
+import { getAvatarFolderRelativePath, isProd } from '@core/utils';
 import {
   BadRequestException,
   ConflictException,
@@ -20,6 +20,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   UnitStatusEnum,
@@ -32,10 +33,10 @@ import {
   validatePhone,
 } from '@nexhouse/shared-domain/utils';
 import { CatalogsService } from 'src/catalogs/services';
+import { StorageService } from 'src/storage/storage.service';
 import { DataSource, DeepPartial, EntityManager, Repository } from 'typeorm';
 import { CreateUserDto, UpdateUserDto } from '../dtos';
 import { UserSearchService } from './user-search.service';
-import { StorageService } from 'src/storage/storage.service';
 
 @Injectable()
 export class UserService {
@@ -48,6 +49,7 @@ export class UserService {
     private readonly cryptoService: CryptoService,
     private readonly searchService: UserSearchService,
     private readonly storageService: StorageService,
+    private readonly configService: ConfigService,
   ) {}
 
   /**
@@ -512,10 +514,12 @@ export class UserService {
       this.storageService.deleteUploadFile(profile.avatar);
     }
 
+    const url = this.configService.get('UPLOAD_DIR');
+    const avatarPath = getAvatarFolderRelativePath(url, avatar.filename);
     await this.repository.update(
       { id: profile.id },
       {
-        avatar: avatar ? `uploads/${avatar.filename}` : profile.avatar, // avatar?.filename,
+        avatar: avatar ? `${avatarPath}` : profile.avatar, // avatar?.filename,
         // avatarFullPath: avatar ? avatar.path : '',
       },
     );

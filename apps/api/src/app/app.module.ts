@@ -9,10 +9,12 @@ import { CryptoService } from '@core/services';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { CatalogsModule } from 'src/catalogs';
-import { DatabaseSeederService, getDatabaseConfig } from '../_core/database';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { join } from 'path';
+import { CatalogsModule } from 'src/catalogs';
+import { StorageModule } from 'src/storage/storage.module';
+import { DatabaseSeederService, getDatabaseConfig } from '../_core/database';
 import {
   City,
   Country,
@@ -20,8 +22,7 @@ import {
   State,
   User,
 } from '../_core/database/entities';
-import { StorageModule } from 'src/storage/storage.module';
-import { join } from 'path';
+import { getUploadsFolderPath } from '@core/utils';
 
 @Module({
   imports: [
@@ -36,23 +37,16 @@ import { join } from 'path';
     ServeStaticModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        // const assetsConfig = configService.get<IAssetsConfiguration>(
-        //   ConfigNameEnum.assets,
-        // );
-        // const rootPath = join(
-        //   __dirname,
-        //   assetsConfig!.rootPath,
-        //   assetsConfig!.assetsPath,
-        //   // assetsConfig!.uploadsPath,
-        // );
-        // const serveRoot = join(
-        //   '/',
-        //   assetsConfig!.assetsPath,
-        //   // assetsConfig!.uploadsPath,
-        // );
+        const url = configService.get('UPLOAD_DIR');
+        const destination = getUploadsFolderPath(url);
+
         return [
           {
-            rootPath: join(__dirname, '..', 'client'),
+            rootPath: destination,
+            serveRoot: `/${url}`,
+            serveStaticOptions: {
+              index: false,
+            },
           },
         ];
       },

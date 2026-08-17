@@ -116,7 +116,10 @@
 
     <!-- Settings -->
     <p-button text (click)="menu.toggle($event)">
-      <app-avatar-component [text]="sessionService.user()?.fullName" />
+      <app-avatar-component
+        [url]="sessionService.user()?.avatar"
+        [text]="sessionService.user()?.fullName"
+      />
 
       <span
         class="hidden sm:inline text-sm font-medium text-slate-700 dark:text-slate-200"

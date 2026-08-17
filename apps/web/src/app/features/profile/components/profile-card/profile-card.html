@@ -2,8 +2,9 @@
   <div class="flex items-center gap-4">
     <app-avatar-upload-component
       [neighId]="user().neighborhood.publicId"
-      [avatar]="user().fullName"
+      [avatar]="user().avatar || user().fullName"
       [editable]="true"
+      (refresh)="refresh.emit()"
     />
     <!-- <app-avatar-component size="xlarge" /> -->
 

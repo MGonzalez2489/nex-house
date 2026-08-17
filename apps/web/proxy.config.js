@@ -17,6 +17,11 @@ const PROXY_CONFIG = {
     secure: false,
     ws: true,
   },
+  "/uploads": {
+    // Nueva configuración para rutas de archivos subidos
+    target: process.env.IS_DOCKER ? "http://api:3000" : "http://localhost:3000",
+    secure: false,
+  },
 };
 
 module.exports = PROXY_CONFIG;

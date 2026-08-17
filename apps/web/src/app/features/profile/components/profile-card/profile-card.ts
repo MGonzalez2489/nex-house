@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   input,
+  output,
 } from "@angular/core";
 import { UserModel } from "@nexhouse/shared-domain/models";
 import { AvatarComponent, AvatarUploadComponent } from "@shared/components";
@@ -17,7 +18,8 @@ import { Panel } from "primeng/panel";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileCard {
-  user = input.required<UserModel>();
+  readonly user = input.required<UserModel>();
+  readonly refresh = output();
 
   address = computed(() => {
     const add = this.user().userUnits.find((f) => f.isCurrentOccupant);

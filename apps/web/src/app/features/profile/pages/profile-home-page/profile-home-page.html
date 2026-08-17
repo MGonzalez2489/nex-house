@@ -15,7 +15,7 @@
     </div>
 
     <div class="space-y-4">
-      <app-profile-card [user]="user" class="block" />
+      <app-profile-card [user]="user" class="block" (refresh)="store.load()" />
       <app-profile-info-form [user]="user" class="block" />
       <app-profile-unit
         class="block"

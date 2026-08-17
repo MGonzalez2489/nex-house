@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   input,
+  output,
 } from "@angular/core";
 import { FileUploadModule } from "primeng/fileupload";
 
@@ -18,6 +19,7 @@ export class AvatarUploadComponent {
   readonly avatar = input<string>();
   readonly neighId = input.required<string>();
   readonly editable = input<boolean>(false);
+  readonly refresh = output();
 
   protected readonly avatarUrl = computed<string>(() => {
     const cAvatar = this.avatar();
@@ -33,6 +35,6 @@ export class AvatarUploadComponent {
   });
 
   onBasicUploadAuto(): void {
-    console.log("upload");
+    this.refresh.emit();
   }
 }

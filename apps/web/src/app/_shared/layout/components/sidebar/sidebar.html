@@ -34,7 +34,10 @@
           class="w-full flex items-center justify-between gap-3 px-2 py-2 rounded-lg hover:bg-white/5 transition"
         >
           <div class="flex gap-3">
-            <app-avatar-component [text]="user().fullName" />
+            <app-avatar-component
+              [url]="user().avatar"
+              [text]="user().fullName"
+            />
 
             <div class="min-w-0 text-left">
               <p class="text-sm font-medium text-white truncate">
