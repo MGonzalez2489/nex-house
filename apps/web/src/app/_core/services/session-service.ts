@@ -6,6 +6,8 @@ import {
   WritableSignal,
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { Router } from "@angular/router";
+import { AUTH_ROUTES_ENUM } from "@auth/auth.routes";
 import { AuthStore } from "@auth/store";
 import { UserStatusEnum } from "@nexhouse/shared-domain/enums";
 import { ProfileStore } from "@stores/profile.store";
@@ -28,6 +30,7 @@ export class SessionService {
   //injects
   private readonly profileStore = inject(ProfileStore);
   private readonly authStore = inject(AuthStore);
+  private readonly router = inject(Router);
   readonly _viewSize: WritableSignal<ViewSize> = signal(
     this.getViewSize(window.innerWidth),
   );
@@ -70,8 +73,9 @@ export class SessionService {
       this.isSidebarOpen.set(!this.isSidebarOpen());
     }
   }
-  logout(): void {
-    this.authStore.logout();
+  async logout() {
+    await this.authStore.logout();
+    this.router.navigateByUrl(`/${AUTH_ROUTES_ENUM.LOGIN}`);
   }
   private getViewSize(width: number): ViewSize {
     if (width < TAILWIND_BREAKPOINTS.md) {

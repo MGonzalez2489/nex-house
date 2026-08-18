@@ -3,8 +3,12 @@
 >
   <div class="flex h-full w-full flex-col">
     <!-- ============ TOPBAR ============ -->
-    @if (showNavComponentes()) {
-      <app-nav-bar />
+    @if (showNavComponentes() && sessionService.user()) {
+      <app-nav-bar
+        [user]="sessionService.user()!"
+        (toggleSidebar)="sessionService.toggleSession()"
+        (logout)="sessionService.logout()"
+      />
     }
 
     <!-- ============ CUERPO: sidebar + contenido ============ -->

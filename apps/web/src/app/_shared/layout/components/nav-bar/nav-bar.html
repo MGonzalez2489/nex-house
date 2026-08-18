@@ -8,7 +8,7 @@
         icon="pi pi-bars"
         text
         severity="secondary"
-        (click)="toggleSidebar()"
+        (click)="toggleSidebar.emit()"
         class="md:hidden"
       />
     }
@@ -116,14 +116,11 @@
 
     <!-- Settings -->
     <p-button text (click)="menu.toggle($event)">
-      <app-avatar-component
-        [url]="sessionService.user()?.avatar"
-        [text]="sessionService.user()?.fullName"
-      />
+      <app-avatar-component [url]="user().avatar" [text]="user().fullName" />
 
       <span
         class="hidden sm:inline text-sm font-medium text-slate-700 dark:text-slate-200"
-        >{{ sessionService.user()?.firstName || "--" }}</span
+        >{{ user().firstName || "--" }}</span
       >
       <i class="pi pi-chevron-down text-sm text-slate-500"></i>
     </p-button>

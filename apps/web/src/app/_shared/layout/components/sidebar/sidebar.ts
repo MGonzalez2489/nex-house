@@ -9,10 +9,11 @@ import { UserModel } from "@nexhouse/shared-domain/models";
 import { AvatarComponent } from "@shared/components";
 import { SideItem } from "../sidebar-item/side-item";
 import { SidebarItem } from "../sidebar-item/sidebar-item";
+import { Button } from "primeng/button";
 
 @Component({
   selector: "app-sidebar",
-  imports: [SidebarItem, AvatarComponent],
+  imports: [SidebarItem, AvatarComponent, Button],
   templateUrl: "./sidebar.html",
   styleUrl: "./sidebar.css",
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -29,5 +30,8 @@ export class Sidebar {
 
   toggleUserMenu() {
     this.isUserMenuOpen.set(!this.isUserMenuOpen());
+  }
+  alert() {
+    alert("hola");
   }
 }

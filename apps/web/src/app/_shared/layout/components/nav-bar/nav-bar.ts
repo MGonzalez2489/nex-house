@@ -3,11 +3,12 @@ import {
   Component,
   computed,
   effect,
-  inject,
+  input,
+  output,
   signal,
 } from "@angular/core";
-import { SessionService } from "@core/services";
 import { UserRoleEnum } from "@nexhouse/shared-domain/enums";
+import { UserModel } from "@nexhouse/shared-domain/models";
 import { PROFILE_ROUTES_ENUM } from "@profile/profile.routes";
 import { AvatarComponent, BrandComponent } from "@shared/components";
 import { MenuItem } from "primeng/api";
@@ -23,6 +24,10 @@ import { MenuModule } from "primeng/menu";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NavBar {
+  user = input.required<UserModel>();
+  toggleSidebar = output();
+  logout = output();
+
   protected readonly darkMode = signal<boolean>(
     //light mode by default
     typeof window !== "undefined"
@@ -47,15 +52,15 @@ export class NavBar {
       label: "Cerrar sesión",
       icon: "pi pi-sign-out",
       command: () => {
-        this.sessionService.logout();
+        this.logout.emit();
       },
     },
   ]);
 
-  protected readonly sessionService = inject(SessionService);
+  // protected readonly sessionService = inject(SessionService);
 
   isResident = computed(
-    () => this.sessionService.user()?.role?.name === UserRoleEnum.RESIDENT,
+    () => this.user()?.role?.name === UserRoleEnum.RESIDENT,
   );
 
   constructor() {
@@ -72,7 +77,7 @@ export class NavBar {
     this.darkMode.update((dark) => !dark);
   }
 
-  toggleSidebar() {
-    this.sessionService.toggleSession();
-  }
+  // toggleSidebar() {
+  //   this.sessionService.toggleSession();
+  // }
 }

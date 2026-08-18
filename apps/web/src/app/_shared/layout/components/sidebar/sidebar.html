@@ -63,47 +63,24 @@
             id="userMenu"
             class="absolute bottom-full left-0 mb-2 w-full rounded-xl border border-white/10 bg-slate-800 shadow-xl overflow-hidden"
           >
-            <a
-              href="#"
-              class="flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-200 hover:bg-white/5 transition"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-                <line x1="12" y1="17" x2="12.01" y2="17" />
-              </svg>
-              Ayuda y soporte
-            </a>
-            <a
-              href="#"
+            <p-button
+              fluid
+              text
+              label="Ayuda y soporte"
+              icon="pi pi-question-circle"
+              (click)="alert()"
+              styleClass="text-sm text-slate-200 hover:bg-white/5! transition justify-start"
+              severity="secondary"
+            />
+
+            <p-button
+              fluid
+              text
+              label="Cerrar sesión"
+              icon="pi pi-sign-out"
               (click)="logout.emit()"
-              class="flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-rose-300 hover:bg-rose-500/10 transition border-t border-white/5"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                <polyline points="16 17 21 12 16 7" />
-                <line x1="21" y1="12" x2="9" y2="12" />
-              </svg>
-              Cerrar sesión
-            </a>
+              styleClass="border-0 text-sm text-rose-300 hover:bg-rose-500/10 transition border-t border-white/5 justify-start"
+            />
           </div>
         }
       </div>
