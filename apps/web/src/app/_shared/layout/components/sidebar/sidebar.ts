@@ -31,7 +31,4 @@ export class Sidebar {
   toggleUserMenu() {
     this.isUserMenuOpen.set(!this.isUserMenuOpen());
   }
-  alert() {
-    alert("hola");
-  }
 }

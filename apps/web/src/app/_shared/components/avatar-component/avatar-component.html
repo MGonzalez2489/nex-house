@@ -1,15 +1,11 @@
-<!-- <p-avatar -->
-<!--   [label]="avatar()" -->
-<!--   [image]="url()" -->
-<!--   class="min-w-8 min-h-8 p-5! font-semibold" -->
-<!--   [size]="size()" -->
-<!--   [shape]="shape()" -->
-<!--   [style]="{ 'background-color': bgColor(), color: color() }" -->
-<!-- /> -->
-
-<p-avatar
-  [image]="url()"
-  [size]="size()"
-  [shape]="shape()"
-  [style]="{ 'background-color': bgColor(), color: color() }"
-/>
+@if (url()) {
+  <p-avatar [image]="url()" [size]="size()" [shape]="shape()" />
+} @else {
+  <p-avatar
+    [label]="avatar()"
+    class="min-w-8 min-h-8 p-5! font-semibold"
+    [size]="size()"
+    [shape]="shape()"
+    [style]="{ 'background-color': bgColor(), color: color() }"
+  />
+}

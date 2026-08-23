@@ -17,7 +17,7 @@ import { FileUploadModule } from "primeng/fileupload";
 })
 export class AvatarUploadComponent {
   readonly avatar = input<string>();
-  readonly neighId = input.required<string>();
+  readonly neighId = input<string>();
   readonly editable = input<boolean>(false);
   readonly refresh = output();
 

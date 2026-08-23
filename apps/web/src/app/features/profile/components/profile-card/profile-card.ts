@@ -6,12 +6,12 @@ import {
   output,
 } from "@angular/core";
 import { UserModel } from "@nexhouse/shared-domain/models";
-import { AvatarComponent, AvatarUploadComponent } from "@shared/components";
+import { AvatarUploadComponent } from "@shared/components";
 import { Panel } from "primeng/panel";
 
 @Component({
   selector: "app-profile-card",
-  imports: [Panel, AvatarComponent, AvatarUploadComponent],
+  imports: [Panel, AvatarUploadComponent],
   templateUrl: "./profile-card.html",
   styleUrl: "./profile-card.css",
   standalone: true,
