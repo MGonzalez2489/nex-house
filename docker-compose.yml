@@ -45,6 +45,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
       UPLOAD_DIR: ${UPLOAD_DIR:-/app/uploads}
+      JWT_SECRET: ${JWT_SECRET}
     ports:
       - '3000:3000'
     networks:
