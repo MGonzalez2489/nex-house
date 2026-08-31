@@ -22,19 +22,19 @@ import { NavBar } from "@shared/layout/components";
 })
 export class ResidentLayout {
   private readonly router = inject(Router);
-  protected readonly sessionService = inject(SessionService);
   private readonly currentUrl = signal(this.router.url);
+  protected readonly sessionService = inject(SessionService);
 
   showNavComponentes = computed(() => {
-    const cUser = this.sessionService.user();
+    const userData = this.sessionService.loggedInUserData();
 
-    if (!cUser) return false;
+    if (!userData) return false;
 
     const path = this.currentUrl();
 
     if (path.includes(ONBOARDING_ROUTES_ENUM.HOME)) return false;
 
-    return cUser.status?.name === UserStatusEnum.ACTIVE;
+    return userData.status.name === UserStatusEnum.ACTIVE;
   });
 
   constructor() {

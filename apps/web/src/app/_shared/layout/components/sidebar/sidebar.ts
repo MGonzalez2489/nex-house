@@ -5,7 +5,11 @@ import {
   output,
   signal,
 } from "@angular/core";
-import { UserModel } from "@nexhouse/shared-domain/models";
+import {
+  UserModel,
+  UserProfileModel,
+  UserRoleModel,
+} from "@nexhouse/shared-domain/models";
 import { AvatarComponent } from "@shared/components";
 import { SideItem } from "../sidebar-item/side-item";
 import { SidebarItem } from "../sidebar-item/sidebar-item";
@@ -22,6 +26,8 @@ import { Button } from "primeng/button";
 export class Sidebar {
   items = input.required<SideItem[]>();
   user = input.required<UserModel>();
+  profile = input.required<UserProfileModel>();
+  role = input.required<UserRoleModel>();
 
   navigate = output();
   logout = output();

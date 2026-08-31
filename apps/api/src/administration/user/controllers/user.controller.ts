@@ -1,3 +1,7 @@
+import { Neighborhood, User } from '@core/database';
+import { CurrentNeigh, CurrentUser } from '@core/decorators';
+import { NeighborhoodScopeGuard } from '@core/guards';
+import { UserToModelMapper } from '@core/mappers';
 import {
   Body,
   Controller,
@@ -12,13 +16,9 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { UserSearchService, UserService, UserStatsService } from '../services';
-import { User, Neighborhood } from '@core/database';
-import { CurrentNeigh, CurrentUser } from '@core/decorators';
 import { ApiOperation, ApiParam } from '@nestjs/swagger';
 import { CreateUserDto, SearchUserDto, UpdateUserDto } from '../dtos';
-import { NeighborhoodScopeGuard } from '@core/guards';
-import { UserToModelMapper } from '@core/mappers';
+import { UserSearchService, UserService, UserStatsService } from '../services';
 // import { FileInterceptor } from '@core/interceptors';
 import { FileInterceptor } from '@nestjs/platform-express';
 

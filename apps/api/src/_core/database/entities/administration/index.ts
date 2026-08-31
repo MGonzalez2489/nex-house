@@ -5,6 +5,7 @@ export * from './neigh_address.entity';
 
 //users
 export * from './user.entity';
+export * from './user-profile.entity';
 export * from './user_role.entity';
 export * from './user_status.entity';
 

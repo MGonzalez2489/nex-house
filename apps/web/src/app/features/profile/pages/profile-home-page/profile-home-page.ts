@@ -1,6 +1,11 @@
-import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+} from "@angular/core";
 import { ProfileCard, ProfileInfoForm, ProfileUnit } from "@profile/components";
-import { ProfileStore } from "@stores/profile.store";
+import { UserStore } from "@stores/user.store";
 
 @Component({
   selector: "app-profile-home-page",
@@ -11,5 +16,8 @@ import { ProfileStore } from "@stores/profile.store";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileHomePage {
-  protected readonly store = inject(ProfileStore);
+  protected readonly store = inject(UserStore);
+
+  user = computed(() => this.store.user());
+  profile = computed(() => this.store.profile());
 }

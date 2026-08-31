@@ -1,24 +1,23 @@
 import { Exclude } from 'class-transformer';
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+} from 'typeorm';
 import { BaseTraceableEntity } from '../_base';
 import { Neighborhood } from './neighborhood.entity';
 import { UserUnit } from './user-unit.entity';
 import { UserRole } from './user_role.entity';
 import { UserStatus } from './user_status.entity';
+import { UserProfile } from './user-profile.entity';
 
 @Entity('users')
 export class User extends BaseTraceableEntity {
-  @Column({ nullable: true })
-  firstName: string;
-
-  @Column({ nullable: true })
-  lastName: string;
-
   @Column({ unique: true, nullable: false })
   email: string;
-
-  @Column({ nullable: true })
-  phone: string;
 
   @Column()
   @Exclude()
@@ -42,13 +41,13 @@ export class User extends BaseTraceableEntity {
   @Column({ default: false })
   isFirstAdmin: boolean;
 
-  @Column({ nullable: true })
-  avatar: string;
-
   //relationshipts
   @ManyToOne(() => Neighborhood)
   @JoinColumn({ name: 'neighborhoodId' })
   neighborhood: Neighborhood;
+
+  @OneToOne(() => UserProfile, (profile) => profile.user, { cascade: true })
+  profile: UserProfile;
 
   @ManyToOne(() => UserRole)
   @JoinColumn({ name: 'roleId' })
@@ -60,11 +59,6 @@ export class User extends BaseTraceableEntity {
 
   @OneToMany(() => UserUnit, (units) => units.user)
   userUnits: UserUnit[];
-
-  //virtual properties
-  get fullName(): string {
-    return `${this.firstName || ''} ${this.lastName || ''}`.trim();
-  }
 
   // ==========================================
   // Audit

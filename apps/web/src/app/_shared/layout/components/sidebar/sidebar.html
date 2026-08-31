@@ -35,21 +35,21 @@
         >
           <div class="flex gap-3">
             <app-avatar-component
-              [url]="user().avatar"
-              [text]="user().fullName"
+              [url]="profile().avatar"
+              [text]="profile().fullName"
             />
 
             <div class="min-w-0 text-left">
               <p class="text-sm font-medium text-white truncate">
-                @if (user().fullName !== "null") {
-                  {{ user().fullName }}
+                @if (profile().fullName !== "null") {
+                  {{ profile().fullName }}
                 } @else {
                   {{ user().email }}
                 }
               </p>
 
               <p class="text-xs text-slate-400 truncate">
-                {{ user().role.displayName }}
+                {{ role().displayName }}
               </p>
             </div>
           </div>

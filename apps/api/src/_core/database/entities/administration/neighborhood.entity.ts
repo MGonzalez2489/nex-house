@@ -21,7 +21,6 @@ export class Neighborhood extends BaseTraceableEntity {
   isActive: boolean;
 
   //relationships
-
   @OneToOne(() => NeighAddress, (address) => address.neighborhood, {
     cascade: true,
   })

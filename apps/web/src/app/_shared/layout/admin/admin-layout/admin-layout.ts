@@ -30,15 +30,15 @@ export class AdminLayout {
   private readonly currentUrl = signal(this.router.url);
 
   showNavComponentes = computed(() => {
-    const cUser = this.sessionService.user();
+    const loggedData = this.sessionService.loggedInUserData();
 
-    if (!cUser) return false;
+    if (!loggedData) return false;
 
     const path = this.currentUrl();
 
     if (path.includes(ONBOARDING_ROUTES_ENUM.HOME)) return false;
 
-    return cUser.status?.name === UserStatusEnum.ACTIVE;
+    return loggedData.status.name === UserStatusEnum.ACTIVE;
   });
 
   constructor() {

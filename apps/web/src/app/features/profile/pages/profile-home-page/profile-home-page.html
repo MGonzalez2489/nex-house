@@ -1,27 +1,36 @@
 <div class="max-w-2xl mx-auto">
-  @if (store.user(); as user) {
-    <!-- header -->
-    <div class="flex items-center justify-between gap-3 mb-6">
-      <div>
-        <h1
-          class="text-xl sm:text-2xl font-display font-semibold text-slate-900 dark:text-white"
-        >
-          Mi perfil
-        </h1>
-        <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-          Consulta y actualiza tu información personal.
-        </p>
-      </div>
+  <!-- header -->
+  <div class="flex items-center justify-between gap-3 mb-6">
+    <div>
+      <h1
+        class="text-xl sm:text-2xl font-display font-semibold text-slate-900 dark:text-white"
+      >
+        Mi perfil
+      </h1>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+        Consulta y actualiza tu información personal.
+      </p>
     </div>
+  </div>
 
-    <div class="space-y-4">
-      <app-profile-card [user]="user" class="block" (refresh)="store.load()" />
-      <app-profile-info-form [user]="user" class="block" />
+  <div class="space-y-4">
+    @if (user() && profile()) {
+      <app-profile-card
+        [user]="user()!"
+        [profile]="profile()!"
+        class="block"
+        (refresh)="store.load()"
+      />
+      <app-profile-info-form
+        [user]="user()!"
+        [profile]="profile()!"
+        class="block"
+      />
       <app-profile-unit
         class="block"
-        [userUnits]="user.userUnits"
-        [neighborhood]="user.neighborhood"
+        [userUnits]="store.units()"
+        [neighborhood]="user()?.neighborhood"
       />
-    </div>
-  }
+    }
+  </div>
 </div>

@@ -14,7 +14,7 @@ import {
   Validators,
 } from "@angular/forms";
 import { UpdateUser } from "@nexhouse/shared-domain/interfaces";
-import { UserModel } from "@nexhouse/shared-domain/models";
+import { UserModel, UserProfileModel } from "@nexhouse/shared-domain/models";
 import {
   FormOptions,
   FormValidationErrorComponent,
@@ -42,6 +42,7 @@ import { Panel } from "primeng/panel";
 })
 export class ProfileInfoForm implements OnInit {
   user = input.required<UserModel>();
+  profile = input.required<UserProfileModel>();
   protected readonly form = new FormGroup({
     firstName: new FormControl("", {
       nonNullable: true,
@@ -103,11 +104,12 @@ export class ProfileInfoForm implements OnInit {
   }
   cancel() {
     const user = this.user();
+    const profile = this.profile();
     this.form.reset();
     this.form.patchValue({
-      firstName: user.firstName,
-      lastName: user.lastName,
-      phone: user.phone,
+      firstName: profile.firstName,
+      lastName: profile.lastName,
+      phone: profile.phone,
       email: user.email,
     });
 

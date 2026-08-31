@@ -11,9 +11,9 @@ import {
 } from "@ngrx/signals";
 import { UserRoleEnum } from "@nexhouse/shared-domain/enums";
 import { ContextStore } from "./context.store";
-import { ProfileStore } from "./profile.store";
 import { CatalogsStore } from "./catalogs.store";
 import { UnitStore } from "@units/units.store";
+import { UserStore } from "./user.store";
 
 export type StartupStatus =
   | "IDLE"
@@ -34,7 +34,7 @@ export const StartupStore = signalStore(
   withProps(() => ({
     _authStore: inject(AuthStore),
     _contextStore: inject(ContextStore),
-    _profileStore: inject(ProfileStore),
+    _userStore: inject(UserStore),
     _catalogsStore: inject(CatalogsStore),
     _unitStore: inject(UnitStore),
   })),
@@ -56,7 +56,6 @@ export const StartupStore = signalStore(
     async _initRoot() {
       await store._catalogsStore.loadRootCatalogs();
       console.log("load all related to root");
-      // await store._profileStore.load();
     },
     async _initAdmin() {
       await Promise.all([
@@ -78,19 +77,21 @@ export const StartupStore = signalStore(
       patchState(store, { status: "LOADING" });
 
       try {
-        const user = await store._profileStore.load();
-        const roleName = user?.role?.name;
+        const loggedData = await store._userStore.load();
+        if (!loggedData) throw "Not logged data";
 
-        if (!user || !roleName) {
+        const { role, user } = loggedData;
+
+        if (!user || !role) {
           patchState(store, { status: "UNAUTHENTICATED" });
           store._authStore.logout();
           return;
         }
 
-        if (roleName === UserRoleEnum.SUPERADMIN) {
+        if (role.name === UserRoleEnum.SUPERADMIN) {
           console.log("=== INIT ROOT ===");
           await store._initRoot();
-        } else if (roleName === UserRoleEnum.ADMIN) {
+        } else if (role.name === UserRoleEnum.ADMIN) {
           console.log("=== INIT ADMIN ===");
           await store._initAdmin();
         } else {
@@ -112,7 +113,7 @@ export const StartupStore = signalStore(
     return {
       onInit: (): void => {
         effect(() => {
-          const usr = store._profileStore.user();
+          const usr = store._userStore.user();
 
           if (usr) {
             store.setReady();

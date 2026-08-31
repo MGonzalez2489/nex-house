@@ -6,7 +6,7 @@
         <dd
           class="text-sm text-slate-700 dark:text-slate-200 mt-0.5 capitalize"
         >
-          {{ neighborhood().name }}
+          {{ neighborhood()?.name || "no hay" }}
         </dd>
       </div>
       <div>

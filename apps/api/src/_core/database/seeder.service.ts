@@ -210,10 +210,12 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
       const superAdminInstance = this.userRepository.create({
         email: superAdminEnv.email.trim().toLowerCase(),
         password: hashedPassword,
-        firstName: 'Super',
-        lastName: 'Admin',
         roleId: 1, // Systemic SuperAdmin structural mapping id constant
         statusId: 1, // Active operational account status constant
+        profile: {
+          firstName: 'Super',
+          lastName: 'Admin',
+        },
       });
 
       await this.userRepository.save(superAdminInstance);

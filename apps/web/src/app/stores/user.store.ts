@@ -1,15 +1,21 @@
 import {
+  setError,
+  setLoaded,
+  setLoading,
+  withCallState,
   withDevtools,
   withReset,
-  withCallState,
-  setError,
-  setLoading,
-  setLoaded,
 } from "@angular-architects/ngrx-toolkit";
 import { inject } from "@angular/core";
 import { ProfileService } from "@core/services";
 import { ChangePassword, UpdateUser } from "@nexhouse/shared-domain/interfaces";
-import { UserModel } from "@nexhouse/shared-domain/models";
+import {
+  UserModel,
+  UserProfileModel,
+  UserRoleModel,
+  UserStatusModel,
+  UserUnitModel,
+} from "@nexhouse/shared-domain/models";
 import {
   patchState,
   signalStore,
@@ -21,22 +27,29 @@ import { lastValueFrom } from "rxjs";
 
 interface ProfileState {
   user: UserModel | undefined;
+  profile: UserProfileModel | undefined;
+  status: UserStatusModel | undefined;
+  role: UserRoleModel | undefined;
+  units: UserUnitModel[];
 }
 
 const initialState: ProfileState = {
   user: undefined,
+  profile: undefined,
+  status: undefined,
+  role: undefined,
+  units: [],
 };
 
-export const ProfileStore = signalStore(
+export const UserStore = signalStore(
   { providedIn: "root" },
-  withDevtools("profile"),
+  withDevtools("user"),
   withReset(),
   withCallState(),
   withState(initialState),
   withProps(() => ({
     _service: inject(ProfileService),
   })),
-
   withMethods((store) => ({
     load: async () => {
       patchState(store, setLoading());
@@ -44,9 +57,36 @@ export const ProfileStore = signalStore(
       try {
         const res = await lastValueFrom(store._service.get());
 
-        patchState(store, { user: res.data }, setLoaded());
+        const state: ProfileState = {
+          user: undefined,
+          profile: undefined,
+          status: undefined,
+          role: undefined,
+          units: [],
+        };
 
-        return res.data;
+        const user = res.data;
+        if (user.profile) {
+          state.profile = user.profile;
+          delete user.profile;
+        }
+        if (user.status) {
+          state.status = user.status;
+          delete user.status;
+        }
+        if (user.role) {
+          state.role = user.role;
+          delete user.role;
+        }
+        if (user.userUnits) {
+          state.units = user.userUnits;
+          user.userUnits = [];
+        }
+        state.user = user;
+
+        patchState(store, state, setLoaded());
+
+        return state;
       } catch (error) {
         patchState(store, setError(error));
         return null;

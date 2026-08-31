@@ -7,10 +7,10 @@ import {
   Type,
 } from "@angular/core";
 import { UserRoleEnum } from "@nexhouse/shared-domain/enums";
-import { ProfileStore } from "@stores/profile.store";
 import { AdminLayout } from "./admin";
 import { ResidentLayout } from "./resident";
 import { RootLayout } from "./root/root-layout/root-layout";
+import { UserStore } from "@stores/user.store";
 
 @Component({
   selector: "app-main-layout",
@@ -21,14 +21,14 @@ import { RootLayout } from "./root/root-layout/root-layout";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MainLayout {
-  protected readonly store = inject(ProfileStore);
+  protected readonly store = inject(UserStore);
 
   //
   protected activeLayout!: Type<any>;
 
   constructor() {
     effect(() => {
-      const role = this.store.user()?.role;
+      const role = this.store.role();
 
       if (!role) return;
 

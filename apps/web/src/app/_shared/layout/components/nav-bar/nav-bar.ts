@@ -8,7 +8,7 @@ import {
   signal,
 } from "@angular/core";
 import { UserRoleEnum } from "@nexhouse/shared-domain/enums";
-import { UserModel } from "@nexhouse/shared-domain/models";
+import { UserModel, UserProfileModel } from "@nexhouse/shared-domain/models";
 import { PROFILE_ROUTES_ENUM } from "@profile/profile.routes";
 import { AvatarComponent, BrandComponent } from "@shared/components";
 import { MenuItem } from "primeng/api";
@@ -25,6 +25,7 @@ import { MenuModule } from "primeng/menu";
 })
 export class NavBar {
   user = input.required<UserModel>();
+  profile = input.required<UserProfileModel>();
   toggleSidebar = output();
   logout = output();
 

@@ -36,6 +36,7 @@ export class ProfileController {
         neighborhood: loadNeigh,
         status: true,
         role: true,
+        profile: true,
         userUnits: { unit: { type: true, street: true } },
       },
     );

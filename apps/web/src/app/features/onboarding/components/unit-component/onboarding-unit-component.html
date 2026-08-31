@@ -1,0 +1,20 @@
+<p>onboarding-unit-component works!</p>
+
+<div class="flex items-center gap-3 pt-2">
+  <p-button
+    label="Atrás"
+    icon="pi pi-arrow-left"
+    variant="outlined"
+    severity="secondary"
+    (click)="prev.emit()"
+  />
+
+  <p-button
+    label="Continuar"
+    icon="pi pi-arrow-right"
+    iconPos="right"
+    fluid
+    (click)="next.emit()"
+    class="w-full"
+  />
+</div>

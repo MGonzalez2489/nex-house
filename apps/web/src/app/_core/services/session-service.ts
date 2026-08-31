@@ -10,7 +10,13 @@ import { Router } from "@angular/router";
 import { AUTH_ROUTES_ENUM } from "@auth/auth.routes";
 import { AuthStore } from "@auth/store";
 import { UserStatusEnum } from "@nexhouse/shared-domain/enums";
-import { ProfileStore } from "@stores/profile.store";
+import {
+  UserModel,
+  UserProfileModel,
+  UserRoleModel,
+  UserStatusModel,
+} from "@nexhouse/shared-domain/models";
+import { UserStore } from "@stores/user.store";
 import { fromEvent, debounceTime, startWith } from "rxjs";
 
 export type ViewSize = "small" | "medium" | "large";
@@ -23,12 +29,19 @@ const TAILWIND_BREAKPOINTS = {
   "2xl": 1536,
 };
 
+interface LoggedInUserData {
+  user: UserModel;
+  profile: UserProfileModel;
+  role: UserRoleModel;
+  status: UserStatusModel;
+}
+
 @Injectable({
   providedIn: "root",
 })
 export class SessionService {
   //injects
-  private readonly profileStore = inject(ProfileStore);
+  private readonly profileStore = inject(UserStore);
   private readonly authStore = inject(AuthStore);
   private readonly router = inject(Router);
   readonly _viewSize: WritableSignal<ViewSize> = signal(
@@ -48,15 +61,19 @@ export class SessionService {
   }
 
   //properties
-  readonly user = computed(() => this.profileStore.user());
-  readonly isUserActive = computed<boolean>(() => {
-    const cUser = this.user();
-    if (!cUser) return false;
 
-    if (cUser.status?.name !== UserStatusEnum.ACTIVE) return false;
+  readonly loggedInUserData = computed<LoggedInUserData | undefined>(() => {
+    const user = this.profileStore.user();
+    const profile = this.profileStore.profile();
+    const role = this.profileStore.role();
+    const status = this.profileStore.status();
 
-    return true;
+    if (user && profile && role && status) {
+      return { user, profile, role, status };
+    }
+    return undefined;
   });
+
   readonly isMobile = computed(() => this._viewSize() === "small");
   readonly isTablet = computed(() => this._viewSize() === "medium");
   readonly isDesktop = computed(() => this._viewSize() === "large");

@@ -40,7 +40,7 @@ export class ResidentStatusComponent {
       case UserStatusEnum.INACTIVE:
         sev = "secondary";
         break;
-      case UserStatusEnum.PENDING:
+      case UserStatusEnum.PENDING_ONBOARDING:
         sev = "warn";
         break;
       default:

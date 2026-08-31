@@ -6,7 +6,7 @@ import {
 } from "@angular/core";
 import { Router } from "@angular/router";
 import { DASHBOARD_ROUTES_ENUM } from "@dashboard/dashboard.routes";
-import { UserModel } from "@nexhouse/shared-domain/models";
+import { UserModel, UserProfileModel } from "@nexhouse/shared-domain/models";
 import { Button } from "primeng/button";
 import { Panel } from "primeng/panel";
 
@@ -21,6 +21,7 @@ import { Panel } from "primeng/panel";
 export class OnboardingFinishComponent {
   private readonly router = inject(Router);
   readonly user = input<UserModel>();
+  readonly profile = input<UserProfileModel>();
 
   goDashboard() {
     // this.router.resetConfig(DASHBOARD_ROUTES);

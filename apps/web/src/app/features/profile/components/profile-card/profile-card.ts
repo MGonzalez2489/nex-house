@@ -5,7 +5,7 @@ import {
   input,
   output,
 } from "@angular/core";
-import { UserModel } from "@nexhouse/shared-domain/models";
+import { UserModel, UserProfileModel } from "@nexhouse/shared-domain/models";
 import { AvatarUploadComponent } from "@shared/components";
 import { Panel } from "primeng/panel";
 
@@ -19,6 +19,7 @@ import { Panel } from "primeng/panel";
 })
 export class ProfileCard {
   readonly user = input.required<UserModel>();
+  readonly profile = input.required<UserProfileModel>();
   readonly refresh = output();
 
   address = computed(() => {

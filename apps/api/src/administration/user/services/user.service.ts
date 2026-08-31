@@ -10,7 +10,7 @@ import {
   UserUnitRole,
 } from '@core/database';
 import { CryptoService } from '@core/services';
-import { getAvatarFolderRelativePath, isProd } from '@core/utils';
+import { isProd } from '@core/utils';
 import {
   BadRequestException,
   ConflictException,
@@ -27,11 +27,7 @@ import {
   UserRoleEnum,
   UserStatusEnum,
 } from '@nexhouse/shared-domain/enums';
-import {
-  formatPhone,
-  generateRandomString,
-  validatePhone,
-} from '@nexhouse/shared-domain/utils';
+import { generateRandomString } from '@nexhouse/shared-domain/utils';
 import { CatalogsService } from 'src/catalogs/services';
 import { StorageService } from 'src/storage/storage.service';
 import { DataSource, DeepPartial, EntityManager, Repository } from 'typeorm';
@@ -95,7 +91,7 @@ export class UserService {
 
     const status = await this.catalogsService.findByName(
       UserStatus,
-      UserStatusEnum.PENDING,
+      UserStatusEnum.PENDING_ONBOARDING,
     );
     if (!status) {
       throw new BadRequestException(
@@ -119,6 +115,7 @@ export class UserService {
         createdBy: currentUser.id,
         neighborhoodId: neighId,
         password: hashedPassword,
+        profile: {},
       };
 
       const newUser = queryRunner.manager.create(User, nUser);
@@ -236,21 +233,11 @@ export class UserService {
       UserRole,
       UserRoleEnum.ADMIN,
     );
-    if (!role) {
-      throw new BadRequestException(
-        'Target user role catalog record not found.',
-      );
-    }
 
     const status = await this.catalogsService.findByName(
       UserStatus,
-      UserStatusEnum.PENDING,
+      UserStatusEnum.PENDING_ONBOARDING,
     );
-    if (!status) {
-      throw new BadRequestException(
-        'Target pending user status catalog record not found.',
-      );
-    }
 
     const formatedEmail = email.trim().toLowerCase();
     const nUser: DeepPartial<User> = {
@@ -261,6 +248,7 @@ export class UserService {
       neighborhoodId: neighId,
       password: hashedPassword,
       isFirstAdmin: true,
+      profile: {},
     };
 
     const newUser = entityManager.create(User, nUser);
@@ -296,21 +284,22 @@ export class UserService {
       );
     }
 
-    if (dto.phone) {
-      const formatedPhone = formatPhone(dto.phone);
-      if (formatedPhone !== existingUser.phone) {
-        if (!validatePhone(formatedPhone)) {
-          throw new BadRequestException('User phone format not valid.');
-        }
-        const existsPhone = await this.repository.exists({
-          where: { phone: formatedPhone },
-        });
-        if (existsPhone) {
-          throw new ConflictException(`Phone ${dto.phone} already in use.`);
-        }
-        existingUser.phone = formatedPhone;
-      }
-    }
+    //TODO: move this to profile
+    // if (dto.phone) {
+    //   const formatedPhone = formatPhone(dto.phone);
+    //   if (formatedPhone !== existingUser.phone) {
+    //     if (!validatePhone(formatedPhone)) {
+    //       throw new BadRequestException('User phone format not valid.');
+    //     }
+    //     const existsPhone = await this.repository.exists({
+    //       where: { phone: formatedPhone },
+    //     });
+    //     if (existsPhone) {
+    //       throw new ConflictException(`Phone ${dto.phone} already in use.`);
+    //     }
+    //     existingUser.phone = formatedPhone;
+    //   }
+    // }
 
     let updatedRole;
     if (dto.userRoleId && dto.userRoleId !== existingUser.role?.publicId) {
@@ -318,11 +307,7 @@ export class UserService {
         UserRole,
         dto.userRoleId,
       );
-      if (!role) {
-        throw new BadRequestException(
-          'Target user role catalog record not found.',
-        );
-      }
+
       updatedRole = role;
     }
 
@@ -331,13 +316,14 @@ export class UserService {
     await queryRunner.startTransaction();
 
     try {
-      if (dto.firstName) existingUser.firstName = dto.firstName.trim();
-      if (dto.lastName) existingUser.lastName = dto.lastName.trim();
+      //TODO: move this to profile
+      // if (dto.firstName) existingUser.firstName = dto.firstName.trim();
+      // if (dto.lastName) existingUser.lastName = dto.lastName.trim();
       if (updatedRole) existingUser.role = updatedRole;
 
-      if (existingUser.statusId !== activeUserStatus.id) {
-        existingUser.status = activeUserStatus;
-      }
+      // if (existingUser.statusId !== activeUserStatus.id) {
+      //   existingUser.status = activeUserStatus;
+      // }
 
       const savedUser = await queryRunner.manager.save(User, existingUser);
 
@@ -506,23 +492,22 @@ export class UserService {
     //TODO: use a default avatar img and make (?) user.avatar not null
     //TODO: Think on a blob storage to handle uploads
 
-    if (
-      profile.avatar &&
-      avatar &&
-      !profile.avatar.includes('avatar-placeholder.webp')
-    ) {
-      this.storageService.deleteUploadFile(profile.avatar);
-    }
-
-    const url = this.configService.get('UPLOAD_DIR');
-    const avatarPath = getAvatarFolderRelativePath(url, avatar.filename);
-    await this.repository.update(
-      { id: profile.id },
-      {
-        avatar: avatar ? `${avatarPath}` : profile.avatar, // avatar?.filename,
-        // avatarFullPath: avatar ? avatar.path : '',
-      },
-    );
+    //TODO: move this to profile
+    // if (
+    //   profile.avatar &&
+    //   avatar &&
+    //   !profile.avatar.includes('avatar-placeholder.webp')
+    // ) {
+    //   this.storageService.deleteUploadFile(profile.avatar);
+    // }
+    // const url = this.configService.get('UPLOAD_DIR');
+    // const avatarPath = getAvatarFolderRelativePath(url, avatar.filename);
+    // await this.repository.update(
+    //   { id: profile.id },
+    //   {
+    //     avatar: avatar ? `${avatarPath}` : profile.avatar, // avatar?.filename,
+    //   },
+    // );
 
     return this.repository.findOne({ where: { id: userId } });
   }

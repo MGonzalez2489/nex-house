@@ -19,7 +19,7 @@ import { Panel } from "primeng/panel";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileUnit {
-  neighborhood = input.required<NeighborhoodModel>();
+  neighborhood = input<NeighborhoodModel>();
   userUnits = input<UserUnitModel[]>();
 
   current = computed(

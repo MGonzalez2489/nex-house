@@ -10,7 +10,7 @@ export const UserStatusSeed = [
     displayName: 'Inactivo',
   },
   {
-    name: UserStatusEnum.PENDING,
-    displayName: 'Pendiente',
+    name: UserStatusEnum.PENDING_ONBOARDING,
+    displayName: 'Onboarding Pendiente',
   },
 ];

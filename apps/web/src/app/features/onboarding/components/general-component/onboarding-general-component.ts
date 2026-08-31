@@ -12,7 +12,7 @@ import {
   Validators,
 } from "@angular/forms";
 import { UpdateUser } from "@nexhouse/shared-domain/interfaces";
-import { UserModel } from "@nexhouse/shared-domain/models";
+import { UserModel, UserProfileModel } from "@nexhouse/shared-domain/models";
 import { FormValidationErrorComponent } from "@shared/components/forms";
 import { Button } from "primeng/button";
 import { InputTextModule } from "primeng/inputtext";
@@ -35,8 +35,9 @@ import { InputMaskModule } from "primeng/inputmask";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OnboardingGeneralComponent {
-  isLoading = input.required<boolean>();
   user = input<UserModel>();
+  profile = input<UserProfileModel>();
+  isLoading = input.required<boolean>();
 
   next = output();
   doSubmit = output<UpdateUser>();
@@ -57,12 +58,13 @@ export class OnboardingGeneralComponent {
   constructor() {
     effect(() => {
       const cUser = this.user();
-      if (!cUser) return;
+      const cProfile = this.profile();
+      if (!cUser || !cProfile) return;
 
       this.form.patchValue({
-        firstName: cUser.firstName,
-        lastName: cUser.lastName,
-        phone: cUser.phone,
+        firstName: cProfile.firstName,
+        lastName: cProfile.lastName,
+        phone: cProfile.phone,
       });
     });
   }
