@@ -10,6 +10,7 @@ import { SessionService } from "@core/services";
 import { OnboardingStepEnum } from "@nexhouse/shared-domain/enums";
 import {
   ChangePassword,
+  CreateUnit,
   UpdateUserProfile,
 } from "@nexhouse/shared-domain/interfaces";
 import { OnboardingStepModel } from "@nexhouse/shared-domain/models";
@@ -28,6 +29,8 @@ import {
 } from "../../components";
 import { ContextStore } from "@stores/context.store";
 import { CatalogsStore } from "@stores/catalogs.store";
+import { Router } from "@angular/router";
+import { DASHBOARD_ROUTES_ENUM } from "@dashboard/dashboard.routes";
 
 @Component({
   selector: "app-onboarding-home-page",
@@ -48,11 +51,13 @@ import { CatalogsStore } from "@stores/catalogs.store";
   standalone: true,
 })
 export class OnboardingHomePage {
+  private readonly router = inject(Router);
   protected readonly sessionService = inject(SessionService);
   protected readonly store = inject(OnboardingStore);
   protected readonly userStore = inject(UserStore);
   protected readonly contextStore = inject(ContextStore);
   protected readonly catalogsStore = inject(CatalogsStore);
+
   // protected readonly onboarding = signal<
   //   OnboardingStatusResponseModel | undefined
   // >(undefined); // = this.store.onboarding;
@@ -60,7 +65,6 @@ export class OnboardingHomePage {
 
   currentStepId = signal<OnboardingStepEnum>(OnboardingStepEnum.WELCOME);
   steps = signal<OnboardingStepModel[]>([]);
-  // steps = computed(() => this.store.steps() || []);
 
   // protected readonly currentStepProgress = computed(() => {
   //   const eSteps = this.enabledSteps();
@@ -72,14 +76,6 @@ export class OnboardingHomePage {
     const index = this.steps().findIndex((s) => s.id === this.currentStepId());
     return index !== -1 ? index : 0;
   });
-  move(value: number) {
-    console.log("value:", value);
-    // const enabledSteps = this.steps.filter((f) => f.enabled);
-    // const cIndex = enabledSteps.findIndex((f) => f.id === this.currentStepId());
-    // const nextId = value < 0 ? cIndex - 1 : cIndex + 1;
-    //
-    // this.currentStepId.set(enabledSteps[nextId].id);
-  }
 
   constructor() {
     effect(() => {
@@ -118,9 +114,22 @@ export class OnboardingHomePage {
     } else {
       this.goNext();
     }
-    // if (response) {
-    //   this.currentStepId.set(3);
-    // }
+  }
+  protected async createUnit(dto?: CreateUnit) {
+    if (dto) {
+      await this.store.createUnit(dto);
+    } else {
+      this.goNext();
+    }
+  }
+  protected async completeOnboarding() {
+    await this.store.complete();
+
+    // this.router.resetConfig(DASHBOARD_ROUTES);
+    // const urlTree = this.router.createUrlTree([
+    //   `/${DASHBOARD_ROUTES_ENUM.HOME}`,
+    // ]);
+    this.router.navigateByUrl(`/${DASHBOARD_ROUTES_ENUM.HOME}`);
   }
 
   protected goBack() {

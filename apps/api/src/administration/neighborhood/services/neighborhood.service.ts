@@ -98,10 +98,7 @@ export class NeighborhoodService {
         createdBy: user.id,
       });
 
-      const savedNeighAddress = await queryRunner.manager.save(
-        NeighAddress,
-        neighAddress,
-      );
+      await queryRunner.manager.save(NeighAddress, neighAddress);
 
       //streets
       const sanitizedStreetsPayload = dto.streets.map((street) => ({
@@ -329,6 +326,7 @@ export class NeighborhoodService {
 
   private async clearNeighborhoodsCache(): Promise<void> {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const store = (this.cacheManager as any).store;
 
       // TODO: use key patern on prod

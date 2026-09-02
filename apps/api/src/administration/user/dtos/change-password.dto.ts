@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ChangePassword } from '@nexhouse/shared-domain/interfaces';
-import { IsString, IsNotEmpty, MinLength } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class ChangePasswordDto implements ChangePassword {
   @ApiProperty({

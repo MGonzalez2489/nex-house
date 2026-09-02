@@ -106,13 +106,14 @@ export class SessionService {
     refreshToken: string,
     userAgent: string,
   ): Promise<SessionModel> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let payload: any;
 
     try {
       // 1. Verify JWT
       payload = this.jwtService.verify(refreshToken);
     } catch (e) {
-      throw new UnauthorizedException('Invalid or expired refresh token');
+      throw new UnauthorizedException('Invalid or expired refresh token' + e);
     }
 
     //find existing db session
@@ -165,6 +166,7 @@ export class SessionService {
         },
       );
     } catch (e) {
+      console.log('expired token' + e);
       // Si el token ya expiró o es inválido, no hacemos nada,
       // pero igual limpiaremos la cookie en el controlador.
     }

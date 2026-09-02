@@ -9,7 +9,6 @@ import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { Router } from "@angular/router";
 import { AUTH_ROUTES_ENUM } from "@auth/auth.routes";
 import { AuthStore } from "@auth/store";
-import { UserStatusEnum } from "@nexhouse/shared-domain/enums";
 import {
   UserModel,
   UserProfileModel,
@@ -17,7 +16,7 @@ import {
   UserStatusModel,
 } from "@nexhouse/shared-domain/models";
 import { UserStore } from "@stores/user.store";
-import { fromEvent, debounceTime, startWith } from "rxjs";
+import { debounceTime, fromEvent, startWith } from "rxjs";
 
 export type ViewSize = "small" | "medium" | "large";
 

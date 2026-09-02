@@ -20,7 +20,6 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   UnitStatusEnum,
@@ -29,7 +28,6 @@ import {
 } from '@nexhouse/shared-domain/enums';
 import { generateRandomString } from '@nexhouse/shared-domain/utils';
 import { CatalogsService } from 'src/catalogs/services';
-import { StorageService } from 'src/storage/storage.service';
 import { DataSource, DeepPartial, EntityManager, Repository } from 'typeorm';
 import { CreateUserDto, UpdateUserDto } from '../dtos';
 import { UserSearchService } from './user-search.service';
@@ -44,8 +42,8 @@ export class UserService {
     private readonly catalogsService: CatalogsService,
     private readonly cryptoService: CryptoService,
     private readonly searchService: UserSearchService,
-    private readonly storageService: StorageService,
-    private readonly configService: ConfigService,
+    // private readonly storageService: StorageService,
+    // private readonly configService: ConfigService,
   ) {}
 
   /**
@@ -269,10 +267,11 @@ export class UserService {
     dto: UpdateUserDto,
     currentUser: User,
   ): Promise<User> {
-    const activeUserStatus = await this.catalogsService.findByName(
-      UserStatus,
-      UserStatusEnum.ACTIVE,
-    );
+    //TODO: review this
+    // const activeUserStatus = await this.catalogsService.findByName(
+    //   UserStatus,
+    //   UserStatusEnum.ACTIVE,
+    // );
     const existingUser = await this.repository.findOne({
       where: { publicId: userPublicId, neighborhoodId: neighId },
       relations: { role: true, status: true },
@@ -301,7 +300,7 @@ export class UserService {
     //   }
     // }
 
-    let updatedRole;
+    let updatedRole: UserRole;
     if (dto.userRoleId && dto.userRoleId !== existingUser.role?.publicId) {
       const role = await this.catalogsService.findByPublicId(
         UserRole,

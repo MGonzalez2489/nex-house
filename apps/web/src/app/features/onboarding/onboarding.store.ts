@@ -20,8 +20,10 @@ import { lastValueFrom } from "rxjs";
 import { OnboardingStepEnum } from "@nexhouse/shared-domain/enums";
 import {
   ChangePassword,
+  CreateUnit,
   UpdateUserProfile,
 } from "@nexhouse/shared-domain/interfaces";
+import { UserStore } from "@stores/user.store";
 
 //TODO: verify if use enum (and in OnboardingStatusResponseModel)
 interface OnboardingState {
@@ -44,6 +46,7 @@ export const OnboardingStore = signalStore(
   withState(initialState),
   withProps(() => ({
     _service: inject(OnboardingService),
+    _userStore: inject(UserStore),
   })),
   withMethods((store) => ({
     load: async () => {
@@ -71,6 +74,32 @@ export const OnboardingStore = signalStore(
       try {
         const res = await lastValueFrom(store._service.updateProfile(dto));
         patchState(store, { ...res.data }, setLoaded());
+        return true;
+      } catch (err) {
+        patchState(store, setError(err));
+        return false;
+      }
+    },
+    createUnit: async (dto: CreateUnit) => {
+      patchState(store, setLoading());
+      try {
+        const res = await lastValueFrom(store._service.createUnit(dto));
+        patchState(store, { ...res.data }, setLoaded());
+        return true;
+      } catch (err) {
+        patchState(store, setError(err));
+        return false;
+      }
+    },
+    complete: async () => {
+      patchState(store, setLoading());
+      try {
+        const res = await lastValueFrom(store._service.complete());
+        patchState(store, { ...res.data });
+
+        await store._userStore.load();
+
+        patchState(store, setLoaded());
         return true;
       } catch (err) {
         patchState(store, setError(err));

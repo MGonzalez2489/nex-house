@@ -123,6 +123,7 @@ export class UnitService {
           createdBy: currentUserId,
           roleId: userUnitRole?.id,
           isCurrentOccupant: dto.isCurrentOccupant ?? true,
+          userUnitRoleId: userUnitRole.id,
         });
 
         await queryRunner.manager.save(assignment);

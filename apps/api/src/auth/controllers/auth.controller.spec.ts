@@ -22,9 +22,17 @@ describe('AuthController', () => {
     token: 'mock-access-token',
     refreshToken: 'mock-refresh-token',
     exp: 1719576000,
+    user: {
+      email: '',
+      isFirstAdmin: false,
+      requirePwdChange: false,
+      userUnits: [],
+      publicId: '',
+    },
   };
 
   // Mocks bases para Express
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let mockRequest: Partial<ExpressRequest>;
   let mockResponse: Partial<ExpressResponse>;
 
@@ -124,22 +132,3 @@ describe('AuthController', () => {
     });
   });
 });
-
-// import { Test, TestingModule } from '@nestjs/testing';
-// import { AuthController } from './auth.controller';
-//
-// describe('AuthController', () => {
-//   let controller: AuthController;
-//
-//   beforeEach(async () => {
-//     const module: TestingModule = await Test.createTestingModule({
-//       controllers: [AuthController],
-//     }).compile();
-//
-//     controller = module.get<AuthController>(AuthController);
-//   });
-//
-//   it('should be defined', () => {
-//     expect(controller).toBeDefined();
-//   });
-// });

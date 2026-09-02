@@ -57,12 +57,17 @@
                     [unitRoles]="catalogsStore.UserUnitRoles()"
                     [unitTypes]="catalogsStore.UnitTypes()"
                     [streets]="contextStore.streets()"
+                    [user]="userStore.user()"
                     (prev)="goBack()"
-                    (next)="move(1)"
+                    (next)="goNext()"
+                    (doSubmit)="createUnit($event)"
                   />
                 }
                 @case ("complete") {
-                  <app-onboarding-finish-component [user]="userStore.user()" />
+                  <app-onboarding-finish-component
+                    [profile]="userStore.profile()"
+                    (complete)="completeOnboarding()"
+                  />
                 }
               }
             </div>

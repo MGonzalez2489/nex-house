@@ -18,6 +18,8 @@ import {
   UpdateUserProfileDto,
 } from '../dtos';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { UnitService } from '@administration/units/services';
+import { CreateUnitDto } from '@administration/neighborhood/dtos';
 
 @Controller('onboarding')
 export class OnboardingController {
@@ -25,6 +27,7 @@ export class OnboardingController {
     private readonly onboardingService: OnboardingService,
     private readonly userService: UserService,
     private readonly profileService: ProfileService,
+    private readonly unitsService: UnitService,
   ) {}
 
   @Get('status')
@@ -74,9 +77,18 @@ export class OnboardingController {
     return this.onboardingService.getOnboardingStatus(user.publicId);
   }
 
+  @Post('unit')
+  async createUnit(
+    @Body() dto: CreateUnitDto,
+    @CurrentUser() user: User,
+  ): Promise<OnboardingStatusResponseDto> {
+    await this.unitsService.create(user.neighborhoodId, dto, user.id);
+    return this.onboardingService.getOnboardingStatus(user.publicId);
+  }
+
   @Post('complete')
   async complete(@CurrentUser() user: User): Promise<{ success: boolean }> {
-    await this.onboardingService.completeOnboarding(user.publicId);
+    await this.onboardingService.completeOnboarding(user.id);
     return { success: true };
   }
 }

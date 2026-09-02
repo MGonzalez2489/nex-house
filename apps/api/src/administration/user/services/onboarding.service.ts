@@ -1,4 +1,4 @@
-import { User } from '@core/database';
+import { User, UserStatus } from '@core/database';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
@@ -7,12 +7,14 @@ import {
 } from '@nexhouse/shared-domain/enums';
 import { Repository } from 'typeorm';
 import { OnboardingStatusResponseDto, OnboardingStepDto } from '../dtos';
+import { CatalogsService } from '@catalogs/services';
 
 @Injectable()
 export class OnboardingService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly catalogsService: CatalogsService,
   ) {}
 
   async getOnboardingStatus(
@@ -92,10 +94,14 @@ export class OnboardingService {
     };
   }
 
-  async completeOnboarding(userId: string): Promise<void> {
-    // Aquí puedes cambiar el status a 'ACTIVE' en la DB una vez superados todos los pasos
+  async completeOnboarding(userId: number): Promise<void> {
+    const activeStatus = await this.catalogsService.findByName(
+      UserStatus,
+      UserStatusEnum.ACTIVE,
+    );
+
     await this.userRepository.update(userId, {
-      // status: activeStatusObject...
+      statusId: activeStatus.id,
     });
   }
 }

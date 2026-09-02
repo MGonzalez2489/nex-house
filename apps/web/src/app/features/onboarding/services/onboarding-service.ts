@@ -2,6 +2,7 @@ import { inject, Injectable } from "@angular/core";
 import { RequestService } from "@core/services";
 import {
   ChangePassword,
+  CreateUnit,
   UpdateUserProfile,
 } from "@nexhouse/shared-domain/interfaces";
 import { OnboardingStatusResponseModel } from "@nexhouse/shared-domain/models";
@@ -21,7 +22,7 @@ export class OnboardingService {
 
   changePassword(dto: ChangePassword) {
     return this.request.patch<OnboardingStatusResponseModel>(
-      `${this.endpoint}/password`,
+      `${this.endpoint}/security`,
       dto,
     );
   }
@@ -30,6 +31,19 @@ export class OnboardingService {
     return this.request.patch<OnboardingStatusResponseModel>(
       `${this.endpoint}/profile`,
       dto,
+    );
+  }
+
+  createUnit(dto: CreateUnit) {
+    return this.request.post<OnboardingStatusResponseModel>(
+      `${this.endpoint}/unit`,
+      dto,
+    );
+  }
+  complete() {
+    return this.request.post<OnboardingStatusResponseModel>(
+      `${this.endpoint}/complete`,
+      {},
     );
   }
 }

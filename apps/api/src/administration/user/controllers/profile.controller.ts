@@ -2,20 +2,17 @@ import { User } from '@core/database';
 import { CurrentUser, Public } from '@core/decorators';
 import { UserToModelMapper } from '@core/mappers';
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
-  HttpCode,
-  HttpStatus,
   InternalServerErrorException,
   Param,
   Patch,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { ChangePasswordDto, UpdateUserDto } from '../dtos';
-import { UserSearchService, UserService } from '../services';
+import { ApiOperation } from '@nestjs/swagger';
 import { UserRoleEnum } from '@nexhouse/shared-domain/enums';
+import { UpdateUserDto } from '../dtos';
+import { UserSearchService, UserService } from '../services';
 
 @Controller('profile')
 export class ProfileController {
@@ -61,6 +58,7 @@ export class ProfileController {
   //TODO: REMOVE THIS: FOR TESTING
   @Get(':userId/resetpwd')
   @Public()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async resetPwd(@Param() userId: any) {
     await this.usersService.restorePwd(userId.userId);
 
