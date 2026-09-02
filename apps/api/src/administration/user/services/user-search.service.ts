@@ -69,6 +69,7 @@ export class UserSearchService {
       .createQueryBuilder('users')
       .leftJoinAndSelect('users.neighborhood', 'neighborhood')
       .leftJoinAndSelect('users.status', 'status')
+      .leftJoinAndSelect('users.profile', 'profile')
       .leftJoinAndSelect('users.role', 'role')
       .leftJoinAndSelect('users.userUnits', 'userUnits')
       .leftJoinAndSelect('userUnits.unit', 'unit')
@@ -103,16 +104,16 @@ export class UserSearchService {
               andQb.andWhere(
                 new Brackets((orQb) => {
                   orQb
-                    .where(`users.firstName LIKE :${paramName}`, {
+                    .where(`profile.firstName LIKE :${paramName}`, {
                       [paramName]: `%${word}%`,
                     })
-                    .orWhere(`users.lastName LIKE :${paramName}`, {
+                    .orWhere(`profile.lastName LIKE :${paramName}`, {
                       [paramName]: `%${word}%`,
                     })
                     .orWhere(`users.email LIKE :${paramName}`, {
                       [paramName]: `%${word}%`,
                     })
-                    .orWhere(`users.phone LIKE :${paramName}`, {
+                    .orWhere(`profile.phone LIKE :${paramName}`, {
                       [paramName]: `%${word}%`,
                     })
                     .orWhere(`street.name LIKE :${paramName}`, {
@@ -134,8 +135,8 @@ export class UserSearchService {
       'roleOrder',
     );
     query.addOrderBy('roleOrder', 'ASC');
-    query.addOrderBy('users.firstName', 'ASC');
-    query.addOrderBy('users.lastName', 'ASC');
+    query.addOrderBy('profile.firstName', 'ASC');
+    query.addOrderBy('profile.lastName', 'ASC');
 
     const result = await paginateQuery(query, filters);
 
