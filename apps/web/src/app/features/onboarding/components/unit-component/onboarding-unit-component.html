@@ -1,20 +1,172 @@
-<p>onboarding-unit-component works!</p>
+<p-panel>
+  <ng-template #header>
+    <div class="block mb-3">
+      <h1
+        class="font-display text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white leading-tight"
+      >
+        algo de la unidad
+      </h1>
+      <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+        algo de la creacion de la unidad
+      </p>
+    </div>
+  </ng-template>
 
-<div class="flex items-center gap-3 pt-2">
-  <p-button
-    label="Atrás"
-    icon="pi pi-arrow-left"
-    variant="outlined"
-    severity="secondary"
-    (click)="prev.emit()"
-  />
+  <form [formGroup]="form" class="space-y-6" (submit)="onSubmit()">
+    <section class="grid grid-cols-1 md:grid-cols-3 md:gap-x-3">
+      <!-- street -->
+      <div class="form-control col-span-2">
+        <label class="form-label" for="streetId">Calle</label>
+        <p-select
+          [options]="streets()"
+          formControlName="streetId"
+          optionLabel="name"
+          optionValue="publicId"
+          placeholder="Calle"
+          fluid
+          [invalid]="
+            form.controls.streetId.invalid && form.controls.streetId.touched
+          "
+          [attr.aria-invalid]="
+            form.controls.streetId.invalid && form.controls.streetId.touched
+          "
+          [attr.aria-describedby]="
+            form.controls.streetId.touched && form.controls.streetId.errors
+              ? 'street-error'
+              : null
+          "
+        >
+          <ng-template #selectedItem let-selectedOption>
+            @if (selectedOption) {
+              <div class="flex items-center gap-2">
+                <div>
+                  <span class="capitalize">
+                    {{ selectedOption.name }}
+                  </span>
+                </div>
+              </div>
+            }
+          </ng-template>
+          <ng-template let-street #item>
+            <div class="flex items-center gap-2">
+              <span class="capitalize">{{ street.name }}</span>
+            </div>
+          </ng-template>
+        </p-select>
+        <app-form-validation-error
+          id="street-errors"
+          [touched]="form.controls.streetId.touched"
+          [errors]="form.controls.streetId.errors"
+          label="Calle"
+        />
+      </div>
+      <!-- identifier -->
+      <div class="form-control">
+        <label class="form-label" for="identifier">Identificador</label>
+        <input
+          pInputText
+          id="identifier"
+          type="text"
+          formControlName="unitIdentifier"
+          placeholder="#15234, #102-A"
+          fluid
+          [invalid]="
+            form.controls.unitIdentifier.invalid &&
+            form.controls.unitIdentifier.touched
+          "
+          [attr.aria-invalid]="
+            form.controls.unitIdentifier.invalid &&
+            form.controls.unitIdentifier.touched
+          "
+          [attr.aria-describedby]="
+            form.controls.unitIdentifier.touched &&
+            form.controls.unitIdentifier.errors
+              ? 'identifier-error'
+              : null
+          "
+        />
+        <app-form-validation-error
+          id="identifier-errors"
+          [touched]="form.controls.unitIdentifier.touched"
+          [errors]="form.controls.unitIdentifier.errors"
+          label="Identificador"
+        />
+      </div>
+    </section>
 
-  <p-button
-    label="Continuar"
-    icon="pi pi-arrow-right"
-    iconPos="right"
-    fluid
-    (click)="next.emit()"
-    class="w-full"
-  />
-</div>
+    <section>
+      <!-- unit type -->
+      <div class="space-y-4">
+        @for (type of unitTypes(); track type.publicId) {
+          @let selected = form.value.unitTypeId === type.publicId;
+          <button
+            type="button"
+            [class.bg-cyan-50]="selected"
+            [class.border-cyan-300]="selected"
+            [class.dark:bg-cyan-700]="selected"
+            (click)="form.patchValue({ unitTypeId: type.publicId })"
+            class="flex w-full items-center justify-between gap-4 border p-4 hover:cursor-pointer hover:border-cyan-500 rounded-lg"
+          >
+            <div class="text-left">
+              <p class="text-sm font-medium text-slate-700 dark:text-slate-300">
+                {{ type.displayName }}
+              </p>
+              <p class="text-xs text-slate-600 dark:text-slate-200 mt-0.5">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+                eiusmod tempor incididunt ut labore...
+              </p>
+            </div>
+            @if (selected) {
+              <i class="pi pi-check-circle"></i>
+            }
+          </button>
+        }
+      </div>
+    </section>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 md:gap-x-3">
+      <!-- UserUnitRole -->
+      <div class="form-control col-span-2">
+        <label class="form-label" for="email">Relación con la unidad</label>
+        <p-select
+          [options]="unitRoles()"
+          formControlName="unitRoleId"
+          optionLabel="displayName"
+          optionValue="publicId"
+          placeholder="Relación con la unidad"
+          fluid
+        />
+      </div>
+
+      <div class="form-control flex items-end pb-2 gap-2">
+        <label class="form-label m-1!" for="isCurrentOccupant"
+          >Habita la unidad</label
+        >
+        <p-toggleswitch
+          id="isCurrentOccupant"
+          formControlName="isCurrentOccupant"
+        />
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3 pt-2">
+      <p-button
+        label="Atrás"
+        icon="pi pi-arrow-left"
+        variant="outlined"
+        severity="secondary"
+        (click)="prev.emit()"
+        [disabled]="isLoading()"
+      />
+      <p-button
+        label="Continuar"
+        icon="pi pi-arrow-right"
+        iconPos="right"
+        fluid
+        type="submit"
+        class="w-full"
+        [loading]="isLoading()"
+      />
+    </div>
+  </form>
+</p-panel>

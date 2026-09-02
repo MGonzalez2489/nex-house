@@ -1,15 +1,15 @@
+import { UserModule } from '@administration/user/user.module';
+import { Neighborhood, NeighStreet, Unit, UserUnit } from '@core/database';
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { CatalogsModule } from 'src/catalogs/catalogs.module';
+import { NeighborhoodController } from './controller';
+import { NeighSearchController } from './controller/neigh-search.controller';
 import {
   NeighborhoodSearchService,
   NeighborhoodService,
   NeighStreetService,
 } from './services';
-import { NeighborhoodController } from './controller';
-import { Neighborhood, NeighStreet, Unit, UserUnit } from '@core/database';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserModule } from '@administration/user/user.module';
-import { NeighSearchController } from './controller/neigh-search.controller';
-import { CatalogsModule } from 'src/catalogs';
 
 @Module({
   imports: [
@@ -23,5 +23,6 @@ import { CatalogsModule } from 'src/catalogs';
     NeighStreetService,
   ],
   controllers: [NeighborhoodController, NeighSearchController],
+  exports: [NeighStreetService],
 })
 export class NeighborhoodModule {}

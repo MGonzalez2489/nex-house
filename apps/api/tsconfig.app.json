@@ -24,7 +24,8 @@
       ],
       "@core/*": ["src/_core/*"],
       "@administration/*": ["src/administration/*"],
-      "@auth/*": ["src/auth/*"]
+      "@auth/*": ["src/auth/*"],
+      "@catalogs/*": ["src/catalogs/*"]
     }
   },
   "include": ["src/**/*.ts"],

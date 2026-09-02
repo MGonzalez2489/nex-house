@@ -12,73 +12,65 @@
 </div>
 
 <div class="flex items-center justify-center">
-  <p-stepper [value]="currentStepId()" class="basis-130">
+  <p-stepper [value]="activeStepIndex()">
+    <!-- CABECERA DEL STEPPER -->
     <p-step-list>
-      <div class="w-full">
-        <div class="flex items-center justify-between mb-2">
-          <span
-            id="progressLabel"
-            class="text-xs font-medium text-slate-500 dark:text-slate-400"
-            >Paso {{ currentStepProgress() }} de
-            {{ enabledSteps().length }}</span
-          >
-          <span
-            id="progressStepName"
-            class="text-xs font-medium text-cyan-600 dark:text-cyan-400"
-            >Bienvenido</span
-          >
-        </div>
-        <div
-          class="w-full rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden"
-        >
-          <p-progressbar class="h-4" [value]="currentProgress()" />
-        </div>
-      </div>
+      @for (step of steps(); track step.id; let i = $index) {
+        <p-step [value]="i">
+          {{ step.label }}
+        </p-step>
+      }
     </p-step-list>
+
+    <!-- PANELS DE CONTENIDO DE CADA PASO -->
     <p-step-panels>
-      <p-step-panel [value]="0">
-        <ng-template #content let-activateCallback="activateCallback">
-          <app-onboarding-welcome-component class="block" (next)="move(1)" />
-        </ng-template>
-      </p-step-panel>
-      <p-step-panel [value]="1">
-        <ng-template #content let-activateCallback="activateCallback">
-          <app-onboarding-pwd-change-component
-            [isLoading]="store.loading()"
-            [user]="store.user()"
-            class="block"
-            (prev)="move(-1)"
-            (doSubmit)="changePwd($event)"
-            (next)="move(1)"
-          />
-        </ng-template>
-      </p-step-panel>
-      <p-step-panel [value]="2">
-        <ng-template #content let-activateCallback="activateCallback">
-          <app-onboarding-general-component
-            [isLoading]="store.loading()"
-            [user]="store.user()"
-            class="block"
-            (doSubmit)="updateProfile($event)"
-            (prev)="move(-1)"
-            (next)="move(1)"
-          />
-        </ng-template>
-      </p-step-panel>
-      <p-step-panel [value]="3">
-        <ng-template #content let-activateCallback="activateCallback">
-          <app-onboarding-unit-component (prev)="move(-1)" (next)="move(1)" />
-        </ng-template>
-      </p-step-panel>
-      <p-step-panel [value]="4">
-        <ng-template #content let-activateCallback="activateCallback">
-          <app-onboarding-finish-component [user]="store.user()" />
-        </ng-template>
-      </p-step-panel>
+      @for (step of steps(); track step.id; let i = $index) {
+        <p-step-panel [value]="i">
+          <ng-template pTemplate="content">
+            <div class="py-6">
+              @switch (step.id) {
+                @case ("welcome") {
+                  <app-onboarding-welcome-component (next)="finishWelcome()" />
+                }
+                @case ("security") {
+                  <app-onboarding-pwd-change-component
+                    [isLoading]="store.loading()"
+                    [user]="userStore.user()"
+                    class="block"
+                    (prev)="goBack()"
+                    (doSubmit)="changePwd($event)"
+                    (next)="changePwd()"
+                  />
+                }
+                @case ("general-form") {
+                  <app-onboarding-general-component
+                    [isLoading]="store.loading()"
+                    [profile]="userStore.profile()"
+                    class="block"
+                    (doSubmit)="updateProfile($event)"
+                    (prev)="goBack()"
+                    (next)="goNext()"
+                  />
+                }
+                @case ("create-unit") {
+                  <app-onboarding-unit-component
+                    [unitRoles]="catalogsStore.UserUnitRoles()"
+                    [unitTypes]="catalogsStore.UnitTypes()"
+                    [streets]="contextStore.streets()"
+                    (prev)="goBack()"
+                    (next)="move(1)"
+                  />
+                }
+                @case ("complete") {
+                  <app-onboarding-finish-component [user]="userStore.user()" />
+                }
+              }
+            </div>
+          </ng-template>
+        </p-step-panel>
+      }
     </p-step-panels>
-    <app-form-feedback [callState]="store.callState()" />
   </p-stepper>
-  <pre>{{ enabledSteps() | json }}</pre>
 </div>
 <p class="text-center text-xs text-slate-400 dark:text-slate-500 mt-6">
   ¿Necesitas ayuda?

@@ -1,8 +1,4 @@
 export interface UpdateUser {
-  firstName?: string;
-  lastName?: string;
-  phone?: string;
-
   //unit
   unitId?: string;
 

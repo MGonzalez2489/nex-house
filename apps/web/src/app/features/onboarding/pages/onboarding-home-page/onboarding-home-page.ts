@@ -1,4 +1,3 @@
-import { JsonPipe } from "@angular/common";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -8,9 +7,14 @@ import {
   signal,
 } from "@angular/core";
 import { SessionService } from "@core/services";
-import { ChangePassword, UpdateUser } from "@nexhouse/shared-domain/interfaces";
+import { OnboardingStepEnum } from "@nexhouse/shared-domain/enums";
+import {
+  ChangePassword,
+  UpdateUserProfile,
+} from "@nexhouse/shared-domain/interfaces";
+import { OnboardingStepModel } from "@nexhouse/shared-domain/models";
+import { OnboardingStore } from "@onboarding/onboarding.store";
 import { BrandComponent } from "@shared/components";
-import { FormFeedback } from "@shared/components/forms/form-feedback/form-feedback";
 import { UserStore } from "@stores/user.store";
 import { Button } from "primeng/button";
 import { ProgressBarModule } from "primeng/progressbar";
@@ -22,12 +26,8 @@ import {
   OnboardingUnitComponent,
   OnboardingWelcomeComponent,
 } from "../../components";
-
-type onboardingStep = {
-  id: number;
-  name: string;
-  enabled: boolean;
-};
+import { ContextStore } from "@stores/context.store";
+import { CatalogsStore } from "@stores/catalogs.store";
 
 @Component({
   selector: "app-onboarding-home-page",
@@ -40,9 +40,7 @@ type onboardingStep = {
     OnboardingGeneralComponent,
     OnboardingUnitComponent,
     OnboardingFinishComponent,
-    FormFeedback,
     Button,
-    JsonPipe,
   ],
   templateUrl: "./onboarding-home-page.html",
   styleUrl: "./onboarding-home-page.css",
@@ -51,62 +49,90 @@ type onboardingStep = {
 })
 export class OnboardingHomePage {
   protected readonly sessionService = inject(SessionService);
-  protected readonly store = inject(UserStore);
-  protected readonly steps: onboardingStep[] = [
-    { id: 0, name: "welcome", enabled: true },
-    { id: 1, name: "security", enabled: true },
-    { id: 2, name: "general-form", enabled: true },
-    { id: 3, name: "unit", enabled: false },
-    { id: 4, name: "thanks", enabled: true },
-  ];
-  protected readonly currentStepId = signal<number>(0);
-  protected readonly enabledSteps = computed(() =>
-    this.steps.filter((f) => f.enabled),
-  );
-  protected readonly currentStepProgress = computed(() => {
-    const eSteps = this.enabledSteps();
-    const cIndex = eSteps.findIndex((f) => f.id === this.currentStepId());
-    return cIndex + 1;
-  });
+  protected readonly store = inject(OnboardingStore);
+  protected readonly userStore = inject(UserStore);
+  protected readonly contextStore = inject(ContextStore);
+  protected readonly catalogsStore = inject(CatalogsStore);
+  // protected readonly onboarding = signal<
+  //   OnboardingStatusResponseModel | undefined
+  // >(undefined); // = this.store.onboarding;
+  // protected readonly steps = this.onboarding?.steps; //this.store.onboarding()?.steps || [];
 
-  protected readonly currentProgress = computed(() => {
-    const totalSteps = this.enabledSteps().length;
-    const cStep = this.currentStepProgress();
+  currentStepId = signal<OnboardingStepEnum>(OnboardingStepEnum.WELCOME);
+  steps = signal<OnboardingStepModel[]>([]);
+  // steps = computed(() => this.store.steps() || []);
 
-    return (cStep / totalSteps) * 100;
+  // protected readonly currentStepProgress = computed(() => {
+  //   const eSteps = this.enabledSteps();
+  //   const cIndex = eSteps.findIndex((f) => f.id === this.currentStepId());
+  //   return cIndex + 1;
+  // });
+
+  protected activeIndex = computed(() => {
+    const index = this.steps().findIndex((s) => s.id === this.currentStepId());
+    return index !== -1 ? index : 0;
   });
+  move(value: number) {
+    console.log("value:", value);
+    // const enabledSteps = this.steps.filter((f) => f.enabled);
+    // const cIndex = enabledSteps.findIndex((f) => f.id === this.currentStepId());
+    // const nextId = value < 0 ? cIndex - 1 : cIndex + 1;
+    //
+    // this.currentStepId.set(enabledSteps[nextId].id);
+  }
 
   constructor() {
     effect(() => {
-      const cUser = this.store.user();
-      if (!cUser) return;
-
-      if (cUser.isFirstAdmin) {
-        const unitStep = this.steps.find((f) => f.id === 3);
-        if (unitStep) unitStep.enabled = true;
-      }
+      const cStepId = this.store.currentStepId();
+      this.currentStepId.set(cStepId);
+      const cSteps = this.store.steps();
+      this.steps.set(cSteps);
     });
   }
 
-  move(value: number) {
-    const enabledSteps = this.steps.filter((f) => f.enabled);
-    const cIndex = enabledSteps.findIndex((f) => f.id === this.currentStepId());
-    const nextId = value < 0 ? cIndex - 1 : cIndex + 1;
+  protected activeStepIndex = computed(() => {
+    const index = this.steps().findIndex(
+      (step) => step.id === this.currentStepId(),
+    );
 
-    this.currentStepId.set(enabledSteps[nextId].id);
+    return index !== -1 ? index : 0;
+  });
+
+  protected async finishWelcome() {
+    const wStep = this.steps().find((f) => f.id === OnboardingStepEnum.WELCOME);
+    if (wStep && !wStep.completed) {
+      wStep.completed = true;
+    }
+    this.goNext();
   }
-
-  protected async updateProfile(dto: UpdateUser) {
-    const response = await this.store.update(dto);
-    if (response) {
-      this.currentStepId.set(3);
+  protected async changePwd(dto?: ChangePassword) {
+    if (dto) {
+      await this.store.changePassword(dto);
+    } else {
+      this.goNext();
     }
   }
-  protected async changePwd(dto: ChangePassword) {
-    const response = await this.store.changePassword(dto);
-
-    if (response) {
-      this.currentStepId.set(2);
+  protected async updateProfile(dto?: UpdateUserProfile) {
+    if (dto) {
+      await this.store.updateProfile(dto);
+    } else {
+      this.goNext();
     }
+    // if (response) {
+    //   this.currentStepId.set(3);
+    // }
+  }
+
+  protected goBack() {
+    const cIndex = this.activeIndex();
+    const prevIndex = cIndex - 1;
+    const prevItem = this.steps()[prevIndex];
+    this.currentStepId.set(prevItem.id);
+  }
+  protected goNext() {
+    const cIndex = this.activeIndex();
+    const nextIndex = cIndex + 1;
+    const nextItem = this.steps()[nextIndex];
+    this.currentStepId.set(nextItem.id);
   }
 }

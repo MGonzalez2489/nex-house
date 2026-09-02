@@ -1,5 +1,4 @@
 import { NeighborhoodModule } from '@administration/neighborhood/neighborhood.module';
-import { UnitsModule } from '@administration/units';
 import { UserModule } from '@administration/user/user.module';
 import { AuthModule } from '@auth/auth.module';
 import { JwtAuthGuard } from '@auth/guards';
@@ -11,8 +10,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { join } from 'path';
-import { CatalogsModule } from 'src/catalogs';
 import { StorageModule } from 'src/storage/storage.module';
 import { DatabaseSeederService, getDatabaseConfig } from '../_core/database';
 import {
@@ -23,6 +20,8 @@ import {
   User,
 } from '../_core/database/entities';
 import { getUploadsFolderPath } from '@core/utils';
+import { UnitsModule } from '@administration/units';
+import { CatalogsModule } from '@catalogs/catalogs.module';
 
 @Module({
   imports: [

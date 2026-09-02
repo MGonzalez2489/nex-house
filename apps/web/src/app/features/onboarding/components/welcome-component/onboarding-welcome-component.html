@@ -1,23 +1,29 @@
-<p-panel>
-  <div
-    class="h-14 w-14 rounded-2xl bg-cyan-50 dark:bg-cyan-500/10 flex items-center justify-center mb-5"
-  >
-    <i class="pi pi-heart text-2xl text-cyan-600 dark:text-cyan-400"></i>
-  </div>
+<p-panel showHeader="false" class="pt-5">
+  <div class="flex items-center gap-5 mb-2">
+    <div
+      class="h-14 w-14 rounded-2xl bg-cyan-50 dark:bg-cyan-500/10 flex items-center justify-center"
+    >
+      <i class="pi pi-heart text-2xl text-cyan-600 dark:text-cyan-400"></i>
+    </div>
 
-  <h1
-    class="font-display text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white leading-tight"
-  >
-    ¡Bienvenido a Nimbus!
-  </h1>
-  <p class="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
-    Gracias por unirte. Configuremos tu cuenta en menos de un minuto. Esto es lo
-    que podrás hacer una vez dentro:
-  </p>
+    <div class="block">
+      <h1
+        class="font-display text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white leading-tight"
+      >
+        ¡Bienvenido a Nimbus!
+      </h1>
+      <p
+        class="text-sm text-slate-500 dark:text-slate-400 text-wrap leading-relaxed max-w-[90%]"
+      >
+        Gracias por unirte. Configuremos tu cuenta en menos de un minuto. Esto
+        es lo que podrás hacer una vez dentro:
+      </p>
+    </div>
+  </div>
 
   <ul class="mt-6 space-y-3.5">
     @for (item of items; track item.id) {
-      <li class="flex items-start gap-3">
+      <li class="flex items-center gap-5 pl-4">
         <div
           class="h-9 w-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-300 shrink-0"
         >

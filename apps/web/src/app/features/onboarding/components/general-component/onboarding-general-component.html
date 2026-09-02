@@ -1,12 +1,19 @@
 <p-panel>
-  <h1
-    class="font-display text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white leading-tight"
-  >
-    Cuéntanos sobre ti
-  </h1>
-  <p class="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
-    Esta información nos ayuda a personalizar tu experiencia dentro de Nimbus.
-  </p>
+  <ng-template #header>
+    <div class="block mb-3">
+      <h1
+        class="font-display text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white leading-tight"
+      >
+        Cuéntanos sobre ti
+      </h1>
+      <p
+        class="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-relaxed"
+      >
+        Esta información nos ayuda a personalizar tu experiencia dentro de
+        Nimbus.
+      </p>
+    </div>
+  </ng-template>
 
   <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
     <!-- Avatar -->

@@ -58,35 +58,6 @@ export class ProfileController {
     return UserToModelMapper(response);
   }
 
-  @Patch('password')
-  @HttpCode(HttpStatus.OK) // Return 204 No Content on successful password change
-  @ApiOperation({ summary: 'Change current user password' })
-  @ApiResponse({ status: 204, description: 'Password successfully changed.' })
-  @ApiResponse({
-    status: 400,
-    description: 'Invalid password details provided.',
-  })
-  async changePassword(
-    @Body() dto: ChangePasswordDto,
-    @CurrentUser() user: User,
-  ): Promise<boolean> {
-    const passwordChanged: boolean = await this.usersService.changePassword(
-      user.publicId,
-      dto.oldPassword,
-      dto.newPassword,
-    );
-
-    if (!passwordChanged) {
-      // The UserService.changePassword method returns false if the old password doesn't match,
-      // the new password is the same as the old, or the new password doesn't meet strength requirements.
-      // A generic BadRequestException is suitable here to indicate a client-side error.
-      throw new BadRequestException(
-        'Failed to change password. Please ensure your old password is correct, the new password is not the same as the old one, and it meets all strength requirements.',
-      );
-    }
-    return passwordChanged;
-  }
-
   //TODO: REMOVE THIS: FOR TESTING
   @Get(':userId/resetpwd')
   @Public()

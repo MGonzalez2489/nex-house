@@ -14,3 +14,5 @@ export * from './payment_status.enum';
 
 export * from './transaction_source.enum';
 export * from './transaction_type.enum';
+
+export * from './onboarding_step.enum';

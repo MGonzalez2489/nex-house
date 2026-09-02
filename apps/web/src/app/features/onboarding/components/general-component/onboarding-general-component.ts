@@ -11,13 +11,13 @@ import {
   ReactiveFormsModule,
   Validators,
 } from "@angular/forms";
-import { UpdateUser } from "@nexhouse/shared-domain/interfaces";
+import { UpdateUserProfile } from "@nexhouse/shared-domain/interfaces";
 import { UserModel, UserProfileModel } from "@nexhouse/shared-domain/models";
 import { FormValidationErrorComponent } from "@shared/components/forms";
 import { Button } from "primeng/button";
+import { InputMaskModule } from "primeng/inputmask";
 import { InputTextModule } from "primeng/inputtext";
 import { Panel } from "primeng/panel";
-import { InputMaskModule } from "primeng/inputmask";
 
 @Component({
   selector: "app-onboarding-general-component",
@@ -35,12 +35,11 @@ import { InputMaskModule } from "primeng/inputmask";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OnboardingGeneralComponent {
-  user = input<UserModel>();
   profile = input<UserProfileModel>();
   isLoading = input.required<boolean>();
 
   next = output();
-  doSubmit = output<UpdateUser>();
+  doSubmit = output<UpdateUserProfile>();
   prev = output();
 
   protected readonly form = new FormGroup({
@@ -57,9 +56,8 @@ export class OnboardingGeneralComponent {
 
   constructor() {
     effect(() => {
-      const cUser = this.user();
       const cProfile = this.profile();
-      if (!cUser || !cProfile) return;
+      if (!cProfile) return;
 
       this.form.patchValue({
         firstName: cProfile.firstName,
@@ -75,10 +73,10 @@ export class OnboardingGeneralComponent {
 
     const formValue = { ...this.form.value };
     if (formValue.phone) {
-      formValue.phone = formValue.phone.replace(/[\D\s]/g, ""); // Remove all non-digits and whitespace
+      formValue.phone = formValue.phone.replace(/[\D\s]/g, "");
     }
 
-    if (this.form.dirty) this.doSubmit.emit(formValue as UpdateUser);
+    if (this.form.dirty) this.doSubmit.emit(formValue as UpdateUserProfile);
     else {
       this.next.emit();
     }
