@@ -1,10 +1,11 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { MulterModule } from '@nestjs/platform-express';
 import { StorageProvider } from './storage.provider';
 import { StorageService } from './storage.service';
 
 // @Module({})
+@Global()
 @Module({
   imports: [
     MulterModule.registerAsync({

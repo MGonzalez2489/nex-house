@@ -1,15 +1,18 @@
 import { UserProfile } from '@core/database';
+import { getAvatarFolderRelativePath } from '@core/utils';
 import {
   BadRequestException,
   ConflictException,
   Injectable,
   Logger,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
+import { formatPhone, validatePhone } from '@nexhouse/shared-domain/utils';
+import { StorageService } from 'src/storage/storage.service';
 import { Repository } from 'typeorm';
 import { UpdateUserProfileDto } from '../dtos';
 import { UserSearchService } from './user-search.service';
-import { formatPhone, validatePhone } from '@nexhouse/shared-domain/utils';
 
 @Injectable()
 export class ProfileService {
@@ -19,9 +22,15 @@ export class ProfileService {
     @InjectRepository(UserProfile)
     private readonly repository: Repository<UserProfile>,
     private readonly searchService: UserSearchService,
+    private readonly storageService: StorageService,
+    private readonly configService: ConfigService,
   ) {}
 
-  async update(userId: string, dto: UpdateUserProfileDto) {
+  async update(
+    userId: string,
+    dto: UpdateUserProfileDto,
+    avatar?: Express.Multer.File,
+  ) {
     const existingUser = await this.searchService.findByPublicIdOrThrow(
       userId,
       undefined,
@@ -46,6 +55,17 @@ export class ProfileService {
         }
         profile.phone = formatedPhone;
       }
+    }
+
+    if (
+      profile.avatar &&
+      avatar &&
+      !profile.avatar.includes('avatar-placeholder.webp')
+    ) {
+      this.storageService.deleteUploadFile(profile.avatar);
+      const url = this.configService.get('UPLOAD_DIR');
+      const avatarPath = getAvatarFolderRelativePath(url, avatar.filename);
+      profile.avatar = avatarPath;
     }
 
     await this.repository.update(profile.id, profile);

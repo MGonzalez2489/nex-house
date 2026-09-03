@@ -1,6 +1,5 @@
 import { inject, Injectable } from "@angular/core";
-import { ChangePassword, UpdateUser } from "@nexhouse/shared-domain/interfaces";
-import { UserModel } from "@nexhouse/shared-domain/models";
+import { UserModel, UserProfileModel } from "@nexhouse/shared-domain/models";
 import { RequestService } from "./request.service";
 
 @Injectable({
@@ -14,7 +13,11 @@ export class ProfileService {
     return this.request.get<UserModel>(this.endpoint);
   }
 
-  update(dto: UpdateUser) {
-    return this.request.patch<UserModel>(this.endpoint, dto);
+  update(dto: FormData) {
+    return this.request.patch<UserProfileModel>(this.endpoint, dto);
   }
+
+  // update(dto: UpdateUser) {
+  //   return this.request.patch<UserModel>(this.endpoint, dto);
+  // }
 }

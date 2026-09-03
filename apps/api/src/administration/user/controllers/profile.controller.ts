@@ -5,20 +5,30 @@ import {
   Body,
   Controller,
   Get,
-  InternalServerErrorException,
   Param,
   Patch,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiOperation } from '@nestjs/swagger';
 import { UserRoleEnum } from '@nexhouse/shared-domain/enums';
-import { UpdateUserDto } from '../dtos';
-import { UserSearchService, UserService } from '../services';
+import { UpdateUserProfileDto } from '../dtos';
+import { ProfileService, UserSearchService, UserService } from '../services';
+
+interface IUploadedFile {
+  originalname: string;
+  buffer: Buffer;
+  mimetype: string;
+  size: number;
+}
 
 @Controller('profile')
 export class ProfileController {
   constructor(
     private readonly usersService: UserService,
     private readonly userSearchService: UserSearchService,
+    private readonly profileService: ProfileService,
   ) {}
 
   @Get()
@@ -41,18 +51,16 @@ export class ProfileController {
   }
 
   @Patch()
+  @UseInterceptors(FileInterceptor('avatar'))
   @ApiOperation({ summary: 'Update a user' })
-  async create(@Body() dto: UpdateUserDto, @CurrentUser() user: User) {
-    const response = await this.usersService.update(
-      user.neighborhoodId,
-      user.publicId,
-      dto,
-      user,
-    );
-    if (!response) {
-      throw new InternalServerErrorException('Used not created.');
-    }
-    return UserToModelMapper(response);
+  async update(
+    @Body() dto: UpdateUserProfileDto,
+    @CurrentUser() user: User,
+    @UploadedFile() avatar?: Express.Multer.File,
+  ) {
+    console.log('avatar:', avatar);
+
+    return this.profileService.update(user.publicId, dto, avatar);
   }
 
   //TODO: REMOVE THIS: FOR TESTING

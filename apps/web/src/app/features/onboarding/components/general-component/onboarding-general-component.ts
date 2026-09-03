@@ -12,7 +12,7 @@ import {
   Validators,
 } from "@angular/forms";
 import { UpdateUserProfile } from "@nexhouse/shared-domain/interfaces";
-import { UserModel, UserProfileModel } from "@nexhouse/shared-domain/models";
+import { UserProfileModel } from "@nexhouse/shared-domain/models";
 import { FormValidationErrorComponent } from "@shared/components/forms";
 import { Button } from "primeng/button";
 import { InputMaskModule } from "primeng/inputmask";

@@ -93,12 +93,12 @@ export const UserStore = signalStore(
         return null;
       }
     },
-    update: async (dto: UpdateUser) => {
+    update: async (dto: FormData) => {
       patchState(store, setLoading());
       try {
         const response = await lastValueFrom(store._service.update(dto));
 
-        patchState(store, { user: response.data }, setLoaded());
+        patchState(store, { profile: response.data }, setLoaded());
 
         return response.data;
       } catch (err) {
