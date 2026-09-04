@@ -5,6 +5,7 @@ import {
   output,
   signal,
 } from "@angular/core";
+import { FormsModule } from "@angular/forms";
 import { UserModel, UserProfileModel } from "@nexhouse/shared-domain/models";
 import { FormOptions, ProfileFormComponent } from "@shared/components/forms";
 import { Button } from "primeng/button";
@@ -13,7 +14,14 @@ import { Panel } from "primeng/panel";
 
 @Component({
   selector: "app-profile-info-form",
-  imports: [InputTextModule, Panel, Button, ProfileFormComponent, FormOptions],
+  imports: [
+    InputTextModule,
+    Panel,
+    Button,
+    ProfileFormComponent,
+    FormOptions,
+    FormsModule,
+  ],
   templateUrl: "./profile-info-form.html",
   styleUrl: "./profile-info-form.css",
   standalone: true,

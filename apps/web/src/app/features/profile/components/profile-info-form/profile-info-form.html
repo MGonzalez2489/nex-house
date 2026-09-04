@@ -17,6 +17,18 @@
     [disabledForm]="mode() === 'info'"
     (doSubmit)="doSubmit($event)"
   >
+    <div class="form-control">
+      <label class="form-label" for="email">Email </label>
+      <input
+        pInputText
+        id="email"
+        type="text"
+        fluid
+        [(ngModel)]="user().email"
+        disabled
+      />
+    </div>
+
     @if (mode() === "form") {
       <app-form-options (doCancel)="cancel()" />
     }
