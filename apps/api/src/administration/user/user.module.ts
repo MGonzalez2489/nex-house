@@ -1,4 +1,5 @@
 import { UnitsModule } from '@administration/units';
+import { CatalogsModule } from '@catalogs/catalogs.module';
 import { CoreModule } from '@core/core.module';
 import { User, UserProfile } from '@core/database';
 import { Module } from '@nestjs/common';
@@ -16,7 +17,6 @@ import {
   UserService,
   UserStatsService,
 } from './services';
-import { CatalogsModule } from '@catalogs/catalogs.module';
 
 @Module({
   imports: [
@@ -34,6 +34,6 @@ import { CatalogsModule } from '@catalogs/catalogs.module';
     OnboardingService,
     ProfileService,
   ],
-  exports: [UserService, UserSearchService],
+  exports: [UserService, UserSearchService, OnboardingService],
 })
 export class UserModule {}
