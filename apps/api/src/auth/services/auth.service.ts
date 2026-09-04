@@ -5,8 +5,15 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { LoginDto } from '../dtos';
-import { UserSearchService } from '@administration/user/services';
-import { UserRoleEnum, UserStatusEnum } from '@nexhouse/shared-domain/enums';
+import {
+  OnboardingService,
+  UserSearchService,
+} from '@administration/user/services';
+import {
+  OnboardingStepEnum,
+  UserRoleEnum,
+  UserStatusEnum,
+} from '@nexhouse/shared-domain/enums';
 import { CryptoService } from '@core/services';
 import { SessionService } from './session.service';
 import { User } from '@core/database';
@@ -19,6 +26,7 @@ export class AuthService {
     private readonly userSearchService: UserSearchService,
     private readonly sessionService: SessionService,
     private readonly cryptoService: CryptoService,
+    private readonly onboardingService: OnboardingService,
   ) {}
 
   /**
@@ -33,11 +41,11 @@ export class AuthService {
    * @returns A promise resolving to the final active Session model.
    */
   async login(dto: LoginDto, userAgent: string, ip: string) {
-    const user = await this.userSearchService.findByEmail(
-      dto.email,
-      undefined,
-      { neighborhood: true, role: true, status: true },
-    );
+    let user = await this.userSearchService.findByEmail(dto.email, undefined, {
+      neighborhood: true,
+      role: true,
+      status: true,
+    });
 
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
@@ -68,8 +76,25 @@ export class AuthService {
       }
     }
 
+    // autocomplete onboarding if last step missing
+    const onboardingState = await this.onboardingService.getOnboardingStatus(
+      user.publicId,
+    );
+    if (
+      !onboardingState.isCompleted &&
+      onboardingState.currentStepId === OnboardingStepEnum.COMPLETE
+    ) {
+      await this.onboardingService.completeOnboarding(user.id);
+      user = await this.userSearchService.findByEmail(dto.email, undefined, {
+        neighborhood: true,
+        role: true,
+        status: true,
+      });
+    }
+
     return this.sessionService.createSession(user, userAgent, ip);
   }
+
   async refreshAuthentication(token: string, userAgent: string) {
     return this.sessionService.refreshSession(token, userAgent);
   }
