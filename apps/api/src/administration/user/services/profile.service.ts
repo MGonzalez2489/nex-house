@@ -57,15 +57,11 @@ export class ProfileService {
       }
     }
 
-    if (
-      profile.avatar &&
-      avatar &&
-      !profile.avatar.includes('avatar-placeholder.webp')
-    ) {
-      this.storageService.deleteUploadFile(profile.avatar);
+    if (avatar) {
       const url = this.configService.get('UPLOAD_DIR');
       const avatarPath = getAvatarFolderRelativePath(url, avatar.filename);
-      profile.avatar = avatarPath;
+      const nxFile = await this.storageService.uploadFile(avatarPath, avatar);
+      profile.avatarId = nxFile.id;
     }
 
     await this.repository.update(profile.id, profile);

@@ -11,102 +11,14 @@
       />
     }
   </ng-template>
-  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
-    <div class="grid grid-cols-2 gap-x-3">
-      <!-- firstName -->
-      <div class="form-control">
-        <label class="form-label required" for="firstName">Nombre </label>
-        <input
-          pInputText
-          id="firstName"
-          type="text"
-          formControlName="firstName"
-          placeholder="Ej. Ana"
-          fluid
-          [invalid]="
-            form.controls.firstName.invalid && form.controls.firstName.touched
-          "
-          [attr.aria-invalid]="
-            form.controls.firstName.invalid && form.controls.firstName.touched
-          "
-          [attr.aria-describedby]="
-            form.controls.firstName.touched && form.controls.firstName.errors
-              ? 'firstName-error'
-              : null
-          "
-        />
 
-        <app-form-validation-error
-          id="firstName-errors"
-          [touched]="form.controls.firstName.touched"
-          [errors]="form.controls.firstName.errors"
-          label="Nombre"
-        />
-      </div>
-      <!-- lastName -->
-      <div class="form-control">
-        <label class="form-label" for="lastName">Apellidos </label>
-        <input
-          pInputText
-          id="lastName"
-          type="text"
-          formControlName="lastName"
-          placeholder="Ej. Martínez López"
-          fluid
-          [invalid]="
-            form.controls.lastName.invalid && form.controls.lastName.touched
-          "
-          [attr.aria-invalid]="
-            form.controls.lastName.invalid && form.controls.lastName.touched
-          "
-          [attr.aria-describedby]="
-            form.controls.lastName.touched && form.controls.lastName.errors
-              ? 'lastName-error'
-              : null
-          "
-        />
-      </div>
-      <!-- phone -->
-      <div class="form-control col-span-2">
-        <label class="form-label required" for="phone">Teléfono </label>
-        <input
-          pInputText
-          id="phone"
-          type="text"
-          formControlName="phone"
-          placeholder="+52 614 123 4567"
-          fluid
-          [invalid]="form.controls.phone.invalid && form.controls.phone.touched"
-          [attr.aria-invalid]="
-            form.controls.phone.invalid && form.controls.phone.touched
-          "
-          [attr.aria-describedby]="
-            form.controls.phone.touched && form.controls.phone.errors
-              ? 'phone-error'
-              : null
-          "
-          pInputMask="(999)-999-9999"
-          placeholder="(614)-123-4567"
-        />
-        <app-form-validation-error
-          id="phone-errors"
-          [touched]="form.controls.phone.touched"
-          [errors]="form.controls.phone.errors"
-          label="Teléfono"
-        />
-      </div>
-      <!-- Email -->
-      <div class="form-control col-span-2">
-        <label class="form-label" for="email">Correo electrónico </label>
-        <input pInputText id="email" formControlName="email" fluid />
-        <p class="text-xs text-slate-400 mt-1.5">
-          El correo se usa para iniciar sesión y no puede modificarse aquí.
-        </p>
-      </div>
-    </div>
-
+  <app-profile-form-component
+    [profile]="profile()"
+    [disabledForm]="mode() === 'info'"
+    (doSubmit)="doSubmit($event)"
+  >
     @if (mode() === "form") {
       <app-form-options (doCancel)="cancel()" />
     }
-  </form>
+  </app-profile-form-component>
 </p-panel>

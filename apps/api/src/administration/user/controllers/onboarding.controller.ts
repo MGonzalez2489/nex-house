@@ -8,6 +8,8 @@ import {
   InternalServerErrorException,
   Patch,
   Post,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { OnboardingService, ProfileService, UserService } from '../services';
 import { User } from '@core/database';
@@ -20,6 +22,7 @@ import {
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { UnitService } from '@administration/units/services';
 import { CreateUnitDto } from '@administration/neighborhood/dtos';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('onboarding')
 export class OnboardingController {
@@ -64,11 +67,17 @@ export class OnboardingController {
   }
 
   @Patch('profile')
+  @UseInterceptors(FileInterceptor('avatar'))
   async updateProfile(
     @Body() dto: UpdateUserProfileDto,
     @CurrentUser() user: User,
+    @UploadedFile() avatar?: Express.Multer.File,
   ) {
-    const updatedProfile = await this.profileService.update(user.publicId, dto);
+    const updatedProfile = await this.profileService.update(
+      user.publicId,
+      dto,
+      avatar,
+    );
 
     if (!updatedProfile) {
       throw new InternalServerErrorException('Failed to update user profile.');

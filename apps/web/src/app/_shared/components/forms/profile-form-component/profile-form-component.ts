@@ -12,16 +12,15 @@ import {
   ReactiveFormsModule,
   Validators,
 } from "@angular/forms";
-import { UserProfileModel } from "@nexhouse/shared-domain/models";
+import { FileModel, UserProfileModel } from "@nexhouse/shared-domain/models";
 import { InputMaskModule } from "primeng/inputmask";
 import { InputTextModule } from "primeng/inputtext";
 import { FormValidationErrorComponent } from "../form-validation-error/form-validation-error";
 
-import { JsonPipe } from "@angular/common";
+import { toSignal } from "@angular/core/rxjs-interop";
 import { FileUploadDirective } from "@shared/directives";
 import { Button } from "primeng/button";
 import { FileUploadModule } from "primeng/fileupload";
-import { toSignal } from "@angular/core/rxjs-interop";
 
 @Component({
   selector: "app-profile-form-component",
@@ -33,7 +32,6 @@ import { toSignal } from "@angular/core/rxjs-interop";
     InputMaskModule,
     FileUploadModule,
     Button,
-    JsonPipe,
   ],
   templateUrl: "./profile-form-component.html",
   styleUrl: "./profile-form-component.css",
@@ -41,6 +39,7 @@ import { toSignal } from "@angular/core/rxjs-interop";
 export class ProfileFormComponent {
   profile = input<UserProfileModel>();
   doSubmit = output<FormData>();
+  disabledForm = input<boolean>(false);
 
   protected avatarPreview = signal<string | null>(null);
   protected readonly previewUrl = computed(() => {
@@ -49,8 +48,6 @@ export class ProfileFormComponent {
 
     const value = URL.createObjectURL(file as File);
     return value;
-    // return file?.ObjectURL;
-    // return file instanceof File ? URL.createObjectURL(file) : null;
   });
 
   protected readonly form = new FormGroup({
@@ -68,7 +65,7 @@ export class ProfileFormComponent {
   protected formChanges = toSignal(this.form.valueChanges);
 
   constructor() {
-    effect(() => {
+    effect(async () => {
       const cProfile = this.profile();
       if (!cProfile) return;
 
@@ -77,6 +74,20 @@ export class ProfileFormComponent {
         lastName: cProfile.lastName,
         phone: cProfile.phone,
       });
+
+      if (cProfile.avatar) {
+        const f = await this.urlToFile(cProfile.avatar);
+        this.form.patchValue({ avatar: f });
+      }
+    });
+
+    effect(() => {
+      const cDisabled = this.disabledForm();
+      if (cDisabled) {
+        this.form.disable();
+      } else {
+        this.form.enable();
+      }
     });
   }
 
@@ -84,17 +95,43 @@ export class ProfileFormComponent {
     this.form.markAllAsTouched();
     if (this.form.invalid) return;
 
-    const formData = new FormData();
-    const { firstName, lastName, avatar, phone } = this.form.value;
-
-    if (firstName) formData.append("firstName", firstName);
-    if (lastName) formData.append("lastName", lastName);
-    if (phone) formData.append("phone", phone);
-
-    if (avatar instanceof File) {
-      formData.append("avatar", avatar, avatar.name);
-    }
+    const formData = this.preparePayload(this.profile());
 
     this.doSubmit.emit(formData);
+  }
+
+  private preparePayload(ex?: UserProfileModel): FormData {
+    const raw = this.form.getRawValue();
+    const formData = new FormData();
+
+    // Helper para añadir solo si cambió o si es nuevo
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const appendIfChanged = (key: string, value: any, original?: any) => {
+      if (!ex || value !== original) {
+        formData.append(
+          key,
+          value instanceof Date ? value.toISOString() : String(value),
+        );
+      }
+    };
+
+    appendIfChanged("firstName", raw.firstName, ex?.firstName);
+    appendIfChanged("lastName", raw.lastName, ex?.lastName);
+    appendIfChanged("phone", raw.phone, ex?.phone);
+    if (raw.avatar instanceof File && this.form.controls.avatar.dirty) {
+      formData.append("avatar", raw.avatar, raw.avatar.name);
+    }
+
+    return formData;
+  }
+
+  async urlToFile(avatar: FileModel): Promise<File> {
+    const response = await fetch(avatar.url);
+    const blob = await response.blob();
+
+    return new File([blob], avatar.originalName, {
+      type: avatar.mimeType,
+      lastModified: new Date(avatar.createdAt!).getTime(),
+    });
   }
 }

@@ -16,13 +16,6 @@ import { UserRoleEnum } from '@nexhouse/shared-domain/enums';
 import { UpdateUserProfileDto } from '../dtos';
 import { ProfileService, UserSearchService, UserService } from '../services';
 
-interface IUploadedFile {
-  originalname: string;
-  buffer: Buffer;
-  mimetype: string;
-  size: number;
-}
-
 @Controller('profile')
 export class ProfileController {
   constructor(
@@ -43,7 +36,7 @@ export class ProfileController {
         neighborhood: loadNeigh,
         status: true,
         role: true,
-        profile: true,
+        profile: { avatar: true },
         userUnits: { unit: { type: true, street: true } },
       },
     );
@@ -58,8 +51,6 @@ export class ProfileController {
     @CurrentUser() user: User,
     @UploadedFile() avatar?: Express.Multer.File,
   ) {
-    console.log('avatar:', avatar);
-
     return this.profileService.update(user.publicId, dto, avatar);
   }
 

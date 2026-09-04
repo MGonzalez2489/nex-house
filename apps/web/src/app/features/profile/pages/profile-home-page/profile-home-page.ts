@@ -4,12 +4,12 @@ import {
   computed,
   inject,
 } from "@angular/core";
-import { ProfileCard, ProfileInfoForm, ProfileUnit } from "@profile/components";
+import { ProfileInfoForm, ProfileUnit } from "@profile/components";
 import { UserStore } from "@stores/user.store";
 
 @Component({
   selector: "app-profile-home-page",
-  imports: [ProfileCard, ProfileInfoForm, ProfileUnit],
+  imports: [ProfileInfoForm, ProfileUnit],
   templateUrl: "./profile-home-page.html",
   styleUrl: "./profile-home-page.css",
   standalone: true,

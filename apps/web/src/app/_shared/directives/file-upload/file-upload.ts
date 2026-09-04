@@ -24,9 +24,9 @@ export class FileUploadDirective implements ControlValueAccessor {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   private onTouched: () => void = () => {};
 
-  writeValue(file: File | null): void {
+  async writeValue(file: File | null) {
     // Update the component's internal file list if value is set programmatically
-    if (file) {
+    if (file && file instanceof File) {
       this.fileUpload.files = [file];
     } else {
       this.fileUpload.clear();

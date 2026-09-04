@@ -1,10 +1,6 @@
 import { inject, Injectable } from "@angular/core";
 import { RequestService } from "@core/services";
-import {
-  ChangePassword,
-  CreateUnit,
-  UpdateUserProfile,
-} from "@nexhouse/shared-domain/interfaces";
+import { ChangePassword, CreateUnit } from "@nexhouse/shared-domain/interfaces";
 import { OnboardingStatusResponseModel } from "@nexhouse/shared-domain/models";
 
 @Injectable({
@@ -27,7 +23,7 @@ export class OnboardingService {
     );
   }
 
-  updateProfile(dto: UpdateUserProfile) {
+  updateProfile(dto: FormData) {
     return this.request.patch<OnboardingStatusResponseModel>(
       `${this.endpoint}/profile`,
       dto,

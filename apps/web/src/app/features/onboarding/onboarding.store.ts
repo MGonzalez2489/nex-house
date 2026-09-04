@@ -69,7 +69,7 @@ export const OnboardingStore = signalStore(
         return false;
       }
     },
-    updateProfile: async (dto: UpdateUserProfile): Promise<boolean> => {
+    updateProfile: async (dto: FormData): Promise<boolean> => {
       patchState(store, setLoading());
       try {
         const res = await lastValueFrom(store._service.updateProfile(dto));

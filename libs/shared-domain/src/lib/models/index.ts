@@ -21,3 +21,4 @@ export * from './state.model';
 export * from './city.model';
 export * from './onboarding_step.model';
 export * from './onboarding_status_response.model';
+export * from './file.model';

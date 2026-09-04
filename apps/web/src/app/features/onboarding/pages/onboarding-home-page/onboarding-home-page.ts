@@ -108,9 +108,10 @@ export class OnboardingHomePage {
       this.goNext();
     }
   }
-  protected async updateProfile(dto?: UpdateUserProfile) {
+  protected async updateProfile(dto?: FormData) {
     if (dto) {
       await this.store.updateProfile(dto);
+      this.store.load();
     } else {
       this.goNext();
     }

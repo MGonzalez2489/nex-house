@@ -117,7 +117,7 @@
     <!-- Settings -->
     <p-button text (click)="menu.toggle($event)">
       <app-avatar-component
-        [url]="profile().avatar"
+        [url]="profile().avatar?.url"
         [text]="profile().fullName"
       />
 

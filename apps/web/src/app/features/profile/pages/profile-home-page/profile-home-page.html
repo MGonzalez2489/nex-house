@@ -15,16 +15,17 @@
 
   <div class="space-y-4">
     @if (user() && profile()) {
-      <app-profile-card
-        [user]="user()!"
-        [profile]="profile()!"
-        class="block"
-        (refresh)="store.load()"
-      />
+      <!-- <app-profile-card -->
+      <!--   [user]="user()!" -->
+      <!--   [profile]="profile()!" -->
+      <!--   class="block" -->
+      <!--   (refresh)="store.load()" -->
+      <!-- /> -->
       <app-profile-info-form
         [user]="user()!"
         [profile]="profile()!"
         class="block"
+        (save)="store.update($event)"
       />
       <app-profile-unit
         class="block"

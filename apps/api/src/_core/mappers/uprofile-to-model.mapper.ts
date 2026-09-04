@@ -1,6 +1,6 @@
 import { UserProfile } from '@core/database';
-import { buildPublicUrl } from '@core/utils';
 import { UserProfileModel } from '@nexhouse/shared-domain/models';
+import { FileToModelMapper } from './file-to-model.mapper';
 
 export const UserProfileToModelMapper = (
   profile: UserProfile,
@@ -10,7 +10,8 @@ export const UserProfileToModelMapper = (
     lastName: profile.lastName,
     fullName: profile.fullName,
     phone: profile.phone,
-    avatar: buildPublicUrl(profile.avatar),
+    // avatar: buildPublicUrl(profile.avatar),
+    avatar: profile.avatar ? FileToModelMapper(profile.avatar) : undefined,
     publicId: profile.publicId,
   };
 };
