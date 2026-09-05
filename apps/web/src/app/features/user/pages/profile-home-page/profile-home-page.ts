@@ -4,8 +4,8 @@ import {
   computed,
   inject,
 } from "@angular/core";
-import { ProfileInfoForm, ProfileUnit } from "@profile/components";
-import { UserStore } from "@stores/user.store";
+import { ProfileInfoForm, ProfileUnit } from "@user/components";
+import { UserStore } from "@user/user.store";
 
 @Component({
   selector: "app-profile-home-page",

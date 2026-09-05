@@ -10,7 +10,7 @@ import { UserRoleEnum } from "@nexhouse/shared-domain/enums";
 import { AdminLayout } from "./admin";
 import { ResidentLayout } from "./resident";
 import { RootLayout } from "./root/root-layout/root-layout";
-import { UserStore } from "@stores/user.store";
+import { UserStore } from "@user/user.store";
 
 @Component({
   selector: "app-main-layout",

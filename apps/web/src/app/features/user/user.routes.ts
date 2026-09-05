@@ -1,10 +1,10 @@
 import { Routes } from "@angular/router";
 
-export enum PROFILE_ROUTES_ENUM {
+export enum USER_ROUTES_ENUM {
   HOME = "profile",
 }
 
-export const PROFILE_ROUTES: Routes = [
+export const USER_ROUTES: Routes = [
   {
     path: "",
     loadComponent: () =>

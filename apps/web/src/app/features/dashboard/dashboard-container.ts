@@ -1,10 +1,9 @@
 import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
-import { ProfileFormComponent } from "@shared/components/forms";
-import { UserStore } from "@stores/user.store";
+import { UserStore } from "@user/user.store";
 
 @Component({
   selector: "app-dashboard-container",
-  imports: [ProfileFormComponent],
+  imports: [],
   templateUrl: "./dashboard-container.html",
   styleUrl: "./dashboard-container.css",
   standalone: true,

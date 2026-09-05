@@ -9,7 +9,7 @@ import { PAGES_ROUTES_ENUM, UnauthorizedPage } from "./pages";
 import { RESIDENT_ROUTES_ENUM } from "./features/residents";
 import { UNIT_ROUTES_ENUM } from "@units/units.routes";
 import { ONBOARDING_ROUTES_ENUM } from "./features/onboarding";
-import { PROFILE_ROUTES_ENUM } from "@profile/profile.routes";
+import { USER_ROUTES, USER_ROUTES_ENUM } from "@user/user.routes";
 
 export const appRoutes: Route[] = [
   //public routes
@@ -63,11 +63,9 @@ export const appRoutes: Route[] = [
           import("./features/units/units.routes").then((m) => m.UNIT_ROUTES),
       },
       {
-        path: PROFILE_ROUTES_ENUM.HOME,
+        path: USER_ROUTES_ENUM.HOME,
         loadChildren: () =>
-          import("./features/profile/profile.routes").then(
-            (m) => m.PROFILE_ROUTES,
-          ),
+          import("./features/user/user.routes").then((m) => m.USER_ROUTES),
       },
     ],
   },

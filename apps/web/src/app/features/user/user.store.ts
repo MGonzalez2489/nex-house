@@ -8,7 +8,6 @@ import {
 } from "@angular-architects/ngrx-toolkit";
 import { inject } from "@angular/core";
 import { ProfileService } from "@core/services";
-import { UpdateUser } from "@nexhouse/shared-domain/interfaces";
 import {
   UserModel,
   UserProfileModel,
@@ -24,6 +23,7 @@ import {
   withState,
 } from "@ngrx/signals";
 import { lastValueFrom } from "rxjs";
+import { UserService } from "./services";
 
 interface ProfileState {
   user: UserModel | undefined;
@@ -48,29 +48,33 @@ export const UserStore = signalStore(
   withCallState(),
   withState(initialState),
   withProps(() => ({
-    _service: inject(ProfileService),
+    _userService: inject(UserService),
+    _profileService: inject(ProfileService),
   })),
   withMethods((store) => ({
-    load: async () => {
+    loadProfile: async () => {
+      try {
+        patchState(store, setLoading());
+        const prof = await lastValueFrom(store._profileService.get());
+
+        patchState(store, { profile: prof.data }, setLoaded());
+      } catch (error) {
+        patchState(store, setError(error));
+      }
+    },
+    loadUser: async () => {
       patchState(store, setLoading());
 
       try {
-        const res = await lastValueFrom(store._service.get());
+        const res = await lastValueFrom(store._userService.get());
 
-        const state: ProfileState = {
-          user: undefined,
-          profile: undefined,
-          status: undefined,
-          role: undefined,
-          units: [],
+        const state = {
+          status: res.data.status,
+          role: res.data.role,
+          units: res.data.userUnits,
         };
 
         const user = res.data;
-
-        if (user.profile) {
-          state.profile = user.profile;
-          delete user.profile;
-        }
         if (user.status) {
           state.status = user.status;
           delete user.status;
@@ -83,20 +87,20 @@ export const UserStore = signalStore(
           state.units = user.userUnits;
           user.userUnits = [];
         }
-        state.user = user;
 
-        patchState(store, state, setLoaded());
-
-        return state;
+        patchState(
+          store,
+          { user, status: state.status, role: state.role, units: state.units },
+          setLoaded(),
+        );
       } catch (error) {
         patchState(store, setError(error));
-        return null;
       }
     },
     update: async (dto: FormData) => {
       patchState(store, setLoading());
       try {
-        const response = await lastValueFrom(store._service.update(dto));
+        const response = await lastValueFrom(store._profileService.update(dto));
 
         patchState(store, { profile: response.data }, setLoaded());
 

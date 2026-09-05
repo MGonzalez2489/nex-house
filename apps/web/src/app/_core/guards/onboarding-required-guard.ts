@@ -5,7 +5,7 @@ import { DASHBOARD_ROUTES_ENUM } from "@dashboard/dashboard.routes";
 import { UserStatusEnum } from "@nexhouse/shared-domain/enums";
 import { filter, map, take } from "rxjs";
 import { ONBOARDING_ROUTES_ENUM } from "../../features/onboarding";
-import { UserStore } from "@stores/user.store";
+import { UserStore } from "@user/user.store";
 
 export const onboardingRequiredGuard: CanActivateFn = (route, state) => {
   const profileStore = inject(UserStore);

@@ -18,12 +18,8 @@ import {
 import { OnboardingService } from "./services/onboarding-service";
 import { lastValueFrom } from "rxjs";
 import { OnboardingStepEnum } from "@nexhouse/shared-domain/enums";
-import {
-  ChangePassword,
-  CreateUnit,
-  UpdateUserProfile,
-} from "@nexhouse/shared-domain/interfaces";
-import { UserStore } from "@stores/user.store";
+import { ChangePassword, CreateUnit } from "@nexhouse/shared-domain/interfaces";
+import { UserStore } from "@user/user.store";
 
 //TODO: verify if use enum (and in OnboardingStatusResponseModel)
 interface OnboardingState {
@@ -97,7 +93,7 @@ export const OnboardingStore = signalStore(
         const res = await lastValueFrom(store._service.complete());
         patchState(store, { ...res.data });
 
-        await store._userStore.load();
+        await store._userStore.loadUser();
 
         patchState(store, setLoaded());
         return true;

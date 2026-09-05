@@ -1,10 +1,14 @@
 import { NeighborhoodModule } from '@administration/neighborhood/neighborhood.module';
+import { ResidentModule } from '@administration/residents/resident.module';
+import { UnitsModule } from '@administration/units';
 import { UserModule } from '@administration/user/user.module';
 import { AuthModule } from '@auth/auth.module';
 import { JwtAuthGuard } from '@auth/guards';
+import { CatalogsModule } from '@catalogs/catalogs.module';
 import { ApiCacheModule } from '@core/api-cache.module';
 import { NeighborhoodInterceptor } from '@core/interceptors';
 import { CryptoService } from '@core/services';
+import { getUploadsFolderPath } from '@core/utils';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
@@ -19,9 +23,6 @@ import {
   State,
   User,
 } from '../_core/database/entities';
-import { getUploadsFolderPath } from '@core/utils';
-import { UnitsModule } from '@administration/units';
-import { CatalogsModule } from '@catalogs/catalogs.module';
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import { CatalogsModule } from '@catalogs/catalogs.module';
     NeighborhoodModule,
     UserModule,
     UnitsModule,
+    ResidentModule,
   ],
   controllers: [],
   providers: [

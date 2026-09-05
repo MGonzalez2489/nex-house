@@ -1,4 +1,7 @@
-import { UserSearchService, UserService } from '@administration/user/services';
+import {
+  ResidentSearchService,
+  ResidentService,
+} from '@administration/residents/services';
 import {
   City,
   NeighAddress,
@@ -30,8 +33,8 @@ export class NeighborhoodService {
     private readonly dataSource: DataSource,
     private readonly streetService: NeighStreetService,
     private readonly searchService: NeighborhoodSearchService,
-    private readonly userService: UserService,
-    private readonly userSearchService: UserSearchService,
+    private readonly residentService: ResidentService,
+    private readonly residentSearchService: ResidentSearchService,
     private readonly catService: CatalogsService,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
@@ -53,7 +56,7 @@ export class NeighborhoodService {
       );
     }
 
-    const existingAdmin = await this.userSearchService.findByEmail(
+    const existingAdmin = await this.residentSearchService.findByEmail(
       dto.adminEmail,
     );
     if (existingAdmin) {
@@ -113,7 +116,7 @@ export class NeighborhoodService {
       );
 
       //user service
-      await this.userService.createFirstAdmin(
+      await this.residentService.createFirstAdmin(
         savedNeighborhood.id,
         dto.adminEmail,
         user,

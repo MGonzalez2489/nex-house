@@ -9,8 +9,8 @@ import {
 } from "@angular/core";
 import { UserRoleEnum } from "@nexhouse/shared-domain/enums";
 import { UserModel, UserProfileModel } from "@nexhouse/shared-domain/models";
-import { PROFILE_ROUTES_ENUM } from "@profile/profile.routes";
 import { AvatarComponent, BrandComponent } from "@shared/components";
+import { USER_ROUTES_ENUM } from "@user/user.routes";
 import { MenuItem } from "primeng/api";
 import { Button } from "primeng/button";
 import { MenuModule } from "primeng/menu";
@@ -45,7 +45,7 @@ export class NavBar {
     {
       label: "Mi Perfil",
       icon: "pi pi-user",
-      routerLink: `/${PROFILE_ROUTES_ENUM.HOME}`,
+      routerLink: `/${USER_ROUTES_ENUM.HOME}`,
     },
     { label: "Ayuda y soporte", icon: "pi pi-question-circle" },
     { separator: true },

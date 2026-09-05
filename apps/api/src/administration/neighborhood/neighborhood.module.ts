@@ -1,4 +1,4 @@
-import { UserModule } from '@administration/user/user.module';
+import { ResidentModule } from '@administration/residents/resident.module';
 import { Neighborhood, NeighStreet, Unit, UserUnit } from '@core/database';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -14,7 +14,7 @@ import {
 @Module({
   imports: [
     TypeOrmModule.forFeature([Neighborhood, NeighStreet, Unit, UserUnit]),
-    UserModule,
+    ResidentModule,
     CatalogsModule,
   ],
   providers: [

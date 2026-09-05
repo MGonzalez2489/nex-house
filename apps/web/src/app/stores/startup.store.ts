@@ -13,7 +13,7 @@ import { UserRoleEnum } from "@nexhouse/shared-domain/enums";
 import { ContextStore } from "./context.store";
 import { CatalogsStore } from "./catalogs.store";
 import { UnitStore } from "@units/units.store";
-import { UserStore } from "./user.store";
+import { UserStore } from "../features/user/user.store";
 
 export type StartupStatus =
   | "IDLE"
@@ -77,10 +77,13 @@ export const StartupStore = signalStore(
       patchState(store, { status: "LOADING" });
 
       try {
-        const loggedData = await store._userStore.load();
-        if (!loggedData) throw "Not logged data";
+        await Promise.all([
+          store._userStore.loadUser(),
+          store._userStore.loadProfile(),
+        ]);
 
-        const { role, user } = loggedData;
+        const user = store._userStore.user();
+        const role = store._userStore.role();
 
         if (!user || !role) {
           patchState(store, { status: "UNAUTHENTICATED" });

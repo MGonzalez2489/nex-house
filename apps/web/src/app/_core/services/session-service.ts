@@ -15,7 +15,7 @@ import {
   UserRoleModel,
   UserStatusModel,
 } from "@nexhouse/shared-domain/models";
-import { UserStore } from "@stores/user.store";
+import { UserStore } from "@user/user.store";
 import { debounceTime, fromEvent, startWith } from "rxjs";
 
 export type ViewSize = "small" | "medium" | "large";

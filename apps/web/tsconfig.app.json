@@ -25,7 +25,7 @@
       "@residents/*": ["./src/app/features/residents/*"],
       "@units/*": ["./src/app/features/units/*"],
       "@onboarding/*": ["./src/app/features/onboarding/*"],
-      "@profile/*": ["./src/app/features/profile/*"]
+      "@user/*": ["./src/app/features/user/*"]
     }
   },
   "include": ["src/**/*.ts"],

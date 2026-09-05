@@ -11,12 +11,13 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UserRoleEnum } from '@nexhouse/shared-domain/enums';
 import { UpdateUserProfileDto } from '../dtos';
 import { ProfileService, UserSearchService, UserService } from '../services';
 
-@Controller('profile')
+@ApiTags('User')
+@Controller('user/profile')
 export class ProfileController {
   constructor(
     private readonly usersService: UserService,
@@ -27,19 +28,7 @@ export class ProfileController {
   @Get()
   @ApiOperation({ summary: 'Get a user profile' })
   async get(@CurrentUser() user: User) {
-    const loadNeigh = user.role?.name !== UserRoleEnum.SUPERADMIN;
-
-    const response = await this.userSearchService.findByPublicId(
-      user.publicId,
-      loadNeigh ? user.neighborhoodId : undefined,
-      {
-        neighborhood: loadNeigh,
-        status: true,
-        role: true,
-        profile: { avatar: true },
-        userUnits: { unit: { type: true, street: true } },
-      },
-    );
+    const response = await this.getFullUser(user);
     return UserToModelMapper(response);
   }
 
@@ -51,16 +40,34 @@ export class ProfileController {
     @CurrentUser() user: User,
     @UploadedFile() avatar?: Express.Multer.File,
   ) {
-    return this.profileService.update(user.publicId, dto, avatar);
+    await this.profileService.update(user.publicId, dto, avatar);
+    const response = await this.getFullUser(user);
+    return UserToModelMapper(response);
   }
 
   //TODO: REMOVE THIS: FOR TESTING
-  @Get(':userId/resetpwd')
+  @Get('resetpwd')
   @Public()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async resetPwd(@Param() userId: any) {
-    await this.usersService.restorePwd(userId.userId);
+  async resetPwd(@CurrentUser() user: User) {
+    await this.usersService.restorePwd(user.id);
 
     return true;
+  }
+
+  private async getFullUser(user: User) {
+    const loadNeigh = user.role?.name !== UserRoleEnum.SUPERADMIN;
+
+    return await this.userSearchService.findByPublicId(
+      user.publicId,
+      loadNeigh ? user.neighborhoodId : undefined,
+      {
+        neighborhood: loadNeigh,
+        status: true,
+        role: true,
+        profile: { avatar: true },
+        userUnits: { unit: { type: true, street: true } },
+      },
+    );
   }
 }

@@ -8,15 +8,10 @@ import {
 } from "@angular/core";
 import { SessionService } from "@core/services";
 import { OnboardingStepEnum } from "@nexhouse/shared-domain/enums";
-import {
-  ChangePassword,
-  CreateUnit,
-  UpdateUserProfile,
-} from "@nexhouse/shared-domain/interfaces";
+import { ChangePassword, CreateUnit } from "@nexhouse/shared-domain/interfaces";
 import { OnboardingStepModel } from "@nexhouse/shared-domain/models";
 import { OnboardingStore } from "@onboarding/onboarding.store";
 import { BrandComponent } from "@shared/components";
-import { UserStore } from "@stores/user.store";
 import { Button } from "primeng/button";
 import { ProgressBarModule } from "primeng/progressbar";
 import { StepperModule } from "primeng/stepper";
@@ -31,6 +26,7 @@ import { ContextStore } from "@stores/context.store";
 import { CatalogsStore } from "@stores/catalogs.store";
 import { Router } from "@angular/router";
 import { DASHBOARD_ROUTES_ENUM } from "@dashboard/dashboard.routes";
+import { UserStore } from "@user/user.store";
 
 @Component({
   selector: "app-onboarding-home-page",
