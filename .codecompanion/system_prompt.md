@@ -5,6 +5,12 @@ Before writing code, strictly adhere to the project standards defined in:
 - `.ai/rules/database.md`
 - `.ai/rules/git-commits.md`
 
+## Agent Skills Index
+
+Whenever you are asked to generate or refactor code, inspect and strictly apply the corresponding step-by-step skill file:
+
+- **Creating Entities:** Read `.ai/skills/backend/create-entity/SKILL.md` before generating TypeORM entities.
+
 <!-- # AI Rules for NexHouse Monorepo -->
 <!---->
 <!-- ## **4\. Framework Best Practices & Coding Standards** -->
