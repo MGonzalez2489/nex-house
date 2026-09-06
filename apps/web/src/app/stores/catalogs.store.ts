@@ -4,18 +4,21 @@ import {
   setLoading,
   withCallState,
   withDevtools,
+  withReset,
 } from "@angular-architects/ngrx-toolkit";
-import { inject } from "@angular/core";
+import { effect, inject } from "@angular/core";
 import { CatalogsService } from "@core/services";
 import { BaseCatalogModel } from "@nexhouse/shared-domain/models";
 import {
   patchState,
   signalStore,
+  withHooks,
   withMethods,
   withProps,
   withState,
 } from "@ngrx/signals";
 import { firstValueFrom, lastValueFrom } from "rxjs";
+import { AuthStore } from "@auth/store";
 
 export interface CatalogsState {
   UserRoles: BaseCatalogModel[];
@@ -42,6 +45,7 @@ export const CatalogsStore = signalStore(
   { providedIn: "root" },
   withDevtools("catalogs"),
   withCallState(),
+  withReset(),
   withState<CatalogsState>({
     UserRoles: [],
     UserStatus: [],
@@ -141,4 +145,17 @@ export const CatalogsStore = signalStore(
       }
     },
   })),
+
+  withHooks((store) => {
+    const authStore = inject(AuthStore);
+    return {
+      onInit: (): void => {
+        effect(() => {
+          if (!authStore.isAuthenticated()) {
+            store.resetState();
+          }
+        });
+      },
+    };
+  }),
 );

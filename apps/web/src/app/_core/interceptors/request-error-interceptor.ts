@@ -80,10 +80,7 @@ export const ErrorInterceptor: HttpInterceptorFn = (req, next) => {
         }),
         catchError((refreshError) => {
           isRefreshing = false;
-          // If refresh fails (e.g., expired refresh token), force logout
-          // authStore.logout();
-          localStorage.clear();
-          authStore.resetState();
+          authStore.clearSession();
           return throwError(() => refreshError);
         }),
       );

@@ -6,7 +6,7 @@ import {
   withDevtools,
   withReset,
 } from "@angular-architects/ngrx-toolkit";
-import { inject } from "@angular/core";
+import { effect, inject } from "@angular/core";
 import { NeighborhoodService } from "@neighborhoods/services";
 import {
   NeighborhoodModel,
@@ -15,11 +15,13 @@ import {
 import {
   patchState,
   signalStore,
+  withHooks,
   withMethods,
   withProps,
   withState,
 } from "@ngrx/signals";
 import { lastValueFrom } from "rxjs";
+import { AuthStore } from "@auth/store";
 
 interface contextState {
   selectedId: string | undefined;
@@ -82,4 +84,17 @@ export const ContextStore = signalStore(
       }
     },
   })),
+
+  withHooks((store) => {
+    const authStore = inject(AuthStore);
+    return {
+      onInit: (): void => {
+        effect(() => {
+          if (!authStore.isAuthenticated()) {
+            store.resetState();
+          }
+        });
+      },
+    };
+  }),
 );

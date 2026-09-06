@@ -6,11 +6,12 @@ import {
   withDevtools,
   withReset,
 } from "@angular-architects/ngrx-toolkit";
-import { inject } from "@angular/core";
+import { effect, inject } from "@angular/core";
 import { OnboardingStepModel } from "@nexhouse/shared-domain/models";
 import {
   patchState,
   signalStore,
+  withHooks,
   withMethods,
   withProps,
   withState,
@@ -20,6 +21,7 @@ import { lastValueFrom } from "rxjs";
 import { OnboardingStepEnum } from "@nexhouse/shared-domain/enums";
 import { ChangePassword, CreateUnit } from "@nexhouse/shared-domain/interfaces";
 import { UserStore } from "@user/user.store";
+import { AuthStore } from "@auth/store";
 
 //TODO: verify if use enum (and in OnboardingStatusResponseModel)
 interface OnboardingState {
@@ -103,4 +105,17 @@ export const OnboardingStore = signalStore(
       }
     },
   })),
+
+  withHooks((store) => {
+    const authStore = inject(AuthStore);
+    return {
+      onInit: (): void => {
+        effect(() => {
+          if (!authStore.isAuthenticated()) {
+            store.resetState();
+          }
+        });
+      },
+    };
+  }),
 );

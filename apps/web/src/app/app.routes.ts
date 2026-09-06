@@ -1,15 +1,15 @@
 import { Route } from "@angular/router";
 import { AuthGuard } from "@auth/guards";
-import { DASHBOARD_ROUTES_ENUM } from "@dashboard/index";
-import { MainLayout } from "@shared/layout";
-import { NEIGHBORHOOD_ROUTES_ENUM } from "./features/neighborhoods";
 import { AccessGuard, onboardingRequiredGuard } from "@core/guards";
+import { DASHBOARD_ROUTES_ENUM } from "@dashboard/index";
 import { UserRoleEnum } from "@nexhouse/shared-domain/enums";
-import { PAGES_ROUTES_ENUM, UnauthorizedPage } from "./pages";
-import { RESIDENT_ROUTES_ENUM } from "./features/residents";
+import { MainLayout } from "@shared/layout";
 import { UNIT_ROUTES_ENUM } from "@units/units.routes";
+import { USER_ROUTES_ENUM } from "@user/user.routes";
+import { NEIGHBORHOOD_ROUTES_ENUM } from "./features/neighborhoods";
 import { ONBOARDING_ROUTES_ENUM } from "./features/onboarding";
-import { USER_ROUTES, USER_ROUTES_ENUM } from "@user/user.routes";
+import { RESIDENT_ROUTES_ENUM } from "./features/residents";
+import { PAGES_ROUTES_ENUM, UnauthorizedPage } from "./pages";
 
 export const appRoutes: Route[] = [
   //public routes

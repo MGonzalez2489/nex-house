@@ -6,7 +6,7 @@ import {
   withDevtools,
   withReset,
 } from "@angular-architects/ngrx-toolkit";
-import { inject } from "@angular/core";
+import { effect, inject } from "@angular/core";
 import {
   ApiPaginationMeta,
   CreateUser,
@@ -19,6 +19,7 @@ import {
   patchState,
   signalStore,
   type,
+  withHooks,
   withMethods,
   withProps,
   withState,
@@ -33,6 +34,7 @@ import { rxMethod } from "@ngrx/signals/rxjs-interop";
 import { ContextStore } from "@stores/context.store";
 import { lastValueFrom, pipe, switchMap, tap } from "rxjs";
 import { ResidentService } from "./services";
+import { AuthStore } from "@auth/store";
 
 const config = entityConfig({
   entity: type<UserModel>(),
@@ -130,4 +132,17 @@ export const ResidentStore = signalStore(
       }
     },
   })),
+
+  withHooks((store) => {
+    const authStore = inject(AuthStore);
+    return {
+      onInit: (): void => {
+        effect(() => {
+          if (!authStore.isAuthenticated()) {
+            store.resetState();
+          }
+        });
+      },
+    };
+  }),
 );

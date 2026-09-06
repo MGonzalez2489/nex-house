@@ -6,7 +6,9 @@ export const loadResolver: ResolveFn<boolean> = async (route, state) => {
   const router = inject(Router);
   const onboardingStore = inject(OnboardingStore);
 
-  await onboardingStore.load();
+  if (onboardingStore.steps().length === 0) {
+    await onboardingStore.load();
+  }
 
   if (onboardingStore.error()) {
     alert("error loading onboarding data> " + onboardingStore.error());

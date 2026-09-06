@@ -10,7 +10,10 @@ import { LoginForm } from "./login-form";
 
 import { AuthStore } from "@auth/store";
 import { DASHBOARD_ROUTES_ENUM } from "@dashboard/index";
+import { ONBOARDING_ROUTES_ENUM } from "@onboarding/onboarding.routes";
+import { UserStatusEnum } from "@nexhouse/shared-domain/enums";
 import { Login } from "@nexhouse/shared-domain/interfaces";
+import { UserStore } from "@user/user.store";
 import {
   FormOptions,
   FormValidationErrorComponent,
@@ -44,6 +47,7 @@ export class LoginPage {
   protected readonly store = inject(AuthStore);
   private readonly router = inject(Router);
   private readonly startupStore = inject(StartupStore);
+  private readonly userStore = inject(UserStore);
 
   protected readonly form = new FormGroup<LoginForm>({
     email: new FormControl("root@test.com", {
@@ -62,12 +66,25 @@ export class LoginPage {
       return;
     }
 
-    const request: Login = this.form.getRawValue();
-    const response = await this.store.login(request);
+    try {
+      const request: Login = this.form.getRawValue();
+      const response = await this.store.login(request);
 
-    if (response) {
-      await this.startupStore.initializeApp();
-      this.router.navigateByUrl(`/${DASHBOARD_ROUTES_ENUM.HOME}`);
+      if (response) {
+        await this.startupStore.initializeApp();
+
+        const pendingOnboarding =
+          this.userStore.status()?.name === UserStatusEnum.PENDING_ONBOARDING;
+        const destination = pendingOnboarding
+          ? `/${ONBOARDING_ROUTES_ENUM.HOME}`
+          : `/${DASHBOARD_ROUTES_ENUM.HOME}`;
+
+        await this.router.navigateByUrl(destination);
+      }
+    } catch (error) {
+      console.error("error", error);
+    } finally {
+      this.store.finishLogin();
     }
   }
 }

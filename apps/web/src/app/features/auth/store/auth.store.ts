@@ -52,20 +52,24 @@ export const AuthStore = signalStore(
   withComputed(({ token }) => ({
     isAuthenticated: computed(() => !!token()),
   })),
-  withMethods((store) => ({
+withMethods((store) => ({
     loadSession: (newSession: SessionModel) => {
       localStorage.setItem(APP_CONSTANTS.TOKEN_STORAGE_KEY, newSession.token);
       localStorage.setItem(APP_CONSTANTS.TOKEN_EXP, newSession.exp.toString());
-      patchState(
-        store,
-        {
-          token: newSession.token,
-          // user: newSession.user,
-          exp: newSession.exp,
-        },
-        setLoaded(),
-      );
-      // store._socketService.connect(newSession.token);
+      patchState(store, {
+        token: newSession.token,
+        exp: newSession.exp,
+      });
+    },
+    finishLogin: () => {
+      patchState(store, setLoaded());
+    },
+  })),
+  withMethods((store) => ({
+    clearSession: () => {
+      localStorage.clear();
+      store.resetState();
+      patchState(store, { token: null, exp: 0 });
     },
   })),
   withMethods((store) => {
@@ -90,7 +94,6 @@ export const AuthStore = signalStore(
       //     patchState(store, { user: res.data }, setLoaded());
       //     return res.data;
       //   } catch (error) {
-      //     console.log("error", error);
       //     patchState(store, setError(error));
       //     return null;
       //   }
@@ -99,12 +102,9 @@ export const AuthStore = signalStore(
         patchState(store, setLoading());
         try {
           // await lastValueFrom(store._authService.logout());
-
-          console.log("logout store");
-          localStorage.clear();
-          // patchState(store, { user: undefined }, setLoaded());
-          store.resetState();
+          store.clearSession();
         } catch (error) {
+          console.log("error", error);
           patchState(store, setError(error));
           return undefined;
         }

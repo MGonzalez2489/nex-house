@@ -46,7 +46,6 @@ describe("AuthStore (Zoneless Edition)", () => {
       // Lazy instantiation: trigger store creation while localStorage is empty
       const store = TestBed.inject(AuthStore);
 
-      expect(store.user()).toBeUndefined();
       expect(store.token()).toBeNull();
       expect(store.recoveryToken()).toBeUndefined();
       expect(store.exp()).toBe(0);
@@ -55,7 +54,7 @@ describe("AuthStore (Zoneless Edition)", () => {
   });
 
   describe("loadSession Method", () => {
-    it("should map session data to state, store references in local storage, and update loading state to loaded", () => {
+    it("should map session data to state and store references in local storage", () => {
       // Spy on the prototype of Storage to safely intercept localStorage calls in JSDOM
       const setItemSpy = jest.spyOn(Storage.prototype, "setItem");
       const store = TestBed.inject(AuthStore);
@@ -64,15 +63,14 @@ describe("AuthStore (Zoneless Edition)", () => {
 
       // Verify state properties update
       expect(store.token()).toBe(mockSession.token);
-      expect(store.user()).toEqual(mockSession.user);
       expect(store.exp()).toBe(mockSession.exp);
 
       // Verify computed properties evaluate instantly
       expect(store.isAuthenticated()).toBe(true);
 
-      // Verify callState updates to loaded (from @angular-architects/ngrx-toolkit)
-      expect(store.loaded()).toBe(true);
+      // loadSession must NOT touch callState; finishLogin() owns the busy->idle transition
       expect(store.loading()).toBe(false);
+      expect(store.loaded()).toBe(false);
 
       // Verify side-effects in localStorage
       expect(setItemSpy).toHaveBeenCalledWith(
@@ -90,7 +88,7 @@ describe("AuthStore (Zoneless Edition)", () => {
   });
 
   describe("login Method Workflows (Zoneless)", () => {
-    it("should set loading flag synchronously, await API, and resolve to true upon successful authorization", async () => {
+    it("should set loading flag synchronously, await API, and stay busy until finishLogin is called", async () => {
       authServiceMock.login.mockReturnValue(
         of({ success: true, data: mockSession, message: "Success" }),
       );
@@ -111,10 +109,15 @@ describe("AuthStore (Zoneless Edition)", () => {
       // Post-resolution checks
       expect(loginResult).toBe(true);
       expect(store.token()).toBe(mockSession.token);
-      expect(store.user()).toEqual(mockSession.user);
+
+      // The busy indicator must stay ON while app initialization runs after login
+      expect(store.loading()).toBe(true);
+      expect(store.isAuthenticated()).toBe(true);
+
+      // Only finishLogin() clears the busy state (login page calls it after init + navigation)
+      store.finishLogin();
       expect(store.loading()).toBe(false);
       expect(store.loaded()).toBe(true);
-      expect(store.isAuthenticated()).toBe(true);
     });
 
     it("should catch exceptions synchronously, update callState to error and return false upon failure response", async () => {
@@ -135,7 +138,6 @@ describe("AuthStore (Zoneless Edition)", () => {
       const loginResult = await loginPromise;
 
       expect(loginResult).toBe(false);
-      expect(store.user()).toBeUndefined();
       expect(store.token()).toBeNull();
 
       // Verify callState handles the error (from @angular-architects/ngrx-toolkit)

@@ -9,11 +9,12 @@ import {
   withProps,
   withState,
 } from "@ngrx/signals";
-import { UserRoleEnum } from "@nexhouse/shared-domain/enums";
+import { UserRoleEnum, UserStatusEnum } from "@nexhouse/shared-domain/enums";
 import { ContextStore } from "./context.store";
 import { CatalogsStore } from "./catalogs.store";
 import { UnitStore } from "@units/units.store";
 import { UserStore } from "../features/user/user.store";
+import { OnboardingStore } from "@onboarding/onboarding.store";
 
 export type StartupStatus =
   | "IDLE"
@@ -37,19 +38,15 @@ export const StartupStore = signalStore(
     _userStore: inject(UserStore),
     _catalogsStore: inject(CatalogsStore),
     _unitStore: inject(UnitStore),
+    _onboardingStore: inject(OnboardingStore),
   })),
   withState<StartupState>({
     status: "IDLE",
     error: null,
   }),
   withMethods((store) => ({
-    setReady() {
+    _setReady() {
       patchState(store, { status: "READY", error: null });
-    },
-    _finalizeInit() {
-      setTimeout(() => {
-        patchState(store, { status: "READY", error: null });
-      }, 1000);
     },
   })),
   withMethods((store) => ({
@@ -61,9 +58,20 @@ export const StartupStore = signalStore(
       await Promise.all([
         store._contextStore.loadNeighborhood(),
         store._contextStore.loadStreets(),
+      ]);
+
+      const requests = [
         store._catalogsStore.loadCatalogs(),
         store._unitStore.loadAll({ showAll: true }),
-      ]);
+      ];
+
+      if (
+        store._userStore.status()?.name === UserStatusEnum.PENDING_ONBOARDING
+      ) {
+        requests.push(store._onboardingStore.load());
+      }
+
+      await Promise.all(requests);
       //
     },
   })),
@@ -101,7 +109,7 @@ export const StartupStore = signalStore(
           console.log("=== INIT RESIDENT ===");
         }
 
-        store._finalizeInit();
+        store._setReady();
       } catch (err) {
         console.error("== APP INITIALIZATION FAILED ==", err);
         patchState(store, {
@@ -112,17 +120,13 @@ export const StartupStore = signalStore(
     },
   })),
 
-  withHooks((store) => {
-    return {
-      onInit: (): void => {
-        effect(() => {
-          const usr = store._userStore.user();
-
-          if (usr) {
-            store.setReady();
-          }
-        });
-      },
-    };
-  }),
+  withHooks((store) => ({
+    onInit: (): void => {
+      effect(() => {
+        if (!store._authStore.isAuthenticated()) {
+          store.resetState();
+        }
+      });
+    },
+  })),
 );

@@ -6,7 +6,7 @@ import {
   withDevtools,
   withReset,
 } from "@angular-architects/ngrx-toolkit";
-import { inject } from "@angular/core";
+import { effect, inject } from "@angular/core";
 import { ProfileService } from "@core/services";
 import {
   UserModel,
@@ -18,15 +18,16 @@ import {
 import {
   patchState,
   signalStore,
+  withHooks,
   withMethods,
   withProps,
   withState,
 } from "@ngrx/signals";
 import { lastValueFrom } from "rxjs";
+import { AuthStore } from "@auth/store";
 import { UserService } from "./services";
 
-interface ProfileState {
-  user: UserModel | undefined;
+interface ProfileState {  user: UserModel | undefined;
   profile: UserProfileModel | undefined;
   status: UserStatusModel | undefined;
   role: UserRoleModel | undefined;
@@ -111,4 +112,17 @@ export const UserStore = signalStore(
       }
     },
   })),
+
+  withHooks((store) => {
+    const authStore = inject(AuthStore);
+    return {
+      onInit: (): void => {
+        effect(() => {
+          if (!authStore.isAuthenticated()) {
+            store.resetState();
+          }
+        });
+      },
+    };
+  }),
 );

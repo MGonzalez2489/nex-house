@@ -16,6 +16,7 @@ import {
   patchState,
   signalStore,
   type,
+  withHooks,
   withMethods,
   withProps,
   withState,
@@ -26,11 +27,12 @@ import {
   withEntities,
 } from "@ngrx/signals/entities";
 import { UnitService } from "./services";
-import { inject } from "@angular/core";
+import { effect, inject } from "@angular/core";
 import { tapResponse } from "@ngrx/operators";
 import { rxMethod } from "@ngrx/signals/rxjs-interop";
 import { ContextStore } from "@stores/context.store";
-import { pipe, tap, switchMap } from "rxjs";
+import { pipe, tap, switchMap, lastValueFrom } from "rxjs";
+import { AuthStore } from "@auth/store";
 
 const config = entityConfig({
   entity: type<UnitModel>(),
@@ -58,30 +60,26 @@ export const UnitStore = signalStore(
     _contextStore: inject(ContextStore),
   })),
   withMethods((store) => ({
-    loadAll: rxMethod<Search>(
-      pipe(
-        tap(() => patchState(store, setLoading())),
-        switchMap((params) => {
-          const nId = store._contextStore.neighborhood();
-          if (!nId) return [];
+    async loadAll(params: Search) {
+      const nId = store._contextStore.neighborhood();
+      if (!nId) return;
 
-          return store._service.getAll(nId.publicId, params).pipe(
-            tapResponse({
-              next: (response) =>
-                patchState(
-                  store,
-                  setAllEntities(response.data, config),
-                  {
-                    pagination: response.meta,
-                  },
-                  setLoaded(),
-                ),
-              error: (err: Error) => patchState(store, setError(err)),
-            }),
-          );
-        }),
-      ),
-    ),
+      patchState(store, setLoading());
+      try {
+        const response = await lastValueFrom(
+          store._service.getAll(nId.publicId, params),
+        );
+        patchState(
+          store,
+          setAllEntities(response.data, config),
+          { pagination: response.meta },
+          setLoaded(),
+        );
+      } catch (err) {
+        patchState(store, setError(err));
+      }
+    },
+
     loadStats: rxMethod<void>(
       pipe(
         tap(() => patchState(store, setLoading())),
@@ -106,4 +104,16 @@ export const UnitStore = signalStore(
       ),
     ),
   })),
+  withHooks((store) => {
+    const authStore = inject(AuthStore);
+    return {
+      onInit: (): void => {
+        effect(() => {
+          if (!authStore.isAuthenticated()) {
+            store.resetState();
+          }
+        });
+      },
+    };
+  }),
 );
