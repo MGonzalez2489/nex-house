@@ -20,8 +20,15 @@
         "../../libs/shared-domain/src/lib/utils/index.ts"
       ],
       "@core/*": ["./src/app/_core/*"],
+      "@stores/*": ["./src/app/stores/*"],
       "@shared/*": ["./src/app/_shared/*"],
-      "@auth/*": ["./src/app/features/auth/*"]
+      "@auth/*": ["./src/app/features/auth/*"],
+      "@dashboard/*": ["./src/app/features/dashboard/*"],
+      "@neighborhoods/*": ["./src/app/features/neighborhoods/*"],
+      "@residents/*": ["./src/app/features/residents/*"],
+      "@units/*": ["./src/app/features/units/*"],
+      "@onboarding/*": ["./src/app/features/onboarding/*"],
+      "@user/*": ["./src/app/features/user/*"]
     }
   },
   "files": ["src/test-setup.ts"],
