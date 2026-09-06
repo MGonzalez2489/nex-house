@@ -107,7 +107,7 @@ export class OnboardingHomePage {
   protected async updateProfile(dto?: FormData) {
     if (dto) {
       await this.store.updateProfile(dto);
-      this.store.load();
+      this.userStore.loadProfile();
     } else {
       this.goNext();
     }

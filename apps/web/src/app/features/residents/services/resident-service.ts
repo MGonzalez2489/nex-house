@@ -58,7 +58,7 @@ export class ResidentService {
   }
 
   private buildUrl(neighborhood: string) {
-    return `/api/neighborhoods/${neighborhood}/users`;
+    return `/api/neighborhoods/${neighborhood}/residents`;
     // return `${this.endpoint}/${neighborhood}/users`;
   }
 }
