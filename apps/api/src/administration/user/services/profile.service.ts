@@ -26,6 +26,17 @@ export class ProfileService {
     private readonly configService: ConfigService,
   ) {}
 
+  async getByUserId(userId: number) {
+    return this.repository.findOne({
+      where: {
+        userId,
+      },
+      relations: {
+        avatar: true,
+      },
+    });
+  }
+
   async update(
     userId: string,
     dto: UpdateUserProfileDto,
@@ -65,6 +76,6 @@ export class ProfileService {
     }
 
     await this.repository.update(profile.id, profile);
-    return this.repository.findOne({ where: { id: profile.id } });
+    return this.getByUserId(existingUser.id);
   }
 }
