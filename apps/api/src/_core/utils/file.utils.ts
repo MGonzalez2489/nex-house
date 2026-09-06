@@ -1,17 +1,9 @@
-import { join } from 'path';
+import { isAbsolute, join } from 'path';
 
-//
 export function getUploadsFolderPath(configValue: string) {
-  const destionation = join(
-    __dirname,
-    '../',
-    '../',
-    '../',
-    'apps/api',
-    configValue, //uploads
-  );
-
-  return destionation;
+  return isAbsolute(configValue)
+    ? configValue
+    : join(process.cwd(), configValue);
 }
 
 export function getAvatarFolderRelativePath(

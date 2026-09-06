@@ -44,5 +44,6 @@ Thumbs.db
 .angular
 
 apps/api/uploads/*
+/uploads/
 __screenshots__/
 .env
