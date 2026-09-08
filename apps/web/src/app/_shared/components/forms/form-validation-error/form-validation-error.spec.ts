@@ -1,4 +1,4 @@
-import { Component, signal } from "@angular/core";
+import { Component, signal, ChangeDetectionStrategy } from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { ValidationErrors } from "@angular/forms";
 import { FormValidationErrorComponent } from "./form-validation-error";
@@ -6,6 +6,7 @@ import { FormValidationErrorComponent } from "./form-validation-error";
 @Component({
   standalone: true,
   imports: [FormValidationErrorComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <app-form-validation-error
       [errors]="errors()"

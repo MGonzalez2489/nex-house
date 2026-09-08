@@ -30,7 +30,7 @@
       <app-profile-unit
         class="block"
         [userUnits]="store.units()"
-        [neighborhood]="user()?.neighborhood"
+        [neighborhood]="$safeNavigationMigration(user()?.neighborhood)"
       />
     }
   </div>

@@ -15,6 +15,8 @@ import { MenuItem } from "@openng/optimus-ui/api";
 import { Button } from "@openng/optimus-ui/button";
 import { MenuModule } from "@openng/optimus-ui/menu";
 
+//TODO: $safeNavigationMigration
+
 @Component({
   selector: "app-nav-bar",
   imports: [Button, BrandComponent, MenuModule, AvatarComponent],

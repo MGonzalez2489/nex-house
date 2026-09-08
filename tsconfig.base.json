@@ -21,7 +21,12 @@
       "@nexhouse/shared-domain/interfaces": [
         "./libs/shared-domain/src/lib/interfaces/index.ts"
       ]
-    }
+    },
+    "strict": false,
+    "noUncheckedSideEffectImports": false,
+    "types": ["*"],
+    "esModuleInterop": false,
+    "ignoreDeprecations": "6.0"
   },
   "exclude": ["node_modules", "tmp"]
 }

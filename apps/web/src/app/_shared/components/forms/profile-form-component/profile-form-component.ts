@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -18,9 +19,9 @@ import { InputTextModule } from "@openng/optimus-ui/inputtext";
 import { FormValidationErrorComponent } from "../form-validation-error/form-validation-error";
 
 import { toSignal } from "@angular/core/rxjs-interop";
-import { FileUploadDirective } from "@shared/directives";
 import { Button } from "@openng/optimus-ui/button";
 import { FileUploadModule } from "@openng/optimus-ui/fileupload";
+import { FileUploadDirective } from "@shared/directives";
 
 @Component({
   selector: "app-profile-form-component",
@@ -34,6 +35,7 @@ import { FileUploadModule } from "@openng/optimus-ui/fileupload";
     Button,
   ],
   templateUrl: "./profile-form-component.html",
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: "./profile-form-component.css",
 })
 export class ProfileFormComponent {
