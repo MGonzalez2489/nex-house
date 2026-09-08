@@ -1,7 +1,7 @@
 import { KeyValuePipe } from "@angular/common";
 import { ChangeDetectionStrategy, Component, input } from "@angular/core";
 import { UnitStats } from "@nexhouse/shared-domain/interfaces";
-import { Panel } from "primeng/panel";
+import { Panel } from "@openng/optimus-ui/panel";
 
 @Component({
   selector: "app-units-stats",

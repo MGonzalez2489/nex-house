@@ -5,7 +5,7 @@ import {
   computed,
   input,
 } from "@angular/core";
-import { Avatar } from "primeng/avatar";
+import { Avatar } from "@openng/optimus-ui/avatar";
 
 @Component({
   selector: "app-avatar-component",

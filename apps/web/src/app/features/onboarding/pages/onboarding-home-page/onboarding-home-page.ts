@@ -12,9 +12,9 @@ import { ChangePassword, CreateUnit } from "@nexhouse/shared-domain/interfaces";
 import { OnboardingStepModel } from "@nexhouse/shared-domain/models";
 import { OnboardingStore } from "@onboarding/onboarding.store";
 import { BrandComponent } from "@shared/components";
-import { Button } from "primeng/button";
-import { ProgressBarModule } from "primeng/progressbar";
-import { StepperModule } from "primeng/stepper";
+import { Button } from "@openng/optimus-ui/button";
+import { ProgressBarModule } from "@openng/optimus-ui/progressbar";
+import { StepperModule } from "@openng/optimus-ui/stepper";
 import {
   OnboardingFinishComponent,
   OnboardingGeneralComponent,

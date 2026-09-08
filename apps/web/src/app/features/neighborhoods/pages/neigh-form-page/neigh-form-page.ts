@@ -27,14 +27,14 @@ import {
   FormOptions,
   FormValidationErrorComponent,
 } from "@shared/components/forms";
-import { Badge } from "primeng/badge";
-import { Button } from "primeng/button";
-import { InputTextModule } from "primeng/inputtext";
-import { Panel } from "primeng/panel";
-import { ToggleSwitchModule } from "primeng/toggleswitch";
+import { Badge } from "@openng/optimus-ui/badge";
+import { Button } from "@openng/optimus-ui/button";
+import { InputTextModule } from "@openng/optimus-ui/inputtext";
+import { Panel } from "@openng/optimus-ui/panel";
+import { ToggleSwitchModule } from "@openng/optimus-ui/toggleswitch";
 
 import { CatalogsStore } from "@stores/catalogs.store";
-import { SelectModule } from "primeng/select";
+import { SelectModule } from "@openng/optimus-ui/select";
 @Component({
   selector: "app-neigh-form-page",
   imports: [

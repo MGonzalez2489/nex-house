@@ -92,7 +92,9 @@
     "@nestjs/typeorm": "^11.0.2",
     "@ngrx/operators": "^21.1.1",
     "@ngrx/signals": "^21.1.1",
-    "@primeuix/themes": "^2.0.3",
+    "@openng/icons": "^1.0.0",
+    "@openng/optimus-ui": "^1.0.2",
+    "@openng/optimus-ui-themes": "^1.0.2",
     "axios": "^1.6.0",
     "bcrypt": "^6.0.0",
     "cache-manager": "^7.2.9",
@@ -106,8 +108,6 @@
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
-    "primeicons": "^7.0.0",
-    "primeng": "^21.1.9",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.0",
     "typeorm": "^1.0.0",
@@ -123,7 +123,7 @@
     "esbuild@0.28.1": true,
     "lmdb@3.5.1": true,
     "msgpackr-extract@3.0.4": true,
-    "fsevents@2.3.2": true
+    "fsevents@2.3.3": true
   },
   "overrides": {
     "@angular-architects/ngrx-toolkit": {

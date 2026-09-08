@@ -10,11 +10,11 @@ import {
 } from "@nexhouse/shared-domain/interfaces";
 import { UserModel } from "@nexhouse/shared-domain/models";
 import { AvatarComponent } from "@shared/components";
-import { Button } from "primeng/button";
-import { TableLazyLoadEvent, TableModule } from "primeng/table";
+import { Button } from "@openng/optimus-ui/button";
+import { TableLazyLoadEvent, TableModule } from "@openng/optimus-ui/table";
 
 //
-import { PanelModule } from "primeng/panel";
+import { PanelModule } from "@openng/optimus-ui/panel";
 import { ResidentStatusComponent } from "../resident-status/resident-status-component";
 import { ResidentFilters } from "../resident-filters/resident-filters";
 

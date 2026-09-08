@@ -5,7 +5,7 @@ import {
   input,
   output,
 } from "@angular/core";
-import { FileUploadModule } from "primeng/fileupload";
+import { FileUploadModule } from "@openng/optimus-ui/fileupload";
 
 @Component({
   selector: "app-avatar-upload-component",

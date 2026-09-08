@@ -34,7 +34,7 @@ Define TypeScript interfaces and DTO validation rules.
 
 ## 5. Frontend Specs (`apps/web`)
 
-- **UI Components:** [PrimeNG Table, Dialog, Form Controls, Tailwind styling][cite: 1, 2]
+- **UI Components:** [Optimus Table, Dialog, Form Controls, Tailwind styling][cite: 1, 2]
 - **UX Flow:** Steps or modals required for input validation.
 
 ## 6. Definition of Done (DoD)

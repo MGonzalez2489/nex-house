@@ -9,7 +9,7 @@ import { SearchUser } from "@nexhouse/shared-domain/interfaces";
 import { ResidentsTable, ResidentStats } from "@residents/components";
 import { RESIDENT_ROUTES_ENUM } from "@residents/resident.routes";
 import { ResidentStore } from "@residents/resident.store";
-import { Button } from "primeng/button";
+import { Button } from "@openng/optimus-ui/button";
 
 @Component({
   selector: "app-resident-home-page",

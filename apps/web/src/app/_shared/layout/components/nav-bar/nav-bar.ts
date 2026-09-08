@@ -11,9 +11,9 @@ import { UserRoleEnum } from "@nexhouse/shared-domain/enums";
 import { UserModel, UserProfileModel } from "@nexhouse/shared-domain/models";
 import { AvatarComponent, BrandComponent } from "@shared/components";
 import { USER_ROUTES_ENUM } from "@user/user.routes";
-import { MenuItem } from "primeng/api";
-import { Button } from "primeng/button";
-import { MenuModule } from "primeng/menu";
+import { MenuItem } from "@openng/optimus-ui/api";
+import { Button } from "@openng/optimus-ui/button";
+import { MenuModule } from "@openng/optimus-ui/menu";
 
 @Component({
   selector: "app-nav-bar",

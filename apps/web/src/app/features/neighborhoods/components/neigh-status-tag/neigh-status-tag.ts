@@ -4,7 +4,7 @@ import {
   computed,
   input,
 } from "@angular/core";
-import { TagModule } from "primeng/tag";
+import { TagModule } from "@openng/optimus-ui/tag";
 
 @Component({
   selector: "app-neigh-status-tag",

@@ -11,7 +11,7 @@ import { SessionService } from "@core/services";
 import { NEIGHBORHOOD_ROUTES_ENUM } from "@neighborhoods/neighborhood.routes";
 import { NeighborhoodsStore } from "@neighborhoods/neighborhood.store";
 import { SearchNeigh } from "@nexhouse/shared-domain/interfaces";
-import { Button } from "primeng/button";
+import { Button } from "@openng/optimus-ui/button";
 import { NeighborhoodsTable } from "../../components";
 
 @Component({

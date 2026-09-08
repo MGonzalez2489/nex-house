@@ -10,11 +10,11 @@ import {
 import { FormControl, FormGroup, ReactiveFormsModule } from "@angular/forms";
 import { SessionService } from "@core/services";
 import { SearchNeigh } from "@nexhouse/shared-domain/interfaces";
-import { Button } from "primeng/button";
-import { IconFieldModule } from "primeng/iconfield";
-import { InputIconModule } from "primeng/inputicon";
-import { InputTextModule } from "primeng/inputtext";
-import { SelectButtonModule } from "primeng/selectbutton";
+import { Button } from "@openng/optimus-ui/button";
+import { IconFieldModule } from "@openng/optimus-ui/iconfield";
+import { InputIconModule } from "@openng/optimus-ui/inputicon";
+import { InputTextModule } from "@openng/optimus-ui/inputtext";
+import { SelectButtonModule } from "@openng/optimus-ui/selectbutton";
 import { debounceTime, distinctUntilChanged } from "rxjs";
 
 @Component({

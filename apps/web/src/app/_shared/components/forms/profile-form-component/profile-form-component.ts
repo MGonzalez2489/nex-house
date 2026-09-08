@@ -13,14 +13,14 @@ import {
   Validators,
 } from "@angular/forms";
 import { FileModel, UserProfileModel } from "@nexhouse/shared-domain/models";
-import { InputMaskModule } from "primeng/inputmask";
-import { InputTextModule } from "primeng/inputtext";
+import { InputMaskModule } from "@openng/optimus-ui/inputmask";
+import { InputTextModule } from "@openng/optimus-ui/inputtext";
 import { FormValidationErrorComponent } from "../form-validation-error/form-validation-error";
 
 import { toSignal } from "@angular/core/rxjs-interop";
 import { FileUploadDirective } from "@shared/directives";
-import { Button } from "primeng/button";
-import { FileUploadModule } from "primeng/fileupload";
+import { Button } from "@openng/optimus-ui/button";
+import { FileUploadModule } from "@openng/optimus-ui/fileupload";
 
 @Component({
   selector: "app-profile-form-component",

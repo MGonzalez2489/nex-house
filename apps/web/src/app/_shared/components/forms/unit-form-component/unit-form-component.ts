@@ -16,10 +16,10 @@ import {
   NeighStreetModel,
   UserModel,
 } from "@nexhouse/shared-domain/models";
-import { Button } from "primeng/button";
-import { InputTextModule } from "primeng/inputtext";
-import { Select } from "primeng/select";
-import { ToggleSwitch } from "primeng/toggleswitch";
+import { Button } from "@openng/optimus-ui/button";
+import { InputTextModule } from "@openng/optimus-ui/inputtext";
+import { Select } from "@openng/optimus-ui/select";
+import { ToggleSwitch } from "@openng/optimus-ui/toggleswitch";
 import { FormValidationErrorComponent } from "../form-validation-error/form-validation-error";
 import { NewUnitForm } from "./unit-form";
 import { CreateUnit } from "@nexhouse/shared-domain/interfaces";

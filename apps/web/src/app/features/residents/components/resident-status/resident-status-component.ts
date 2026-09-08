@@ -6,7 +6,7 @@ import {
 } from "@angular/core";
 import { UserStatusEnum } from "@nexhouse/shared-domain/enums";
 import { UserStatusModel } from "@nexhouse/shared-domain/models";
-import { TagModule } from "primeng/tag";
+import { TagModule } from "@openng/optimus-ui/tag";
 
 @Component({
   selector: "app-resident-status-component",

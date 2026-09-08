@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, output } from "@angular/core";
-import { Button } from "primeng/button";
-import { Panel } from "primeng/panel";
+import { Button } from "@openng/optimus-ui/button";
+import { Panel } from "@openng/optimus-ui/panel";
 
 type infoItem = {
   id: number;

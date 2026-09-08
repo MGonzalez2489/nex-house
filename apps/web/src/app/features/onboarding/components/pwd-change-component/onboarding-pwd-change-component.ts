@@ -17,9 +17,9 @@ import {
 import { ChangePassword } from "@nexhouse/shared-domain/interfaces";
 import { UserModel } from "@nexhouse/shared-domain/models";
 import { FormValidationErrorComponent } from "@shared/components/forms";
-import { Button } from "primeng/button";
-import { Panel } from "primeng/panel";
-import { PasswordModule } from "primeng/password";
+import { Button } from "@openng/optimus-ui/button";
+import { Panel } from "@openng/optimus-ui/panel";
+import { PasswordModule } from "@openng/optimus-ui/password";
 
 @Component({
   selector: "app-onboarding-pwd-change-component",

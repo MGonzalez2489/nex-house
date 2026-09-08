@@ -8,7 +8,7 @@ import {
   NeighborhoodModel,
   UserUnitModel,
 } from "@nexhouse/shared-domain/models";
-import { Panel } from "primeng/panel";
+import { Panel } from "@openng/optimus-ui/panel";
 
 @Component({
   selector: "app-profile-unit",

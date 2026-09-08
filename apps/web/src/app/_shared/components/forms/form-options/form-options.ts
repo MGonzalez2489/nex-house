@@ -5,7 +5,7 @@ import {
   input,
   output,
 } from "@angular/core";
-import { Button, ButtonSeverity } from "primeng/button";
+import { Button, ButtonSeverity } from "@openng/optimus-ui/button";
 import { FormFeedback } from "../form-feedback/form-feedback";
 
 @Component({

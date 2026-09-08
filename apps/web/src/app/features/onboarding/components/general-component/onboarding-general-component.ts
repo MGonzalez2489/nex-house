@@ -6,8 +6,8 @@ import {
 } from "@angular/core";
 import { UserProfileModel } from "@nexhouse/shared-domain/models";
 import { ProfileFormComponent } from "@shared/components/forms";
-import { Button } from "primeng/button";
-import { Panel } from "primeng/panel";
+import { Button } from "@openng/optimus-ui/button";
+import { Panel } from "@openng/optimus-ui/panel";
 
 @Component({
   selector: "app-onboarding-general-component",

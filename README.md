@@ -6,7 +6,7 @@ Neighborhood management and automated financial control SaaS for condominiums. T
 
 Monorepo Manager: NX
 
-Frontend: Angular (PrimeNG / Tailwind CSS)
+Frontend: Angular (OptimusUi / Tailwind CSS)
 
 Backend: NestJS (TypeORM / WebSockets)
 

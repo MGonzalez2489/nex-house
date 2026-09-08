@@ -10,9 +10,9 @@ import {
   SearchUser,
 } from "@nexhouse/shared-domain/interfaces";
 import { UnitModel } from "@nexhouse/shared-domain/models";
-import { Button } from "primeng/button";
-import { Panel } from "primeng/panel";
-import { TableLazyLoadEvent, TableModule } from "primeng/table";
+import { Button } from "@openng/optimus-ui/button";
+import { Panel } from "@openng/optimus-ui/panel";
+import { TableLazyLoadEvent, TableModule } from "@openng/optimus-ui/table";
 import { UnitsFilters } from "../units-filters/units-filters";
 
 @Component({

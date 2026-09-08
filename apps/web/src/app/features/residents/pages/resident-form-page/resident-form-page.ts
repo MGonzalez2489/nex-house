@@ -24,11 +24,11 @@ import { ResidentStore } from "@residents/resident.store";
 import { FormValidationErrorComponent } from "@shared/components/forms";
 import { CatalogsStore } from "@stores/catalogs.store";
 import { ContextStore } from "@stores/context.store";
-import { Button } from "primeng/button";
-import { InputTextModule } from "primeng/inputtext";
-import { Panel } from "primeng/panel";
-import { Select } from "primeng/select";
-import { ToggleSwitch } from "primeng/toggleswitch";
+import { Button } from "@openng/optimus-ui/button";
+import { InputTextModule } from "@openng/optimus-ui/inputtext";
+import { Panel } from "@openng/optimus-ui/panel";
+import { Select } from "@openng/optimus-ui/select";
+import { ToggleSwitch } from "@openng/optimus-ui/toggleswitch";
 import { CreateResidentForm } from "./resident-form";
 import { UnitStore } from "@units/units.store";
 

@@ -7,8 +7,8 @@ import {
 } from "@angular/core";
 import { FormGroup, FormControl, ReactiveFormsModule } from "@angular/forms";
 import { Search } from "@nexhouse/shared-domain/interfaces";
-import { Button } from "primeng/button";
-import { InputTextModule } from "primeng/inputtext";
+import { Button } from "@openng/optimus-ui/button";
+import { InputTextModule } from "@openng/optimus-ui/inputtext";
 import { debounceTime, distinctUntilChanged } from "rxjs";
 
 @Component({

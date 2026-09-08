@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, input } from "@angular/core";
 import { UserStats } from "@nexhouse/shared-domain/interfaces";
-import { Panel } from "primeng/panel";
-import { Tag } from "primeng/tag";
+import { Panel } from "@openng/optimus-ui/panel";
+import { Tag } from "@openng/optimus-ui/tag";
 
 @Component({
   selector: "app-resident-stats",

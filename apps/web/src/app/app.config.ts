@@ -11,8 +11,8 @@ import {
   withFetch,
   withInterceptors,
 } from "@angular/common/http";
-import { providePrimeNG } from "primeng/config";
 import { NxPreset } from "./theme/preset";
+import { provideOptimus } from "@openng/optimus-ui/config";
 import { StartupStore } from "@stores/startup.store";
 import {
   authInterceptor,
@@ -36,15 +36,15 @@ export const appConfig: ApplicationConfig = {
       const startupStore = inject(StartupStore);
       return startupStore.initializeApp();
     }),
-    providePrimeNG({
+    provideOptimus({
       inputVariant: "filled",
       theme: {
         preset: NxPreset,
         options: {
           darkModeSelector: ".dark",
           cssLayer: {
-            name: "primeng",
-            order: "theme, base, primeng",
+            name: "optimus",
+            order: "theme, base, optimus",
           },
         },
       },

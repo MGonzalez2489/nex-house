@@ -13,7 +13,7 @@ import {
 import { AvatarComponent } from "@shared/components";
 import { SideItem } from "../sidebar-item/side-item";
 import { SidebarItem } from "../sidebar-item/sidebar-item";
-import { Button } from "primeng/button";
+import { Button } from "@openng/optimus-ui/button";
 
 @Component({
   selector: "app-sidebar",

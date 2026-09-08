@@ -8,9 +8,9 @@ import {
 import { FormsModule } from "@angular/forms";
 import { UserModel, UserProfileModel } from "@nexhouse/shared-domain/models";
 import { FormOptions, ProfileFormComponent } from "@shared/components/forms";
-import { Button } from "primeng/button";
-import { InputTextModule } from "primeng/inputtext";
-import { Panel } from "primeng/panel";
+import { Button } from "@openng/optimus-ui/button";
+import { InputTextModule } from "@openng/optimus-ui/inputtext";
+import { Panel } from "@openng/optimus-ui/panel";
 
 @Component({
   selector: "app-profile-info-form",

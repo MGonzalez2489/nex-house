@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Directive, forwardRef, inject } from "@angular/core";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
-import { FileUpload } from "primeng/fileupload";
+import { FileUpload } from "@openng/optimus-ui/fileupload";
 
 @Directive({
   // selector: "[appFileUpload]",

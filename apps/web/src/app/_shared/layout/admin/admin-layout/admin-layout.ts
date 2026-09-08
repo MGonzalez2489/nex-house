@@ -14,7 +14,7 @@ import { ONBOARDING_ROUTES_ENUM } from "@onboarding/onboarding.routes";
 import { RESIDENT_ROUTES_ENUM } from "@residents/resident.routes";
 import { NavBar, Sidebar, SideItem } from "@shared/layout/components";
 import { UNIT_ROUTES_ENUM } from "@units/units.routes";
-import { DrawerModule } from "primeng/drawer";
+import { DrawerModule } from "@openng/optimus-ui/drawer";
 
 @Component({
   selector: "app-admin-layout",

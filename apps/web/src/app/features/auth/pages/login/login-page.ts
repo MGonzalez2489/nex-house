@@ -19,11 +19,11 @@ import {
   FormValidationErrorComponent,
 } from "@shared/components/forms";
 import { StartupStore } from "@stores/startup.store";
-import { Checkbox } from "primeng/checkbox";
-import { IconFieldModule } from "primeng/iconfield";
-import { InputIconModule } from "primeng/inputicon";
-import { InputTextModule } from "primeng/inputtext";
-import { PasswordModule } from "primeng/password";
+import { Checkbox } from "@openng/optimus-ui/checkbox";
+import { IconFieldModule } from "@openng/optimus-ui/iconfield";
+import { InputIconModule } from "@openng/optimus-ui/inputicon";
+import { InputTextModule } from "@openng/optimus-ui/inputtext";
+import { PasswordModule } from "@openng/optimus-ui/password";
 
 @Component({
   selector: "app-login-page",

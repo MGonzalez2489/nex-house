@@ -21,11 +21,11 @@ import {
   FormValidationErrorComponent,
   UnitFormComponent,
 } from "@shared/components/forms";
-import { Button } from "primeng/button";
-import { InputTextModule } from "primeng/inputtext";
-import { Panel } from "primeng/panel";
-import { Select } from "primeng/select";
-import { ToggleSwitch } from "primeng/toggleswitch";
+import { Button } from "@openng/optimus-ui/button";
+import { InputTextModule } from "@openng/optimus-ui/inputtext";
+import { Panel } from "@openng/optimus-ui/panel";
+import { Select } from "@openng/optimus-ui/select";
+import { ToggleSwitch } from "@openng/optimus-ui/toggleswitch";
 
 @Component({
   selector: "app-onboarding-unit-component",

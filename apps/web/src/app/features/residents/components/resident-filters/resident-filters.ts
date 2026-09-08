@@ -7,10 +7,10 @@ import {
 } from "@angular/core";
 import { FormControl, FormGroup, ReactiveFormsModule } from "@angular/forms";
 import { SearchUser } from "@nexhouse/shared-domain/interfaces";
-import { Button } from "primeng/button";
-import { IconFieldModule } from "primeng/iconfield";
-import { InputIconModule } from "primeng/inputicon";
-import { InputTextModule } from "primeng/inputtext";
+import { Button } from "@openng/optimus-ui/button";
+import { IconFieldModule } from "@openng/optimus-ui/iconfield";
+import { InputIconModule } from "@openng/optimus-ui/inputicon";
+import { InputTextModule } from "@openng/optimus-ui/inputtext";
 import { debounceTime, distinctUntilChanged } from "rxjs";
 
 @Component({

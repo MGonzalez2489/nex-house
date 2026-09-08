@@ -7,7 +7,7 @@ import {
 import { RouterOutlet } from "@angular/router";
 import { SessionService } from "@core/services";
 import { NavBar, Sidebar, SideItem } from "@shared/layout/components";
-import { DrawerModule } from "primeng/drawer";
+import { DrawerModule } from "@openng/optimus-ui/drawer";
 
 @Component({
   selector: "app-root-layout",

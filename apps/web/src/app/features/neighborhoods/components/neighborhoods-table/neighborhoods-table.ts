@@ -10,9 +10,9 @@ import {
 } from "@nexhouse/shared-domain/interfaces";
 import { NeighborhoodModel } from "@nexhouse/shared-domain/models";
 import { AvatarComponent } from "@shared/components";
-import { Button } from "primeng/button";
-import { Panel } from "primeng/panel";
-import { TableLazyLoadEvent, TableModule } from "primeng/table";
+import { Button } from "@openng/optimus-ui/button";
+import { Panel } from "@openng/optimus-ui/panel";
+import { TableLazyLoadEvent, TableModule } from "@openng/optimus-ui/table";
 import { NeighStatusTag } from "../neigh-status-tag/neigh-status-tag";
 import { NeighTableFilters } from "../neigh-table-filters/neigh-table-filters";
 

@@ -50,7 +50,7 @@ export class ErrorService {
 
   private _showNotification(message: string): void {
     // Implementa aquí tu lógica para mostrar notificaciones al usuario.
-    // Podrías inyectar un servicio de Angular Material SnackBar, PrimeNG MessageService, etc.
+    // Podrías inyectar un servicio de Angular Material SnackBar, OptimusUI MessageService, etc.
     console.warn(`ErrorService - Notificación al usuario: ${message}`);
     // Ejemplo ficticio:
     // this.toastService.error(message);

@@ -11,8 +11,8 @@ import { Router } from "@angular/router";
 import { NeighStatusTag } from "@neighborhoods/components";
 import { NeighborhoodsStore } from "@neighborhoods/neighborhood.store";
 import { NeighborhoodModel } from "@nexhouse/shared-domain/models";
-import { Button } from "primeng/button";
-import { Panel } from "primeng/panel";
+import { Button } from "@openng/optimus-ui/button";
+import { Panel } from "@openng/optimus-ui/panel";
 
 @Component({
   selector: "app-neigh-details-page",

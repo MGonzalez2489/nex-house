@@ -5,7 +5,7 @@ import {
   computed,
   input,
 } from "@angular/core";
-import { MessageModule } from "primeng/message";
+import { MessageModule } from "@openng/optimus-ui/message";
 
 @Component({
   selector: "app-form-feedback",
