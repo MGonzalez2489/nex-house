@@ -172,19 +172,19 @@ export const NxPreset = definePreset(Aura, {
     },
   },
   semantic: {
+    primary: {
+      50: "{cyan.50}",
+      100: "{cyan.100}",
+      200: "{cyan.200}",
+      300: "{cyan.300}",
+      400: "{cyan.400}",
+      500: "{cyan.600}",
+      600: "{cyan.700}",
+      700: "{cyan.800}",
+      800: "{cyan.800}",
+      900: "{cyan.900}",
+    },
     colorScheme: {
-      primary: {
-        50: "{cyan.50}",
-        100: "{cyan.100}",
-        200: "{cyan.200}",
-        300: "{cyan.300}",
-        400: "{cyan.400}",
-        500: "{cyan.600}",
-        600: "{cyan.700}",
-        700: "{cyan.800}",
-        800: "{cyan.800}",
-        900: "{cyan.900}",
-      },
       light: {
         //   surface: {
         //     0: "#ffffff",
