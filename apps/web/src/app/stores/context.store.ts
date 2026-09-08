@@ -5,7 +5,7 @@ import {
   withCallState,
   withDevtools,
   withReset,
-} from "@angular-architects/ngrx-toolkit";
+} from "@ngrx-toolkit/core";
 import { effect, inject } from "@angular/core";
 import { NeighborhoodService } from "@neighborhoods/services";
 import {

@@ -5,7 +5,7 @@ import {
   setError,
   setLoaded,
   setLoading,
-} from "@angular-architects/ngrx-toolkit";
+} from "@ngrx-toolkit/core";
 import {
   ApiPaginationMeta,
   Search,

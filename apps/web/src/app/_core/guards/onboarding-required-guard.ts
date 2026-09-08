@@ -3,9 +3,9 @@ import { toObservable } from "@angular/core/rxjs-interop";
 import { CanActivateFn, Router } from "@angular/router";
 import { DASHBOARD_ROUTES_ENUM } from "@dashboard/dashboard.routes";
 import { UserStatusEnum } from "@nexhouse/shared-domain/enums";
+import { UserStore } from "@user/user.store";
 import { filter, map, take } from "rxjs";
 import { ONBOARDING_ROUTES_ENUM } from "../../features/onboarding";
-import { UserStore } from "@user/user.store";
 
 export const onboardingRequiredGuard: CanActivateFn = (route, state) => {
   const profileStore = inject(UserStore);
@@ -13,10 +13,10 @@ export const onboardingRequiredGuard: CanActivateFn = (route, state) => {
   const onboardingRoute = `/${ONBOARDING_ROUTES_ENUM.HOME}`;
   const dashboardRoute = `/${DASHBOARD_ROUTES_ENUM.HOME}`;
 
-  return toObservable(profileStore.callState).pipe(
-    filter((state) => state === "loaded"),
+  return toObservable(profileStore.loaded).pipe(
+    filter((loaded) => loaded),
     take(1),
-    map((st) => {
+    map(() => {
       const status = profileStore.status();
       if (!status) return false;
 

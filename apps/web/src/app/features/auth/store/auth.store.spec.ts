@@ -140,7 +140,7 @@ describe("AuthStore (Zoneless Edition)", () => {
       expect(loginResult).toBe(false);
       expect(store.token()).toBeNull();
 
-      // Verify callState handles the error (from @angular-architects/ngrx-toolkit)
+      // Verify callState handles the error (from @ngrx-toolkit/core)
       expect(store.loading()).toBe(false);
       expect(store.error()).toEqual("Invalid Credentials");
     });

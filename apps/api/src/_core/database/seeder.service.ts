@@ -75,11 +75,11 @@ export class DatabaseSeederService implements OnApplicationBootstrap {
 
     // 1. Seed Country
     for (const countryData of CountrySeed) {
-      let country = await this.countryRepository.findOneBy({
+      const country = await this.countryRepository.findOneBy({
         code: countryData.code,
       });
       if (!country) {
-        country = await this.countryRepository.save(countryData);
+        await this.countryRepository.save(countryData);
       }
     }
 

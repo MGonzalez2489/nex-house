@@ -1,4 +1,4 @@
-import { withDevtools, withReset } from "@angular-architects/ngrx-toolkit";
+import { withDevtools, withReset } from "@ngrx-toolkit/core";
 import { effect, inject } from "@angular/core";
 import { AuthStore } from "@auth/store";
 import {

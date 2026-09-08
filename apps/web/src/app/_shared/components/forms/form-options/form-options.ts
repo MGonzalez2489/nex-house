@@ -1,4 +1,4 @@
-import { CallState } from "@angular-architects/ngrx-toolkit";
+import { CallState } from "@ngrx-toolkit/core";
 import {
   ChangeDetectionStrategy,
   Component,

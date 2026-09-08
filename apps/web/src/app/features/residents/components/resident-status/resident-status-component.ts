@@ -7,6 +7,7 @@ import {
 import { UserStatusEnum } from "@nexhouse/shared-domain/enums";
 import { UserStatusModel } from "@nexhouse/shared-domain/models";
 import { TagModule } from "@openng/optimus-ui/tag";
+import { BadgeSeverity } from "@openng/optimus-ui/types/badge";
 
 @Component({
   selector: "app-resident-status-component",
@@ -19,34 +20,18 @@ import { TagModule } from "@openng/optimus-ui/tag";
 export class ResidentStatusComponent {
   status = input.required<UserStatusModel>();
 
-  severity = computed<
-    | "success"
-    | "secondary"
-    | "info"
-    | "warn"
-    | "danger"
-    | "contrast"
-    | undefined
-    | null
-  >(() => {
+  severity = computed<BadgeSeverity | undefined | null>(() => {
     const cStatus = this.status();
-    let sev = "secondary";
 
     switch (cStatus.name) {
       case UserStatusEnum.ACTIVE:
-        sev = "success";
-        break;
-
+        return "success";
       case UserStatusEnum.INACTIVE:
-        sev = "secondary";
-        break;
+        return "secondary";
       case UserStatusEnum.PENDING_ONBOARDING:
-        sev = "warn";
-        break;
+        return "warn";
       default:
-        sev = "secondary";
+        return "secondary";
     }
-
-    return sev as any;
   });
 }

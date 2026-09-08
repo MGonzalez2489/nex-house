@@ -5,7 +5,7 @@ import {
   withCallState,
   withDevtools,
   withReset,
-} from "@angular-architects/ngrx-toolkit";
+} from "@ngrx-toolkit/core";
 import { computed, inject } from "@angular/core";
 import { APP_CONSTANTS } from "@core/constants";
 import { SessionModel } from "@nexhouse/shared-domain/models";
