@@ -1,16 +1,16 @@
 <form [formGroup]="form" (submit)="onSubmit()">
   <div class="mb-4">
-    @if (canPickExisting()) {
-      <div class="flex justify-between">
-        <div>
-          <h2 class="text-sm font-semibold text-slate-800 dark:text-white">
-            Información de la unidad
-          </h2>
-          <p class="text-xs text-slate-400 mt-0.5">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          </p>
-        </div>
+    <div class="flex justify-between">
+      <div>
+        <h2 class="text-sm font-semibold text-slate-800 dark:text-white">
+          Información de la unidad
+        </h2>
+        <p class="text-xs text-slate-400 mt-0.5">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+        </p>
+      </div>
 
+      @if (canPickExisting()) {
         @if (mode() === 'create') {
           <p-button
             text
@@ -28,8 +28,8 @@
             (click)="setMode('create')"
           />
         }
-      </div>
-    }
+      }
+    </div>
   </div>
 
   <div class="space-y-6">

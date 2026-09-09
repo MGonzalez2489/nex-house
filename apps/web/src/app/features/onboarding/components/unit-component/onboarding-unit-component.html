@@ -1,17 +1,4 @@
-<p-panel>
-  <ng-template #header>
-    <div class="block mb-3">
-      <h1
-        class="font-display text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white leading-tight"
-      >
-        algo de la unidad
-      </h1>
-      <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-        algo de la creacion de la unidad
-      </p>
-    </div>
-  </ng-template>
-
+<p-panel showHeader="false" class="pt-5">
   <app-unit-form-component
     [streets]="streets()"
     [unitTypes]="unitTypes()"
