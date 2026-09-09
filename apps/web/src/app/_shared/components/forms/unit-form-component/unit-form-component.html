@@ -1,6 +1,5 @@
 <form [formGroup]="form" class="space-y-6" (submit)="onSubmit()">
   <section class="grid grid-cols-1 md:grid-cols-3 md:gap-x-3">
-    <!-- street -->
     <div class="form-control col-span-2">
       <label class="form-label" for="streetId">Calle</label>
       <p-select
@@ -10,20 +9,19 @@
         optionValue="publicId"
         placeholder="Calle"
         fluid
-        [invalid]="form.controls.streetId.invalid && form.controls.streetId.touched"
-        [attr.aria-invalid]="form.controls.streetId.invalid && form.controls.streetId.touched"
+        [invalid]="isStreetInvalid()"
+        [attr.aria-invalid]="isStreetInvalid() || null"
         [attr.aria-describedby]="
-          form.controls.streetId.touched && form.controls.streetId.errors ? 'street-error' : null
+          (form.controls.streetId.touched || parentTouched()) &&
+          form.controls.streetId.errors
+            ? 'street-errors'
+            : null
         "
       >
         <ng-template #selectedItem let-selectedOption>
           @if (selectedOption) {
             <div class="flex items-center gap-2">
-              <div>
-                <span class="capitalize">
-                  {{ selectedOption.name }}
-                </span>
-              </div>
+              <span class="capitalize">{{ selectedOption.name }}</span>
             </div>
           }
         </ng-template>
@@ -35,12 +33,12 @@
       </p-select>
       <app-form-validation-error
         id="street-errors"
-        [touched]="form.controls.streetId.touched"
+        [touched]="form.controls.streetId.touched || parentTouched()"
         [errors]="form.controls.streetId.errors"
         label="Calle"
       />
     </div>
-    <!-- identifier -->
+
     <div class="form-control">
       <label class="form-label" for="identifier">Identificador</label>
       <input
@@ -50,19 +48,18 @@
         formControlName="unitIdentifier"
         placeholder="#15234, #102-A"
         fluid
-        [invalid]="form.controls.unitIdentifier.invalid && form.controls.unitIdentifier.touched"
-        [attr.aria-invalid]="
-          form.controls.unitIdentifier.invalid && form.controls.unitIdentifier.touched
-        "
+        [invalid]="isIdentifierInvalid()"
+        [attr.aria-invalid]="isIdentifierInvalid() || null"
         [attr.aria-describedby]="
-          form.controls.unitIdentifier.touched && form.controls.unitIdentifier.errors
-            ? 'identifier-error'
+          (form.controls.unitIdentifier.touched || parentTouched()) &&
+          form.controls.unitIdentifier.errors
+            ? 'identifier-errors'
             : null
         "
       />
       <app-form-validation-error
         id="identifier-errors"
-        [touched]="form.controls.unitIdentifier.touched"
+        [touched]="form.controls.unitIdentifier.touched || parentTouched()"
         [errors]="form.controls.unitIdentifier.errors"
         label="Identificador"
       />
@@ -70,7 +67,6 @@
   </section>
 
   <section>
-    <!-- unit type -->
     <div class="space-y-4">
       @for (type of unitTypes(); track type.publicId) {
         @let selected = form.value.unitTypeId === type.publicId;
@@ -100,9 +96,8 @@
   </section>
 
   <div class="grid grid-cols-1 md:grid-cols-3 md:gap-x-3">
-    <!-- UserUnitRole -->
     <div class="form-control col-span-2">
-      <label class="form-label" for="email">Relación con la unidad</label>
+      <label class="form-label" for="unitRoleId">Relación con la unidad</label>
       <p-select
         [options]="unitRoles()"
         formControlName="unitRoleId"
@@ -119,25 +114,5 @@
     </div>
   </div>
 
-  <!-- options -->
   <ng-content />
-
-  <!-- <div class="flex items-center gap-3 pt-2"> -->
-  <!--   <p-button -->
-  <!--     label="Atrás" -->
-  <!--     icon="pi pi-arrow-left" -->
-  <!--     variant="outlined" -->
-  <!--     severity="secondary" -->
-  <!--     [disabled]="isLoading()" -->
-  <!--   /> -->
-  <!--   <p-button -->
-  <!--     label="Continuar" -->
-  <!--     icon="pi pi-arrow-right" -->
-  <!--     iconPos="right" -->
-  <!--     fluid -->
-  <!--     type="submit" -->
-  <!--     class="w-full" -->
-  <!--     [loading]="isLoading()" -->
-  <!--   /> -->
-  <!-- </div> -->
 </form>

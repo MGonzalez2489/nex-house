@@ -1,33 +1,34 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
 import {
-  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
-  forwardRef,
+  computed,
   inject,
   Injector,
   input,
-  OnDestroy,
   OnInit,
   output,
 } from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {
+  AbstractControl,
   ControlValueAccessor,
   FormControl,
   FormGroup,
-  NgControl,
   NG_VALUE_ACCESSOR,
+  NgControl,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
 import {CreateUnit} from '@nexhouse/shared-domain/interfaces';
 import {BaseCatalogModel, NeighStreetModel, UserModel} from '@nexhouse/shared-domain/models';
-import {Button} from '@openng/optimus-ui/button';
 import {InputTextModule} from '@openng/optimus-ui/inputtext';
 import {Select} from '@openng/optimus-ui/select';
 import {ToggleSwitch} from '@openng/optimus-ui/toggleswitch';
 import {FormValidationErrorComponent} from '../form-validation-error/form-validation-error';
 import {NewUnitForm} from './unit-form';
+
+/** Tracked accessor for a control's touched state (see AbstractControl._touched). */
+type TrackedControl = AbstractControl & {readonly _touched?: () => boolean};
 
 @Component({
   selector: 'app-unit-form-component',
@@ -37,34 +38,41 @@ import {NewUnitForm} from './unit-form';
     Select,
     ToggleSwitch,
     FormValidationErrorComponent,
-    Button,
   ],
   templateUrl: './unit-form-component.html',
-  styleUrl: './unit-form-component.css',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => UnitFormComponent),
+      useExisting: UnitFormComponent,
       multi: true,
     },
   ],
 })
-export class UnitFormComponent implements OnInit, AfterViewInit, OnDestroy, ControlValueAccessor {
-  //inputs
+export class UnitFormComponent implements OnInit, ControlValueAccessor {
   streets = input.required<NeighStreetModel[]>();
   unitTypes = input.required<BaseCatalogModel[]>();
   unitRoles = input.required<BaseCatalogModel[]>();
   isLoading = input<boolean>(false);
   user = input<UserModel>();
 
-  //optional to handle submit
   doSubmit = output<CreateUnit>();
 
-  private readonly injector = inject(Injector);
-  private ngControl?: NgControl | null;
-  private originalMarkAsTouched?: () => void;
+  protected readonly parentTouched = computed(() => {
+    const control = this.ngControl?.control as TrackedControl | null | undefined;
+    return control?._touched?.() ?? control?.touched ?? false;
+  });
+
+  protected readonly isStreetInvalid = computed(() => {
+    const ctrl = this.form.controls.streetId;
+    return ctrl.invalid && (ctrl.touched || this.parentTouched());
+  });
+
+  protected readonly isIdentifierInvalid = computed(() => {
+    const ctrl = this.form.controls.unitIdentifier;
+    return ctrl.invalid && (ctrl.touched || this.parentTouched());
+  });
 
   protected readonly form = new FormGroup<NewUnitForm>({
     streetId: new FormControl('', {
@@ -78,7 +86,6 @@ export class UnitFormComponent implements OnInit, AfterViewInit, OnDestroy, Cont
     unitTypeId: new FormControl('', {
       nonNullable: true,
     }),
-
     unitRoleId: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required],
@@ -88,102 +95,78 @@ export class UnitFormComponent implements OnInit, AfterViewInit, OnDestroy, Cont
       validators: [Validators.required],
     }),
   });
-  private onChange: (value: CreateUnit | null) => void = () => {};
-  private onTouched: () => void = () => {};
 
-  ngOnInit(): void {
-    this.doInit();
-    this.listenToFormChanges();
+  private readonly injector = inject(Injector);
+  private _ngControl: NgControl | null | undefined;
+  private get ngControl(): NgControl | null {
+    this._ngControl ??= this.injector.get(NgControl, null, {self: true});
+    return this._ngControl;
   }
+  private onChange: (value: CreateUnit | null) => void = () => {
+    /* noop – replaced by registerOnChange */
+  };
+  private onTouched: () => void = () => {
+    /* noop – replaced by registerOnTouched */
+  };
 
-  ngAfterViewInit(): void {
-    this.ngControl = this.injector.get(NgControl, null, {self: true});
-    this.overrideParentMarkAsTouched();
-  }
-
-  ngOnDestroy(): void {
-    this.restoreParentMarkAsTouched();
-  }
-
-  protected onSubmit(): void {
-    this.form.markAllAsTouched();
-
-    if (this.form.invalid) return;
-
-    const payload = this.form.value as CreateUnit;
-    payload.userId = this.user()?.publicId;
-    this.doSubmit.emit(payload);
-  }
-  private listenToFormChanges(): void {
-    // Notifica al padre cada vez que cambien los valores internos
-    this.form.valueChanges.subscribe(() => {
+  constructor() {
+    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
       if (this.form.valid) {
-        const payload = this.form.value as CreateUnit;
-        if (this.user()?.publicId) {
-          payload.userId = this.user()?.publicId;
+        const payload = this.form.getRawValue() as CreateUnit;
+        const userId = this.user()?.publicId;
+        if (userId) {
+          payload.userId = userId;
         }
         this.onChange(payload);
       } else {
-        // Si no es válido, enviamos null o un valor según tus reglas
         this.onChange(null);
       }
     });
   }
 
-  private doInit() {
-    const fUnitType = this.unitTypes()[0];
-    const fUnitRole = this.unitRoles()[0];
-
-    this.form.patchValue({
-      unitTypeId: fUnitType?.publicId,
-      unitRoleId: fUnitRole?.publicId,
-    });
+  ngOnInit(): void {
+    this.applyCatalogDefaults();
   }
 
-  //control value accesor
+  private applyCatalogDefaults(): void {
+    const fUnitType = this.unitTypes()[0];
+    const fUnitRole = this.unitRoles()[0];
+    this.form.patchValue(
+      {
+        unitTypeId: fUnitType?.publicId ?? '',
+        unitRoleId: fUnitRole?.publicId ?? '',
+      },
+      {emitEvent: false},
+    );
+  }
 
-  // --- MÉTODOS REQUERIDOS POR ControlValueAccessor ---
+  protected onSubmit(): void {
+    this.form.markAllAsTouched();
+    if (this.form.invalid) return;
 
-  // 1. Angular le envía un valor inicial/nuevo desde el padre
+    const payload = this.form.getRawValue() as CreateUnit;
+    payload.userId = this.user()?.publicId;
+    this.doSubmit.emit(payload);
+  }
+
   writeValue(value: CreateUnit | null): void {
     if (value) {
       this.form.patchValue(value, {emitEvent: false});
     } else {
       this.form.reset({}, {emitEvent: false});
-      this.doInit();
+      this.applyCatalogDefaults();
     }
   }
 
-  // 2. Registra la función callback que el padre usará para escuchar cambios de valor
-  registerOnChange(fn: any): void {
+  registerOnChange(fn: (value: CreateUnit | null) => void): void {
     this.onChange = fn;
   }
 
-  // 3. Registra la función callback para cuando el usuario interactúa ("blur")
-  registerOnTouched(fn: any): void {
+  registerOnTouched(fn: () => void): void {
     this.onTouched = fn;
   }
 
-  private overrideParentMarkAsTouched(): void {
-    const control = this.ngControl?.control;
-    if (!control || typeof control.markAsTouched !== 'function') return;
-
-    this.originalMarkAsTouched = control.markAsTouched.bind(control);
-    control.markAsTouched = () => {
-      this.originalMarkAsTouched?.();
-      this.form.markAllAsTouched();
-    };
-  }
-
-  private restoreParentMarkAsTouched(): void {
-    const control = this.ngControl?.control;
-    if (control && this.originalMarkAsTouched) {
-      control.markAsTouched = this.originalMarkAsTouched;
-    }
-  }
-
-  // 4. (Opcional) Angular deshabilita/habilita el control
-  setDisabledState?(isDisabled: boolean): void {
+  setDisabledState(isDisabled: boolean): void {
     if (isDisabled) {
       this.form.disable({emitEvent: false});
     } else {

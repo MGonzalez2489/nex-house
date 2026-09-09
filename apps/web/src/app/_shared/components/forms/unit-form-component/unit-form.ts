@@ -1,10 +1,9 @@
-import { FormControl } from "@angular/forms";
+import {FormControl} from '@angular/forms';
 
 export interface NewUnitForm {
-  streetId: FormControl<string | undefined>;
-  unitTypeId: FormControl<string | undefined>;
-  unitIdentifier: FormControl<string | undefined>;
-
-  unitRoleId: FormControl<string | undefined>;
+  streetId: FormControl<string>;
+  unitTypeId: FormControl<string>;
+  unitIdentifier: FormControl<string>;
+  unitRoleId: FormControl<string>;
   isCurrentOccupant: FormControl<boolean>;
 }
