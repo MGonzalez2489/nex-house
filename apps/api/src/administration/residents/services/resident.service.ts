@@ -82,21 +82,11 @@ export class ResidentService {
       UserRole,
       dto.userRoleId,
     );
-    if (!role) {
-      throw new BadRequestException(
-        'Target user role catalog record not found.',
-      );
-    }
 
     const status = await this.catalogsService.findByName(
       UserStatus,
       UserStatusEnum.PENDING_ONBOARDING,
     );
-    if (!status) {
-      throw new BadRequestException(
-        'Target pending user status catalog record not found.',
-      );
-    }
 
     const hashedPassword = await this.generateDefaultPassword();
 
@@ -127,9 +117,9 @@ export class ResidentService {
         targetUnit = await queryRunner.manager.findOne(Unit, {
           where: { publicId: dto.unitId },
         });
-      } else if (dto.unitIdentifier) {
+      } else if (dto.unit?.unitIdentifier) {
         const street = await queryRunner.manager.findOne(NeighStreet, {
-          where: { publicId: dto.streetId },
+          where: { publicId: dto.unit?.streetId },
         });
 
         if (!street) {
@@ -139,7 +129,7 @@ export class ResidentService {
         }
 
         const unitType = await queryRunner.manager.findOne(UnitType, {
-          where: { publicId: dto.unitTypeId },
+          where: { publicId: dto.unit?.unitTypeId },
         });
 
         if (!unitType) {
@@ -156,7 +146,7 @@ export class ResidentService {
 
         const newUnit = queryRunner.manager.create(Unit, {
           streetId: street.id,
-          identifier: dto.unitIdentifier,
+          identifier: dto.unit?.unitIdentifier,
           neighborhoodId: neighId,
           typeId: unitType.id,
           statusId: unitStatus.id,
@@ -173,7 +163,7 @@ export class ResidentService {
       // Map dynamic relational role assignations
       const userUnitRole = await this.catalogsService.findByPublicId(
         UserUnitRole,
-        dto.unitRoleId,
+        dto.unit.unitRoleId,
       );
       if (!userUnitRole) {
         throw new BadRequestException('Target unit assignment role not found.');
@@ -184,7 +174,7 @@ export class ResidentService {
         userId: savedUser.id,
         createdBy: currentUser.id,
         userUnitRole,
-        isCurrentOccupant: dto.isCurrentOccupant,
+        isCurrentOccupant: dto.unit?.isCurrentOccupant,
       });
 
       await queryRunner.manager.save(assignment);

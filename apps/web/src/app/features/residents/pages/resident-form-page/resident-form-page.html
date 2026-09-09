@@ -10,10 +10,8 @@
     />
 
     <div>
-      <h1
-        class="text-xl sm:text-2xl font-display font-semibold text-slate-900 dark:text-white"
-      >
-        {{ id() ? "Actualizar" : "Nuevo" }} residente
+      <h1 class="text-xl sm:text-2xl font-display font-semibold text-slate-900 dark:text-white">
+        {{ id() ? 'Actualizar' : 'Nuevo' }} residente
       </h1>
       <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
         Registra la información básica y las calles que lo componen.
@@ -39,16 +37,10 @@
             formControlName="email"
             placeholder="Jhon@example.com"
             fluid
-            [invalid]="
-              form.controls.email.invalid && form.controls.email.touched
-            "
-            [attr.aria-invalid]="
-              form.controls.email.invalid && form.controls.email.touched
-            "
+            [invalid]="form.controls.email.invalid && form.controls.email.touched"
+            [attr.aria-invalid]="form.controls.email.invalid && form.controls.email.touched"
             [attr.aria-describedby]="
-              form.controls.email.touched && form.controls.email.errors
-                ? 'email-error'
-                : null
+              form.controls.email.touched && form.controls.email.errors ? 'email-error' : null
             "
           />
           <app-form-validation-error
@@ -127,15 +119,10 @@
           <ng-template #selectedItem let-selectedOption>
             @if (selectedOption) {
               <div class="flex items-center gap-2">
-                @let icon =
-                  selectedOption.type?.name === "apartment"
-                    ? "pi-building"
-                    : "pi-home";
+                @let icon = selectedOption.type?.name === 'apartment' ? 'pi-building' : 'pi-home';
                 <i class="pi" [class]="icon"></i>
 
-                <span class="capitalize">
-                  {{ selectedOption.street?.name }},
-                </span>
+                <span class="capitalize"> {{ selectedOption.street?.name }}, </span>
                 <span>
                   {{ selectedOption.identifier }}
                 </span>
@@ -149,8 +136,7 @@
                 [class.bg-orange-100]="unit.type?.name !== 'apartment'"
                 class="size-10 rounded-full flex items-center justify-center"
               >
-                @let icon =
-                  unit.type?.name === "apartment" ? "pi-building" : "pi-home";
+                @let icon = unit.type?.name === 'apartment' ? 'pi-building' : 'pi-home';
                 <i
                   [class.text-emerald-600]="unit.type?.name === 'apartment'"
                   [class.text-orange-600]="unit.type?.name !== 'apartment'"
@@ -175,12 +161,7 @@
 
     <!-- Acciones -->
     <div class="hidden lg:flex items-center justify-end gap-3">
-      <p-button
-        label="Cancelar"
-        severity="secondary"
-        variant="outlined"
-        (click)="cancel()"
-      />
+      <p-button label="Cancelar" severity="secondary" variant="outlined" (click)="cancel()" />
       <p-button label="Guardar" type="submit" />
     </div>
     <div

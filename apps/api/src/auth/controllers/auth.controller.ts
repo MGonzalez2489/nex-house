@@ -15,13 +15,13 @@ import { SessionModel } from '@nexhouse/shared-domain/models';
 import { LoginDto } from '../dtos';
 import { AuthService } from '../services';
 
+import { User } from '@core/database';
 import { CurrentUser, Public } from '@core/decorators';
 import { UserToModelMapper } from '@core/mappers';
 import {
   Request as ExpressRequest,
   Response as ExpressResponse,
 } from 'express';
-import { User } from '@core/database';
 
 @ApiTags('Authentication')
 @Controller('auth')
