@@ -5,7 +5,7 @@
 NX monorepo. Two apps, one shared lib.
 
 - `apps/api` — NestJS + TypeORM + MySQL backend, global prefix `api`, Swagger at `/api/docs`.
-- `apps/web` — Angular 21 + OptimusUi + Tailwind v4 (standalone components, signals). Dev server proxies `/api`, `/uploads`, `/socket.io` to `localhost:3000` (`apps/web/proxy.config.js`).
+- `apps/web` — Angular 22 + OptimusUi + Tailwind v4 (standalone components, signals). Dev server proxies `/api`, `/uploads`, `/socket.io` to `localhost:3000` (`apps/web/proxy.config.js`).
 - `libs/shared-domain` — shared contracts only; import via `@nexhouse/shared-domain/{enums,interfaces,models,utils}` (aliases in `tsconfig.base.json`). Reuse these instead of duplicating types across apps.
 - API app-local path aliases live in `apps/api/tsconfig.app.json`: `@core/*` → `src/_core/*`, plus `@auth/*`, `@administration/*`, `@catalogs/*`.
 
@@ -43,3 +43,7 @@ NX monorepo. Two apps, one shared lib.
 ## Commits
 
 Conventional Commits is enforced by a husky hook: `type(scope): lowercase imperative description`, no trailing period. Allowed types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore` (see `.ai/rules/git-commits.md`).
+
+## Code Standards
+
+- Use ./.agents/skills/web for every action required in the web application

@@ -10,16 +10,10 @@
         optionValue="publicId"
         placeholder="Calle"
         fluid
-        [invalid]="
-          form.controls.streetId.invalid && form.controls.streetId.touched
-        "
-        [attr.aria-invalid]="
-          form.controls.streetId.invalid && form.controls.streetId.touched
-        "
+        [invalid]="form.controls.streetId.invalid && form.controls.streetId.touched"
+        [attr.aria-invalid]="form.controls.streetId.invalid && form.controls.streetId.touched"
         [attr.aria-describedby]="
-          form.controls.streetId.touched && form.controls.streetId.errors
-            ? 'street-error'
-            : null
+          form.controls.streetId.touched && form.controls.streetId.errors ? 'street-error' : null
         "
       >
         <ng-template #selectedItem let-selectedOption>
@@ -56,17 +50,12 @@
         formControlName="unitIdentifier"
         placeholder="#15234, #102-A"
         fluid
-        [invalid]="
-          form.controls.unitIdentifier.invalid &&
-          form.controls.unitIdentifier.touched
-        "
+        [invalid]="form.controls.unitIdentifier.invalid && form.controls.unitIdentifier.touched"
         [attr.aria-invalid]="
-          form.controls.unitIdentifier.invalid &&
-          form.controls.unitIdentifier.touched
+          form.controls.unitIdentifier.invalid && form.controls.unitIdentifier.touched
         "
         [attr.aria-describedby]="
-          form.controls.unitIdentifier.touched &&
-          form.controls.unitIdentifier.errors
+          form.controls.unitIdentifier.touched && form.controls.unitIdentifier.errors
             ? 'identifier-error'
             : null
         "
@@ -90,7 +79,7 @@
           [class.bg-cyan-50]="selected"
           [class.border-cyan-300]="selected"
           [class.dark:bg-cyan-700]="selected"
-          (click)="form.patchValue({ unitTypeId: type.publicId })"
+          (click)="form.patchValue({unitTypeId: type.publicId})"
           class="flex w-full items-center justify-between gap-4 border p-4 hover:cursor-pointer hover:border-cyan-500 rounded-lg"
         >
           <div class="text-left">
@@ -98,8 +87,8 @@
               {{ type.displayName }}
             </p>
             <p class="text-xs text-slate-600 dark:text-slate-200 mt-0.5">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore...
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+              incididunt ut labore...
             </p>
           </div>
           @if (selected) {
@@ -125,13 +114,8 @@
     </div>
 
     <div class="form-control flex items-end pb-2 gap-2">
-      <label class="form-label m-1!" for="isCurrentOccupant"
-        >Habita la unidad</label
-      >
-      <p-toggleswitch
-        id="isCurrentOccupant"
-        formControlName="isCurrentOccupant"
-      />
+      <label class="form-label m-1!" for="isCurrentOccupant">Habita la unidad</label>
+      <p-toggleswitch id="isCurrentOccupant" formControlName="isCurrentOccupant" />
     </div>
   </div>
 

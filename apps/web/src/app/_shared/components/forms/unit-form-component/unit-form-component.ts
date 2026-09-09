@@ -1,35 +1,36 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   forwardRef,
+  inject,
+  Injector,
   input,
+  OnDestroy,
   OnInit,
   output,
-} from "@angular/core";
+} from '@angular/core';
 import {
   ControlValueAccessor,
   FormControl,
   FormGroup,
+  NgControl,
   NG_VALUE_ACCESSOR,
   ReactiveFormsModule,
   Validators,
-} from "@angular/forms";
-import { CreateUnit } from "@nexhouse/shared-domain/interfaces";
-import {
-  BaseCatalogModel,
-  NeighStreetModel,
-  UserModel,
-} from "@nexhouse/shared-domain/models";
-import { Button } from "@openng/optimus-ui/button";
-import { InputTextModule } from "@openng/optimus-ui/inputtext";
-import { Select } from "@openng/optimus-ui/select";
-import { ToggleSwitch } from "@openng/optimus-ui/toggleswitch";
-import { FormValidationErrorComponent } from "../form-validation-error/form-validation-error";
-import { NewUnitForm } from "./unit-form";
+} from '@angular/forms';
+import {CreateUnit} from '@nexhouse/shared-domain/interfaces';
+import {BaseCatalogModel, NeighStreetModel, UserModel} from '@nexhouse/shared-domain/models';
+import {Button} from '@openng/optimus-ui/button';
+import {InputTextModule} from '@openng/optimus-ui/inputtext';
+import {Select} from '@openng/optimus-ui/select';
+import {ToggleSwitch} from '@openng/optimus-ui/toggleswitch';
+import {FormValidationErrorComponent} from '../form-validation-error/form-validation-error';
+import {NewUnitForm} from './unit-form';
 
 @Component({
-  selector: "app-unit-form-component",
+  selector: 'app-unit-form-component',
   imports: [
     ReactiveFormsModule,
     InputTextModule,
@@ -38,8 +39,8 @@ import { NewUnitForm } from "./unit-form";
     FormValidationErrorComponent,
     Button,
   ],
-  templateUrl: "./unit-form-component.html",
-  styleUrl: "./unit-form-component.css",
+  templateUrl: './unit-form-component.html',
+  styleUrl: './unit-form-component.css',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
@@ -50,7 +51,7 @@ import { NewUnitForm } from "./unit-form";
     },
   ],
 })
-export class UnitFormComponent implements OnInit, ControlValueAccessor {
+export class UnitFormComponent implements OnInit, AfterViewInit, OnDestroy, ControlValueAccessor {
   //inputs
   streets = input.required<NeighStreetModel[]>();
   unitTypes = input.required<BaseCatalogModel[]>();
@@ -61,20 +62,24 @@ export class UnitFormComponent implements OnInit, ControlValueAccessor {
   //optional to handle submit
   doSubmit = output<CreateUnit>();
 
+  private readonly injector = inject(Injector);
+  private ngControl?: NgControl | null;
+  private originalMarkAsTouched?: () => void;
+
   protected readonly form = new FormGroup<NewUnitForm>({
-    streetId: new FormControl("", {
+    streetId: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required],
     }),
-    unitIdentifier: new FormControl("", {
+    unitIdentifier: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required],
     }),
-    unitTypeId: new FormControl("", {
+    unitTypeId: new FormControl('', {
       nonNullable: true,
     }),
 
-    unitRoleId: new FormControl("", {
+    unitRoleId: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required],
     }),
@@ -89,6 +94,15 @@ export class UnitFormComponent implements OnInit, ControlValueAccessor {
   ngOnInit(): void {
     this.doInit();
     this.listenToFormChanges();
+  }
+
+  ngAfterViewInit(): void {
+    this.ngControl = this.injector.get(NgControl, null, {self: true});
+    this.overrideParentMarkAsTouched();
+  }
+
+  ngOnDestroy(): void {
+    this.restoreParentMarkAsTouched();
   }
 
   protected onSubmit(): void {
@@ -133,9 +147,9 @@ export class UnitFormComponent implements OnInit, ControlValueAccessor {
   // 1. Angular le envía un valor inicial/nuevo desde el padre
   writeValue(value: CreateUnit | null): void {
     if (value) {
-      this.form.patchValue(value, { emitEvent: false });
+      this.form.patchValue(value, {emitEvent: false});
     } else {
-      this.form.reset({}, { emitEvent: false });
+      this.form.reset({}, {emitEvent: false});
       this.doInit();
     }
   }
@@ -150,12 +164,30 @@ export class UnitFormComponent implements OnInit, ControlValueAccessor {
     this.onTouched = fn;
   }
 
+  private overrideParentMarkAsTouched(): void {
+    const control = this.ngControl?.control;
+    if (!control || typeof control.markAsTouched !== 'function') return;
+
+    this.originalMarkAsTouched = control.markAsTouched.bind(control);
+    control.markAsTouched = () => {
+      this.originalMarkAsTouched?.();
+      this.form.markAllAsTouched();
+    };
+  }
+
+  private restoreParentMarkAsTouched(): void {
+    const control = this.ngControl?.control;
+    if (control && this.originalMarkAsTouched) {
+      control.markAsTouched = this.originalMarkAsTouched;
+    }
+  }
+
   // 4. (Opcional) Angular deshabilita/habilita el control
   setDisabledState?(isDisabled: boolean): void {
     if (isDisabled) {
-      this.form.disable({ emitEvent: false });
+      this.form.disable({emitEvent: false});
     } else {
-      this.form.enable({ emitEvent: false });
+      this.form.enable({emitEvent: false});
     }
   }
 }
