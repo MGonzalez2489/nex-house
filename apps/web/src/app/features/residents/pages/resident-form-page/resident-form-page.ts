@@ -18,10 +18,13 @@ import {
   UserRoleEnum,
   UserUnitRoleEnum,
 } from "@nexhouse/shared-domain/enums";
-import { CreateUser } from "@nexhouse/shared-domain/interfaces";
+import { CreateUnit, CreateUser } from "@nexhouse/shared-domain/interfaces";
 import { RESIDENT_ROUTES_ENUM } from "@residents/resident.routes";
 import { ResidentStore } from "@residents/resident.store";
-import { FormValidationErrorComponent } from "@shared/components/forms";
+import {
+  FormValidationErrorComponent,
+  UnitFormComponent,
+} from "@shared/components/forms";
 import { CatalogsStore } from "@stores/catalogs.store";
 import { ContextStore } from "@stores/context.store";
 import { Button } from "@openng/optimus-ui/button";
@@ -31,6 +34,7 @@ import { Select } from "@openng/optimus-ui/select";
 import { ToggleSwitch } from "@openng/optimus-ui/toggleswitch";
 import { CreateResidentForm } from "./resident-form";
 import { UnitStore } from "@units/units.store";
+import { JsonPipe } from "@angular/common";
 
 @Component({
   selector: "app-resident-form-page",
@@ -42,6 +46,8 @@ import { UnitStore } from "@units/units.store";
     Select,
     ToggleSwitch,
     FormValidationErrorComponent,
+    UnitFormComponent,
+    JsonPipe,
   ],
   templateUrl: "./resident-form-page.html",
   styleUrl: "./resident-form-page.css",
@@ -67,28 +73,29 @@ export class ResidentFormPage {
       nonNullable: true,
       validators: [Validators.required],
     }),
-    isCurrentOccupant: new FormControl<boolean>(true, {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-
+    // isCurrentOccupant: new FormControl<boolean>(true, {
+    //   nonNullable: true,
+    //   validators: [Validators.required],
+    // }),
+    //
     unitId: new FormControl("", {
       nonNullable: true,
     }),
-    streetId: new FormControl("", {
-      nonNullable: true,
-    }),
-    unitTypeId: new FormControl("", {
-      nonNullable: true,
-    }),
-    unitIdentifier: new FormControl("", {
-      nonNullable: true,
-    }),
-
-    unitRoleId: new FormControl("", {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
+    unit: new FormControl<CreateUnit | null>(null, [Validators.required]),
+    // streetId: new FormControl("", {
+    //   nonNullable: true,
+    // }),
+    // unitTypeId: new FormControl("", {
+    //   nonNullable: true,
+    // }),
+    // unitIdentifier: new FormControl("", {
+    //   nonNullable: true,
+    // }),
+    //
+    // unitRoleId: new FormControl("", {
+    //   nonNullable: true,
+    //   validators: [Validators.required],
+    // }),
   });
 
   constructor() {
@@ -119,22 +126,23 @@ export class ResidentFormPage {
 
     effect(() => {
       const cIsNewUnit = this.isNewUnit();
-      const { unitId, streetId, unitTypeId, unitIdentifier } =
-        this.form.controls;
-
-      if (cIsNewUnit) {
-        unitId.setValue(undefined, { emitEvent: false });
-        unitId.clearValidators();
-
-        streetId.setValidators([Validators.required]);
-        unitTypeId.setValidators([Validators.required]);
-        unitIdentifier.setValidators([Validators.required]);
-      } else {
-        unitId.setValidators([Validators.required]);
-        streetId.clearValidators();
-        unitTypeId.clearValidators();
-        unitIdentifier.clearValidators();
-      }
+      console.log("cIsNewUnit:", cIsNewUnit);
+      // const { unitId, streetId, unitTypeId, unitIdentifier } =
+      //   this.form.controls;
+      //
+      // if (cIsNewUnit) {
+      //   unitId.setValue(undefined, { emitEvent: false });
+      //   unitId.clearValidators();
+      //
+      //   streetId.setValidators([Validators.required]);
+      //   unitTypeId.setValidators([Validators.required]);
+      //   unitIdentifier.setValidators([Validators.required]);
+      // } else {
+      //   unitId.setValidators([Validators.required]);
+      //   streetId.clearValidators();
+      //   unitTypeId.clearValidators();
+      //   unitIdentifier.clearValidators();
+      // }
     });
   }
 
@@ -172,10 +180,14 @@ export class ResidentFormPage {
     );
 
     this.form.patchValue({
-      userRoleId: userRole?.publicId,
-      unitTypeId: unitType?.publicId,
-      unitRoleId: userUnitRole?.publicId,
-      streetId: streets[0].publicId,
+      userRoleId: userRole?.publicId || "",
+      unit: {
+        unitTypeId: unitType?.publicId || "",
+        unitRoleId: userUnitRole?.publicId || "",
+        streetId: streets[0].publicId,
+        unitIdentifier: "",
+        isCurrentOccupant: false,
+      },
     });
   }
 
@@ -187,11 +199,20 @@ export class ResidentFormPage {
 
     if (!cResident) return;
 
+    const userUnit = cResident.userUnits[0];
+    const unit = userUnit?.unit;
+
     this.form.patchValue({
       email: cResident.email,
+      unitId: unit?.publicId,
       userRoleId: cResident.role?.publicId,
-      unitId: cResident.userUnits[0]?.unit.publicId,
-      unitRoleId: cResident.userUnits[0]?.userUnitRole.publicId,
+      unit: {
+        streetId: unit?.street?.publicId,
+        unitTypeId: unit?.type?.publicId,
+        unitIdentifier: unit?.identifier,
+        unitRoleId: userUnit.userUnitRole?.publicId,
+        isCurrentOccupant: userUnit.isCurrentOccupant,
+      },
     });
   }
 }
