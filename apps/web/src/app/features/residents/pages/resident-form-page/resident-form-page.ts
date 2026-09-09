@@ -89,13 +89,18 @@ export class ResidentFormPage {
 
     effect(() => {
       const cIsNewUnit = this.isNewUnit();
+      const {unitId, unit} = this.form.controls;
       if (cIsNewUnit) {
         this.initUnitCreate();
+        unit.setValidators([Validators.required]);
+        unitId.setValue('');
+        unitId.clearValidators();
       } else {
-        const {unitId} = this.form.controls;
         unitId.setValidators([Validators.required]);
-        this.form.controls.unit.setValue(null);
+        unit.setValue(null);
+        unit.clearValidators();
       }
+      this.form.updateValueAndValidity();
     });
   }
 
