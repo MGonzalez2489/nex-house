@@ -1,43 +1,24 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  effect,
-  inject,
-  input,
-  signal,
-} from "@angular/core";
-import {
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from "@angular/forms";
-import { Router } from "@angular/router";
-import {
-  UnitTypeEnum,
-  UserRoleEnum,
-  UserUnitRoleEnum,
-} from "@nexhouse/shared-domain/enums";
-import { CreateUnit, CreateUser } from "@nexhouse/shared-domain/interfaces";
-import { RESIDENT_ROUTES_ENUM } from "@residents/resident.routes";
-import { ResidentStore } from "@residents/resident.store";
-import {
-  FormValidationErrorComponent,
-  UnitFormComponent,
-} from "@shared/components/forms";
-import { CatalogsStore } from "@stores/catalogs.store";
-import { ContextStore } from "@stores/context.store";
-import { Button } from "@openng/optimus-ui/button";
-import { InputTextModule } from "@openng/optimus-ui/inputtext";
-import { Panel } from "@openng/optimus-ui/panel";
-import { Select } from "@openng/optimus-ui/select";
-import { ToggleSwitch } from "@openng/optimus-ui/toggleswitch";
-import { CreateResidentForm } from "./resident-form";
-import { UnitStore } from "@units/units.store";
-import { JsonPipe } from "@angular/common";
+import {JsonPipe} from '@angular/common';
+import {ChangeDetectionStrategy, Component, effect, inject, input, signal} from '@angular/core';
+import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {Router} from '@angular/router';
+import {UnitTypeEnum, UserRoleEnum, UserUnitRoleEnum} from '@nexhouse/shared-domain/enums';
+import {CreateUnit, CreateUser} from '@nexhouse/shared-domain/interfaces';
+import {Button} from '@openng/optimus-ui/button';
+import {InputTextModule} from '@openng/optimus-ui/inputtext';
+import {Panel} from '@openng/optimus-ui/panel';
+import {Select} from '@openng/optimus-ui/select';
+import {ToggleSwitch} from '@openng/optimus-ui/toggleswitch';
+import {RESIDENT_ROUTES_ENUM} from '@residents/resident.routes';
+import {ResidentStore} from '@residents/resident.store';
+import {FormValidationErrorComponent, UnitFormComponent} from '@shared/components/forms';
+import {CatalogsStore} from '@stores/catalogs.store';
+import {ContextStore} from '@stores/context.store';
+import {UnitStore} from '@units/units.store';
+import {CreateResidentForm} from './resident-form';
 
 @Component({
-  selector: "app-resident-form-page",
+  selector: 'app-resident-form-page',
   imports: [
     ReactiveFormsModule,
     Button,
@@ -49,8 +30,8 @@ import { JsonPipe } from "@angular/common";
     UnitFormComponent,
     JsonPipe,
   ],
-  templateUrl: "./resident-form-page.html",
-  styleUrl: "./resident-form-page.css",
+  templateUrl: './resident-form-page.html',
+  styleUrl: './resident-form-page.css',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -65,37 +46,19 @@ export class ResidentFormPage {
   private readonly isLoadingComplete = signal<boolean>(false);
 
   protected readonly form = new FormGroup<CreateResidentForm>({
-    email: new FormControl("", {
+    email: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required, Validators.email],
     }),
-    userRoleId: new FormControl("", {
+    userRoleId: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required],
     }),
-    // isCurrentOccupant: new FormControl<boolean>(true, {
-    //   nonNullable: true,
-    //   validators: [Validators.required],
-    // }),
-    //
-    unitId: new FormControl("", {
+
+    unitId: new FormControl('', {
       nonNullable: true,
     }),
     unit: new FormControl<CreateUnit | null>(null, [Validators.required]),
-    // streetId: new FormControl("", {
-    //   nonNullable: true,
-    // }),
-    // unitTypeId: new FormControl("", {
-    //   nonNullable: true,
-    // }),
-    // unitIdentifier: new FormControl("", {
-    //   nonNullable: true,
-    // }),
-    //
-    // unitRoleId: new FormControl("", {
-    //   nonNullable: true,
-    //   validators: [Validators.required],
-    // }),
   });
 
   constructor() {
@@ -126,23 +89,13 @@ export class ResidentFormPage {
 
     effect(() => {
       const cIsNewUnit = this.isNewUnit();
-      console.log("cIsNewUnit:", cIsNewUnit);
-      // const { unitId, streetId, unitTypeId, unitIdentifier } =
-      //   this.form.controls;
-      //
-      // if (cIsNewUnit) {
-      //   unitId.setValue(undefined, { emitEvent: false });
-      //   unitId.clearValidators();
-      //
-      //   streetId.setValidators([Validators.required]);
-      //   unitTypeId.setValidators([Validators.required]);
-      //   unitIdentifier.setValidators([Validators.required]);
-      // } else {
-      //   unitId.setValidators([Validators.required]);
-      //   streetId.clearValidators();
-      //   unitTypeId.clearValidators();
-      //   unitIdentifier.clearValidators();
-      // }
+      if (cIsNewUnit) {
+        this.initUnitCreate();
+      } else {
+        const {unitId} = this.form.controls;
+        unitId.setValidators([Validators.required]);
+        this.form.controls.unit.setValue(null);
+      }
     });
   }
 
@@ -169,33 +122,17 @@ export class ResidentFormPage {
   //private
   private initCreate() {
     const roles = this.catStore.UserRoles();
-    const unitTypes = this.catStore.UnitTypes();
-    const userUnitRoles = this.catStore.UserUnitRoles();
-    const streets = this.contextStore.streets();
 
     const userRole = roles.find((f) => f.name === UserRoleEnum.RESIDENT);
-    const unitType = unitTypes.find((f) => f.name === UnitTypeEnum.HOUSE);
-    const userUnitRole = userUnitRoles.find(
-      (f) => f.name === UserUnitRoleEnum.FAMILY,
-    );
 
     this.form.patchValue({
-      userRoleId: userRole?.publicId || "",
-      unit: {
-        unitTypeId: unitType?.publicId || "",
-        unitRoleId: userUnitRole?.publicId || "",
-        streetId: streets[0].publicId,
-        unitIdentifier: "",
-        isCurrentOccupant: false,
-      },
+      userRoleId: userRole?.publicId || '',
     });
   }
 
   private initUpdate() {
     const rId = this.id();
-    const cResident = this.residentStore
-      .entities()
-      .find((f) => f.publicId == rId);
+    const cResident = this.residentStore.entities().find((f) => f.publicId == rId);
 
     if (!cResident) return;
 
@@ -213,6 +150,24 @@ export class ResidentFormPage {
         unitRoleId: userUnit.userUnitRole?.publicId,
         isCurrentOccupant: userUnit.isCurrentOccupant,
       },
+    });
+  }
+
+  private initUnitCreate() {
+    const unitTypes = this.catStore.UnitTypes();
+    const userUnitRoles = this.catStore.UserUnitRoles();
+    const streets = this.contextStore.streets();
+
+    const unitType = unitTypes.find((f) => f.name === UnitTypeEnum.HOUSE);
+    const userUnitRole = userUnitRoles.find((f) => f.name === UserUnitRoleEnum.FAMILY);
+    const streetId = streets[0].publicId;
+
+    this.form.controls.unit.setValue({
+      streetId: streetId,
+      unitTypeId: unitType?.publicId || '',
+      unitRoleId: userUnitRole?.publicId || '',
+      unitIdentifier: '',
+      isCurrentOccupant: true,
     });
   }
 }

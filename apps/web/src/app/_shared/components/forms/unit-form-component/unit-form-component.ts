@@ -2,13 +2,14 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   Injector,
   input,
   OnInit,
   output,
 } from '@angular/core';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {toSignal} from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
   ControlValueAccessor,
@@ -56,6 +57,7 @@ export class UnitFormComponent implements OnInit, ControlValueAccessor {
   unitRoles = input.required<BaseCatalogModel[]>();
   isLoading = input<boolean>(false);
   user = input<UserModel>();
+  handledByParent = input<boolean>(false);
 
   doSubmit = output<CreateUnit>();
 
@@ -109,23 +111,25 @@ export class UnitFormComponent implements OnInit, ControlValueAccessor {
     /* noop – replaced by registerOnTouched */
   };
 
+  formChanges = toSignal(this.form.valueChanges);
   constructor() {
-    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
-      if (this.form.valid) {
-        const payload = this.form.getRawValue() as CreateUnit;
+    effect(() => {
+      const nChanges = this.formChanges();
+      if (nChanges) {
+        const payload = nChanges as CreateUnit;
         const userId = this.user()?.publicId;
         if (userId) {
           payload.userId = userId;
         }
         this.onChange(payload);
-      } else {
-        this.onChange(null);
       }
     });
   }
 
   ngOnInit(): void {
-    this.applyCatalogDefaults();
+    if (!this.handledByParent()) {
+      this.applyCatalogDefaults();
+    }
   }
 
   private applyCatalogDefaults(): void {
@@ -151,7 +155,7 @@ export class UnitFormComponent implements OnInit, ControlValueAccessor {
 
   writeValue(value: CreateUnit | null): void {
     if (value) {
-      this.form.patchValue(value, {emitEvent: false});
+      this.form.patchValue(value);
     } else {
       this.form.reset({}, {emitEvent: false});
       this.applyCatalogDefaults();
