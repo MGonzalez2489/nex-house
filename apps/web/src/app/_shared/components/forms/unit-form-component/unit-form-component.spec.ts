@@ -2,9 +2,15 @@ import {Component, signal} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
-import {BaseCatalogModel, NeighStreetModel} from '@nexhouse/shared-domain/models';
+import {
+  BaseCatalogModel,
+  NeighStreetModel,
+  UnitModel,
+} from '@nexhouse/shared-domain/models';
 import {CreateUnit} from '@nexhouse/shared-domain/interfaces';
+import {Button} from '@openng/optimus-ui/button';
 import {UnitFormComponent} from './unit-form-component';
+import {UnitMode} from './unit-form';
 
 @Component({
   standalone: true,
@@ -36,7 +42,7 @@ class TestHostComponent {
 
 @Component({
   standalone: true,
-  imports: [UnitFormComponent, ReactiveFormsModule],
+  imports: [UnitFormComponent, ReactiveFormsModule, Button],
   template: `
     <form [formGroup]="form">
       <app-unit-form-component
@@ -44,6 +50,8 @@ class TestHostComponent {
         [streets]="streets()"
         [unitTypes]="unitTypes()"
         [unitRoles]="unitRoles()"
+        [canPickExisting]="canPickExisting()"
+        [searchUnits]="searchUnits()"
       />
       <button type="submit" (click)="form.markAllAsTouched()">Submit</button>
     </form>
@@ -53,6 +61,16 @@ class CvaHostComponent {
   readonly form = new FormGroup({
     unit: new FormControl<CreateUnit | null>(null),
   });
+  readonly canPickExisting = signal(false);
+  readonly searchUnits = signal<UnitModel[]>([
+    {
+      publicId: 'u1',
+      identifier: 'A-101',
+      street: {name: 'Calle Reforma'} as NeighStreetModel,
+      type: {name: 'casa', displayName: 'Casa'} as BaseCatalogModel,
+      userUnits: [],
+    } as unknown as UnitModel,
+  ]);
   readonly streets = signal<NeighStreetModel[]>([{publicId: 's1', name: 'Calle Reforma'} as NeighStreetModel]);
   readonly unitTypes = signal<BaseCatalogModel[]>([
     {publicId: 'ut1', name: 'departamento', displayName: 'Departamento'},
@@ -64,6 +82,16 @@ class CvaHostComponent {
 
 function getUnitFormComponent(fixture: ComponentFixture<unknown>): UnitFormComponent {
   return fixture.debugElement.query(By.directive(UnitFormComponent)).componentInstance;
+}
+
+function clickButtonByLabel(fixture: ComponentFixture<unknown>, label: string): void {
+  const buttons = Array.from(
+    fixture.nativeElement.querySelectorAll('button'),
+  ) as HTMLButtonElement[];
+  const target = buttons.find((button) => button.textContent?.includes(label));
+  expect(target).toBeTruthy();
+  target?.click();
+  fixture.detectChanges();
 }
 
 describe('UnitFormComponent', () => {
@@ -89,6 +117,11 @@ describe('UnitFormComponent', () => {
     expect(component.form.value.unitTypeId).toBe('ut1');
     expect(component.form.value.unitRoleId).toBe('ur1');
     expect(component.form.value.isCurrentOccupant).toBe(true);
+  });
+
+  it('should default to create mode without canPickExisting', () => {
+    const component = getUnitFormComponent(fixture);
+    expect(component.mode()).toBe('create');
   });
 
   it('should render street select options', () => {
@@ -120,6 +153,21 @@ describe('UnitFormComponent', () => {
     component.onSubmit();
 
     expect(spy).toHaveBeenCalled();
+  });
+
+  it('should emit a create payload without a unitId on doSubmit', () => {
+    const component = getUnitFormComponent(fixture);
+    const spy = jest.fn();
+    component.doSubmit.subscribe(spy);
+
+    component.form.controls.streetId.setValue('s1');
+    component.form.controls.unitIdentifier.setValue('#101');
+    component.form.controls.unitRoleId.setValue('ur1');
+    component.onSubmit();
+
+    expect(spy).toHaveBeenCalledWith(
+      expect.not.objectContaining({unitId: expect.anything()}),
+    );
   });
 
   it('should not emit doSubmit when form is invalid', () => {
@@ -171,6 +219,7 @@ describe('UnitFormComponent (CVA integration with formControlName)', () => {
     component.form.controls.streetId.setValue('s1');
     component.form.controls.unitIdentifier.setValue('#101');
     component.form.controls.unitRoleId.setValue('ur1');
+    fixture.detectChanges();
 
     const parentValue = hostComponent.form.controls.unit.value;
     expect(parentValue).toEqual(
@@ -205,6 +254,88 @@ describe('UnitFormComponent (CVA integration with formControlName)', () => {
 
     const component = getUnitFormComponent(fixture);
     expect(component.form.value.streetId).toBe('s1');
+    expect(component.form.value.isCurrentOccupant).toBe(false);
+  });
+});
+
+describe('UnitFormComponent (existing unit mode)', () => {
+  let hostComponent: CvaHostComponent;
+  let fixture: ComponentFixture<CvaHostComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [CvaHostComponent],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(CvaHostComponent);
+    hostComponent = fixture.componentInstance;
+    hostComponent.canPickExisting.set(true);
+    fixture.detectChanges();
+  });
+
+  it('should hide the mode toggle when canPickExisting is false', () => {
+    hostComponent.canPickExisting.set(false);
+    fixture.detectChanges();
+    const buttons = Array.from(fixture.nativeElement.querySelectorAll('button')) as HTMLButtonElement[];
+    expect(buttons.some((button) => button.textContent?.includes('Buscar existente'))).toBe(false);
+  });
+
+  it('should switch to existing mode via the toggle', () => {
+    const component = getUnitFormComponent(fixture);
+    clickButtonByLabel(fixture, 'Buscar existente');
+    expect(component.mode()).toBe('existing');
+  });
+
+  it('should require a unit selection in existing mode', () => {
+    const component = getUnitFormComponent(fixture);
+    component.setMode('existing');
+    fixture.detectChanges();
+    expect(component.form.controls.unitId.invalid).toBe(true);
+  });
+
+  it('should propagate a unitId payload to the parent control in existing mode', () => {
+    const component = getUnitFormComponent(fixture);
+    component.setMode('existing');
+    fixture.detectChanges();
+    component.form.controls.unitId.setValue('u1');
+    component.form.controls.unitRoleId.setValue('ur1');
+    fixture.detectChanges();
+
+    const parentValue = hostComponent.form.controls.unit.value;
+    expect(parentValue).toEqual(
+      expect.objectContaining({
+        unitId: 'u1',
+        unitRoleId: 'ur1',
+        isCurrentOccupant: true,
+      }),
+    );
+    expect(parentValue).not.toHaveProperty('streetId');
+  });
+
+  it('should switch back to create mode and emit create fields', () => {
+    const component = getUnitFormComponent(fixture);
+    component.setMode('existing');
+    fixture.detectChanges();
+    component.form.controls.unitId.setValue('u1');
+    component.setMode('create');
+    fixture.detectChanges();
+
+    const parentValue = hostComponent.form.controls.unit.value;
+    expect(parentValue).not.toHaveProperty('unitId');
+    expect(parentValue).toEqual(expect.any(Object));
+  });
+
+  it('should restore existing mode when writeValue provides a unitId', () => {
+    hostComponent.form.controls.unit.setValue({
+      unitId: 'u1',
+      unitRoleId: 'ur1',
+      isCurrentOccupant: false,
+    });
+    fixture.detectChanges();
+
+    const component = getUnitFormComponent(fixture);
+    expect(component.mode()).toBe('existing');
+    expect(component.form.value.unitId).toBe('u1');
     expect(component.form.value.isCurrentOccupant).toBe(false);
   });
 });

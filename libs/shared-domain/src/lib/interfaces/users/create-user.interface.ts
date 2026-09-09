@@ -6,8 +6,5 @@ export interface CreateUser {
   userRoleId: string;
 
   //unit
-  unitId?: string;
-
-  //roles
-  unit?: CreateUnit;
+  unit: CreateUnit;
 }

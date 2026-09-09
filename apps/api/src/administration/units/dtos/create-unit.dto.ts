@@ -3,11 +3,21 @@ import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class CreateUnitDto implements CreateUnit {
   @IsString()
-  streetId: string;
+  @IsOptional()
+  unitId?: string;
+
   @IsString()
-  unitTypeId: string;
+  @IsOptional()
+  streetId?: string;
+
   @IsString()
-  unitIdentifier: string;
+  @IsOptional()
+  unitTypeId?: string;
+
+  @IsString()
+  @IsOptional()
+  unitIdentifier?: string;
+
   @IsString()
   unitRoleId: string;
 

@@ -1,6 +1,7 @@
-import { CreateUnitDto } from '@administration/neighborhood/dtos';
+import { CreateUnitDto } from '@administration/units/dtos';
 import { CreateUser } from '@nexhouse/shared-domain/interfaces';
-import { IsEmail, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsEmail, IsString, ValidateNested } from 'class-validator';
 
 export class CreateResidentDto implements CreateUser {
   @IsEmail()
@@ -9,10 +10,7 @@ export class CreateResidentDto implements CreateUser {
   @IsString()
   userRoleId: string;
 
-  @IsString()
-  @IsOptional()
-  unitId?: string;
-
-  @IsOptional()
-  unit?: CreateUnitDto;
+  @ValidateNested()
+  @Type(() => CreateUnitDto)
+  unit: CreateUnitDto;
 }

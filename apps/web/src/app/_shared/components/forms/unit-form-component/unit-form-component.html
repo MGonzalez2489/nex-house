@@ -1,116 +1,217 @@
-<form [formGroup]="form" class="space-y-6" (submit)="onSubmit()">
-  <section class="grid grid-cols-1 md:grid-cols-3 md:gap-x-3">
-    <div class="form-control col-span-2">
-      <label class="form-label" for="streetId">Calle</label>
-      <p-select
-        [options]="streets()"
-        formControlName="streetId"
-        optionLabel="name"
-        optionValue="publicId"
-        placeholder="Calle"
-        fluid
-        [invalid]="isStreetInvalid()"
-        [attr.aria-invalid]="isStreetInvalid() || null"
-        [attr.aria-describedby]="
-          (form.controls.streetId.touched || parentTouched()) &&
-          form.controls.streetId.errors
-            ? 'street-errors'
-            : null
-        "
-      >
-        <ng-template #selectedItem let-selectedOption>
-          @if (selectedOption) {
-            <div class="flex items-center gap-2">
-              <span class="capitalize">{{ selectedOption.name }}</span>
-            </div>
+<form [formGroup]="form" (submit)="onSubmit()">
+  <div class="mb-4">
+    @if (canPickExisting()) {
+      <div class="flex justify-between">
+        <div>
+          <h2 class="text-sm font-semibold text-slate-800 dark:text-white">
+            Información de la unidad
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+          </p>
+        </div>
+
+        @if (mode() === 'create') {
+          <p-button
+            text
+            label="Buscar existente"
+            size="small"
+            severity="info"
+            (click)="setMode('existing')"
+          />
+        } @else {
+          <p-button
+            text
+            label="Registrar nueva"
+            size="small"
+            severity="info"
+            (click)="setMode('create')"
+          />
+        }
+      </div>
+    }
+  </div>
+
+  <div class="space-y-6">
+    @if (mode() === 'create') {
+      <section class="grid grid-cols-1 md:grid-cols-3 md:gap-x-3">
+        <div class="form-control col-span-2">
+          <label class="form-label" for="streetId">Calle</label>
+          <p-select
+            [options]="streets()"
+            formControlName="streetId"
+            optionLabel="name"
+            optionValue="publicId"
+            placeholder="Calle"
+            fluid
+            [invalid]="isStreetInvalid()"
+            [attr.aria-invalid]="isStreetInvalid() || null"
+            [attr.aria-describedby]="
+              (form.controls.streetId.touched || parentTouched()) && form.controls.streetId.errors
+                ? 'street-errors'
+                : null
+            "
+          >
+            <ng-template #selectedItem let-selectedOption>
+              @if (selectedOption) {
+                <div class="flex items-center gap-2">
+                  <span class="capitalize">{{ selectedOption.name }}</span>
+                </div>
+              }
+            </ng-template>
+            <ng-template let-street #item>
+              <div class="flex items-center gap-2">
+                <span class="capitalize">{{ street.name }}</span>
+              </div>
+            </ng-template>
+          </p-select>
+          <app-form-validation-error
+            id="street-errors"
+            [touched]="form.controls.streetId.touched || parentTouched()"
+            [errors]="form.controls.streetId.errors"
+            label="Calle"
+          />
+        </div>
+
+        <div class="form-control">
+          <label class="form-label" for="identifier">Identificador</label>
+          <input
+            pInputText
+            id="identifier"
+            type="text"
+            formControlName="unitIdentifier"
+            placeholder="#15234, #102-A"
+            fluid
+            [invalid]="isIdentifierInvalid()"
+            [attr.aria-invalid]="isIdentifierInvalid() || null"
+            [attr.aria-describedby]="
+              (form.controls.unitIdentifier.touched || parentTouched()) &&
+              form.controls.unitIdentifier.errors
+                ? 'identifier-errors'
+                : null
+            "
+          />
+          <app-form-validation-error
+            id="identifier-errors"
+            [touched]="form.controls.unitIdentifier.touched || parentTouched()"
+            [errors]="form.controls.unitIdentifier.errors"
+            label="Identificador"
+          />
+        </div>
+      </section>
+
+      <section>
+        <div class="space-y-4">
+          @for (type of unitTypes(); track type.publicId) {
+            @let selected = form.value.unitTypeId === type.publicId;
+            <button
+              type="button"
+              [class.bg-cyan-50]="selected"
+              [class.border-cyan-300]="selected"
+              [class.dark:bg-cyan-700]="selected"
+              (click)="form.patchValue({unitTypeId: type.publicId})"
+              class="flex w-full items-center justify-between gap-4 border p-4 hover:cursor-pointer hover:border-cyan-500 rounded-lg"
+            >
+              <div class="text-left">
+                <p class="text-sm font-medium text-slate-700 dark:text-slate-300">
+                  {{ type.displayName }}
+                </p>
+                <p class="text-xs text-slate-600 dark:text-slate-200 mt-0.5">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+                  incididunt ut labore...
+                </p>
+              </div>
+              @if (selected) {
+                <i class="pi pi-check-circle"></i>
+              }
+            </button>
           }
-        </ng-template>
-        <ng-template let-street #item>
-          <div class="flex items-center gap-2">
-            <span class="capitalize">{{ street.name }}</span>
-          </div>
-        </ng-template>
-      </p-select>
-      <app-form-validation-error
-        id="street-errors"
-        [touched]="form.controls.streetId.touched || parentTouched()"
-        [errors]="form.controls.streetId.errors"
-        label="Calle"
-      />
-    </div>
-
-    <div class="form-control">
-      <label class="form-label" for="identifier">Identificador</label>
-      <input
-        pInputText
-        id="identifier"
-        type="text"
-        formControlName="unitIdentifier"
-        placeholder="#15234, #102-A"
-        fluid
-        [invalid]="isIdentifierInvalid()"
-        [attr.aria-invalid]="isIdentifierInvalid() || null"
-        [attr.aria-describedby]="
-          (form.controls.unitIdentifier.touched || parentTouched()) &&
-          form.controls.unitIdentifier.errors
-            ? 'identifier-errors'
-            : null
-        "
-      />
-      <app-form-validation-error
-        id="identifier-errors"
-        [touched]="form.controls.unitIdentifier.touched || parentTouched()"
-        [errors]="form.controls.unitIdentifier.errors"
-        label="Identificador"
-      />
-    </div>
-  </section>
-
-  <section>
-    <div class="space-y-4">
-      @for (type of unitTypes(); track type.publicId) {
-        @let selected = form.value.unitTypeId === type.publicId;
-        <button
-          type="button"
-          [class.bg-cyan-50]="selected"
-          [class.border-cyan-300]="selected"
-          [class.dark:bg-cyan-700]="selected"
-          (click)="form.patchValue({unitTypeId: type.publicId})"
-          class="flex w-full items-center justify-between gap-4 border p-4 hover:cursor-pointer hover:border-cyan-500 rounded-lg"
+        </div>
+      </section>
+    } @else {
+      <div class="form-control">
+        <label class="form-label" for="unitId">Buscar unidad</label>
+        <p-select
+          fluid
+          placeholder="Buscar unidad"
+          [options]="searchUnits()"
+          formControlName="unitId"
+          optionValue="publicId"
+          appendTo="body"
+          [invalid]="isUnitIdInvalid()"
+          [attr.aria-invalid]="isUnitIdInvalid() || null"
+          [attr.aria-describedby]="
+            (form.controls.unitId.touched || parentTouched()) && form.controls.unitId.errors
+              ? 'unit-errors'
+              : null
+          "
         >
-          <div class="text-left">
-            <p class="text-sm font-medium text-slate-700 dark:text-slate-300">
-              {{ type.displayName }}
-            </p>
-            <p class="text-xs text-slate-600 dark:text-slate-200 mt-0.5">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-              incididunt ut labore...
-            </p>
-          </div>
-          @if (selected) {
-            <i class="pi pi-check-circle"></i>
-          }
-        </button>
-      }
-    </div>
-  </section>
+          <ng-template #selectedItem let-selectedOption>
+            @if (selectedOption) {
+              <div class="flex items-center gap-2">
+                @let icon = selectedOption.type?.name === 'apartment' ? 'pi-building' : 'pi-home';
+                <i class="pi" [class]="icon"></i>
 
-  <div class="grid grid-cols-1 md:grid-cols-3 md:gap-x-3">
-    <div class="form-control col-span-2">
-      <label class="form-label" for="unitRoleId">Relación con la unidad</label>
-      <p-select
-        [options]="unitRoles()"
-        formControlName="unitRoleId"
-        optionLabel="displayName"
-        optionValue="publicId"
-        placeholder="Relación con la unidad"
-        fluid
-      />
-    </div>
+                <span class="capitalize"> {{ selectedOption.street?.name }}, </span>
+                <span>
+                  {{ selectedOption.identifier }}
+                </span>
+              </div>
+            }
+          </ng-template>
+          <ng-template let-unit #item>
+            <div class="flex items-center gap-2">
+              <div
+                [class.bg-emerald-100]="unit.type?.name === 'apartment'"
+                [class.bg-orange-100]="unit.type?.name !== 'apartment'"
+                class="size-10 rounded-full flex items-center justify-center"
+              >
+                @let icon = unit.type?.name === 'apartment' ? 'pi-building' : 'pi-home';
+                <i
+                  [class.text-emerald-600]="unit.type?.name === 'apartment'"
+                  [class.text-orange-600]="unit.type?.name !== 'apartment'"
+                  class="pi text-xl"
+                  [class]="icon"
+                ></i>
+              </div>
+              <div class="flex flex-col gap-1">
+                <p>
+                  <span class="capitalize">{{ unit.street?.name }}, </span>
+                  <span> {{ unit.identifier }} </span>
+                </p>
+                <p class="text-xs text-slate-400 dark:text-slate-200">
+                  {{ unit.type?.displayName }}
+                </p>
+              </div>
+            </div>
+          </ng-template>
+        </p-select>
+        <app-form-validation-error
+          id="unit-errors"
+          [touched]="form.controls.unitId.touched || parentTouched()"
+          [errors]="form.controls.unitId.errors"
+          label="Unidad"
+        />
+      </div>
+    }
 
-    <div class="form-control flex items-end pb-2 gap-2">
-      <label class="form-label m-1!" for="isCurrentOccupant">Habita la unidad</label>
-      <p-toggleswitch id="isCurrentOccupant" formControlName="isCurrentOccupant" />
+    <div class="grid grid-cols-1 md:grid-cols-3 md:gap-x-3">
+      <div class="form-control col-span-2">
+        <label class="form-label" for="unitRoleId">Relación con la unidad</label>
+        <p-select
+          [options]="unitRoles()"
+          formControlName="unitRoleId"
+          optionLabel="displayName"
+          optionValue="publicId"
+          placeholder="Relación con la unidad"
+          fluid
+        />
+      </div>
+
+      <div class="form-control flex items-end pb-2 gap-2">
+        <label class="form-label m-1!" for="isCurrentOccupant">Habita la unidad</label>
+        <p-toggleswitch id="isCurrentOccupant" formControlName="isCurrentOccupant" />
+      </div>
     </div>
   </div>
 

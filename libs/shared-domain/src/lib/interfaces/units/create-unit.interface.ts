@@ -1,7 +1,8 @@
 export interface CreateUnit {
-  streetId: string;
-  unitTypeId: string;
-  unitIdentifier: string;
+  unitId?: string;
+  streetId?: string;
+  unitTypeId?: string;
+  unitIdentifier?: string;
   unitRoleId: string;
 
   //TODO: review if it needs to be

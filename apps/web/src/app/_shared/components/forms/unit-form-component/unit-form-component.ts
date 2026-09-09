@@ -8,6 +8,7 @@ import {
   input,
   OnInit,
   output,
+  signal,
 } from '@angular/core';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {
@@ -21,12 +22,18 @@ import {
   Validators,
 } from '@angular/forms';
 import {CreateUnit} from '@nexhouse/shared-domain/interfaces';
-import {BaseCatalogModel, NeighStreetModel, UserModel} from '@nexhouse/shared-domain/models';
+import {
+  BaseCatalogModel,
+  NeighStreetModel,
+  UnitModel,
+  UserModel,
+} from '@nexhouse/shared-domain/models';
+import {Button} from '@openng/optimus-ui/button';
 import {InputTextModule} from '@openng/optimus-ui/inputtext';
 import {Select} from '@openng/optimus-ui/select';
 import {ToggleSwitch} from '@openng/optimus-ui/toggleswitch';
 import {FormValidationErrorComponent} from '../form-validation-error/form-validation-error';
-import {NewUnitForm} from './unit-form';
+import {NewUnitForm, UnitMode} from './unit-form';
 
 /** Tracked accessor for a control's touched state (see AbstractControl._touched). */
 type TrackedControl = AbstractControl & {readonly _touched?: () => boolean};
@@ -35,6 +42,7 @@ type TrackedControl = AbstractControl & {readonly _touched?: () => boolean};
   selector: 'app-unit-form-component',
   imports: [
     ReactiveFormsModule,
+    Button,
     InputTextModule,
     Select,
     ToggleSwitch,
@@ -55,11 +63,19 @@ export class UnitFormComponent implements OnInit, ControlValueAccessor {
   streets = input.required<NeighStreetModel[]>();
   unitTypes = input.required<BaseCatalogModel[]>();
   unitRoles = input.required<BaseCatalogModel[]>();
+  searchUnits = input<UnitModel[]>([]);
+  canPickExisting = input<boolean>(false);
   isLoading = input<boolean>(false);
   user = input<UserModel>();
   handledByParent = input<boolean>(false);
 
   doSubmit = output<CreateUnit>();
+
+  protected readonly mode = signal<UnitMode>('create');
+
+  protected setMode(mode: UnitMode): void {
+    this.mode.set(mode);
+  }
 
   protected readonly parentTouched = computed(() => {
     const control = this.ngControl?.control as TrackedControl | null | undefined;
@@ -76,7 +92,15 @@ export class UnitFormComponent implements OnInit, ControlValueAccessor {
     return ctrl.invalid && (ctrl.touched || this.parentTouched());
   });
 
+  protected readonly isUnitIdInvalid = computed(() => {
+    const ctrl = this.form.controls.unitId;
+    return ctrl.invalid && (ctrl.touched || this.parentTouched());
+  });
+
   protected readonly form = new FormGroup<NewUnitForm>({
+    unitId: new FormControl('', {
+      nonNullable: true,
+    }),
     streetId: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required],
@@ -114,14 +138,23 @@ export class UnitFormComponent implements OnInit, ControlValueAccessor {
   formChanges = toSignal(this.form.valueChanges);
   constructor() {
     effect(() => {
+      const {unitId, streetId, unitIdentifier} = this.form.controls;
+      if (this.mode() === 'create') {
+        streetId.setValidators([Validators.required]);
+        unitIdentifier.setValidators([Validators.required]);
+        unitId.clearValidators();
+      } else {
+        streetId.clearValidators();
+        unitIdentifier.clearValidators();
+        unitId.setValidators([Validators.required]);
+      }
+      this.form.updateValueAndValidity();
+    });
+
+    effect(() => {
       const nChanges = this.formChanges();
       if (nChanges) {
-        const payload = nChanges as CreateUnit;
-        const userId = this.user()?.publicId;
-        if (userId) {
-          payload.userId = userId;
-        }
-        this.onChange(payload);
+        this.onChange(this.buildPayload());
       }
     });
   }
@@ -144,17 +177,44 @@ export class UnitFormComponent implements OnInit, ControlValueAccessor {
     );
   }
 
+  private buildPayload(): CreateUnit {
+    const raw = this.form.getRawValue();
+    const userId = this.user()?.publicId;
+    if (this.mode() === 'existing') {
+      return {
+        unitId: raw.unitId,
+        unitRoleId: raw.unitRoleId,
+        isCurrentOccupant: raw.isCurrentOccupant,
+        userId,
+      };
+    }
+    return {
+      streetId: raw.streetId,
+      unitTypeId: raw.unitTypeId,
+      unitIdentifier: raw.unitIdentifier,
+      unitRoleId: raw.unitRoleId,
+      isCurrentOccupant: raw.isCurrentOccupant,
+      userId,
+    };
+  }
+
   protected onSubmit(): void {
     this.form.markAllAsTouched();
     if (this.form.invalid) return;
 
-    const payload = this.form.getRawValue() as CreateUnit;
-    payload.userId = this.user()?.publicId;
-    this.doSubmit.emit(payload);
+    this.doSubmit.emit(this.buildPayload());
   }
 
   writeValue(value: CreateUnit | null): void {
-    if (value) {
+    if (value?.unitId) {
+      this.mode.set('existing');
+      this.form.patchValue({
+        unitId: value.unitId,
+        unitRoleId: value.unitRoleId,
+        isCurrentOccupant: value.isCurrentOccupant ?? true,
+      });
+    } else if (value) {
+      this.mode.set('create');
       this.form.patchValue(value);
     } else {
       this.form.reset({}, {emitEvent: false});

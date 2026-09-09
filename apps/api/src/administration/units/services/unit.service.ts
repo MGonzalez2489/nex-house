@@ -48,9 +48,17 @@ export class UnitService {
     dto: CreateUnitDto,
     currentUserId: number,
   ): Promise<Unit> {
+    const { unitIdentifier, unitTypeId, streetId } = dto;
+
+    if (!unitIdentifier || !unitTypeId || !streetId) {
+      throw new BadRequestException(
+        'Unit creation requires street, unit type and identifier.',
+      );
+    }
+
     // 1. Sanitize input before acquiring heavy database connections
     const sanitizedIdentifier = this.validateAndSanitizeUnitIdentifier(
-      dto.unitIdentifier,
+      unitIdentifier,
     );
 
     // 2. Resolve target unit status name based on initial user assignment presence
@@ -60,11 +68,11 @@ export class UnitService {
 
     // 3. Resolve catalog & relational dependencies in parallel
     const [unitType, userUnitRole, street, unitStatus] = await Promise.all([
-      this.catalogsService.findByPublicId(UnitType, dto.unitTypeId),
+      this.catalogsService.findByPublicId(UnitType, unitTypeId),
       dto.unitRoleId
         ? this.catalogsService.findByPublicId(UserUnitRole, dto.unitRoleId)
         : Promise.resolve(null),
-      this.neighStreetService.findByPublicId(dto.streetId),
+      this.neighStreetService.findByPublicId(streetId),
       this.catalogsService.findByName(UnitStatus, unitStatusEnumValue),
     ]);
 

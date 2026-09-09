@@ -1,14 +1,9 @@
-export interface UpdateUser {
-  //unit
-  unitId?: string;
+import { CreateUnit } from '../units';
 
-  streetId?: string;
-  unitTypeId?: string;
-  unitIdentifier?: string;
+export interface UpdateUser {
   //roles
   userRoleId?: string;
 
-  //TODO: move this to a separated intercae (user to unit = UserUnit)
-  unitRoleId?: string;
-  isCurrentOccupant?: boolean;
+  //unit
+  unit?: CreateUnit;
 }

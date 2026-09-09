@@ -1,28 +1,15 @@
+import { CreateUnitDto } from '@administration/units/dtos';
 import { UpdateUser } from '@nexhouse/shared-domain/interfaces';
-import { IsString, IsOptional } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsOptional, IsString, ValidateNested } from 'class-validator';
 
 export class UpdateUserDto implements UpdateUser {
   @IsString()
   @IsOptional()
-  unitId?: string;
-
-  @IsString()
-  @IsOptional()
-  streetId?: string;
-  @IsString()
-  @IsOptional()
-  unitTypeId?: string;
-  @IsString()
-  @IsOptional()
-  unitIdentifier?: string;
-  //roles
-  @IsString()
-  @IsOptional()
   userRoleId?: string;
-  @IsString()
+
   @IsOptional()
-  unitRoleId?: string;
-  @IsString()
-  @IsOptional()
-  isCurrentOccupant?: boolean;
+  @ValidateNested()
+  @Type(() => CreateUnitDto)
+  unit?: CreateUnitDto;
 }

@@ -113,13 +113,13 @@ export class ResidentService {
       // Handle Unit resolution or creation
       let targetUnit: Unit | null = null;
 
-      if (dto.unitId) {
+      if (dto.unit.unitId) {
         targetUnit = await queryRunner.manager.findOne(Unit, {
-          where: { publicId: dto.unitId },
+          where: { publicId: dto.unit.unitId },
         });
-      } else if (dto.unit?.unitIdentifier) {
+      } else if (dto.unit.unitIdentifier) {
         const street = await queryRunner.manager.findOne(NeighStreet, {
-          where: { publicId: dto.unit?.streetId },
+          where: { publicId: dto.unit.streetId },
         });
 
         if (!street) {
@@ -146,7 +146,7 @@ export class ResidentService {
 
         const newUnit = queryRunner.manager.create(Unit, {
           streetId: street.id,
-          identifier: dto.unit?.unitIdentifier,
+          identifier: dto.unit.unitIdentifier,
           neighborhoodId: neighId,
           typeId: unitType.id,
           statusId: unitStatus.id,
@@ -174,7 +174,7 @@ export class ResidentService {
         userId: savedUser.id,
         createdBy: currentUser.id,
         userUnitRole,
-        isCurrentOccupant: dto.unit?.isCurrentOccupant,
+        isCurrentOccupant: dto.unit.isCurrentOccupant,
       });
 
       await queryRunner.manager.save(assignment);
@@ -321,13 +321,13 @@ export class ResidentService {
       // Handle unit assignment updates if provided
       let targetUnit: Unit | null = null;
 
-      if (dto.unitId) {
+      if (dto.unit?.unitId) {
         targetUnit = await queryRunner.manager.findOne(Unit, {
-          where: { publicId: dto.unitId },
+          where: { publicId: dto.unit.unitId },
         });
-      } else if (dto.unitIdentifier) {
+      } else if (dto.unit?.unitIdentifier) {
         const street = await queryRunner.manager.findOne(NeighStreet, {
-          where: { publicId: dto.streetId },
+          where: { publicId: dto.unit.streetId },
         });
 
         if (!street) {
@@ -339,7 +339,7 @@ export class ResidentService {
         // Create new unit if it does not exist under that identifier
         const newUnit = queryRunner.manager.create(Unit, {
           streetId: street.id,
-          identifier: dto.unitIdentifier,
+          identifier: dto.unit.unitIdentifier,
           neighborhoodId: neighId,
         });
         targetUnit = await queryRunner.manager.save(newUnit);
@@ -349,7 +349,7 @@ export class ResidentService {
       if (targetUnit) {
         const userUnitRole = await this.catalogsService.findByPublicId(
           UserUnitRole,
-          dto.unitRoleId,
+          dto.unit?.unitRoleId,
         );
         if (!userUnitRole) {
           throw new BadRequestException(
@@ -358,7 +358,7 @@ export class ResidentService {
         }
 
         // Deactivate previous active unit allocations if necessary
-        if (dto.isCurrentOccupant) {
+        if (dto.unit?.isCurrentOccupant) {
           await queryRunner.manager.update(
             UserUnit,
             { userId: savedUser.id, isCurrentOccupant: true },
@@ -372,7 +372,7 @@ export class ResidentService {
           userId: savedUser.id,
           createdBy: currentUser.id,
           userUnitRole,
-          isCurrentOccupant: dto.isCurrentOccupant,
+          isCurrentOccupant: dto.unit?.isCurrentOccupant,
         });
 
         await queryRunner.manager.save(assignment);
