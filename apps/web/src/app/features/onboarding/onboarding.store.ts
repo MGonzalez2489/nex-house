@@ -5,23 +5,16 @@ import {
   withCallState,
   withDevtools,
   withReset,
-} from "@ngrx-toolkit/core";
-import { effect, inject } from "@angular/core";
-import { OnboardingStepModel } from "@nexhouse/shared-domain/models";
-import {
-  patchState,
-  signalStore,
-  withHooks,
-  withMethods,
-  withProps,
-  withState,
-} from "@ngrx/signals";
-import { OnboardingService } from "./services/onboarding-service";
-import { lastValueFrom } from "rxjs";
-import { OnboardingStepEnum } from "@nexhouse/shared-domain/enums";
-import { ChangePassword, CreateUnit } from "@nexhouse/shared-domain/interfaces";
-import { UserStore } from "@user/user.store";
-import { AuthStore } from "@auth/store";
+} from '@ngrx-toolkit/core';
+import {effect, inject} from '@angular/core';
+import {OnboardingStepModel} from '@nexhouse/shared-domain/models';
+import {patchState, signalStore, withHooks, withMethods, withProps, withState} from '@ngrx/signals';
+import {OnboardingService} from './services/onboarding-service';
+import {lastValueFrom} from 'rxjs';
+import {OnboardingStepEnum} from '@nexhouse/shared-domain/enums';
+import {ChangePassword, CreateUnit} from '@nexhouse/shared-domain/interfaces';
+import {UserStore} from '@user/user.store';
+import {AuthStore} from '@auth/store';
 
 //TODO: verify if use enum (and in OnboardingStatusResponseModel)
 interface OnboardingState {
@@ -37,8 +30,8 @@ const initialState: OnboardingState = {
 };
 
 export const OnboardingStore = signalStore(
-  { providedIn: "root" },
-  withDevtools("onboarding"),
+  {providedIn: 'root'},
+  withDevtools('onboarding'),
   withReset(),
   withCallState(),
   withState(initialState),
@@ -48,19 +41,21 @@ export const OnboardingStore = signalStore(
   })),
   withMethods((store) => ({
     load: async () => {
-      patchState(store, setLoading());
       try {
+        patchState(store, setLoading());
         const res = await lastValueFrom(store._service.get());
-        patchState(store, { ...res.data }, setLoaded());
+        patchState(store, {...res.data}, setLoaded());
+        return true;
       } catch (error) {
         patchState(store, setError(error));
+        return false;
       }
     },
     changePassword: async (dto: ChangePassword): Promise<boolean> => {
       patchState(store, setLoading());
       try {
         const res = await lastValueFrom(store._service.changePassword(dto));
-        patchState(store, { ...res.data }, setLoaded());
+        patchState(store, {...res.data}, setLoaded());
         return true;
       } catch (err) {
         patchState(store, setError(err));
@@ -71,7 +66,7 @@ export const OnboardingStore = signalStore(
       patchState(store, setLoading());
       try {
         const res = await lastValueFrom(store._service.updateProfile(dto));
-        patchState(store, { ...res.data }, setLoaded());
+        patchState(store, {...res.data}, setLoaded());
         return true;
       } catch (err) {
         patchState(store, setError(err));
@@ -82,7 +77,7 @@ export const OnboardingStore = signalStore(
       patchState(store, setLoading());
       try {
         const res = await lastValueFrom(store._service.createUnit(dto));
-        patchState(store, { ...res.data }, setLoaded());
+        patchState(store, {...res.data}, setLoaded());
         return true;
       } catch (err) {
         patchState(store, setError(err));
@@ -93,7 +88,7 @@ export const OnboardingStore = signalStore(
       patchState(store, setLoading());
       try {
         const res = await lastValueFrom(store._service.complete());
-        patchState(store, { ...res.data });
+        patchState(store, {...res.data});
 
         await store._userStore.loadUser();
 

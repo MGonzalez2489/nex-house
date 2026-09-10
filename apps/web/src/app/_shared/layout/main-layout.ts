@@ -2,7 +2,7 @@ import { NgComponentOutlet } from "@angular/common";
 import {
   ChangeDetectionStrategy,
   Component,
-  effect,
+  computed,
   inject,
   Type,
 } from "@angular/core";
@@ -11,6 +11,8 @@ import { AdminLayout } from "./admin";
 import { ResidentLayout } from "./resident";
 import { RootLayout } from "./root/root-layout/root-layout";
 import { UserStore } from "@user/user.store";
+
+type AppLayout = Type<RootLayout | AdminLayout | ResidentLayout>;
 
 @Component({
   selector: "app-main-layout",
@@ -23,30 +25,22 @@ import { UserStore } from "@user/user.store";
 export class MainLayout {
   protected readonly store = inject(UserStore);
 
-  //
-  protected activeLayout!: Type<any>;
+  protected readonly activeLayout = computed<AppLayout | null>(() => {
+    const role = this.store.role();
 
-  constructor() {
-    effect(() => {
-      const role = this.store.role();
+    if (!role) return null;
 
-      if (!role) return;
-
-      switch (role.name) {
-        case UserRoleEnum.SUPERADMIN:
-          this.activeLayout = RootLayout;
-          break;
-        case UserRoleEnum.ADMIN:
-          this.activeLayout = AdminLayout;
-          break;
-        default: {
-          console.log(
-            `======== LAYOUT UNDEFINED WITH ROLE: ${role?.displayName}`,
-          );
-          this.activeLayout = ResidentLayout;
-          break;
-        }
+    switch (role.name) {
+      case UserRoleEnum.SUPERADMIN:
+        return RootLayout;
+      case UserRoleEnum.ADMIN:
+        return AdminLayout;
+      default: {
+        console.log(
+          `======== LAYOUT UNDEFINED WITH ROLE: ${role?.displayName}`,
+        );
+        return ResidentLayout;
       }
-    });
-  }
+    }
+  });
 }

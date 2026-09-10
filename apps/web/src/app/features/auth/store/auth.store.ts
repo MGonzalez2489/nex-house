@@ -1,3 +1,6 @@
+import {computed, inject} from '@angular/core';
+import {APP_CONSTANTS} from '@core/constants';
+import {SessionModel} from '@nexhouse/shared-domain/models';
 import {
   setError,
   setLoaded,
@@ -5,12 +8,9 @@ import {
   withCallState,
   withDevtools,
   withReset,
-} from "@ngrx-toolkit/core";
-import { computed, inject } from "@angular/core";
-import { APP_CONSTANTS } from "@core/constants";
-import { SessionModel } from "@nexhouse/shared-domain/models";
+} from '@ngrx-toolkit/core';
 
-import { Login } from "@nexhouse/shared-domain/interfaces";
+import {Login} from '@nexhouse/shared-domain/interfaces';
 import {
   patchState,
   signalStore,
@@ -18,19 +18,17 @@ import {
   withMethods,
   withProps,
   withState,
-} from "@ngrx/signals";
-import { lastValueFrom } from "rxjs";
-import { AuthService } from "../services";
+} from '@ngrx/signals';
+import {lastValueFrom} from 'rxjs';
+import {AuthService} from '../services';
 
 interface AuthState {
-  // user: UserModel | undefined;
   token: string | null;
   recoveryToken: string | undefined;
   exp: number;
 }
 
 const initialState: AuthState = {
-  // user: undefined,
   token: localStorage.getItem(APP_CONSTANTS.TOKEN_STORAGE_KEY),
   recoveryToken: undefined,
   exp: (() => {
@@ -41,18 +39,18 @@ const initialState: AuthState = {
 };
 
 export const AuthStore = signalStore(
-  { providedIn: "root" },
+  {providedIn: 'root'},
   withState(initialState),
-  withDevtools("auth"),
+  withDevtools('auth'),
   withReset(),
   withCallState(),
   withProps(() => ({
     _authService: inject(AuthService),
   })),
-  withComputed(({ token }) => ({
+  withComputed(({token}) => ({
     isAuthenticated: computed(() => !!token()),
   })),
-withMethods((store) => ({
+  withMethods((store) => ({
     loadSession: (newSession: SessionModel) => {
       localStorage.setItem(APP_CONSTANTS.TOKEN_STORAGE_KEY, newSession.token);
       localStorage.setItem(APP_CONSTANTS.TOKEN_EXP, newSession.exp.toString());
@@ -61,50 +59,37 @@ withMethods((store) => ({
         exp: newSession.exp,
       });
     },
-    finishLogin: () => {
-      patchState(store, setLoaded());
-    },
   })),
   withMethods((store) => ({
     clearSession: () => {
       localStorage.clear();
       store.resetState();
-      patchState(store, { token: null, exp: 0 });
+      patchState(store, {token: null, exp: 0});
     },
   })),
   withMethods((store) => {
     return {
       login: async (dto: Login): Promise<boolean> => {
-        patchState(store, setLoading());
         try {
+          patchState(store, setLoading());
           const res = await lastValueFrom(store._authService.login(dto));
           store.loadSession(res.data);
+          patchState(store, setLoaded());
           return true;
         } catch (error) {
-          console.log("error", error);
+          console.log('error', error);
           patchState(store, setError(error));
           return false;
         }
       },
-      // restoreSession: async (): Promise<UserModel | null> => {
-      //   patchState(store, setLoading());
-      //   try {
-      //     const res = await lastValueFrom(store._authService.me());
-      //
-      //     patchState(store, { user: res.data }, setLoaded());
-      //     return res.data;
-      //   } catch (error) {
-      //     patchState(store, setError(error));
-      //     return null;
-      //   }
-      // },
+
       logout: async () => {
         patchState(store, setLoading());
         try {
           // await lastValueFrom(store._authService.logout());
           store.clearSession();
         } catch (error) {
-          console.log("error", error);
+          console.log('error', error);
           patchState(store, setError(error));
           return undefined;
         }

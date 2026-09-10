@@ -1,77 +1,69 @@
-import { Route } from "@angular/router";
-import { AuthGuard } from "@auth/guards";
-import { AccessGuard, onboardingRequiredGuard } from "@core/guards";
-import { DASHBOARD_ROUTES_ENUM } from "@dashboard/index";
-import { UserRoleEnum } from "@nexhouse/shared-domain/enums";
-import { MainLayout } from "@shared/layout";
-import { UNIT_ROUTES_ENUM } from "@units/units.routes";
-import { USER_ROUTES_ENUM } from "@user/user.routes";
-import { NEIGHBORHOOD_ROUTES_ENUM } from "./features/neighborhoods";
-import { ONBOARDING_ROUTES_ENUM } from "./features/onboarding";
-import { RESIDENT_ROUTES_ENUM } from "./features/residents";
-import { PAGES_ROUTES_ENUM, UnauthorizedPage } from "./pages";
+import {Route} from '@angular/router';
+import {AuthGuard} from '@auth/guards';
+import {AccessGuard} from '@core/guards';
+import {ShellResolver} from '@core/resolvers';
+import {DASHBOARD_ROUTES_ENUM} from '@dashboard/index';
+import {UserRoleEnum} from '@nexhouse/shared-domain/enums';
+import {MainLayout} from '@shared/layout';
+import {UNIT_ROUTES_ENUM} from '@units/units.routes';
+import {USER_ROUTES_ENUM} from '@user/user.routes';
+import {NEIGHBORHOOD_ROUTES_ENUM} from './features/neighborhoods';
+import {ONBOARDING_ROUTES_ENUM} from './features/onboarding';
+import {RESIDENT_ROUTES_ENUM} from './features/residents';
+import {PAGES_ROUTES_ENUM, UnauthorizedPage} from './pages';
 
 export const appRoutes: Route[] = [
   //public routes
   {
-    path: "auth",
-    loadChildren: () =>
-      import("./features/auth/auth.routes").then((m) => m.AUTH_ROUTES),
+    path: 'auth',
+    loadChildren: () => import('./features/auth/auth.routes').then((m) => m.AUTH_ROUTES),
   },
   //private routes
   {
-    path: "",
+    path: '',
     component: MainLayout,
-    canActivate: [AuthGuard, onboardingRequiredGuard],
+    // canActivate: [AuthGuard, onboardingRequiredGuard],
+    canActivate: [AuthGuard],
+    resolve: {shell: ShellResolver},
     children: [
-      { path: "", redirectTo: "dashboard", pathMatch: "full" },
+      {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
       {
         path: ONBOARDING_ROUTES_ENUM.HOME,
-        canActivate: [onboardingRequiredGuard],
+        // canActivate: [onboardingRequiredGuard],
         loadChildren: () =>
-          import("./features/onboarding/onboarding.routes").then(
-            (m) => m.ONBOARDING_ROUTES,
-          ),
+          import('./features/onboarding/onboarding.routes').then((m) => m.ONBOARDING_ROUTES),
       },
       {
         path: DASHBOARD_ROUTES_ENUM.HOME,
         loadChildren: () =>
-          import("./features/dashboard/dashboard.routes").then(
-            (m) => m.DASHBOARD_ROUTES,
-          ),
+          import('./features/dashboard/dashboard.routes').then((m) => m.DASHBOARD_ROUTES),
       },
       {
         path: NEIGHBORHOOD_ROUTES_ENUM.HOME,
         canActivate: [AccessGuard([UserRoleEnum.SUPERADMIN])],
         loadChildren: () =>
-          import("./features/neighborhoods/neighborhood.routes").then(
-            (m) => m.NEIGHBORHOOD_ROUTES,
-          ),
+          import('./features/neighborhoods/neighborhood.routes').then((m) => m.NEIGHBORHOOD_ROUTES),
       },
       {
         path: RESIDENT_ROUTES_ENUM.HOME,
         canActivate: [AccessGuard([UserRoleEnum.ADMIN])],
         loadChildren: () =>
-          import("./features/residents/resident.routes").then(
-            (m) => m.RESIDENT_ROUTES,
-          ),
+          import('./features/residents/resident.routes').then((m) => m.RESIDENT_ROUTES),
       },
       {
         path: UNIT_ROUTES_ENUM.HOME,
         canActivate: [AccessGuard([UserRoleEnum.ADMIN])],
-        loadChildren: () =>
-          import("./features/units/units.routes").then((m) => m.UNIT_ROUTES),
+        loadChildren: () => import('./features/units/units.routes').then((m) => m.UNIT_ROUTES),
       },
       {
         path: USER_ROUTES_ENUM.HOME,
-        loadChildren: () =>
-          import("./features/user/user.routes").then((m) => m.USER_ROUTES),
+        loadChildren: () => import('./features/user/user.routes').then((m) => m.USER_ROUTES),
       },
     ],
   },
-  { path: PAGES_ROUTES_ENUM.UNAUTHORIZED, component: UnauthorizedPage },
+  {path: PAGES_ROUTES_ENUM.UNAUTHORIZED, component: UnauthorizedPage},
   {
-    path: "**",
-    redirectTo: "/auth/login",
+    path: '**',
+    redirectTo: '/auth/login',
   },
 ];

@@ -1,11 +1,9 @@
-import { inject } from "@angular/core";
-import { toObservable } from "@angular/core/rxjs-interop";
-import { CanActivateFn, Router } from "@angular/router";
-import { DASHBOARD_ROUTES_ENUM } from "@dashboard/dashboard.routes";
-import { UserStatusEnum } from "@nexhouse/shared-domain/enums";
-import { UserStore } from "@user/user.store";
-import { filter, map, take } from "rxjs";
-import { ONBOARDING_ROUTES_ENUM } from "../../features/onboarding";
+import {inject} from '@angular/core';
+import {CanActivateFn, Router} from '@angular/router';
+import {DASHBOARD_ROUTES_ENUM} from '@dashboard/dashboard.routes';
+import {UserStatusEnum} from '@nexhouse/shared-domain/enums';
+import {UserStore} from '@user/user.store';
+import {ONBOARDING_ROUTES_ENUM} from '../../features/onboarding';
 
 export const onboardingRequiredGuard: CanActivateFn = (route, state) => {
   const profileStore = inject(UserStore);
@@ -13,30 +11,45 @@ export const onboardingRequiredGuard: CanActivateFn = (route, state) => {
   const onboardingRoute = `/${ONBOARDING_ROUTES_ENUM.HOME}`;
   const dashboardRoute = `/${DASHBOARD_ROUTES_ENUM.HOME}`;
 
-  return toObservable(profileStore.loaded).pipe(
-    filter((loaded) => loaded),
-    take(1),
-    map(() => {
-      const status = profileStore.status();
-      if (!status) return false;
+  const status = profileStore.status();
+  if (!status) return false;
 
-      //if pending and not going to onboarding -> redirect to onboarding
-      if (
-        status.name === UserStatusEnum.PENDING_ONBOARDING &&
-        !state.url.includes(onboardingRoute)
-      ) {
-        return router.createUrlTree([onboardingRoute]);
-      }
+  //if pending and not going to onboarding -> redirect to onboarding
+  if (status.name === UserStatusEnum.PENDING_ONBOARDING && !state.url.includes(onboardingRoute)) {
+    return router.createUrlTree([onboardingRoute]);
+  }
 
-      //if not pending and going to onboarding -> redirect to dashboard
-      if (
-        status.name === UserStatusEnum.ACTIVE &&
-        state.url.includes(onboardingRoute)
-      ) {
-        return router.createUrlTree([dashboardRoute]);
-      }
+  //if not pending and going to onboarding -> redirect to dashboard
+  if (status.name === UserStatusEnum.ACTIVE && state.url.includes(onboardingRoute)) {
+    return router.createUrlTree([dashboardRoute]);
+  }
 
-      return true;
-    }),
-  );
+  return true;
+
+  // return toObservable(profileStore.loaded).pipe(
+  //   filter((loaded) => loaded),
+  //   take(1),
+  //   map(() => {
+  //     const status = profileStore.status();
+  //     if (!status) return false;
+  //
+  //     //if pending and not going to onboarding -> redirect to onboarding
+  //     if (
+  //       status.name === UserStatusEnum.PENDING_ONBOARDING &&
+  //       !state.url.includes(onboardingRoute)
+  //     ) {
+  //       return router.createUrlTree([onboardingRoute]);
+  //     }
+  //
+  //     //if not pending and going to onboarding -> redirect to dashboard
+  //     if (
+  //       status.name === UserStatusEnum.ACTIVE &&
+  //       state.url.includes(onboardingRoute)
+  //     ) {
+  //       return router.createUrlTree([dashboardRoute]);
+  //     }
+  //
+  //     return true;
+  //   }),
+  // );
 };

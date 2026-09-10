@@ -1,27 +1,23 @@
-import { withDevtools, withReset } from "@ngrx-toolkit/core";
-import { effect, inject } from "@angular/core";
-import { AuthStore } from "@auth/store";
+import {withDevtools, withReset} from '@ngrx-toolkit/core';
+import {computed, effect, inject} from '@angular/core';
+import {AuthStore} from '@auth/store';
 import {
   patchState,
   signalStore,
+  withComputed,
   withHooks,
   withMethods,
   withProps,
   withState,
-} from "@ngrx/signals";
-import { UserRoleEnum, UserStatusEnum } from "@nexhouse/shared-domain/enums";
-import { ContextStore } from "./context.store";
-import { CatalogsStore } from "./catalogs.store";
-import { UnitStore } from "@units/units.store";
-import { UserStore } from "../features/user/user.store";
-import { OnboardingStore } from "@onboarding/onboarding.store";
+} from '@ngrx/signals';
+import {UserRoleEnum, UserStatusEnum} from '@nexhouse/shared-domain/enums';
+import {ContextStore} from './context.store';
+import {CatalogsStore} from './catalogs.store';
+import {UnitStore} from '@units/units.store';
+import {UserStore} from '../features/user/user.store';
+import {OnboardingStore} from '@onboarding/onboarding.store';
 
-export type StartupStatus =
-  | "IDLE"
-  | "LOADING"
-  | "READY"
-  | "ERROR"
-  | "UNAUTHENTICATED";
+export type StartupStatus = 'IDLE' | 'LOADING' | 'READY' | 'ERROR' | 'UNAUTHENTICATED';
 
 export interface StartupState {
   status: StartupStatus;
@@ -29,8 +25,8 @@ export interface StartupState {
 }
 
 export const StartupStore = signalStore(
-  { providedIn: "root" },
-  withDevtools("startup"),
+  {providedIn: 'root'},
+  withDevtools('startup'),
   withReset(),
   withProps(() => ({
     _authStore: inject(AuthStore),
@@ -40,19 +36,23 @@ export const StartupStore = signalStore(
     _unitStore: inject(UnitStore),
     _onboardingStore: inject(OnboardingStore),
   })),
+
   withState<StartupState>({
-    status: "IDLE",
+    status: 'IDLE',
     error: null,
   }),
+  withComputed((store) => ({
+    isReady: computed(() => store.status() === 'READY'),
+  })),
   withMethods((store) => ({
     _setReady() {
-      patchState(store, { status: "READY", error: null });
+      patchState(store, {status: 'READY', error: null});
     },
   })),
   withMethods((store) => ({
     async _initRoot() {
       await store._catalogsStore.loadRootCatalogs();
-      console.log("load all related to root");
+      console.log('load all related to root');
     },
     async _initAdmin() {
       await Promise.all([
@@ -62,12 +62,10 @@ export const StartupStore = signalStore(
 
       const requests = [
         store._catalogsStore.loadCatalogs(),
-        store._unitStore.loadAll({ showAll: true }),
+        store._unitStore.loadAll({showAll: true}),
       ];
 
-      if (
-        store._userStore.status()?.name === UserStatusEnum.PENDING_ONBOARDING
-      ) {
+      if (store._userStore.status()?.name === UserStatusEnum.PENDING_ONBOARDING) {
         requests.push(store._onboardingStore.load());
       }
 
@@ -77,44 +75,51 @@ export const StartupStore = signalStore(
   })),
 
   withMethods((store) => ({
+    armLoading() {
+      if (store.status() === 'LOADING' || store.status() === 'READY') {
+        return;
+      }
+      if (!store._authStore.token()) {
+        return;
+      }
+
+      patchState(store, {status: 'LOADING', error: null});
+    },
     async initializeApp() {
       if (!store._authStore.token()) {
         return;
       }
 
-      patchState(store, { status: "LOADING" });
+      patchState(store, {status: 'LOADING', error: null});
 
       try {
-        await Promise.all([
-          store._userStore.loadUser(),
-          store._userStore.loadProfile(),
-        ]);
+        await Promise.all([store._userStore.loadUser(), store._userStore.loadProfile()]);
 
         const user = store._userStore.user();
         const role = store._userStore.role();
 
         if (!user || !role) {
-          patchState(store, { status: "UNAUTHENTICATED" });
+          patchState(store, {status: 'UNAUTHENTICATED'});
           store._authStore.logout();
           return;
         }
 
         if (role.name === UserRoleEnum.SUPERADMIN) {
-          console.log("=== INIT ROOT ===");
+          console.log('=== INIT ROOT ===');
           await store._initRoot();
         } else if (role.name === UserRoleEnum.ADMIN) {
-          console.log("=== INIT ADMIN ===");
+          console.log('=== INIT ADMIN ===');
           await store._initAdmin();
         } else {
-          console.log("=== INIT RESIDENT ===");
+          console.log('=== INIT RESIDENT ===');
         }
 
         store._setReady();
       } catch (err) {
-        console.error("== APP INITIALIZATION FAILED ==", err);
+        console.error('== APP INITIALIZATION FAILED ==', err);
         patchState(store, {
-          status: "ERROR",
-          error: "No se pudo cargar la configuración inicial",
+          status: 'ERROR',
+          error: 'No se pudo cargar la configuración inicial',
         });
       }
     },

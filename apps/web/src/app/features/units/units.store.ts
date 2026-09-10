@@ -5,13 +5,9 @@ import {
   setError,
   setLoaded,
   setLoading,
-} from "@ngrx-toolkit/core";
-import {
-  ApiPaginationMeta,
-  Search,
-  UnitStats,
-} from "@nexhouse/shared-domain/interfaces";
-import { UnitModel } from "@nexhouse/shared-domain/models";
+} from '@ngrx-toolkit/core';
+import {ApiPaginationMeta, Search, UnitStats} from '@nexhouse/shared-domain/interfaces';
+import {UnitModel} from '@nexhouse/shared-domain/models';
 import {
   patchState,
   signalStore,
@@ -20,19 +16,15 @@ import {
   withMethods,
   withProps,
   withState,
-} from "@ngrx/signals";
-import {
-  entityConfig,
-  setAllEntities,
-  withEntities,
-} from "@ngrx/signals/entities";
-import { UnitService } from "./services";
-import { effect, inject } from "@angular/core";
-import { tapResponse } from "@ngrx/operators";
-import { rxMethod } from "@ngrx/signals/rxjs-interop";
-import { ContextStore } from "@stores/context.store";
-import { pipe, tap, switchMap, lastValueFrom } from "rxjs";
-import { AuthStore } from "@auth/store";
+} from '@ngrx/signals';
+import {entityConfig, setAllEntities, withEntities} from '@ngrx/signals/entities';
+import {UnitService} from './services';
+import {effect, inject} from '@angular/core';
+import {tapResponse} from '@ngrx/operators';
+import {rxMethod} from '@ngrx/signals/rxjs-interop';
+import {ContextStore} from '@stores/context.store';
+import {pipe, tap, switchMap, lastValueFrom} from 'rxjs';
+import {AuthStore} from '@auth/store';
 
 const config = entityConfig({
   entity: type<UnitModel>(),
@@ -49,8 +41,8 @@ const initialState: UnitState = {
 };
 
 export const UnitStore = signalStore(
-  { providedIn: "root" },
-  withDevtools("units"),
+  {providedIn: 'root'},
+  withDevtools('units'),
   withReset(),
   withEntities(config),
   withCallState(),
@@ -66,17 +58,17 @@ export const UnitStore = signalStore(
 
       patchState(store, setLoading());
       try {
-        const response = await lastValueFrom(
-          store._service.getAll(nId.publicId, params),
-        );
+        const response = await lastValueFrom(store._service.getAll(nId.publicId, params));
         patchState(
           store,
           setAllEntities(response.data, config),
-          { pagination: response.meta },
+          {pagination: response.meta},
           setLoaded(),
         );
+        return true;
       } catch (err) {
         patchState(store, setError(err));
+        return false;
       }
     },
 

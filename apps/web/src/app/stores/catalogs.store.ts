@@ -1,3 +1,7 @@
+import {effect, inject} from '@angular/core';
+import {AuthStore} from '@auth/store';
+import {CatalogsService} from '@core/services';
+import {BaseCatalogModel} from '@nexhouse/shared-domain/models';
 import {
   setError,
   setLoaded,
@@ -5,20 +9,9 @@ import {
   withCallState,
   withDevtools,
   withReset,
-} from "@ngrx-toolkit/core";
-import { effect, inject } from "@angular/core";
-import { CatalogsService } from "@core/services";
-import { BaseCatalogModel } from "@nexhouse/shared-domain/models";
-import {
-  patchState,
-  signalStore,
-  withHooks,
-  withMethods,
-  withProps,
-  withState,
-} from "@ngrx/signals";
-import { firstValueFrom, lastValueFrom } from "rxjs";
-import { AuthStore } from "@auth/store";
+} from '@ngrx-toolkit/core';
+import {patchState, signalStore, withHooks, withMethods, withProps, withState} from '@ngrx/signals';
+import {firstValueFrom, lastValueFrom} from 'rxjs';
 
 export interface CatalogsState {
   UserRoles: BaseCatalogModel[];
@@ -42,8 +35,8 @@ export interface CatalogsState {
 }
 
 export const CatalogsStore = signalStore(
-  { providedIn: "root" },
-  withDevtools("catalogs"),
+  {providedIn: 'root'},
+  withDevtools('catalogs'),
   withCallState(),
   withReset(),
   withState<CatalogsState>({
@@ -71,16 +64,16 @@ export const CatalogsStore = signalStore(
       patchState(store, setLoading());
       try {
         const c = await lastValueFrom(store._service.getCountries());
-        const mex = c.data.find((f) => f.name == "mexico");
+        const mex = c.data.find((f) => f.name == 'mexico');
         if (!mex) {
-          console.log("no hay mexico");
-          throw "no hay mexico";
+          console.log('no hay mexico');
+          throw 'no hay mexico';
         }
         const s = await lastValueFrom(store._service.getStates(mex.publicId));
-        const chi = s.data.find((f) => f.name === "chihuahua");
+        const chi = s.data.find((f) => f.name === 'chihuahua');
         if (!chi) {
-          console.log("no hay chihuahua");
-          throw "no hay chihuahua";
+          console.log('no hay chihuahua');
+          throw 'no hay chihuahua';
         }
 
         const cit = await lastValueFrom(store._service.getCities(chi.publicId));
@@ -140,8 +133,10 @@ export const CatalogsStore = signalStore(
           ChargeStatus: chargeStatusResponse.data,
         });
         patchState(store, setLoaded());
+        return true;
       } catch (e) {
         patchState(store, setError(e));
+        return false;
       }
     },
   })),

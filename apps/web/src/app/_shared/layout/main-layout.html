@@ -1,7 +1,3 @@
-@if (activeLayout) {
-  <ng-container *ngComponentOutlet="activeLayout" />
-} @else {
-  <div class="h-screen w-screen flex items-center justify-center">
-    <p class="text-2xl text-gray-400">Cargando interfaz ...</p>
-  </div>
+@if (activeLayout(); as layout) {
+  <ng-container *ngComponentOutlet="layout" />
 }
