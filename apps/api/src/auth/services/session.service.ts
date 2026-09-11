@@ -84,7 +84,8 @@ export class SessionService {
       },
     );
 
-    // 3. Performance Optimization: Compute expiration timestamp mathematically instead of executing decoding overhead
+    // 3. Performance Optimization: Compute expiration timestamp mathematically instead
+    // of executing decoding overhead
     const accessTokenExpInSeconds = Math.floor(
       (nowInMs + 15 * 60 * 1000) / 1000,
     );

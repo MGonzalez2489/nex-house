@@ -1,11 +1,7 @@
 <div>
   <div class="text-center mb-8">
-    <h2 class="text-2xl font-bold text-slate-800 tracking-tight">
-      Bienvenido de vuelta
-    </h2>
-    <p class="text-slate-500 text-sm mt-2">
-      Gestiona tu fraccionamiento de forma inteligente
-    </p>
+    <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Bienvenido de vuelta</h2>
+    <p class="text-slate-500 text-sm mt-2">Gestiona tu fraccionamiento de forma inteligente</p>
   </div>
 
   <form [formGroup]="form" (ngSubmit)="doSubmit()" class="space-y-6">
@@ -21,13 +17,9 @@
           placeholder="nombre@ejemplo.com"
           fluid
           [invalid]="form.controls.email.invalid && form.controls.email.touched"
-          [attr.aria-invalid]="
-            form.controls.email.invalid && form.controls.email.touched
-          "
+          [attr.aria-invalid]="form.controls.email.invalid && form.controls.email.touched"
           [attr.aria-describedby]="
-            form.controls.email.touched && form.controls.email.errors
-              ? 'email-error'
-              : null
+            form.controls.email.touched && form.controls.email.errors ? 'email-error' : null
           "
         />
       </p-iconfield>
@@ -43,7 +35,7 @@
       <div class="flex justify-between items-center ml-1">
         <label for="password" class="form-label">Contraseña</label>
         <a
-          [routerLink]="['/auth/password-recovery']"
+          [routerLink]="['/auth/recovery-request']"
           class="text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
         >
           ¿Olvidaste tu contraseña?
@@ -57,16 +49,10 @@
         placeholder="••••••••"
         fluid
         autocomplete="off"
-        [invalid]="
-          form.controls.password.invalid && form.controls.password.touched
-        "
-        [attr.aria-invalid]="
-          form.controls.password.invalid && form.controls.password.touched
-        "
+        [invalid]="form.controls.password.invalid && form.controls.password.touched"
+        [attr.aria-invalid]="form.controls.password.invalid && form.controls.password.touched"
         [attr.aria-describedby]="
-          form.controls.password.touched && form.controls.password.errors
-            ? 'password-error'
-            : null
+          form.controls.password.touched && form.controls.password.errors ? 'password-error' : null
         "
       ></p-password>
       <app-form-validation-error
@@ -79,9 +65,7 @@
 
     <div class="flex items-center gap-2 ml-1">
       <p-checkbox [binary]="true" inputId="remember"></p-checkbox>
-      <label for="remember" class="text-sm text-slate-600 cursor-pointer"
-        >Recordar mi sesión</label
-      >
+      <label for="remember" class="text-sm text-slate-600 cursor-pointer">Recordar mi sesión</label>
     </div>
 
     <app-form-options
@@ -96,9 +80,7 @@
   <div class="mt-8 pt-6 border-t border-slate-50 text-center">
     <p class="text-sm text-slate-500">
       ¿Problemas con tu acceso?
-      <a
-        href="mailto:soporte@nexhouse.com"
-        class="font-semibold text-slate-700 hover:underline"
+      <a href="mailto:soporte@nexhouse.com" class="font-semibold text-slate-700 hover:underline"
         >Contacta a soporte</a
       >
     </p>

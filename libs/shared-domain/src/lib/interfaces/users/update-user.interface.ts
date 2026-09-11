@@ -6,4 +6,9 @@ export interface UpdateUser {
 
   //unit
   unit?: CreateUnit;
+
+  //internal
+  recoveryCode?: string;
+  recoveryCodeExpiration?: string;
+  recoveryToken?: string;
 }

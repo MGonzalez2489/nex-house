@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Get,
   HttpCode,
   HttpStatus,
   Headers as NestHeaders,
@@ -15,9 +14,7 @@ import { SessionModel } from '@nexhouse/shared-domain/models';
 import { LoginDto } from '../dtos';
 import { AuthService } from '../services';
 
-import { User } from '@core/database';
-import { CurrentUser, Public } from '@core/decorators';
-import { UserToModelMapper } from '@core/mappers';
+import { Public } from '@core/decorators';
 import {
   Request as ExpressRequest,
   Response as ExpressResponse,
@@ -43,19 +40,20 @@ export class AuthController {
 
     const session = await this.authService.login(loginDto, userAgent, ip);
 
-    this.createCookie(response, session.refreshToken);
+    this.authService.createCookie(response, session.refreshToken);
 
     return session;
   }
 
-  @Get('me')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'User identity' })
-  async me(@CurrentUser() user: User) {
-    const response = await this.authService.getFreshProfileUser(user);
-
-    return UserToModelMapper(response);
-  }
+  //TODO: review this to remove
+  // @Get('me')
+  // @HttpCode(HttpStatus.OK)
+  // @ApiOperation({ summary: 'User identity' })
+  // async me(@CurrentUser() user: User) {
+  //   const response = await this.authService.getFreshProfileUser(user);
+  //
+  //   return UserToModelMapper(response);
+  // }
 
   @Public()
   @Post('refresh')
@@ -74,7 +72,7 @@ export class AuthController {
     const { refreshToken, ...sessionData } =
       await this.authService.refreshAuthentication(oldToken, userAgent);
 
-    this.createCookie(response, refreshToken);
+    this.authService.createCookie(response, refreshToken);
 
     return sessionData;
   }
@@ -101,15 +99,5 @@ export class AuthController {
     });
 
     return { message: 'Logged out successfully' };
-  }
-
-  private createCookie(response: ExpressResponse, refreshToken: string) {
-    response.cookie('refresh_token', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      path: '/',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
   }
 }

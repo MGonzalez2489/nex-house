@@ -60,6 +60,14 @@ export class User extends BaseTraceableEntity {
   @OneToMany(() => UserUnit, (units) => units.user)
   userUnits: UserUnit[];
 
+  //password recovery
+  @Column({ nullable: true })
+  recoveryCode: string;
+  @Column({ nullable: true })
+  recoveryCodeExpiration: string;
+  @Column({ nullable: true })
+  recoveryToken: string;
+
   // ==========================================
   // Audit
   // ==========================================

@@ -24,18 +24,21 @@ import {AuthService} from '../services';
 
 interface AuthState {
   token: string | null;
-  recoveryToken: string | undefined;
   exp: number;
+  //pwd recovery
+  recoveryCode: string | undefined;
+  resetPwdToken: string | null;
 }
 
 const initialState: AuthState = {
   token: localStorage.getItem(APP_CONSTANTS.TOKEN_STORAGE_KEY),
-  recoveryToken: undefined,
   exp: (() => {
     const cExp = localStorage.getItem(APP_CONSTANTS.TOKEN_EXP);
     if (!cExp) return 0;
     return Number(cExp);
   })(),
+  recoveryCode: undefined,
+  resetPwdToken: localStorage.getItem(APP_CONSTANTS.TOKEN_RESET_PWD),
 };
 
 export const AuthStore = signalStore(
@@ -77,12 +80,10 @@ export const AuthStore = signalStore(
           patchState(store, setLoaded());
           return true;
         } catch (error) {
-          console.log('error', error);
           patchState(store, setError(error));
           return false;
         }
       },
-
       logout: async () => {
         patchState(store, setLoading());
         try {
@@ -92,6 +93,54 @@ export const AuthStore = signalStore(
           console.log('error', error);
           patchState(store, setError(error));
           return undefined;
+        }
+      },
+    };
+  }),
+  withMethods((store) => {
+    return {
+      pwdRecoveryRequest: async (email: string) => {
+        try {
+          patchState(store, setLoading());
+          const res = await lastValueFrom(store._authService.recoveryRequest(email));
+          patchState(store, {recoveryCode: res.data.code}, setLoaded());
+          return true;
+        } catch (error) {
+          patchState(store, setError(error));
+          return false;
+        }
+      },
+      codeValidation: async (code: string) => {
+        try {
+          patchState(store, setLoading());
+          const res = await lastValueFrom(store._authService.codeValidation(code));
+          patchState(store, {resetPwdToken: res.data.token}, setLoaded());
+          localStorage.setItem(APP_CONSTANTS.TOKEN_RESET_PWD, res.data.token);
+
+          return true;
+        } catch (error) {
+          patchState(store, setError(error));
+          return false;
+        }
+      },
+      resetPwd: async (pwd: string) => {
+        try {
+          patchState(store, setLoading());
+          const res = await lastValueFrom(store._authService.resetPwd(pwd));
+          localStorage.removeItem(APP_CONSTANTS.TOKEN_RESET_PWD);
+          store.loadSession(res.data);
+          patchState(
+            store,
+            {
+              resetPwdToken: undefined,
+              recoveryCode: undefined,
+            },
+            setLoaded(),
+          );
+          return true;
+        } catch (error) {
+          patchState(store, setError(error));
+          return false;
         }
       },
     };

@@ -407,6 +407,7 @@ export class ResidentService {
 
   /**
    * Changes the password for a specific user.
+   * Used in the boarding process
    *
    * @param publicId The public ID of the user to update.
    * @param oldPassword The user's current password.

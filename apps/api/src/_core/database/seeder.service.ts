@@ -33,9 +33,9 @@ import {
   UserUnitRoleSeed,
 } from './seeds';
 import {
+  ChihuahuaCitiesSeed,
   CountrySeed,
   StateSeed,
-  ChihuahuaCitiesSeed,
 } from './seeds/location.seed';
 
 type CatalogRegistry = {

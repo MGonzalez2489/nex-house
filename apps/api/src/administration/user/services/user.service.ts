@@ -3,6 +3,7 @@ import {
   Unit,
   User,
   UserRole,
+  UserStatus,
   UserUnit,
   UserUnitRole,
 } from '@core/database';
@@ -17,9 +18,10 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CatalogsService } from 'src/catalogs/services';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, IsNull, Repository } from 'typeorm';
 import { UpdateUserDto } from '../dtos';
 import { UserSearchService } from './user-search.service';
+import { UserStatusEnum } from '@nexhouse/shared-domain/enums';
 
 @Injectable()
 export class UserService {
@@ -53,7 +55,7 @@ export class UserService {
     //   UserStatusEnum.ACTIVE,
     // );
     const existingUser = await this.repository.findOne({
-      where: { publicId: userPublicId, neighborhoodId: neighId },
+      where: { publicId: userPublicId, neighborhoodId: neighId ?? IsNull() },
       relations: { role: true, status: true },
     });
 
@@ -73,19 +75,34 @@ export class UserService {
       updatedRole = role;
     }
 
+    //pass recovery validations
+    if (dto.recoveryCode && !dto.recoveryCodeExpiration) {
+      throw new InternalServerErrorException(
+        'No expiration date provided for recovery code.',
+      );
+    } else if (!dto.recoveryCode && dto.recoveryCodeExpiration) {
+      throw new InternalServerErrorException(
+        'No recovery code for expiration date.',
+      );
+    } else {
+      const recoveryStatus = await this.catalogsService.findByName(
+        UserStatus,
+        UserStatusEnum.PASSWORD_RECOVERY,
+      );
+      existingUser.recoveryCode = dto.recoveryCode;
+      existingUser.recoveryCodeExpiration = dto.recoveryCodeExpiration;
+      existingUser.status = recoveryStatus;
+    }
+    if (dto.recoveryToken) {
+      existingUser.recoveryToken = dto.recoveryToken;
+    }
+
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      //TODO: move this to profile
-      // if (dto.firstName) existingUser.firstName = dto.firstName.trim();
-      // if (dto.lastName) existingUser.lastName = dto.lastName.trim();
       if (updatedRole) existingUser.role = updatedRole;
-
-      // if (existingUser.statusId !== activeUserStatus.id) {
-      //   existingUser.status = activeUserStatus;
-      // }
 
       const savedUser = await queryRunner.manager.save(User, existingUser);
 
@@ -152,7 +169,7 @@ export class UserService {
       await queryRunner.commitTransaction();
       return await this.searchService.findByPublicId(
         savedUser.publicId,
-        savedUser.neighborhoodId,
+        savedUser.neighborhoodId || undefined,
         {
           status: true,
           role: true,
@@ -233,6 +250,21 @@ export class UserService {
 
     this.logger.log(`Password for user '${publicId}' successfully changed.`);
     return true;
+  }
+
+  async updatePasswordOnRecoveryProcess(id: number, newPwd: string) {
+    const [hashedPwd, activeStatus] = await Promise.all([
+      this.cryptoService.hash(newPwd),
+      this.catalogsService.findByName(UserStatus, UserStatusEnum.ACTIVE),
+    ]);
+
+    this.repository.update(id, {
+      password: hashedPwd,
+      statusId: activeStatus.id,
+      recoveryCode: null,
+      recoveryCodeExpiration: null,
+      recoveryToken: null,
+    });
   }
 
   async restorePwd(userId: number) {

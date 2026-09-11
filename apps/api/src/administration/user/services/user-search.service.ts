@@ -20,6 +20,22 @@ export class UserSearchService {
   ) {}
 
   /**
+   * Finds a single user based on a generic predicate and optional relations.
+   * This method provides a flexible way to query users using TypeORM's FindOptionsWhere.
+   *
+   * @param predicate The criteria to use for finding the user (e.g., { email: 'test@example.com' }).
+   * @param relations Optional custom entity relations to load. Passes default relations if omitted.
+   * @returns A promise that resolves to the User entity or null if not found.
+   */
+  async findOne(
+    predicate: FindOptionsWhere<User>,
+    relations?: FindOptionsRelations<User>,
+  ): Promise<User | null> {
+    // Delegates to the more generic findOneByCriteria, passing undefined for neighborhoodId
+    return this.findOneByCriteria(predicate, undefined, relations);
+  }
+
+  /**
    * Finds a user by their publicId with optional custom relations.
    *
    * @param publicId The unique public identifier of the user.

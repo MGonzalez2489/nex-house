@@ -13,4 +13,8 @@ export const UserStatusSeed = [
     name: UserStatusEnum.PENDING_ONBOARDING,
     displayName: 'Onboarding Pendiente',
   },
+  {
+    name: UserStatusEnum.PASSWORD_RECOVERY,
+    displayName: 'Recuperar Contraseña',
+  },
 ];

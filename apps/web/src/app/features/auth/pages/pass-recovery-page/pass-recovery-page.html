@@ -1,1 +1,74 @@
-<p>pass-recovery-page works!</p>
+<div>
+  <div class="text-center mb-8">
+    <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Reestablecer Contraseña</h2>
+    <p class="text-slate-500 text-sm mt-2">
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit, labore...
+    </p>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="doSubmit()" class="space-y-6">
+    <div class="form-control">
+      <div class="flex justify-between items-center ml-1">
+        <label for="password" class="form-label">Nueva Contraseña</label>
+      </div>
+      <p-password
+        id="password"
+        formControlName="password"
+        [feedback]="false"
+        [toggleMask]="true"
+        placeholder="••••••••"
+        fluid
+        autocomplete="off"
+        [invalid]="form.controls.password.invalid && form.controls.password.touched"
+        [attr.aria-invalid]="form.controls.password.invalid && form.controls.password.touched"
+        [attr.aria-describedby]="
+          form.controls.password.touched && form.controls.password.errors ? 'password-error' : null
+        "
+      ></p-password>
+      <app-form-validation-error
+        id="password-error"
+        [touched]="form.controls.password.touched"
+        [errors]="form.controls.password.errors"
+        label="Password"
+      />
+    </div>
+
+    <div class="form-control">
+      <div class="flex justify-between items-center ml-1">
+        <label for="confirmPassword" class="form-label">Confirmar Contraseña</label>
+      </div>
+      <p-password
+        id="confirmPassword"
+        formControlName="confirmPassword"
+        [feedback]="false"
+        [toggleMask]="true"
+        placeholder="••••••••"
+        fluid
+        autocomplete="off"
+        [invalid]="form.controls.confirmPassword.invalid && form.controls.confirmPassword.touched"
+        [attr.aria-invalid]="
+          form.controls.confirmPassword.invalid && form.controls.confirmPassword.touched
+        "
+        [attr.aria-describedby]="
+          form.controls.confirmPassword.touched && form.controls.confirmPassword.errors
+            ? 'confirm-password-error'
+            : null
+        "
+      ></p-password>
+      <app-form-validation-error
+        id="confirm-password-error"
+        [touched]="form.controls.confirmPassword.touched"
+        [errors]="form.controls.confirmPassword.errors"
+        label="Confirmar Contraseña"
+      />
+    </div>
+
+    <app-form-options
+      [submitFullWidth]="true"
+      [showCancel]="false"
+      [callState]="store.callState()"
+      submitLabel="Iniciar Sesión"
+      [isLoading]="store.loading()"
+    />
+  </form>
+</div>

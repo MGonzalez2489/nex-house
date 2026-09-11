@@ -3,19 +3,12 @@ import {
   HttpHandlerFn,
   HttpInterceptorFn,
   HttpRequest,
-} from "@angular/common/http";
-import { inject } from "@angular/core";
-import { AuthService } from "@auth/services";
-import { AuthStore } from "@auth/store";
-import { ErrorService } from "@core/services/error-service";
-import {
-  BehaviorSubject,
-  catchError,
-  switchMap,
-  throwError,
-  filter,
-  take,
-} from "rxjs";
+} from '@angular/common/http';
+import {inject} from '@angular/core';
+import {AuthService} from '@auth/services';
+import {AuthStore} from '@auth/store';
+import {ErrorService} from '@core/services/error-service';
+import {BehaviorSubject, catchError, switchMap, throwError, filter, take} from 'rxjs';
 
 /**
  * ErrorInterceptor
@@ -35,16 +28,18 @@ export const ErrorInterceptor: HttpInterceptorFn = (req, next) => {
 
   // State variables for the refresh semaphore logic
   let isRefreshing = false;
-  const refreshTokenSubject: BehaviorSubject<string | null> =
-    new BehaviorSubject<string | null>(null);
+  const refreshTokenSubject: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(
+    null,
+  );
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       if (
         error instanceof HttpErrorResponse &&
         error.status === 401 &&
-        !req.url.includes("auth/refresh") &&
-        !req.url.includes("auth/login")
+        !req.url.includes('auth/refresh') &&
+        !req.url.includes('auth/login') &&
+        !req.url.includes('auth/reset-password')
       ) {
         return handle401Error(req, next);
       }

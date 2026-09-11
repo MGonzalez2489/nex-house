@@ -15,9 +15,6 @@ export class UserProfile extends BaseTraceableEntity {
   @Column({ nullable: true })
   phone: string;
 
-  // @Column({ nullable: true })
-  // avatar: string;
-
   @Column()
   @Exclude()
   userId: number;

@@ -12,4 +12,17 @@ export class UpdateUserDto implements UpdateUser {
   @ValidateNested()
   @Type(() => CreateUnitDto)
   unit?: CreateUnitDto;
+
+  //internal
+  @IsString()
+  @IsOptional()
+  recoveryCode?: string;
+
+  @IsString()
+  @IsOptional()
+  recoveryCodeExpiration?: string;
+
+  @IsString()
+  @IsOptional()
+  recoveryToken?: string;
 }

@@ -1,22 +1,24 @@
 import {
+  OnboardingService,
+  UserSearchService,
+} from '@administration/user/services';
+import { User } from '@core/database';
+import { CryptoService } from '@core/services';
+import {
   ForbiddenException,
   Injectable,
   Logger,
   UnauthorizedException,
 } from '@nestjs/common';
-import { LoginDto } from '../dtos';
-import {
-  OnboardingService,
-  UserSearchService,
-} from '@administration/user/services';
 import {
   OnboardingStepEnum,
   UserRoleEnum,
   UserStatusEnum,
 } from '@nexhouse/shared-domain/enums';
-import { CryptoService } from '@core/services';
+import { LoginDto } from '../dtos';
 import { SessionService } from './session.service';
-import { User } from '@core/database';
+
+import { Response as ExpressResponse } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -80,6 +82,7 @@ export class AuthService {
     const onboardingState = await this.onboardingService.getOnboardingStatus(
       user.publicId,
     );
+
     if (
       !onboardingState.isCompleted &&
       onboardingState.currentStepId === OnboardingStepEnum.COMPLETE
@@ -95,25 +98,21 @@ export class AuthService {
     return this.sessionService.createSession(user, userAgent, ip);
   }
 
+  createCookie(response: ExpressResponse, refreshToken: string) {
+    response.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+  }
+
   async refreshAuthentication(token: string, userAgent: string) {
     return this.sessionService.refreshSession(token, userAgent);
   }
 
   async logout(refreshToken: string) {
     return this.sessionService.logout(refreshToken);
-  }
-
-  async getFreshProfileUser(user: User) {
-    if (user.role.name === UserRoleEnum.SUPERADMIN) return user;
-
-    return this.userSearchService.findByPublicId(
-      user.publicId,
-      user.neighborhoodId,
-      {
-        neighborhood: true,
-        role: true,
-        status: true,
-      },
-    );
   }
 }
