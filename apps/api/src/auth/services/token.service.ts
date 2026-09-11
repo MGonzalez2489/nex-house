@@ -24,7 +24,16 @@ export class TokenService {
     private readonly configService: ConfigService,
   ) {}
 
-  //Crea el access token usado para acceder a endpoints privados del api
+  /**
+   * Creates the access token used to reach private API endpoints.
+   *
+   * @param email The user's email, embedded as the `email` claim.
+   * @param userPublicId The user's public ID, embedded as the `sub` claim.
+   * @param sessionPublicId The active session's public ID, embedded as the
+   *   `session` claim.
+   * @returns A `NexHouseToken` of type `'access'` with the signed JWT, the
+   *   expiration timestamp (in ms) and the matching UTC date string.
+   */
   createAccessToken(
     email: string,
     userPublicId: string,
@@ -44,16 +53,27 @@ export class TokenService {
         expiresIn: `${duration.minutes}m`,
       },
     );
+    const expiresAt = this.getDateWithMS(ACCESS_TOKEN_DURATION);
 
     return {
       type: 'access',
       token,
-      expiresInMs: this.getDateWithMS(ACCESS_TOKEN_DURATION),
-      expiresAtDate: this.getDateStrFromMs(ACCESS_TOKEN_DURATION),
+      expiresInMs: expiresAt,
+      expiresAtDate: this.getDateStrFromMs(expiresAt),
     };
   }
 
-  //crea el refresh token usado para re crear un access token
+  /**
+   * Creates the refresh token used to re-issue an access token.
+   *
+   * @param userPublicId The user's public ID, embedded as the `sub` claim.
+   * @param sessionPublicId The active session's public ID, embedded as the
+   *   `session` claim.
+   * @param rememberMe Extends the token lifetime from 7 days to 30 days when
+   *   `true`.
+   * @returns A `NexHouseToken` of type `'refresh'` with the signed JWT, the
+   *   expiration timestamp (in ms) and the matching UTC date string.
+   */
   createRefreshAccessToken(
     userPublicId: string,
     sessionPublicId: string,
@@ -76,19 +96,30 @@ export class TokenService {
         expiresIn: `${duration.days}d`,
       },
     );
+    const expiresAt = this.getDateWithMS(end);
 
     return {
       type: 'refresh',
       token,
-
-      expiresInMs: this.getDateWithMS(end),
-      expiresAtDate: this.getDateStrFromMs(end),
+      expiresInMs: expiresAt,
+      expiresAtDate: this.getDateStrFromMs(expiresAt),
     };
   }
 
-  // crea el reset token usado en el proceso de recuperacion de contraseña
-  // este token solamente es valido para el endpoint 'api/auth/code-validation'
-  createResetPasswordToken(email: string, userPublicId: string): NexHouseToken {
+  /**
+   * Creates the reset token used in the password recovery flow. It is only
+   * valid for the 'api/auth/code-validation' endpoint and is signed with the
+   * dedicated `JWT_RESET` secret.
+   *
+   * @param email The user's email, embedded as the `email` claim.
+   * @param userPublicId The user's public ID, embedded as the `sub` claim.
+   * @returns A `NexHouseToken` of type `'reset_password'` with the signed JWT,
+   *   the expiration timestamp (in ms) and the matching UTC date string.
+   */
+  createResetPasswordToken(
+    email: string,
+    userPublicId: string,
+  ): NexHouseToken {
     const resetSecret = this.configService.get<string>('JWT_RESET') || '';
 
     const duration = intervalToDuration({
@@ -105,22 +136,33 @@ export class TokenService {
       secret: resetSecret,
       expiresIn: `${duration.minutes}m`,
     });
+    const expiresAt = this.getDateWithMS(RESET_TOKEN_EXPIRATION);
 
     return {
       token,
       type: 'reset_password',
-      expiresInMs: this.getDateWithMS(RESET_TOKEN_EXPIRATION),
-      expiresAtDate: this.getDateStrFromMs(RESET_TOKEN_EXPIRATION),
+      expiresInMs: expiresAt,
+      expiresAtDate: this.getDateStrFromMs(expiresAt),
     };
   }
 
-  // valida si un token es valido o no
+  /**
+   * Validates the integrity and expiry of a JWT and returns its decoded payload.
+   *
+   * @param token The raw JWT string to verify against the JWT secret.
+   * @returns The decoded token payload when the token is valid; otherwise the
+   *   underlying `JwtService` error is propagated.
+   */
   verifyToken(token: string) {
     return this.jwtService.verify(token);
   }
 
-  //Calcula la fecha futura de este momento + ms adicionales
-  //retorna ms
+  /**
+   * Computes the future epoch timestamp of `now + msToAdd`.
+   *
+   * @param msToAdd The milliseconds to add to the current time.
+   * @returns The resulting epoch timestamp in milliseconds.
+   */
   private getDateWithMS(msToAdd: number): number {
     const date = new Date();
     const currentMs = date.getTime();
@@ -131,8 +173,12 @@ export class TokenService {
     return finalMs;
   }
 
-  //calcula la fecha futura desde este momento + ms adicionales
-  //retorna UTC date string
+  /**
+   * Converts an epoch timestamp (in ms) into a UTC date string.
+   *
+   * @param ms The epoch timestamp in milliseconds to format.
+   * @returns A UTC date string (e.g. `Tue, 11 Sep 2026 19:00:00 GMT`).
+   */
   private getDateStrFromMs(ms: number) {
     const date: Date = new Date(ms);
     return date.toUTCString();

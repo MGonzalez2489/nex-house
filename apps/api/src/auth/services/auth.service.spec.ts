@@ -64,6 +64,7 @@ describe('AuthService', () => {
       token: 'jwt',
       refreshToken: 'rt',
       exp: 123,
+      user: {} as never,
     });
 
     const result = await service.login(mockLoginDto, mockAgent, mockIp);

@@ -2,7 +2,7 @@ import { UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { ResetPwdGuard } from './reset-pwd.guard';
-import { PWD_RESET_PURPOSE } from '../pwd-recovery.constants';
+import { PWD_RESET_PURPOSE } from '@auth/constants';
 
 describe('ResetPwdGuard', () => {
   let guard: ResetPwdGuard;

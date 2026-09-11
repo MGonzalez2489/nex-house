@@ -4,24 +4,18 @@ import {
   ForbiddenException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
 import { UserSearchService, UserService } from '@administration/user/services';
 import { User } from '@core/database';
 import { UserRoleEnum, UserStatusEnum } from '@nexhouse/shared-domain/enums';
 import { SessionService } from './session.service';
 import { PwdRecoveryService } from './pwd-recovery.service';
-import {
-  PWD_RESET_PURPOSE,
-  RESET_TOKEN_TTL_MINUTES,
-} from '../pwd-recovery.constants';
+import { TokenService } from './token.service';
 
 describe('PwdRecoveryService', () => {
   let service: PwdRecoveryService;
   let mockUserSearchService: jest.Mocked<UserSearchService>;
   let mockUserService: jest.Mocked<UserService>;
-  let mockJwtService: jest.Mocked<JwtService>;
-  let mockConfigService: jest.Mocked<ConfigService>;
+  let mockTokenService: jest.Mocked<TokenService>;
   let mockSessionService: jest.Mocked<SessionService>;
 
   const baseMockUser = {
@@ -53,13 +47,14 @@ describe('PwdRecoveryService', () => {
       updatePasswordOnRecoveryProcess: jest.fn(),
     } as unknown as jest.Mocked<UserService>;
 
-    mockJwtService = {
-      sign: jest.fn().mockReturnValue('mocked-reset-jwt'),
-    } as unknown as jest.Mocked<JwtService>;
-
-    mockConfigService = {
-      get: jest.fn().mockReturnValue('reset-secret'),
-    } as unknown as jest.Mocked<ConfigService>;
+    mockTokenService = {
+      createResetPasswordToken: jest.fn().mockReturnValue({
+        type: 'reset_password',
+        token: 'mocked-reset-jwt',
+        expiresInMs: Date.now() + 5 * 60 * 1000,
+        expiresAtDate: new Date(Date.now() + 5 * 60 * 1000).toUTCString(),
+      }),
+    } as unknown as jest.Mocked<TokenService>;
 
     mockSessionService = {
       createSession: jest.fn(),
@@ -70,8 +65,7 @@ describe('PwdRecoveryService', () => {
         PwdRecoveryService,
         { provide: UserSearchService, useValue: mockUserSearchService },
         { provide: UserService, useValue: mockUserService },
-        { provide: JwtService, useValue: mockJwtService },
-        { provide: ConfigService, useValue: mockConfigService },
+        { provide: TokenService, useValue: mockTokenService },
         { provide: SessionService, useValue: mockSessionService },
       ],
     }).compile();
@@ -153,7 +147,7 @@ describe('PwdRecoveryService', () => {
       await expect(service.validateCode('ZZZ-000000')).rejects.toThrow(
         BadRequestException,
       );
-      expect(mockJwtService.sign).not.toHaveBeenCalled();
+      expect(mockTokenService.createResetPasswordToken).not.toHaveBeenCalled();
     });
 
     it('should throw BadRequestException when the recovery code has expired', async () => {
@@ -166,24 +160,17 @@ describe('PwdRecoveryService', () => {
       await expect(service.validateCode('ABC-123456')).rejects.toThrow(
         BadRequestException,
       );
-      expect(mockJwtService.sign).not.toHaveBeenCalled();
+      expect(mockTokenService.createResetPasswordToken).not.toHaveBeenCalled();
     });
 
-    it('should sign a purpose-limited token with the JWT_RESET secret and persist it', async () => {
+    it('should create a purpose-limited reset token and persist it', async () => {
       mockUserSearchService.findOne.mockResolvedValue(baseMockUser);
 
       const result = await service.validateCode('ABC-123456');
 
-      expect(mockJwtService.sign).toHaveBeenCalledWith(
-        {
-          email: baseMockUser.email,
-          sub: baseMockUser.publicId,
-          purpose: PWD_RESET_PURPOSE,
-        },
-        {
-          expiresIn: `${RESET_TOKEN_TTL_MINUTES}m`,
-          secret: 'reset-secret',
-        },
+      expect(mockTokenService.createResetPasswordToken).toHaveBeenCalledWith(
+        baseMockUser.email,
+        baseMockUser.publicId,
       );
       expect(mockUserService.update).toHaveBeenCalledWith(
         baseMockUser.neighborhoodId,
@@ -192,7 +179,8 @@ describe('PwdRecoveryService', () => {
         baseMockUser,
       );
       expect(result.token).toBe('mocked-reset-jwt');
-      expect(result.exp).toBeGreaterThan(Math.floor(Date.now() / 1000));
+      expect(result.exp).toBe(expect.any(Number));
+      expect(result.exp).toBeGreaterThan(Date.now());
     });
   });
 
