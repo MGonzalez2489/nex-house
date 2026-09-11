@@ -7,26 +7,21 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
 import { UserRoleEnum, UserStatusEnum } from '@nexhouse/shared-domain/enums';
 import { addMinutes, isPast } from 'date-fns';
-import {
-  PWD_RESET_PURPOSE,
-  RECOVERY_CODE_TTL_MINUTES,
-  RESET_TOKEN_TTL_MINUTES,
-} from '../pwd-recovery.constants';
 import { SessionService } from './session.service';
+import { TokenService } from './token.service';
 
 @Injectable()
 export class PwdRecoveryService {
   constructor(
     private readonly userSearchService: UserSearchService,
     private readonly userService: UserService,
-    private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
+    private readonly tokenService: TokenService,
     private readonly sessionService: SessionService,
   ) {}
+
+  private readonly RECOVERY_CODE_TTL_MINUTES = 30;
 
   // step 1: validate user by email and create recovery code
 
@@ -52,7 +47,7 @@ export class PwdRecoveryService {
     const recoveryCode = this.generateRecoveryCode();
     const expirationDate = addMinutes(
       new Date(),
-      RECOVERY_CODE_TTL_MINUTES,
+      this.RECOVERY_CODE_TTL_MINUTES,
     ).toUTCString();
     await this.userService.update(
       user.neighborhoodId,
@@ -87,30 +82,21 @@ export class PwdRecoveryService {
       throw new BadRequestException(`El codigo de recuperacion ha expirado.`);
     }
 
-    const resetSecret = this.configService.get<string>('JWT_RESET') || '';
-
-    const accessToken = this.jwtService.sign(
-      {
-        email: user.email,
-        sub: user.publicId,
-        purpose: PWD_RESET_PURPOSE,
-      },
-      {
-        expiresIn: `${RESET_TOKEN_TTL_MINUTES}m`,
-        secret: resetSecret,
-      },
+    const accessToken = this.tokenService.createResetPasswordToken(
+      user.email,
+      user.publicId,
     );
 
     await this.userService.update(
       user.neighborhoodId,
       user.publicId,
-      { recoveryToken: accessToken },
+      { recoveryToken: accessToken.token },
       user,
     );
 
     return {
-      token: accessToken,
-      exp: this.calculateExpirationInSeconds(RESET_TOKEN_TTL_MINUTES),
+      token: accessToken.token,
+      exp: accessToken.expiresInMs,
     };
   }
 
@@ -171,31 +157,5 @@ export class PwdRecoveryService {
 
     // Combine the prefix and the number with a hyphen
     return `${prefix}-${recoveryNumber.toString()}`;
-  }
-
-  /**
-   * Calculates a Unix timestamp (in seconds) representing a future expiration time.
-   * The expiration time is 'minutesToAdd' from the current moment.
-   *
-   * @param minutesToAdd The number of minutes from now when the token/session should expire.
-   * @returns A Unix timestamp (number of seconds since Jan 1, 1970 UTC) representing the expiration.
-   */
-  private calculateExpirationInSeconds(minutesToAdd: number): number {
-    const nowInMs = Date.now(); // Obtiene la hora actual en milisegundos
-
-    if (!minutesToAdd) {
-      minutesToAdd = 15;
-    }
-
-    // Calcula la duración en milisegundos
-    const durationInMs = minutesToAdd * 60 * 1000; // minutos * segundos/minuto * milisegundos/segundo
-
-    // Suma la duración a la hora actual para obtener el tiempo futuro en milisegundos
-    const futureTimeInMs = nowInMs + durationInMs;
-
-    // Convierte el tiempo futuro de milisegundos a segundos y redondea hacia abajo
-    const expirationInSeconds = Math.floor(futureTimeInMs / 1000);
-
-    return expirationInSeconds;
   }
 }

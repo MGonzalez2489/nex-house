@@ -12,6 +12,7 @@ import { SessionService } from './services/session.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { PwdRecoveryController } from './controllers/pwd-recovery.controller';
 import { PwdRecoveryService } from './services/pwd-recovery.service';
+import { TokenService } from './services/token.service';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { PwdRecoveryService } from './services/pwd-recovery.service';
     CryptoService,
     JwtStrategy,
     PwdRecoveryService,
+    TokenService,
   ],
   controllers: [AuthController, PwdRecoveryController],
 })

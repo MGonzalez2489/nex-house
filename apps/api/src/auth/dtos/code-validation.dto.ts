@@ -1,5 +1,5 @@
+import { RECOVERY_CODE_PATTERN } from '@auth/constants';
 import { Matches, IsNotEmpty, IsString } from 'class-validator';
-import { RECOVERY_CODE_PATTERN } from '../pwd-recovery.constants';
 
 export class CodeValidationDto {
   @IsString()

@@ -1,21 +1,21 @@
 import { NxSession, User } from '@core/database';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { SessionModel } from '@nexhouse/shared-domain/models';
-import UAParser from 'ua-parser-js';
-import { CryptoService } from '@core/services';
-import { randomUUID } from 'crypto';
 import { UserToModelMapper } from '@core/mappers';
+import { CryptoService } from '@core/services';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { SessionModel } from '@nexhouse/shared-domain/models';
+import { randomUUID } from 'crypto';
+import { Repository } from 'typeorm';
+import UAParser from 'ua-parser-js';
+import { TokenService } from './token.service';
 
 @Injectable()
 export class SessionService {
   constructor(
     @InjectRepository(NxSession)
     private readonly repository: Repository<NxSession>,
-    private readonly jwtService: JwtService,
     private cryptoService: CryptoService,
+    private tokenService: TokenService,
   ) {}
 
   /**
@@ -39,23 +39,16 @@ export class SessionService {
     const parser = new UAParser.UAParser(userAgent);
     const agentData = parser.getResult();
 
-    const daysValid = rememberMe ? 30 : 7;
-    const nowInMs = Date.now();
-    const expiresAt = new Date(nowInMs + daysValid * 24 * 60 * 60 * 1000);
-
     // 1. Pre-generate session public ID to perform a single database write execution
     const sessionPublicId = randomUUID();
 
-    const refreshPayload = {
-      sub: user.publicId,
-      session: sessionPublicId,
-    };
+    const refreshToken = this.tokenService.createRefreshAccessToken(
+      user.publicId,
+      sessionPublicId,
+      rememberMe,
+    );
 
-    const refreshToken = this.jwtService.sign(refreshPayload, {
-      expiresIn: `${daysValid}d`,
-    });
-
-    const refreshTokenHash = await this.cryptoService.hash(refreshToken);
+    const refreshTokenHash = await this.cryptoService.hash(refreshToken.token);
 
     // 2. Build the completed entity state maps
     const session = this.repository.create({
@@ -67,34 +60,24 @@ export class SessionService {
       os: agentData.os.name,
       device: agentData.device.model || 'Desktop',
       ipAddress: ip,
-      expiresAt,
+      expiresAt: refreshToken.expiresAtDate,
       socketId: existingSocket,
     });
 
     await this.repository.save(session);
-
-    const accessToken = this.jwtService.sign(
-      {
-        email: user.email,
-        sub: user.publicId,
-        session: sessionPublicId,
-      },
-      {
-        expiresIn: '15m',
-      },
+    const accessToken = this.tokenService.createAccessToken(
+      user.email,
+      user.publicId,
+      sessionPublicId,
     );
-
     // 3. Performance Optimization: Compute expiration timestamp mathematically instead
     // of executing decoding overhead
-    const accessTokenExpInSeconds = Math.floor(
-      (nowInMs + 15 * 60 * 1000) / 1000,
-    );
 
     return {
       user: UserToModelMapper(user),
-      token: accessToken,
-      refreshToken,
-      exp: accessTokenExpInSeconds,
+      token: accessToken.token,
+      refreshToken: refreshToken.token,
+      exp: accessToken.expiresInMs,
     };
   }
 
@@ -112,7 +95,7 @@ export class SessionService {
 
     try {
       // 1. Verify JWT
-      payload = this.jwtService.verify(refreshToken);
+      payload = this.tokenService.verifyToken(refreshToken);
     } catch (e) {
       throw new UnauthorizedException('Invalid or expired refresh token' + e);
     }
@@ -155,7 +138,7 @@ export class SessionService {
   async logout(refreshToken: string): Promise<void> {
     try {
       // 1.Verify token to get session ID
-      const payload = this.jwtService.verify(refreshToken);
+      const payload = this.tokenService.verifyToken(refreshToken);
 
       // 2. Revoke session
       await this.repository.update(

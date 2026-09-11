@@ -1,3 +1,4 @@
+import { PWD_RESET_PURPOSE } from '@auth/constants';
 import {
   CanActivate,
   ExecutionContext,
@@ -6,7 +7,6 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { PWD_RESET_PURPOSE } from '../pwd-recovery.constants';
 
 @Injectable()
 export class ResetPwdGuard implements CanActivate {
@@ -21,7 +21,9 @@ export class ResetPwdGuard implements CanActivate {
 
     const secret = this.configService.get<string>('JWT_RESET');
     if (!secret) {
-      throw new UnauthorizedException('Reset password secret is not configured');
+      throw new UnauthorizedException(
+        'Reset password secret is not configured',
+      );
     }
 
     if (!token) {
@@ -33,9 +35,7 @@ export class ResetPwdGuard implements CanActivate {
 
       // Validamos que el token sea para reset y no un login robado
       if (payload.purpose !== PWD_RESET_PURPOSE || !payload.email) {
-        throw new UnauthorizedException(
-          'Token inválido para esta acción',
-        );
+        throw new UnauthorizedException('Token inválido para esta acción');
       }
 
       // Inyectamos el usuario en la request para el Endpoint 3
