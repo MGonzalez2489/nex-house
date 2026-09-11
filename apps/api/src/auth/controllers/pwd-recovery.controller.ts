@@ -1,7 +1,12 @@
-import { RecoveryCodeResponseDto, ResetPasswordTokenDto } from '@auth/dtos';
+import {
+  CodeValidationDto,
+  PwdRecoveryRequestDto,
+  RecoveryCodeResponseDto,
+  ResetPasswordTokenDto,
+  ResetPwdDto,
+} from '@auth/dtos';
 import { ResetPwdGuard } from '@auth/guards';
 import { AuthService, PwdRecoveryService } from '@auth/services';
-import { User } from '@core/database';
 import { CurrentUser, Public } from '@core/decorators';
 import {
   Body,
@@ -21,6 +26,12 @@ import {
   Response as ExpressResponse,
 } from 'express';
 
+type ResetTokenPayload = {
+  email: string;
+  sub: string;
+  purpose: string;
+};
+
 @ApiTags('Authentication')
 @Controller('auth')
 export class PwdRecoveryController {
@@ -33,7 +44,7 @@ export class PwdRecoveryController {
   @Post('pwd-recovery-request')
   @HttpCode(HttpStatus.OK)
   async pwdRecoveryRequest(
-    @Body() dto: { email: string },
+    @Body() dto: PwdRecoveryRequestDto,
   ): Promise<RecoveryCodeResponseDto> {
     return this.recoveryService.createRecoveryCode(dto.email);
   }
@@ -42,7 +53,7 @@ export class PwdRecoveryController {
   @Post('code-validation')
   @HttpCode(HttpStatus.OK)
   async codeValidation(
-    @Body() dto: { code: string },
+    @Body() dto: CodeValidationDto,
   ): Promise<ResetPasswordTokenDto> {
     return this.recoveryService.validateCode(dto.code);
   }
@@ -51,20 +62,22 @@ export class PwdRecoveryController {
   @UseGuards(ResetPwdGuard)
   @HttpCode(HttpStatus.OK)
   async updatePassword(
-    @Body() dto: { pwd: string },
+    @Body() dto: ResetPwdDto,
     @Req() request: ExpressRequest,
-    @CurrentUser() user: User,
+    @CurrentUser() user: ResetTokenPayload,
     @NestHeaders('user-agent') userAgent: string,
     @Res({ passthrough: true }) response: ExpressResponse,
   ): Promise<SessionModel> {
     const ip =
       request.ip || (request.headers['x-forwarded-for'] as string) || '0.0.0.0';
+    const token = request.headers.authorization?.split(' ')[1] ?? '';
 
     const session = await this.recoveryService.updatePwd(
       user.email,
       dto.pwd,
       userAgent,
       ip,
+      token,
     );
     this.authService.createCookie(response, session.refreshToken);
 

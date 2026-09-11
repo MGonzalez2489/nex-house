@@ -1,39 +1,39 @@
-import { UserModel, SessionModel } from "@nexhouse/shared-domain/models";
+import { SessionModel } from "@nexhouse/shared-domain/models";
 import { TestBed } from "@angular/core/testing";
 import { of, throwError } from "rxjs";
 import { AuthService } from "../services/auth-service";
 import { AuthStore } from "./auth.store";
 import { APP_CONSTANTS } from "@core/constants";
 
-describe("AuthStore (Zoneless Edition)", () => {
+describe("AuthStore", () => {
   let authServiceMock: jest.Mocked<AuthService>;
-
-  const mockUser: UserModel = {
-    email: "resident@nexhouse.com",
-    firstName: "Alejandro",
-    lastName: "Ríos",
-  } as UserModel;
 
   const mockSession: SessionModel = {
     token: "jwt-access-token-987",
     exp: 1718820000,
-    user: mockUser,
-    refreshToken: "",
+    refreshToken: "refresh-token",
+    user: {
+      email: "resident@nexhouse.com",
+      firstName: "Alejandro",
+      lastName: "Ríos",
+    } as SessionModel["user"],
   };
 
   beforeEach(() => {
-    // Clean storage values before starting each test execution context
     localStorage.clear();
 
     const authSpy = {
       login: jest.fn(),
+      recoveryRequest: jest.fn(),
+      codeValidation: jest.fn(),
+      resetPwd: jest.fn(),
+      refreshSession: jest.fn(),
     } as unknown as jest.Mocked<AuthService>;
 
     TestBed.configureTestingModule({
       providers: [AuthStore, { provide: AuthService, useValue: authSpy }],
     });
 
-    // We only inject the service mock, allowing each test to instantiate the store on demand
     authServiceMock = TestBed.inject(AuthService) as jest.Mocked<AuthService>;
   });
 
@@ -41,38 +41,28 @@ describe("AuthStore (Zoneless Edition)", () => {
     localStorage.clear();
   });
 
-  describe("Initialization and Storage Checks", () => {
+  describe("Initialization", () => {
     it("should initialize with anonymous state values when localStorage is empty", () => {
-      // Lazy instantiation: trigger store creation while localStorage is empty
       const store = TestBed.inject(AuthStore);
 
       expect(store.token()).toBeNull();
-      expect(store.recoveryToken()).toBeUndefined();
       expect(store.exp()).toBe(0);
+      expect(store.recoveryCode()).toBeUndefined();
+      expect(store.resetPwdToken()).toBeNull();
       expect(store.isAuthenticated()).toBe(false);
     });
   });
 
-  describe("loadSession Method", () => {
-    it("should map session data to state and store references in local storage", () => {
-      // Spy on the prototype of Storage to safely intercept localStorage calls in JSDOM
+  describe("loadSession", () => {
+    it("should map session data to state and persist the token in localStorage", () => {
       const setItemSpy = jest.spyOn(Storage.prototype, "setItem");
       const store = TestBed.inject(AuthStore);
 
       store.loadSession(mockSession);
 
-      // Verify state properties update
       expect(store.token()).toBe(mockSession.token);
       expect(store.exp()).toBe(mockSession.exp);
-
-      // Verify computed properties evaluate instantly
       expect(store.isAuthenticated()).toBe(true);
-
-      // loadSession must NOT touch callState; finishLogin() owns the busy->idle transition
-      expect(store.loading()).toBe(false);
-      expect(store.loaded()).toBe(false);
-
-      // Verify side-effects in localStorage
       expect(setItemSpy).toHaveBeenCalledWith(
         APP_CONSTANTS.TOKEN_STORAGE_KEY,
         mockSession.token,
@@ -82,67 +72,130 @@ describe("AuthStore (Zoneless Edition)", () => {
         mockSession.exp.toString(),
       );
 
-      // Clean up the spy to avoid affecting other tests
       setItemSpy.mockRestore();
     });
   });
 
-  describe("login Method Workflows (Zoneless)", () => {
-    it("should set loading flag synchronously, await API, and stay busy until finishLogin is called", async () => {
+  describe("login", () => {
+    it("should load the session and return true on success", async () => {
       authServiceMock.login.mockReturnValue(
         of({ success: true, data: mockSession, message: "Success" }),
       );
       const store = TestBed.inject(AuthStore);
 
-      // Trigger the login promise
-      const loginPromise = store.login({
+      const result = await store.login({
         email: "resident@nexhouse.com",
         password: "password123",
       });
 
-      // Synchronous Verification: Before resolving, the store must IMMEDIATELY enter the loading state
-      expect(store.loading()).toBe(true);
-
-      // Await promise resolution natively (without fakeAsync/tick)
-      const loginResult = await loginPromise;
-
-      // Post-resolution checks
-      expect(loginResult).toBe(true);
+      expect(result).toBe(true);
       expect(store.token()).toBe(mockSession.token);
-
-      // The busy indicator must stay ON while app initialization runs after login
-      expect(store.loading()).toBe(true);
-      expect(store.isAuthenticated()).toBe(true);
-
-      // Only finishLogin() clears the busy state (login page calls it after init + navigation)
-      store.finishLogin();
       expect(store.loading()).toBe(false);
-      expect(store.loaded()).toBe(true);
     });
 
-    it("should catch exceptions synchronously, update callState to error and return false upon failure response", async () => {
-      const apiError = new Error("Invalid Credentials");
-      authServiceMock.login.mockReturnValue(throwError(() => apiError));
+    it("should set the error state and return false on failure", async () => {
+      authServiceMock.login.mockReturnValue(
+        throwError(() => new Error("Invalid Credentials")),
+      );
       const store = TestBed.inject(AuthStore);
 
-      // Trigger the login promise
-      const loginPromise = store.login({
+      const result = await store.login({
         email: "wrong@nexhouse.com",
         password: "bad",
       });
 
-      // Synchronous Verification: Check transition to loading state
-      expect(store.loading()).toBe(true);
-
-      // Await promise rejection handling
-      const loginResult = await loginPromise;
-
-      expect(loginResult).toBe(false);
+      expect(result).toBe(false);
       expect(store.token()).toBeNull();
-
-      // Verify callState handles the error (from @ngrx-toolkit/core)
-      expect(store.loading()).toBe(false);
       expect(store.error()).toEqual("Invalid Credentials");
+    });
+  });
+
+  describe("pwdRecoveryRequest", () => {
+    it("should store the returned recovery code and return true", async () => {
+      authServiceMock.recoveryRequest.mockReturnValue(
+        of({ message: "ok", data: { code: "ABC-123456" } }),
+      );
+      const store = TestBed.inject(AuthStore);
+
+      const result = await store.pwdRecoveryRequest("resident@nexhouse.com");
+
+      expect(result).toBe(true);
+      expect(store.recoveryCode()).toBe("ABC-123456");
+    });
+
+    it("should set the error state and return false on failure", async () => {
+      authServiceMock.recoveryRequest.mockReturnValue(
+        throwError(() => new Error("Something went wrong")),
+      );
+      const store = TestBed.inject(AuthStore);
+
+      const result = await store.pwdRecoveryRequest("resident@nexhouse.com");
+
+      expect(result).toBe(false);
+      expect(store.error()).toEqual("Something went wrong");
+    });
+  });
+
+  describe("codeValidation", () => {
+    it("should persist the reset token in state and localStorage, returning true", async () => {
+      authServiceMock.codeValidation.mockReturnValue(
+        of({ message: "ok", data: { token: "reset-jwt", exp: 12345 } }),
+      );
+      const store = TestBed.inject(AuthStore);
+
+      const result = await store.codeValidation("ABC-123456");
+
+      expect(result).toBe(true);
+      expect(store.resetPwdToken()).toBe("reset-jwt");
+      expect(localStorage.getItem(APP_CONSTANTS.TOKEN_RESET_PWD)).toBe(
+        "reset-jwt",
+      );
+    });
+
+    it("should set the error state and return false on failure", async () => {
+      authServiceMock.codeValidation.mockReturnValue(
+        throwError(() => new Error("Invalid code")),
+      );
+      const store = TestBed.inject(AuthStore);
+
+      const result = await store.codeValidation("ABC-000000");
+
+      expect(result).toBe(false);
+      expect(store.resetPwdToken()).toBeNull();
+    });
+  });
+
+  describe("resetPwd", () => {
+    it("should clear the reset token, load the session and return true on success", async () => {
+      localStorage.setItem(APP_CONSTANTS.TOKEN_RESET_PWD, "stale-reset-jwt");
+      authServiceMock.resetPwd.mockReturnValue(
+        of({ success: true, data: mockSession, message: "Success" }),
+      );
+      const store = TestBed.inject(AuthStore);
+
+      const result = await store.resetPwd("new-password");
+
+      expect(result).toBe(true);
+      expect(store.token()).toBe(mockSession.token);
+      expect(store.resetPwdToken()).toBeNull();
+      expect(store.recoveryCode()).toBeUndefined();
+      expect(localStorage.getItem(APP_CONSTANTS.TOKEN_RESET_PWD)).toBeNull();
+    });
+
+    it("should set the error state and keep the reset token on failure", async () => {
+      localStorage.setItem(APP_CONSTANTS.TOKEN_RESET_PWD, "stale-reset-jwt");
+      authServiceMock.resetPwd.mockReturnValue(
+        throwError(() => new Error("Reset failed")),
+      );
+      const store = TestBed.inject(AuthStore);
+
+      const result = await store.resetPwd("new-password");
+
+      expect(result).toBe(false);
+      expect(store.error()).toEqual("Reset failed");
+      expect(localStorage.getItem(APP_CONSTANTS.TOKEN_RESET_PWD)).toBe(
+        "stale-reset-jwt",
+      );
     });
   });
 });

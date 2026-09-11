@@ -6,6 +6,8 @@ import {AuthStore} from '@auth/store';
 import {InputTextModule} from '@openng/optimus-ui/inputtext';
 import {FormOptions, FormValidationErrorComponent} from '@shared/components/forms';
 
+const RECOVERY_CODE_PATTERN = /^[A-Z]{3}-\d{6}$/;
+
 @Component({
   selector: 'app-pass-code-validate-page',
   imports: [InputTextModule, FormOptions, ReactiveFormsModule, FormValidationErrorComponent],
@@ -20,7 +22,7 @@ export class PassCodeValidatePage implements OnInit {
   readonly form = new FormGroup({
     code: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required],
+      validators: [Validators.required, Validators.pattern(RECOVERY_CODE_PATTERN)],
     }),
   });
 

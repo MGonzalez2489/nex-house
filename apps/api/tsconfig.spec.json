@@ -5,7 +5,7 @@
     "baseUrl": ".",
     "module": "commonjs",
     "moduleResolution": "node10",
-    "types": ["jest", "node"],
+    "types": ["jest", "node", "multer"],
     "paths": {
       "@nexhouse/shared-domain/enums": [
         "../../libs/shared-domain/src/lib/enums/index.ts"
@@ -21,7 +21,8 @@
       ],
       "@core/*": ["src/_core/*"],
       "@administration/*": ["src/administration/*"],
-      "@auth/*": ["src/auth/*"]
+      "@auth/*": ["src/auth/*"],
+      "@catalogs/*": ["src/catalogs/*"]
     }
   },
   "include": [

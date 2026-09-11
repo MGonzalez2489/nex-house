@@ -1,5 +1,13 @@
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
-import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {
+  AbstractControl,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
 import {Router} from '@angular/router';
 import {AuthStore} from '@auth/store';
 import {DASHBOARD_ROUTES_ENUM} from '@dashboard/dashboard.routes';
@@ -13,6 +21,13 @@ type ResetPwdForm = {
   password: FormControl<string>;
   confirmPassword: FormControl<string>;
 };
+
+const passwordMatchValidator: ValidatorFn = (
+  control: AbstractControl,
+): ValidationErrors | null =>
+  control.get('password')?.value === control.get('confirmPassword')?.value
+    ? null
+    : {mismatch: true};
 
 @Component({
   selector: 'app-pass-recovery-page',
@@ -34,16 +49,19 @@ export class PassRecoveryPage {
   private readonly router = inject(Router);
   private readonly startupStore = inject(StartupStore);
 
-  readonly form = new FormGroup<ResetPwdForm>({
-    password: new FormControl('1234', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.minLength(4)],
-    }),
-    confirmPassword: new FormControl('1234', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.minLength(4)],
-    }),
-  });
+  readonly form = new FormGroup<ResetPwdForm>(
+    {
+      password: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.required, Validators.minLength(4)],
+      }),
+      confirmPassword: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.required, Validators.minLength(4)],
+      }),
+    },
+    {validators: passwordMatchValidator},
+  );
 
   async doSubmit() {
     this.form.markAllAsTouched();

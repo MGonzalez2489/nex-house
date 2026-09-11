@@ -132,7 +132,7 @@ export const AuthStore = signalStore(
           patchState(
             store,
             {
-              resetPwdToken: undefined,
+              resetPwdToken: null,
               recoveryCode: undefined,
             },
             setLoaded(),

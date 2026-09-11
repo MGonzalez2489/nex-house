@@ -2,7 +2,6 @@ import {
   OnboardingService,
   UserSearchService,
 } from '@administration/user/services';
-import { User } from '@core/database';
 import { CryptoService } from '@core/services';
 import {
   ForbiddenException,

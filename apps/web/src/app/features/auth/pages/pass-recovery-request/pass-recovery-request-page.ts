@@ -27,6 +27,7 @@ import {FormOptions, FormValidationErrorComponent} from '@shared/components/form
 export class PassRecoveryRequestPage {
   private readonly router = inject(Router);
   protected readonly store = inject(AuthStore);
+  protected readonly PASS_VALIDATE_CODE = AUTH_ROUTES_ENUM.PASS_VALIDATE_CODE;
   readonly form = new FormGroup({
     email: new FormControl('', {
       nonNullable: true,

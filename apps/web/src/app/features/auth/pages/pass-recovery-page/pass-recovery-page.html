@@ -57,9 +57,15 @@
       ></p-password>
       <app-form-validation-error
         id="confirm-password-error"
-        [touched]="form.controls.confirmPassword.touched"
+        [touched]="form.controls.confirmPassword.touched && form.controls.confirmPassword.invalid"
         [errors]="form.controls.confirmPassword.errors"
         label="Confirmar Contraseña"
+      />
+      <app-form-validation-error
+        id="confirm-password-mismatch"
+        [touched]="true"
+        [errors]="form.touched ? form.errors : null"
+        label=""
       />
     </div>
 

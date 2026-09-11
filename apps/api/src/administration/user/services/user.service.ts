@@ -80,11 +80,16 @@ export class UserService {
       throw new InternalServerErrorException(
         'No expiration date provided for recovery code.',
       );
-    } else if (!dto.recoveryCode && dto.recoveryCodeExpiration) {
+    }
+    if (!dto.recoveryCode && dto.recoveryCodeExpiration) {
       throw new InternalServerErrorException(
         'No recovery code for expiration date.',
       );
-    } else {
+    }
+    // Only touch recovery fields/status when a recovery payload is explicitly provided.
+    // This keeps regular profile updates (and the token-only step of the recovery
+    // flow) from wiping the recovery data stored in step 1.
+    if (dto.recoveryCode && dto.recoveryCodeExpiration) {
       const recoveryStatus = await this.catalogsService.findByName(
         UserStatus,
         UserStatusEnum.PASSWORD_RECOVERY,
@@ -252,13 +257,16 @@ export class UserService {
     return true;
   }
 
-  async updatePasswordOnRecoveryProcess(id: number, newPwd: string) {
+  async updatePasswordOnRecoveryProcess(
+    id: number,
+    newPwd: string,
+  ): Promise<void> {
     const [hashedPwd, activeStatus] = await Promise.all([
       this.cryptoService.hash(newPwd),
       this.catalogsService.findByName(UserStatus, UserStatusEnum.ACTIVE),
     ]);
 
-    this.repository.update(id, {
+    await this.repository.update(id, {
       password: hashedPwd,
       statusId: activeStatus.id,
       recoveryCode: null,
@@ -267,7 +275,7 @@ export class UserService {
     });
   }
 
-  async restorePwd(userId: number) {
+  async restorePwd(userId: number): Promise<void> {
     const user = await this.repository.findOne({
       where: { id: Number(userId) },
     });

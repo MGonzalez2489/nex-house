@@ -103,6 +103,57 @@ describe("AuthService", () => {
       });
     });
   });
+
+  describe("password recovery endpoints", () => {
+    it("should POST the email to pwd-recovery-request", (done) => {
+      requestServiceMock.post.mockReturnValue(
+        of({ message: "ok", data: { code: "ABC-123456" } }),
+      );
+
+      service.recoveryRequest("admin@nexhouse.com").subscribe({
+        next: (response) => {
+          expect(requestServiceMock.post).toHaveBeenCalledWith(
+            "/api/auth/pwd-recovery-request",
+            { email: "admin@nexhouse.com" },
+          );
+          expect(response.data.code).toBe("ABC-123456");
+          done();
+        },
+      });
+    });
+
+    it("should POST the code to code-validation", (done) => {
+      requestServiceMock.post.mockReturnValue(
+        of({ message: "ok", data: { token: "reset-jwt", exp: 12345 } }),
+      );
+
+      service.codeValidation("ABC-123456").subscribe({
+        next: (response) => {
+          expect(requestServiceMock.post).toHaveBeenCalledWith(
+            "/api/auth/code-validation",
+            { code: "ABC-123456" },
+          );
+          expect(response.data.token).toBe("reset-jwt");
+          done();
+        },
+      });
+    });
+
+    it("should POST the new password to reset-password", (done) => {
+      requestServiceMock.post.mockReturnValue(of(mockSuccessResponse));
+
+      service.resetPwd("new-password").subscribe({
+        next: (response) => {
+          expect(requestServiceMock.post).toHaveBeenCalledWith(
+            "/api/auth/reset-password",
+            { pwd: "new-password" },
+          );
+          expect(response.data.token).toBe(mockSession.token);
+          done();
+        },
+      });
+    });
+  });
 });
 
 // describe('AuthService', () => {

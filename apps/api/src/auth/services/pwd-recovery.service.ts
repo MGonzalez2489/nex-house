@@ -1,26 +1,25 @@
 import { UserSearchService, UserService } from '@administration/user/services';
 import { RecoveryCodeResponseDto, ResetPasswordTokenDto } from '@auth/dtos';
-import { CryptoService } from '@core/services';
 import { isProd } from '@core/utils';
 import {
   BadRequestException,
   ForbiddenException,
   Injectable,
-  Logger,
-  NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { UserRoleEnum, UserStatusEnum } from '@nexhouse/shared-domain/enums';
 import { addMinutes, isPast } from 'date-fns';
+import {
+  PWD_RESET_PURPOSE,
+  RECOVERY_CODE_TTL_MINUTES,
+  RESET_TOKEN_TTL_MINUTES,
+} from '../pwd-recovery.constants';
 import { SessionService } from './session.service';
-
-//TODO: transalte errors to english
 
 @Injectable()
 export class PwdRecoveryService {
-  private readonly logger = new Logger(PwdRecoveryService.name);
-
   constructor(
     private readonly userSearchService: UserSearchService,
     private readonly userService: UserService,
@@ -31,7 +30,7 @@ export class PwdRecoveryService {
 
   // step 1: validate user by email and create recovery code
 
-  async createRecoveryCode(email: string) {
+  async createRecoveryCode(email: string): Promise<RecoveryCodeResponseDto> {
     const user = await this.userSearchService.findByEmailOrThrow(
       email,
       undefined,
@@ -51,9 +50,10 @@ export class PwdRecoveryService {
     }
 
     const recoveryCode = this.generateRecoveryCode();
-    const minutesToAdd = 30;
-    const expirationDate = addMinutes(new Date(), minutesToAdd).toUTCString();
-    // encrypt code
+    const expirationDate = addMinutes(
+      new Date(),
+      RECOVERY_CODE_TTL_MINUTES,
+    ).toUTCString();
     await this.userService.update(
       user.neighborhoodId,
       user.publicId,
@@ -61,7 +61,6 @@ export class PwdRecoveryService {
       user,
     );
 
-    //TODO: send code by email
     const response: RecoveryCodeResponseDto = {};
     if (!isProd) {
       response.code = recoveryCode;
@@ -84,26 +83,21 @@ export class PwdRecoveryService {
       );
     }
 
-    const expiredCode = isPast(new Date(user.recoveryCodeExpiration));
-    if (expiredCode) {
-      throw new BadRequestException(`El codigo de recuperacion ha espierado.`);
+    if (isPast(new Date(user.recoveryCodeExpiration))) {
+      throw new BadRequestException(`El codigo de recuperacion ha expirado.`);
     }
 
-    //token used just to change password
-    const securityConfig = {
-      reset: this.configService.get<string>('JWT_RESET') || '',
-    };
+    const resetSecret = this.configService.get<string>('JWT_RESET') || '';
 
-    const expirationTime = 5; //5mn
     const accessToken = this.jwtService.sign(
       {
         email: user.email,
         sub: user.publicId,
-        purpose: 'password_reset',
+        purpose: PWD_RESET_PURPOSE,
       },
       {
-        expiresIn: `${expirationTime}m`,
-        secret: securityConfig.reset,
+        expiresIn: `${RESET_TOKEN_TTL_MINUTES}m`,
+        secret: resetSecret,
       },
     );
 
@@ -116,7 +110,7 @@ export class PwdRecoveryService {
 
     return {
       token: accessToken,
-      exp: this.calculateExpirationInSeconds(expirationTime),
+      exp: this.calculateExpirationInSeconds(RESET_TOKEN_TTL_MINUTES),
     };
   }
 
@@ -125,6 +119,7 @@ export class PwdRecoveryService {
     newPwd: string,
     userAgent: string,
     ip: string,
+    resetToken: string,
   ) {
     const user = await this.userSearchService.findByEmailOrThrow(
       email,
@@ -146,12 +141,18 @@ export class PwdRecoveryService {
       throw new BadRequestException('Usuario fuera de proceso.');
     }
 
+    // Bind the presented token to the one issued in step 2 of this flow, so a
+    // leaked/short-lived token cannot be replayed against another user.
+    if (user.recoveryToken !== resetToken) {
+      throw new UnauthorizedException('Token inválido para esta acción.');
+    }
+
     await this.userService.updatePasswordOnRecoveryProcess(user.id, newPwd);
 
     return this.sessionService.createSession(user, userAgent, ip);
   }
 
-  private generateRecoveryCode(): string {
+  generateRecoveryCode(): string {
     // Generate three random uppercase letters (A-Z)
     const generateRandomLetter = (): string => {
       const asciiA = 65; // ASCII code for 'A'

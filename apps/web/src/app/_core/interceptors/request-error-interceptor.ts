@@ -39,7 +39,9 @@ export const ErrorInterceptor: HttpInterceptorFn = (req, next) => {
         error.status === 401 &&
         !req.url.includes('auth/refresh') &&
         !req.url.includes('auth/login') &&
-        !req.url.includes('auth/reset-password')
+        !req.url.includes('auth/reset-password') &&
+        !req.url.includes('auth/code-validation') &&
+        !req.url.includes('auth/pwd-recovery-request')
       ) {
         return handle401Error(req, next);
       }
