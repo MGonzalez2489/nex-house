@@ -45,16 +45,6 @@ export class AuthController {
     return session;
   }
 
-  //TODO: review this to remove
-  // @Get('me')
-  // @HttpCode(HttpStatus.OK)
-  // @ApiOperation({ summary: 'User identity' })
-  // async me(@CurrentUser() user: User) {
-  //   const response = await this.authService.getFreshProfileUser(user);
-  //
-  //   return UserToModelMapper(response);
-  // }
-
   @Public()
   @Post('refresh')
   @HttpCode(HttpStatus.OK)

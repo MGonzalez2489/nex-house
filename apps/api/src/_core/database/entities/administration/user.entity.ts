@@ -63,9 +63,11 @@ export class User extends BaseTraceableEntity {
   //password recovery
   @Column({ nullable: true })
   recoveryCode: string;
+
   @Column({ nullable: true })
   recoveryCodeExpiration: string;
-  @Column({ nullable: true })
+
+  @Column({ type: 'text', nullable: true })
   recoveryToken: string;
 
   // ==========================================

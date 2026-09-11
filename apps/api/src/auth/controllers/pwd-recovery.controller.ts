@@ -33,6 +33,7 @@ type ResetTokenPayload = {
 };
 
 @ApiTags('Authentication')
+@Public()
 @Controller('auth')
 export class PwdRecoveryController {
   constructor(
