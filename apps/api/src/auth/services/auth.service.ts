@@ -1,8 +1,8 @@
 import {
   OnboardingService,
   UserSearchService,
+  UserService,
 } from '@administration/user/services';
-import { User } from '@core/database';
 import { CryptoService } from '@core/services';
 import {
   ForbiddenException,
@@ -26,6 +26,7 @@ export class AuthService {
 
   constructor(
     private readonly userSearchService: UserSearchService,
+    private readonly userService: UserService,
     private readonly sessionService: SessionService,
     private readonly cryptoService: CryptoService,
     private readonly onboardingService: OnboardingService,
@@ -62,6 +63,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    //validate neighborhood state if is not root user
     if (user.role.name !== UserRoleEnum.SUPERADMIN) {
       if (!user.neighborhood) {
         throw new ForbiddenException('Invalid neighborhood assignation.');
@@ -78,21 +80,31 @@ export class AuthService {
       }
     }
 
-    // autocomplete onboarding if last step missing
-    const onboardingState = await this.onboardingService.getOnboardingStatus(
-      user.publicId,
-    );
+    //if onboarding is pending to complete and there's missing the last step `complete`
+    //lets finish it here
+    if (user.status.name === UserStatusEnum.PENDING_ONBOARDING) {
+      // autocomplete onboarding if last step missing
+      const onboardingState = await this.onboardingService.getOnboardingStatus(
+        user.publicId,
+      );
 
-    if (
-      !onboardingState.isCompleted &&
-      onboardingState.currentStepId === OnboardingStepEnum.COMPLETE
-    ) {
-      await this.onboardingService.completeOnboarding(user.id);
-      user = await this.userSearchService.findByEmail(dto.email, undefined, {
-        neighborhood: true,
-        role: true,
-        status: true,
-      });
+      if (
+        !onboardingState.isCompleted &&
+        onboardingState.currentStepId === OnboardingStepEnum.COMPLETE
+      ) {
+        await this.onboardingService.completeOnboarding(user.id);
+        user = await this.userSearchService.findByEmail(dto.email, undefined, {
+          neighborhood: true,
+          role: true,
+          status: true,
+        });
+      }
+    }
+
+    //if there's a password recovery state but login was success
+    //lets clean up the state (meaning user was able to login)
+    if (user.status.name === UserStatusEnum.PASSWORD_RECOVERY) {
+      await this.userService.cleanPwdRecoveryState(user.id);
     }
 
     return this.sessionService.createSession(user, userAgent, ip);

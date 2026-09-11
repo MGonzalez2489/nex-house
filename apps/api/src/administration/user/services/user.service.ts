@@ -274,6 +274,19 @@ export class UserService {
       recoveryToken: null,
     });
   }
+  async cleanPwdRecoveryState(id: number) {
+    const status = await this.catalogsService.findByName(
+      UserStatus,
+      UserStatusEnum.ACTIVE,
+    );
+
+    await this.repository.update(id, {
+      statusId: status.id,
+      recoveryCode: null,
+      recoveryCodeExpiration: null,
+      recoveryToken: null,
+    });
+  }
 
   async restorePwd(userId: number): Promise<void> {
     const user = await this.repository.findOne({
