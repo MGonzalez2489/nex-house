@@ -1,11 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  input,
-  OnInit,
-  signal,
-} from "@angular/core";
+import {ChangeDetectionStrategy, Component, inject, input, OnInit, signal} from '@angular/core';
 import {
   FormArray,
   FormBuilder,
@@ -13,30 +6,27 @@ import {
   FormGroup,
   ReactiveFormsModule,
   Validators,
-} from "@angular/forms";
-import { Router } from "@angular/router";
-import { NEIGHBORHOOD_ROUTES_ENUM } from "@neighborhoods/neighborhood.routes";
-import { NeighborhoodsStore } from "@neighborhoods/neighborhood.store";
+} from '@angular/forms';
+import {Router} from '@angular/router';
+import {NEIGHBORHOOD_ROUTES_ENUM} from '@neighborhoods/neighborhood.routes';
+import {NeighborhoodsStore} from '@neighborhoods/neighborhood.store';
 import {
   CreateNeighStreet,
   UpdateNeighborhood,
   UpdateNeighStreet,
-} from "@nexhouse/shared-domain/interfaces";
-import { NeighborhoodModel } from "@nexhouse/shared-domain/models";
-import {
-  FormOptions,
-  FormValidationErrorComponent,
-} from "@shared/components/forms";
-import { Badge } from "@openng/optimus-ui/badge";
-import { Button } from "@openng/optimus-ui/button";
-import { InputTextModule } from "@openng/optimus-ui/inputtext";
-import { Panel } from "@openng/optimus-ui/panel";
-import { ToggleSwitchModule } from "@openng/optimus-ui/toggleswitch";
+} from '@nexhouse/shared-domain/interfaces';
+import {NeighborhoodModel} from '@nexhouse/shared-domain/models';
+import {Badge} from '@openng/optimus-ui/badge';
+import {Button} from '@openng/optimus-ui/button';
+import {InputTextModule} from '@openng/optimus-ui/inputtext';
+import {Panel} from '@openng/optimus-ui/panel';
+import {ToggleSwitchModule} from '@openng/optimus-ui/toggleswitch';
+import {FormOptions, FormValidationErrorComponent} from '@shared/components/forms';
 
-import { CatalogsStore } from "@stores/catalogs.store";
-import { SelectModule } from "@openng/optimus-ui/select";
+import {SelectModule} from '@openng/optimus-ui/select';
+import {CatalogsStore} from '@stores/catalogs.store';
 @Component({
-  selector: "app-neigh-form-page",
+  selector: 'app-neigh-form-page',
   imports: [
     ReactiveFormsModule,
     Button,
@@ -48,8 +38,8 @@ import { SelectModule } from "@openng/optimus-ui/select";
     FormValidationErrorComponent,
     SelectModule,
   ],
-  templateUrl: "./neigh-form-page.html",
-  styleUrl: "./neigh-form-page.css",
+  templateUrl: './neigh-form-page.html',
+  styleUrl: './neigh-form-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
 })
@@ -63,20 +53,18 @@ export class NeighFormPage implements OnInit {
   readonly neighborhood = signal<NeighborhoodModel | undefined>(undefined);
 
   readonly form = this.fb.nonNullable.group({
-    name: this.fb.nonNullable.control("", [
+    name: this.fb.nonNullable.control('', [Validators.required, Validators.minLength(3)]),
+    //
+    countryId: this.fb.nonNullable.control('', [Validators.required]),
+    stateId: this.fb.nonNullable.control('', [Validators.required]),
+    cityId: this.fb.nonNullable.control('', [Validators.required]),
+    zipCode: this.fb.nonNullable.control('', [
       Validators.required,
-      Validators.minLength(3),
+      Validators.maxLength(5),
+      Validators.minLength(5),
     ]),
     //
-    countryId: this.fb.nonNullable.control("", [Validators.required]),
-    stateId: this.fb.nonNullable.control("", [Validators.required]),
-    cityId: this.fb.nonNullable.control("", [Validators.required]),
-    zipCode: this.fb.nonNullable.control("", [Validators.required]),
-    //
-    firstAdminEmail: this.fb.nonNullable.control("", [
-      Validators.required,
-      Validators.email,
-    ]),
+    firstAdminEmail: this.fb.nonNullable.control('', [Validators.required, Validators.email]),
     active: this.fb.nonNullable.control(true),
     streets: this.fb.array<
       FormGroup<{
@@ -105,8 +93,8 @@ export class NeighFormPage implements OnInit {
     if (cCities.length === 0) return;
 
     const mex = cCountry[0];
-    const chi = cStates.find((f) => f.name === "chihuahua");
-    const chic = cCities.find((f) => f.name === "chihuahua");
+    const chi = cStates.find((f) => f.name === 'chihuahua');
+    const chic = cCities.find((f) => f.name === 'chihuahua');
 
     this.form.patchValue({
       countryId: mex.publicId,
@@ -121,13 +109,11 @@ export class NeighFormPage implements OnInit {
     publicId: FormControl<string | null>;
   }> {
     return this.fb.nonNullable.group({
-      name: this.fb.nonNullable.control(street?.name || "", [
+      name: this.fb.nonNullable.control(street?.name || '', [
         Validators.required,
         Validators.minLength(2),
       ]),
-      publicId: this.fb.nonNullable.control<string | null>(
-        street?.publicId || null,
-      ),
+      publicId: this.fb.nonNullable.control<string | null>(street?.publicId || null),
     });
   }
 
@@ -195,13 +181,12 @@ export class NeighFormPage implements OnInit {
   }
 
   private async create() {
-    const { name, active, streets, firstAdminEmail, cityId, zipCode } =
-      this.form.getRawValue();
+    const {name, active, streets, firstAdminEmail, cityId, zipCode} = this.form.getRawValue();
     const response = await this.store.create({
       name,
       adminEmail: firstAdminEmail,
       streets: streets.map((streetFormValue) => {
-        return { name: streetFormValue.name };
+        return {name: streetFormValue.name};
       }),
       isActive: active,
       cityId,
@@ -214,7 +199,7 @@ export class NeighFormPage implements OnInit {
     const cId = this.id();
     if (!cId) return;
 
-    const { name, active, streets } = this.form.getRawValue();
+    const {name, active, streets} = this.form.getRawValue();
 
     // Map the form values to CreateNeighStreet, conditionally including publicId
     const fStreets: UpdateNeighStreet[] = streets.map((streetFormValue) => {

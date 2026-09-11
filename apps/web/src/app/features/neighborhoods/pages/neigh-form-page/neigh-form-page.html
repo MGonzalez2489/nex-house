@@ -11,10 +11,8 @@
     />
 
     <div>
-      <h1
-        class="text-xl sm:text-2xl font-display font-semibold text-slate-900 dark:text-white"
-      >
-        {{ id() ? "Actualizar" : "Nuevo" }} fraccionamiento
+      <h1 class="text-xl sm:text-2xl font-display font-semibold text-slate-900 dark:text-white">
+        {{ id() ? 'Actualizar' : 'Nuevo' }} fraccionamiento
       </h1>
       <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
         Registra la información básica y las calles que lo componen.
@@ -25,16 +23,12 @@
     <!-- Información general -->
     <p-panel>
       <ng-template #header>
-        <h2 class="text-sm text-slate-400 font-semibold">
-          Información general
-        </h2>
+        <h2 class="text-sm text-slate-400 font-semibold">Información general</h2>
       </ng-template>
       <div class="grid grid-cols-1 md:grid-cols-2 md:gap-x-3">
         <!-- Nombre -->
         <div class="form-control">
-          <label class="form-label" for="name"
-            >Nombre del fraccionamiento</label
-          >
+          <label class="form-label" for="name">Nombre del fraccionamiento</label>
           <input
             pInputText
             id="name"
@@ -43,13 +37,9 @@
             placeholder="Ej. Residencial San Agustín"
             fluid
             [invalid]="form.controls.name.invalid && form.controls.name.touched"
-            [attr.aria-invalid]="
-              form.controls.name.invalid && form.controls.name.touched
-            "
+            [attr.aria-invalid]="form.controls.name.invalid && form.controls.name.touched"
             [attr.aria-describedby]="
-              form.controls.name.touched && form.controls.name.errors
-                ? 'name-error'
-                : null
+              form.controls.name.touched && form.controls.name.errors ? 'name-error' : null
             "
           />
           <app-form-validation-error
@@ -70,16 +60,13 @@
             placeholder="jhon@example.com"
             fluid
             [invalid]="
-              form.controls.firstAdminEmail.invalid &&
-              form.controls.firstAdminEmail.touched
+              form.controls.firstAdminEmail.invalid && form.controls.firstAdminEmail.touched
             "
             [attr.aria-invalid]="
-              form.controls.firstAdminEmail.invalid &&
-              form.controls.firstAdminEmail.touched
+              form.controls.firstAdminEmail.invalid && form.controls.firstAdminEmail.touched
             "
             [attr.aria-describedby]="
-              form.controls.firstAdminEmail.touched &&
-              form.controls.firstAdminEmail.errors
+              form.controls.firstAdminEmail.touched && form.controls.firstAdminEmail.errors
                 ? 'firstAdminEmail-error'
                 : null
             "
@@ -99,15 +86,11 @@
             Fraccionamiento activo
           </p>
           <p class="text-xs text-slate-400 mt-0.5">
-            Los fraccionamientos inactivos no aparecerán disponibles para su
-            asignación.
+            Los fraccionamientos inactivos no aparecerán disponibles para su asignación.
           </p>
         </div>
 
-        <label
-          class="relative inline-flex items-center cursor-pointer shrink-0"
-          for="isActive"
-        >
+        <label class="relative inline-flex items-center cursor-pointer shrink-0" for="isActive">
           <p-toggleswitch name="isActive" formControlName="active" />
         </label>
       </div>
@@ -116,12 +99,10 @@
     <p-panel>
       <ng-template #header>
         <div>
-          <h2 class="text-sm font-semibold text-slate-800 dark:text-white">
-            Localización
-          </h2>
+          <h2 class="text-sm font-semibold text-slate-800 dark:text-white">Localización</h2>
           <p class="text-xs text-slate-400 mt-0.5">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore...
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+            incididunt ut labore...
           </p>
         </div>
       </ng-template>
@@ -175,16 +156,11 @@
             formControlName="zipCode"
             placeholder="11532"
             fluid
-            [invalid]="
-              form.controls.zipCode.invalid && form.controls.zipCode.touched
-            "
-            [attr.aria-invalid]="
-              form.controls.zipCode.invalid && form.controls.zipCode.touched
-            "
+            maxlength="5"
+            [invalid]="form.controls.zipCode.invalid && form.controls.zipCode.touched"
+            [attr.aria-invalid]="form.controls.zipCode.invalid && form.controls.zipCode.touched"
             [attr.aria-describedby]="
-              form.controls.zipCode.touched && form.controls.zipCode.errors
-                ? 'zipCode-error'
-                : null
+              form.controls.zipCode.touched && form.controls.zipCode.errors ? 'zipCode-error' : null
             "
           />
           <app-form-validation-error
@@ -200,12 +176,9 @@
     <p-panel>
       <ng-template #header>
         <div>
-          <h2 class="text-sm font-semibold text-slate-800 dark:text-white">
-            Calles / Secciones
-          </h2>
+          <h2 class="text-sm font-semibold text-slate-800 dark:text-white">Calles / Secciones</h2>
           <p class="text-xs text-slate-400 mt-0.5">
-            Agrega todas las calles o secciones que pertenecen a este
-            fraccionamiento.
+            Agrega todas las calles o secciones que pertenecen a este fraccionamiento.
           </p>
         </div>
       </ng-template>
@@ -227,9 +200,7 @@
                   placeholder="Ej. Calle Hacienda del Sol"
                   [invalid]="street.invalid && street.touched"
                   [attr.aria-invalid]="street.invalid && street.touched"
-                  [attr.aria-describedby]="
-                    street.touched && street.errors ? 'street-error' : null
-                  "
+                  [attr.aria-describedby]="street.touched && street.errors ? 'street-error' : null"
                 />
                 <!-- Hidden input for publicId (if it exists) -->
                 <input type="hidden" formControlName="publicId" />
