@@ -99,25 +99,59 @@ export class ResidentFormPage {
     this.form.markAllAsTouched();
     if (this.form.invalid) return;
 
-    const payload = this.form.value;
-
-    console.log('dirty', this.form.controls.unit.dirty);
-
     const response = this.user()
-      ? await this.residentStore.update(this.id() as string, this.form.value as UpdateUser)
+      ? await this.residentStore.update(this.id() as string, this.buildUpdatePayload())
       : await this.residentStore.create(this.form.value as CreateUser);
     if (!response) {
       return;
     }
 
-    //TODO: update units on create
-    // if (this.isNewUnit()) {
-    //   this.contextStore.loadUnits();
-    // }
     this.router.navigateByUrl(`/${RESIDENT_ROUTES_ENUM.HOME}`);
   }
   cancel() {
     this.router.navigate([`/${RESIDENT_ROUTES_ENUM.HOME}`]);
+  }
+
+  private originalUserRoleId: string | undefined;
+  private originalUnit: CreateUnit | undefined;
+
+  private buildUpdatePayload(): UpdateUser {
+    const current = this.form.value;
+
+    const payload: UpdateUser = {};
+
+    if (this.originalUserRoleId !== undefined && current.userRoleId !== this.originalUserRoleId) {
+      payload.userRoleId = current.userRoleId;
+    }
+
+    if (this.hasUnitChanged(this.form.controls.unit.value)) {
+      payload.unit = this.form.controls.unit.value ?? undefined;
+    }
+
+    return payload;
+  }
+
+  private hasUnitChanged(current: CreateUnit | null | undefined): boolean {
+    const original = this.originalUnit ?? null;
+
+    if (!original) return !!current;
+    if (!current) return true;
+
+    if (current.unitId || original.unitId) {
+      return (
+        current.unitId !== original.unitId ||
+        current.unitRoleId !== original.unitRoleId ||
+        current.isCurrentOccupant !== original.isCurrentOccupant
+      );
+    }
+
+    return (
+      current.streetId !== original.streetId ||
+      current.unitIdentifier !== original.unitIdentifier ||
+      current.unitTypeId !== original.unitTypeId ||
+      current.unitRoleId !== original.unitRoleId ||
+      current.isCurrentOccupant !== original.isCurrentOccupant
+    );
   }
 
   //private
@@ -142,6 +176,18 @@ export class ResidentFormPage {
     const userUnit = cResident.userUnits[0];
     const unit = userUnit?.unit;
 
+    this.originalUserRoleId = cResident.role?.publicId;
+    this.originalUnit = unit
+      ? {
+          unitId: unit.publicId,
+          streetId: unit.street?.publicId,
+          unitTypeId: unit.type?.publicId,
+          unitIdentifier: unit.identifier,
+          unitRoleId: userUnit.userUnitRole?.publicId,
+          isCurrentOccupant: userUnit.isCurrentOccupant,
+        }
+      : undefined;
+
     this.form.patchValue({
       email: cResident.email,
       userRoleId: cResident.role?.publicId,
@@ -150,8 +196,8 @@ export class ResidentFormPage {
         streetId: unit?.street?.publicId,
         unitTypeId: unit?.type?.publicId,
         unitIdentifier: unit?.identifier,
-        unitRoleId: userUnit.userUnitRole?.publicId,
-        isCurrentOccupant: userUnit.isCurrentOccupant,
+        unitRoleId: userUnit?.userUnitRole?.publicId,
+        isCurrentOccupant: userUnit?.isCurrentOccupant,
       },
     });
   }
