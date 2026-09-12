@@ -1,37 +1,15 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  input,
-  OnInit,
-  output,
-} from "@angular/core";
-import {
-  FormGroup,
-  FormControl,
-  Validators,
-  ReactiveFormsModule,
-} from "@angular/forms";
-import { CreateUnit } from "@nexhouse/shared-domain/interfaces";
-import {
-  BaseCatalogModel,
-  NeighStreetModel,
-  UserModel,
-} from "@nexhouse/shared-domain/models";
-import {
-  FormValidationErrorComponent,
-  UnitFormComponent,
-} from "@shared/components/forms";
-import { Button } from "@openng/optimus-ui/button";
-import { InputTextModule } from "@openng/optimus-ui/inputtext";
-import { Panel } from "@openng/optimus-ui/panel";
-import { Select } from "@openng/optimus-ui/select";
-import { ToggleSwitch } from "@openng/optimus-ui/toggleswitch";
+import {ChangeDetectionStrategy, Component, input, output} from '@angular/core';
+import {CreateUnit} from '@nexhouse/shared-domain/interfaces';
+import {BaseCatalogModel, NeighStreetModel, UserModel} from '@nexhouse/shared-domain/models';
+import {Button} from '@openng/optimus-ui/button';
+import {Panel} from '@openng/optimus-ui/panel';
+import {UnitFormComponent} from '@shared/components/forms';
 
 @Component({
-  selector: "app-onboarding-unit-component",
+  selector: 'app-onboarding-unit-component',
   imports: [Button, Panel, UnitFormComponent],
-  templateUrl: "./onboarding-unit-component.html",
-  styleUrl: "./onboarding-unit-component.css",
+  templateUrl: './onboarding-unit-component.html',
+  styleUrl: './onboarding-unit-component.css',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

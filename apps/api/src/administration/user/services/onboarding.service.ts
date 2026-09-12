@@ -32,7 +32,7 @@ export class OnboardingService {
     // 1. Evaluar si debe crear unidad (Solo Admin inicial sin unidades)
     const isAdmin = user.isFirstAdmin; // O según el código/id de tu catálogo de roles
     const hasUnits = user.userUnits && user.userUnits.length > 0;
-    const requiresUnitCreation = isAdmin && !hasUnits;
+    const requiresUnitCreation = isAdmin;
 
     // 2. Evaluar cuáles pasos fueron completados
     const isSecurityCompleted = !user.requirePwdChange;

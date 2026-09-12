@@ -12,6 +12,7 @@
         icon="pi pi-arrow-left"
         variant="outlined"
         severity="secondary"
+        (click)="prev.emit()"
         [disabled]="isLoading()"
       />
       <p-button

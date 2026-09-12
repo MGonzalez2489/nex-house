@@ -1,11 +1,6 @@
 <div class="flex items-center justify-center md:py-8">
-  <div class="flex justify-between w-130">
-    <p-button
-      icon="pi pi-sign-out"
-      class="scale-x-[-1]"
-      text
-      (click)="sessionService.logout()"
-    />
+  <div class="flex justify-between w-210">
+    <p-button icon="pi pi-sign-out" class="scale-x-[-1]" text (click)="sessionService.logout()" />
     <app-brand-component />
     <p></p>
   </div>
@@ -29,10 +24,10 @@
           <ng-template pTemplate="content">
             <div class="py-6">
               @switch (step.id) {
-                @case ("welcome") {
+                @case ('welcome') {
                   <app-onboarding-welcome-component (next)="finishWelcome()" />
                 }
-                @case ("security") {
+                @case ('security') {
                   <app-onboarding-pwd-change-component
                     [isLoading]="store.loading()"
                     [user]="userStore.user()"
@@ -42,7 +37,7 @@
                     (next)="changePwd()"
                   />
                 }
-                @case ("general-form") {
+                @case ('general-form') {
                   <app-onboarding-general-component
                     [isLoading]="store.loading()"
                     [profile]="userStore.profile()"
@@ -52,7 +47,7 @@
                     (next)="goNext()"
                   />
                 }
-                @case ("create-unit") {
+                @case ('create-unit') {
                   <app-onboarding-unit-component
                     [unitRoles]="catalogsStore.UserUnitRoles()"
                     [unitTypes]="catalogsStore.UnitTypes()"
@@ -63,7 +58,7 @@
                     (doSubmit)="createUnit($event)"
                   />
                 }
-                @case ("complete") {
+                @case ('complete') {
                   <app-onboarding-finish-component
                     [profile]="userStore.profile()"
                     (complete)="completeOnboarding()"
@@ -79,7 +74,5 @@
 </div>
 <p class="text-center text-xs text-slate-400 dark:text-slate-500 mt-6">
   ¿Necesitas ayuda?
-  <a href="#" class="text-cyan-600 dark:text-cyan-400 hover:underline"
-    >Contáctanos</a
-  >
+  <a href="#" class="text-cyan-600 dark:text-cyan-400 hover:underline">Contáctanos</a>
 </p>

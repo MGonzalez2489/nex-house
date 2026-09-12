@@ -30,10 +30,10 @@
     <ng-template #body let-user>
       <tr>
         <td>
-          <app-avatar-component [text]="user.fullName" />
+          <app-avatar-component [text]="user.profile?.fullName" />
         </td>
         <td>
-          <p class="font-semibold capitalize">{{ user.fullName ?? "--" }}</p>
+          <p class="font-semibold capitalize">{{ user.profile?.fullName ?? '--' }}</p>
           <p class="text-sm text-slate-400">{{ user.email }}</p>
         </td>
 

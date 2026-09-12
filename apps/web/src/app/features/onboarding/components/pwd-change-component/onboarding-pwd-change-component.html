@@ -11,17 +11,14 @@
     Actualiza tu contraseña
   </h1>
   <p class="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
-    Por seguridad, es necesario que cambies tu contraseña temporal antes de
-    continuar.
+    Por seguridad, es necesario que cambies tu contraseña temporal antes de continuar.
   </p>
 
   @if (requirePwdChange()) {
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-5">
       <!-- current pwd -->
       <div class="form-control">
-        <label class="form-label required" for="currentPwd"
-          >Contraseña actual
-        </label>
+        <label class="form-label required" for="currentPwd">Contraseña actual </label>
         <p-password
           [toggleMask]="true"
           autocomplete="off"
@@ -30,12 +27,8 @@
           feedback="false"
           formControlName="currentPwd"
           placeholder="••••••••"
-          [invalid]="
-            form.controls.currentPwd.invalid && form.controls.currentPwd.touched
-          "
-          [attr.aria-invalid]="
-            form.controls.currentPwd.invalid && form.controls.currentPwd.touched
-          "
+          [invalid]="form.controls.currentPwd.invalid && form.controls.currentPwd.touched"
+          [attr.aria-invalid]="form.controls.currentPwd.invalid && form.controls.currentPwd.touched"
           [attr.aria-describedby]="
             form.controls.currentPwd.touched && form.controls.currentPwd.errors
               ? 'currentPwd-error'
@@ -52,9 +45,7 @@
       </div>
       <!-- new pwd -->
       <div class="form-control">
-        <label class="form-label required" for="newPwd"
-          >Nueva contraseña
-        </label>
+        <label class="form-label required" for="newPwd">Nueva contraseña </label>
         <p-password
           [toggleMask]="true"
           autocomplete="off"
@@ -63,16 +54,10 @@
           formControlName="newPwd"
           placeholder="••••••••"
           feedback="false"
-          [invalid]="
-            form.controls.newPwd.invalid && form.controls.newPwd.touched
-          "
-          [attr.aria-invalid]="
-            form.controls.newPwd.invalid && form.controls.newPwd.touched
-          "
+          [invalid]="form.controls.newPwd.invalid && form.controls.newPwd.touched"
+          [attr.aria-invalid]="form.controls.newPwd.invalid && form.controls.newPwd.touched"
           [attr.aria-describedby]="
-            form.controls.newPwd.touched && form.controls.newPwd.errors
-              ? 'newPwd-error'
-              : null
+            form.controls.newPwd.touched && form.controls.newPwd.errors ? 'newPwd-error' : null
           "
         />
 
@@ -85,9 +70,7 @@
       </div>
       <!-- confirm pwd -->
       <div class="form-control">
-        <label class="form-label required" for="confirmPwd"
-          >Confirmar nueva contraseña
-        </label>
+        <label class="form-label required" for="confirmPwd">Confirmar nueva contraseña </label>
         <p-password
           [toggleMask]="true"
           autocomplete="off"
@@ -96,12 +79,8 @@
           formControlName="confirmPwd"
           feedback="false"
           placeholder="••••••••"
-          [invalid]="
-            form.controls.confirmPwd.invalid && form.controls.confirmPwd.touched
-          "
-          [attr.aria-invalid]="
-            form.controls.confirmPwd.invalid && form.controls.confirmPwd.touched
-          "
+          [invalid]="form.controls.confirmPwd.invalid && form.controls.confirmPwd.touched"
+          [attr.aria-invalid]="form.controls.confirmPwd.invalid && form.controls.confirmPwd.touched"
           [attr.aria-describedby]="
             form.controls.confirmPwd.touched && form.controls.confirmPwd.errors
               ? 'confirmPwd-error'
@@ -144,8 +123,8 @@
     >
       <i class="pi pi-info-circle text-2xl text-emerald-600"></i>
       <h2>
-        Tu contraseña ha sido actualizada correctamente. Podras realizar este
-        proceso de nuevo en la sección
+        Tu contraseña ha sido actualizada correctamente. Podras realizar este proceso de nuevo en la
+        sección
         <span class="text-cyan-500 font-semibold">Perfil</span>.
       </h2>
     </div>

@@ -1,35 +1,28 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  inject,
-  signal,
-} from "@angular/core";
-import { SessionService } from "@core/services";
-import { OnboardingStepEnum } from "@nexhouse/shared-domain/enums";
-import { ChangePassword, CreateUnit } from "@nexhouse/shared-domain/interfaces";
-import { OnboardingStepModel } from "@nexhouse/shared-domain/models";
-import { OnboardingStore } from "@onboarding/onboarding.store";
-import { BrandComponent } from "@shared/components";
-import { Button } from "@openng/optimus-ui/button";
-import { ProgressBarModule } from "@openng/optimus-ui/progressbar";
-import { StepperModule } from "@openng/optimus-ui/stepper";
+import {ChangeDetectionStrategy, Component, computed, effect, inject, signal} from '@angular/core';
+import {SessionService} from '@core/services';
+import {OnboardingStepEnum} from '@nexhouse/shared-domain/enums';
+import {ChangePassword, CreateUnit} from '@nexhouse/shared-domain/interfaces';
+import {OnboardingStepModel} from '@nexhouse/shared-domain/models';
+import {OnboardingStore} from '@onboarding/onboarding.store';
+import {BrandComponent} from '@shared/components';
+import {Button} from '@openng/optimus-ui/button';
+import {ProgressBarModule} from '@openng/optimus-ui/progressbar';
+import {StepperModule} from '@openng/optimus-ui/stepper';
 import {
   OnboardingFinishComponent,
   OnboardingGeneralComponent,
   OnboardingPwdChangeComponent,
   OnboardingUnitComponent,
   OnboardingWelcomeComponent,
-} from "../../components";
-import { ContextStore } from "@stores/context.store";
-import { CatalogsStore } from "@stores/catalogs.store";
-import { Router } from "@angular/router";
-import { DASHBOARD_ROUTES_ENUM } from "@dashboard/dashboard.routes";
-import { UserStore } from "@user/user.store";
+} from '../../components';
+import {ContextStore} from '@stores/context.store';
+import {CatalogsStore} from '@stores/catalogs.store';
+import {Router} from '@angular/router';
+import {DASHBOARD_ROUTES_ENUM} from '@dashboard/dashboard.routes';
+import {UserStore} from '@user/user.store';
 
 @Component({
-  selector: "app-onboarding-home-page",
+  selector: 'app-onboarding-home-page',
   imports: [
     StepperModule,
     ProgressBarModule,
@@ -41,8 +34,8 @@ import { UserStore } from "@user/user.store";
     OnboardingFinishComponent,
     Button,
   ],
-  templateUrl: "./onboarding-home-page.html",
-  styleUrl: "./onboarding-home-page.css",
+  templateUrl: './onboarding-home-page.html',
+  styleUrl: './onboarding-home-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
 })
@@ -83,9 +76,7 @@ export class OnboardingHomePage {
   }
 
   protected activeStepIndex = computed(() => {
-    const index = this.steps().findIndex(
-      (step) => step.id === this.currentStepId(),
-    );
+    const index = this.steps().findIndex((step) => step.id === this.currentStepId());
 
     return index !== -1 ? index : 0;
   });
@@ -121,11 +112,6 @@ export class OnboardingHomePage {
   }
   protected async completeOnboarding() {
     await this.store.complete();
-
-    // this.router.resetConfig(DASHBOARD_ROUTES);
-    // const urlTree = this.router.createUrlTree([
-    //   `/${DASHBOARD_ROUTES_ENUM.HOME}`,
-    // ]);
     this.router.navigateByUrl(`/${DASHBOARD_ROUTES_ENUM.HOME}`);
   }
 

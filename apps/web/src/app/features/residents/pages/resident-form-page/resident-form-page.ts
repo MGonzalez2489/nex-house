@@ -1,16 +1,20 @@
-import {JsonPipe} from '@angular/common';
 import {ChangeDetectionStrategy, Component, effect, inject, input, signal} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 import {UserRoleEnum} from '@nexhouse/shared-domain/enums';
-import {CreateUnit, CreateUser} from '@nexhouse/shared-domain/interfaces';
+import {CreateUnit, CreateUser, UpdateUser} from '@nexhouse/shared-domain/interfaces';
+import {UserModel} from '@nexhouse/shared-domain/models';
 import {Button} from '@openng/optimus-ui/button';
 import {InputTextModule} from '@openng/optimus-ui/inputtext';
 import {Panel} from '@openng/optimus-ui/panel';
 import {Select} from '@openng/optimus-ui/select';
 import {RESIDENT_ROUTES_ENUM} from '@residents/resident.routes';
 import {ResidentStore} from '@residents/resident.store';
-import {FormValidationErrorComponent, UnitFormComponent} from '@shared/components/forms';
+import {
+  FormOptions,
+  FormValidationErrorComponent,
+  UnitFormComponent,
+} from '@shared/components/forms';
 import {CatalogsStore} from '@stores/catalogs.store';
 import {ContextStore} from '@stores/context.store';
 import {UnitStore} from '@units/units.store';
@@ -26,7 +30,7 @@ import {CreateResidentForm} from './resident-form';
     Select,
     FormValidationErrorComponent,
     UnitFormComponent,
-    JsonPipe,
+    FormOptions,
   ],
   templateUrl: './resident-form-page.html',
   styleUrl: './resident-form-page.css',
@@ -55,6 +59,8 @@ export class ResidentFormPage {
     unit: new FormControl<CreateUnit | null>(null, [Validators.required]),
   });
 
+  protected readonly user = signal<UserModel | undefined>(undefined);
+
   constructor() {
     effect(() => {
       const cIsLoadingComplete = this.isLoadingComplete();
@@ -80,14 +86,26 @@ export class ResidentFormPage {
         this.initCreate();
       }
     });
+
+    effect(() => {
+      const cUser = this.user();
+      if (!cUser) return;
+
+      this.form.controls.email.disable();
+    });
   }
 
   async submit() {
     this.form.markAllAsTouched();
     if (this.form.invalid) return;
 
-    const dto = this.form.value as CreateUser;
-    const response = await this.residentStore.create(dto);
+    const payload = this.form.value;
+
+    console.log('dirty', this.form.controls.unit.dirty);
+
+    const response = this.user()
+      ? await this.residentStore.update(this.id() as string, this.form.value as UpdateUser)
+      : await this.residentStore.create(this.form.value as CreateUser);
     if (!response) {
       return;
     }
@@ -113,11 +131,13 @@ export class ResidentFormPage {
     });
   }
 
-  private initUpdate() {
-    const rId = this.id();
-    const cResident = this.residentStore.entities().find((f) => f.publicId == rId);
+  private async initUpdate() {
+    const rId = this.id() as string;
+    const cResident = await this.residentStore.loadById(rId);
 
     if (!cResident) return;
+
+    this.user.set(cResident);
 
     const userUnit = cResident.userUnits[0];
     const unit = userUnit?.unit;

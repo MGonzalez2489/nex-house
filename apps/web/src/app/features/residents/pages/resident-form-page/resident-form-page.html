@@ -14,11 +14,29 @@
         {{ id() ? 'Actualizar' : 'Nuevo' }} residente
       </h1>
       <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-        Registra la información básica y las calles que lo componen.
+        {{ id() ? 'Actualiza' : 'Registra' }} la información básica y las calles que lo componen.
       </p>
     </div>
   </div>
   <form class="space-y-5" [formGroup]="form" (submit)="submit()">
+    @if (user(); as user) {
+      <p-panel showHeader="false" class="pt-5">
+        <div class="grid grid-cols-2 gap-3">
+          <section class="space-y-1">
+            <h4 class="font-semibold text-xs text-slate-500/80">Nombre</h4>
+            <h3 class="capitalize">{{ user.profile?.fullName }}</h3>
+          </section>
+          <section class="space-y-1">
+            <h4 class="font-semibold text-xs text-slate-500/80">Correo Electrónico</h4>
+            <h3 class="capitalize">{{ user.email }}</h3>
+          </section>
+          <section class="space-y-1">
+            <h4 class="font-semibold text-xs text-slate-500/80">Estatus</h4>
+            <h3 class="capitalize">{{ user.status?.displayName }}</h3>
+          </section>
+        </div>
+      </p-panel>
+    }
     <!-- Información general -->
     <p-panel>
       <ng-template #header>
@@ -76,8 +94,11 @@
     </p-panel>
     <!-- Acciones -->
     <div class="hidden lg:flex items-center justify-end gap-3">
-      <p-button label="Cancelar" severity="secondary" variant="outlined" (click)="cancel()" />
-      <p-button label="Guardar" type="submit" />
+      <app-form-options
+        [isLoading]="residentStore.loading()"
+        [callState]="residentStore.callState()"
+        (doCancel)="cancel()"
+      />
     </div>
     <div
       class="lg:hidden fixed bottom-0 left-0 right-0 z-30 border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur px-4 py-3 flex items-center gap-3"
@@ -95,4 +116,3 @@
     </div>
   </form>
 </div>
-<pre>{{ form.value | json }}</pre>

@@ -7,6 +7,7 @@ import {
   Controller,
   Get,
   InternalServerErrorException,
+  NotFoundException,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -72,7 +73,29 @@ export class ResidentController {
     @Param('publicId', ParseUUIDPipe) publicId: string,
     @CurrentNeigh() neigh: Neighborhood,
   ) {
-    return await this.searchService.findByPublicId(publicId, neigh.id);
+    const response = await this.searchService.findByPublicId(
+      publicId,
+      neigh.id,
+      {
+        neighborhood: true,
+        status: true,
+        profile: true,
+        role: true,
+        userUnits: {
+          unit: {
+            street: true,
+            type: true,
+          },
+          userUnitRole: true,
+        },
+      },
+    );
+
+    if (!response) {
+      throw new NotFoundException('Used not found.');
+    }
+
+    return UserToModelMapper(response);
   }
 
   @Patch(':publicId')

@@ -1,3 +1,13 @@
+import {effect, inject} from '@angular/core';
+import {AuthStore} from '@auth/store';
+import {
+  ApiPaginationMeta,
+  CreateUser,
+  SearchUser,
+  UpdateUser,
+  UserStats,
+} from '@nexhouse/shared-domain/interfaces';
+import {UserModel} from '@nexhouse/shared-domain/models';
 import {
   setError,
   setLoaded,
@@ -5,16 +15,8 @@ import {
   withCallState,
   withDevtools,
   withReset,
-} from "@ngrx-toolkit/core";
-import { effect, inject } from "@angular/core";
-import {
-  ApiPaginationMeta,
-  CreateUser,
-  SearchUser,
-  UserStats,
-} from "@nexhouse/shared-domain/interfaces";
-import { UserModel } from "@nexhouse/shared-domain/models";
-import { tapResponse } from "@ngrx/operators";
+} from '@ngrx-toolkit/core';
+import {tapResponse} from '@ngrx/operators';
 import {
   patchState,
   signalStore,
@@ -23,18 +25,12 @@ import {
   withMethods,
   withProps,
   withState,
-} from "@ngrx/signals";
-import {
-  addEntity,
-  entityConfig,
-  setAllEntities,
-  withEntities,
-} from "@ngrx/signals/entities";
-import { rxMethod } from "@ngrx/signals/rxjs-interop";
-import { ContextStore } from "@stores/context.store";
-import { lastValueFrom, pipe, switchMap, tap } from "rxjs";
-import { ResidentService } from "./services";
-import { AuthStore } from "@auth/store";
+} from '@ngrx/signals';
+import {addEntity, entityConfig, setAllEntities, withEntities} from '@ngrx/signals/entities';
+import {rxMethod} from '@ngrx/signals/rxjs-interop';
+import {ContextStore} from '@stores/context.store';
+import {lastValueFrom, pipe, switchMap, tap} from 'rxjs';
+import {ResidentService} from './services';
 
 const config = entityConfig({
   entity: type<UserModel>(),
@@ -51,8 +47,8 @@ const initialState: ResidentState = {
 };
 
 export const ResidentStore = signalStore(
-  { providedIn: "root" },
-  withDevtools("residents"),
+  {providedIn: 'root'},
+  withDevtools('residents'),
   withReset(),
   withEntities(config),
   withCallState(),
@@ -61,7 +57,6 @@ export const ResidentStore = signalStore(
     _residentService: inject(ResidentService),
     _contextStore: inject(ContextStore),
   })),
-
   withMethods((store) => ({
     loadStats: rxMethod<void>(
       pipe(
@@ -112,16 +107,13 @@ export const ResidentStore = signalStore(
         }),
       ),
     ),
-
     create: async (dto: CreateUser): Promise<boolean> => {
       const n = store._contextStore.neighborhood();
       if (!n) return false;
 
       patchState(store, setLoading());
       try {
-        const response = await lastValueFrom(
-          store._residentService.create(n.publicId, dto),
-        );
+        const response = await lastValueFrom(store._residentService.create(n.publicId, dto));
         patchState(store, addEntity(response.data, config), setLoaded());
 
         store.loadStats();
@@ -129,6 +121,39 @@ export const ResidentStore = signalStore(
       } catch (err) {
         patchState(store, setError(err));
         return false;
+      }
+    },
+    loadById: async (id: string): Promise<UserModel | null> => {
+      const loaded = store.entities().find((f) => f.publicId === id);
+      if (loaded) {
+        return loaded;
+      }
+
+      const n = store._contextStore.neighborhood();
+      if (!n) return null;
+
+      try {
+        patchState(store, setLoading());
+        const response = await lastValueFrom(store._residentService.getById(n.publicId, id));
+        patchState(store, setLoaded());
+        return response.data;
+      } catch (err) {
+        patchState(store, setError(err));
+        return null;
+      }
+    },
+    update: async (id: string, dto: UpdateUser) => {
+      const n = store._contextStore.neighborhood();
+      if (!n) return null;
+
+      try {
+        patchState(store, setLoading());
+        const response = await lastValueFrom(store._residentService.update(n.publicId, id, dto));
+        patchState(store, setLoaded());
+        return response.data;
+      } catch (err) {
+        patchState(store, setError(err));
+        return null;
       }
     },
   })),
