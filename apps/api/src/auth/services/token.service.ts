@@ -8,10 +8,11 @@ import {
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { intervalToDuration } from 'date-fns';
+
+export type TokenType = 'access' | 'refresh' | 'reset_password';
 
 export type NexHouseToken = {
-  type: string;
+  type: TokenType;
   token: string;
   expiresAtDate: string;
   expiresInMs: number;
@@ -39,10 +40,6 @@ export class TokenService {
     userPublicId: string,
     sessionPublicId: string,
   ): NexHouseToken {
-    const duration = intervalToDuration({
-      start: 0,
-      end: ACCESS_TOKEN_DURATION,
-    });
     const token = this.jwtService.sign(
       {
         email,
@@ -50,7 +47,7 @@ export class TokenService {
         session: sessionPublicId,
       },
       {
-        expiresIn: `${duration.minutes}m`,
+        expiresIn: this.toJwtExpirySeconds(ACCESS_TOKEN_DURATION),
       },
     );
     const expiresAt = this.getDateWithMS(ACCESS_TOKEN_DURATION);
@@ -79,13 +76,9 @@ export class TokenService {
     sessionPublicId: string,
     rememberMe: boolean,
   ): NexHouseToken {
-    const end = rememberMe
+    const duration = rememberMe
       ? REFRESH_TOKEN_REMEMBER_DURATION
       : REFRESH_TOKEN_DURATION;
-    const duration = intervalToDuration({
-      start: 0,
-      end,
-    });
 
     const token = this.jwtService.sign(
       {
@@ -93,10 +86,10 @@ export class TokenService {
         session: sessionPublicId,
       },
       {
-        expiresIn: `${duration.days}d`,
+        expiresIn: this.toJwtExpirySeconds(duration),
       },
     );
-    const expiresAt = this.getDateWithMS(end);
+    const expiresAt = this.getDateWithMS(duration);
 
     return {
       type: 'refresh',
@@ -122,11 +115,6 @@ export class TokenService {
   ): NexHouseToken {
     const resetSecret = this.configService.get<string>('JWT_RESET') || '';
 
-    const duration = intervalToDuration({
-      start: 0,
-      end: RESET_TOKEN_EXPIRATION,
-    });
-
     const payload = {
       email,
       sub: userPublicId,
@@ -134,7 +122,7 @@ export class TokenService {
     };
     const token = this.jwtService.sign(payload, {
       secret: resetSecret,
-      expiresIn: `${duration.minutes}m`,
+      expiresIn: this.toJwtExpirySeconds(RESET_TOKEN_EXPIRATION),
     });
     const expiresAt = this.getDateWithMS(RESET_TOKEN_EXPIRATION);
 
@@ -158,19 +146,24 @@ export class TokenService {
   }
 
   /**
+   * Converts a duration in milliseconds to whole seconds so it can be passed
+   * to the `JwtService` as `expiresIn`.
+   *
+   * @param ms The duration in milliseconds.
+   * @returns The duration expressed as whole seconds.
+   */
+  private toJwtExpirySeconds(ms: number): number {
+    return Math.floor(ms / 1000);
+  }
+
+  /**
    * Computes the future epoch timestamp of `now + msToAdd`.
    *
    * @param msToAdd The milliseconds to add to the current time.
    * @returns The resulting epoch timestamp in milliseconds.
    */
   private getDateWithMS(msToAdd: number): number {
-    const date = new Date();
-    const currentMs = date.getTime();
-
-    // Add the milliseconds
-    const finalMs = currentMs + msToAdd;
-
-    return finalMs;
+    return Date.now() + msToAdd;
   }
 
   /**
@@ -179,8 +172,7 @@ export class TokenService {
    * @param ms The epoch timestamp in milliseconds to format.
    * @returns A UTC date string (e.g. `Tue, 11 Sep 2026 19:00:00 GMT`).
    */
-  private getDateStrFromMs(ms: number) {
-    const date: Date = new Date(ms);
-    return date.toUTCString();
+  private getDateStrFromMs(ms: number): string {
+    return new Date(ms).toUTCString();
   }
 }

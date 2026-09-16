@@ -10,6 +10,9 @@ import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TokenService } from './token.service';
 
+const RFC_UTC_STRING =
+  /^[A-Z][a-z]{2}, \d{2} [A-Z][a-z]{2} \d{4} \d{2}:\d{2}:\d{2} GMT$/;
+
 describe('TokenService', () => {
   let service: TokenService;
   let mockJwtService: jest.Mocked<JwtService>;
@@ -41,20 +44,24 @@ describe('TokenService', () => {
   });
 
   describe('createAccessToken', () => {
+    const EMAIL = 'user@nexhouse.com';
+    const USER_PUBLIC_ID = 'user-public-1';
+    const SESSION_PUBLIC_ID = 'session-public-1';
+
     it('should sign an access token with email, sub and session claims and a 15-minute expiry', () => {
       const result = service.createAccessToken(
-        'user@nexhouse.com',
-        'user-public-1',
-        'session-public-1',
+        EMAIL,
+        USER_PUBLIC_ID,
+        SESSION_PUBLIC_ID,
       );
 
       expect(mockJwtService.sign).toHaveBeenCalledWith(
         {
-          email: 'user@nexhouse.com',
-          sub: 'user-public-1',
-          session: 'session-public-1',
+          email: EMAIL,
+          sub: USER_PUBLIC_ID,
+          session: SESSION_PUBLIC_ID,
         },
-        expect.objectContaining({ expiresIn: '15m' }),
+        expect.objectContaining({ expiresIn: ACCESS_TOKEN_DURATION / 1000 }),
       );
       expect(result.type).toBe('access');
       expect(result.token).toBe('signed-jwt');
@@ -63,9 +70,9 @@ describe('TokenService', () => {
     it('should report expiration 15 minutes from now in both ms and UTC string form', () => {
       const before = Date.now();
       const result = service.createAccessToken(
-        'user@nexhouse.com',
-        'user-public-1',
-        'session-public-1',
+        EMAIL,
+        USER_PUBLIC_ID,
+        SESSION_PUBLIC_ID,
       );
       const after = Date.now();
 
@@ -75,83 +82,220 @@ describe('TokenService', () => {
       expect(result.expiresInMs).toBeLessThanOrEqual(
         after + ACCESS_TOKEN_DURATION,
       );
-      expect(new Date(result.expiresInMs).toUTCString()).toBe(
-        result.expiresAtDate,
+      expect(result.expiresAtDate).toBe(
+        new Date(result.expiresInMs).toUTCString(),
       );
+      expect(result.expiresAtDate).toMatch(RFC_UTC_STRING);
+    });
+
+    it('should pass empty or unusually shaped values straight into the JWT payload', () => {
+      service.createAccessToken('', '', '');
+
+      expect(mockJwtService.sign).toHaveBeenCalledWith(
+        { email: '', sub: '', session: '' },
+        expect.objectContaining({ expiresIn: ACCESS_TOKEN_DURATION / 1000 }),
+      );
+    });
+
+    it('should always use the fixed ACCESS_TOKEN_DURATION regardless of the inputs', () => {
+      service.createAccessToken(EMAIL, USER_PUBLIC_ID, SESSION_PUBLIC_ID);
+      service.createAccessToken('', '', '');
+
+      expect(mockJwtService.sign).toHaveBeenNthCalledWith(
+        2,
+        expect.any(Object),
+        expect.objectContaining({ expiresIn: ACCESS_TOKEN_DURATION / 1000 }),
+      );
+    });
+
+    it('should propagate an error thrown by the JwtService', () => {
+      mockJwtService.sign.mockImplementation(() => {
+        throw new Error('signing failed');
+      });
+
+      expect(() =>
+        service.createAccessToken(EMAIL, USER_PUBLIC_ID, SESSION_PUBLIC_ID),
+      ).toThrow('signing failed');
     });
   });
 
   describe('createRefreshAccessToken', () => {
+    const USER_PUBLIC_ID = 'user-public-1';
+    const SESSION_PUBLIC_ID = 'session-public-1';
+
     it('should sign a 7-day refresh token when rememberMe is false', () => {
       const result = service.createRefreshAccessToken(
-        'user-public-1',
-        'session-public-1',
+        USER_PUBLIC_ID,
+        SESSION_PUBLIC_ID,
         false,
       );
 
       expect(mockJwtService.sign).toHaveBeenCalledWith(
-        { sub: 'user-public-1', session: 'session-public-1' },
-        expect.objectContaining({ expiresIn: '7d' }),
+        { sub: USER_PUBLIC_ID, session: SESSION_PUBLIC_ID },
+        expect.objectContaining({ expiresIn: REFRESH_TOKEN_DURATION / 1000 }),
       );
       expect(result.type).toBe('refresh');
       expect(result.token).toBe('signed-jwt');
-      expect(result.expiresInMs).toBeGreaterThanOrEqual(
-        Date.now() + REFRESH_TOKEN_DURATION - 100,
-      );
     });
 
     it('should extend the refresh token lifetime to 30 days when rememberMe is true', () => {
       const result = service.createRefreshAccessToken(
-        'user-public-1',
-        'session-public-1',
+        USER_PUBLIC_ID,
+        SESSION_PUBLIC_ID,
         true,
       );
 
       expect(mockJwtService.sign).toHaveBeenCalledWith(
         expect.any(Object),
-        expect.objectContaining({ expiresIn: '30d' }),
+        expect.objectContaining({
+          expiresIn: REFRESH_TOKEN_REMEMBER_DURATION / 1000,
+        }),
       );
+      expect(result.type).toBe('refresh');
+      expect(result.token).toBe('signed-jwt');
+    });
+
+    it('should embed only the sub and session claims (no email) in the payload', () => {
+      service.createRefreshAccessToken(
+        USER_PUBLIC_ID,
+        SESSION_PUBLIC_ID,
+        false,
+      );
+
+      expect(mockJwtService.sign).toHaveBeenCalledWith(
+        { sub: USER_PUBLIC_ID, session: SESSION_PUBLIC_ID },
+        expect.any(Object),
+      );
+      expect(mockJwtService.sign.mock.calls[0][0]).not.toHaveProperty('email');
+    });
+
+    it('should report expiration 7 days from now when rememberMe is false', () => {
+      const before = Date.now();
+      const result = service.createRefreshAccessToken(
+        USER_PUBLIC_ID,
+        SESSION_PUBLIC_ID,
+        false,
+      );
+      const after = Date.now();
+
       expect(result.expiresInMs).toBeGreaterThanOrEqual(
-        Date.now() + REFRESH_TOKEN_REMEMBER_DURATION - 100,
+        before + REFRESH_TOKEN_DURATION,
       );
+      expect(result.expiresInMs).toBeLessThanOrEqual(
+        after + REFRESH_TOKEN_DURATION,
+      );
+      expect(result.expiresAtDate).toBe(
+        new Date(result.expiresInMs).toUTCString(),
+      );
+    });
+
+    it('should report expiration 30 days from now when rememberMe is true', () => {
+      const before = Date.now();
+      const result = service.createRefreshAccessToken(
+        USER_PUBLIC_ID,
+        SESSION_PUBLIC_ID,
+        true,
+      );
+      const after = Date.now();
+
+      expect(result.expiresInMs).toBeGreaterThanOrEqual(
+        before + REFRESH_TOKEN_REMEMBER_DURATION,
+      );
+      expect(result.expiresInMs).toBeLessThanOrEqual(
+        after + REFRESH_TOKEN_REMEMBER_DURATION,
+      );
+      expect(result.expiresAtDate).toBe(
+        new Date(result.expiresInMs).toUTCString(),
+      );
+      expect(result.expiresAtDate).toMatch(RFC_UTC_STRING);
+    });
+
+    it('should propagate an error thrown by the JwtService', () => {
+      mockJwtService.sign.mockImplementation(() => {
+        throw new Error('signing failed');
+      });
+
+      expect(() =>
+        service.createRefreshAccessToken(
+          USER_PUBLIC_ID,
+          SESSION_PUBLIC_ID,
+          false,
+        ),
+      ).toThrow('signing failed');
     });
   });
 
   describe('createResetPasswordToken', () => {
-    it('should sign a password-reset token with the JWT_RESET secret and password_reset purpose', () => {
+    const EMAIL = 'user@nexhouse.com';
+    const USER_PUBLIC_ID = 'user-public-1';
+
+    it('should sign a 5-minute reset token with the JWT_RESET secret and password_reset purpose', () => {
       const result = service.createResetPasswordToken(
-        'user@nexhouse.com',
-        'user-public-1',
+        EMAIL,
+        USER_PUBLIC_ID,
       );
 
       expect(mockConfigService.get).toHaveBeenCalledWith('JWT_RESET');
       expect(mockJwtService.sign).toHaveBeenCalledWith(
         {
-          email: 'user@nexhouse.com',
-          sub: 'user-public-1',
+          email: EMAIL,
+          sub: USER_PUBLIC_ID,
           purpose: PWD_RESET_PURPOSE,
         },
         {
           secret: 'reset-secret',
-          expiresIn: '5m',
+          expiresIn: RESET_TOKEN_EXPIRATION / 1000,
         },
       );
       expect(result.type).toBe('reset_password');
       expect(result.token).toBe('signed-jwt');
-      expect(result.expiresInMs).toBeGreaterThanOrEqual(
-        Date.now() + RESET_TOKEN_EXPIRATION - 100,
-      );
     });
 
     it('should fall back to an empty secret when JWT_RESET is not configured', () => {
       mockConfigService.get.mockReturnValue(undefined);
 
-      service.createResetPasswordToken('user@nexhouse.com', 'user-public-1');
+      service.createResetPasswordToken(EMAIL, USER_PUBLIC_ID);
 
       expect(mockJwtService.sign).toHaveBeenCalledWith(
         expect.any(Object),
         expect.objectContaining({ secret: '' }),
       );
+    });
+
+    it('should pass empty email and public id through to the token payload', () => {
+      service.createResetPasswordToken('', '');
+
+      expect(mockJwtService.sign).toHaveBeenCalledWith(
+        { email: '', sub: '', purpose: PWD_RESET_PURPOSE },
+        expect.objectContaining({ expiresIn: RESET_TOKEN_EXPIRATION / 1000 }),
+      );
+    });
+
+    it('should report expiration 5 minutes from now in both ms and UTC string form', () => {
+      const before = Date.now();
+      const result = service.createResetPasswordToken(EMAIL, USER_PUBLIC_ID);
+      const after = Date.now();
+
+      expect(result.expiresInMs).toBeGreaterThanOrEqual(
+        before + RESET_TOKEN_EXPIRATION,
+      );
+      expect(result.expiresInMs).toBeLessThanOrEqual(
+        after + RESET_TOKEN_EXPIRATION,
+      );
+      expect(result.expiresAtDate).toBe(
+        new Date(result.expiresInMs).toUTCString(),
+      );
+      expect(result.expiresAtDate).toMatch(RFC_UTC_STRING);
+    });
+
+    it('should propagate an error thrown by the JwtService', () => {
+      mockJwtService.sign.mockImplementation(() => {
+        throw new Error('signing failed');
+      });
+
+      expect(() =>
+        service.createResetPasswordToken(EMAIL, USER_PUBLIC_ID),
+      ).toThrow('signing failed');
     });
   });
 
@@ -172,6 +316,18 @@ describe('TokenService', () => {
       expect(() => service.verifyToken('expired.jwt.token')).toThrow(
         'jwt expired',
       );
+    });
+
+    it('should pass an empty token string straight through to the JwtService', () => {
+      service.verifyToken('');
+
+      expect(mockJwtService.verify).toHaveBeenCalledWith('');
+    });
+
+    it('should surface whatever the JwtService returns, including non-object results', () => {
+      mockJwtService.verify.mockReturnValue('decoded-string' as never);
+
+      expect(service.verifyToken('some.jwt')).toBe('decoded-string');
     });
   });
 });
