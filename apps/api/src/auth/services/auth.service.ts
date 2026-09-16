@@ -3,7 +3,10 @@ import {
   UserSearchService,
   UserService,
 } from '@administration/user/services';
+import { REFRESH_TOKEN_DURATION } from '@auth/constants';
+import { User } from '@core/database';
 import { CryptoService } from '@core/services';
+import { isProd } from '@core/utils';
 import {
   ForbiddenException,
   Injectable,
@@ -15,10 +18,10 @@ import {
   UserRoleEnum,
   UserStatusEnum,
 } from '@nexhouse/shared-domain/enums';
+import { SessionModel } from '@nexhouse/shared-domain/models';
+import { Response as ExpressResponse } from 'express';
 import { LoginDto } from '../dtos';
 import { SessionService } from './session.service';
-
-import { Response as ExpressResponse } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -43,12 +46,12 @@ export class AuthService {
    * @throws ForbiddenException if domain boundaries, status definitions, or neighborhood gates are closed.
    * @returns A promise resolving to the final active Session model.
    */
-  async login(dto: LoginDto, userAgent: string, ip: string) {
-    let user = await this.userSearchService.findByEmail(dto.email, undefined, {
-      neighborhood: true,
-      role: true,
-      status: true,
-    });
+  async login(
+    dto: LoginDto,
+    userAgent: string,
+    ip: string,
+  ): Promise<SessionModel> {
+    let user: User | null = await this.findLoginUser(dto.email);
 
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
@@ -63,7 +66,8 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    //validate neighborhood state if is not root user
+    // Neighborhood membership gates only apply to non-root users;
+    // root users are not bound to a single tenant boundary.
     if (user.role.name !== UserRoleEnum.SUPERADMIN) {
       if (!user.neighborhood) {
         throw new ForbiddenException('Invalid neighborhood assignation.');
@@ -72,12 +76,14 @@ export class AuthService {
       if (!user.neighborhood.isActive) {
         throw new ForbiddenException('Neighborhood not available.');
       }
+    }
 
-      if (user.status.name === UserStatusEnum.INACTIVE) {
-        throw new ForbiddenException(
-          'Authentication disabled. Contact your administrator.',
-        );
-      }
+    // Status gates apply to every role. This check deliberately lives outside
+    // the neighborhood block above, so an INACTIVE SUPERADMIN cannot bypass it.
+    if (user.status.name === UserStatusEnum.INACTIVE) {
+      throw new ForbiddenException(
+        'Authentication disabled. Contact your administrator.',
+      );
     }
 
     //if onboarding is pending to complete and there's missing the last step `complete`
@@ -93,11 +99,7 @@ export class AuthService {
         onboardingState.currentStepId === OnboardingStepEnum.COMPLETE
       ) {
         await this.onboardingService.completeOnboarding(user.id);
-        user = await this.userSearchService.findByEmail(dto.email, undefined, {
-          neighborhood: true,
-          role: true,
-          status: true,
-        });
+        user = await this.findLoginUser(dto.email);
       }
     }
 
@@ -107,24 +109,42 @@ export class AuthService {
       await this.userService.cleanPwdRecoveryState(user.id);
     }
 
+    this.logger.log(`User '${user.email}' logged in successfully.`);
+
     return this.sessionService.createSession(user, userAgent, ip);
   }
 
-  createCookie(response: ExpressResponse, refreshToken: string) {
+  createCookie(
+    response: ExpressResponse,
+    refreshToken: string,
+    maxAge = REFRESH_TOKEN_DURATION,
+  ) {
     response.cookie('refresh_token', refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: isProd,
       sameSite: 'strict',
       path: '/',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge,
     });
   }
 
-  async refreshAuthentication(token: string, userAgent: string, ip?: string) {
+  async refreshAuthentication(
+    token: string,
+    userAgent: string,
+    ip?: string,
+  ): Promise<SessionModel> {
     return this.sessionService.refreshSession(token, userAgent, ip);
   }
 
-  async logout(refreshToken: string) {
+  async logout(refreshToken: string): Promise<void> {
     return this.sessionService.logout(refreshToken);
+  }
+
+  private findLoginUser(email: string): Promise<User | null> {
+    return this.userSearchService.findByEmail(email, undefined, {
+      neighborhood: true,
+      role: true,
+      status: true,
+    });
   }
 }
