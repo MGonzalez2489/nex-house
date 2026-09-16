@@ -14,7 +14,8 @@ recovery flow plus the token-protected final step that issues a new session.
 | `PwdRecoveryService` | `createRecoveryCode` (step 1), `validateCode` (step 2), `updatePwd` (step 3) |
 | `AuthService` | `createCookie` — sets the `refresh_token` cookie with the rotated session |
 | `ResetPwdGuard` (+ `ResetTokenPayload`) | Verifies step-3 token; the payload type is imported from the guard |
-| `@core/decorators > Public` | Marks all routes as public (default JWT guard skips them) |
+| `@core/decorators > Public` | Class-level: marks every route public so the global JWT guard skips them (both recovery and reset-password) |
+| `@core/utils > getClientIp` | Shared client-IP resolution (same helper as `AuthController`) |
 
 ## Public contract
 
@@ -36,7 +37,7 @@ short-lived reset token.
 
 `updatePassword(@Body() dto: ResetPwdDto, @Req() request, @CurrentUser() user: ResetTokenPayload, @NestHeaders('user-agent') userAgent, @Res() response): Promise<SessionModel>`
 
-1. Resolves the caller IP: `request.ip ?? x-forwarded-for ?? '0.0.0.0'`.
+1. Resolves the caller IP via the shared `getClientIp` helper (`request.ip` → first `X-Forwarded-For` entry → `0.0.0.0`).
 2. Calls `PwdRecoveryService.updatePwd(user.email, dto.pwd, userAgent, ip, user.token)`.
 
    > The reset token is taken from the payload injected by `ResetPwdGuard`
@@ -50,13 +51,14 @@ short-lived reset token.
 
 | Method/Prefix | Guard | Delegates to |
 |---|---|---|
-| `POST /auth/pwd-recovery-request` | public | `PwdRecoveryService.createRecoveryCode` |
-| `POST /auth/code-validation` | public | `PwdRecoveryService.validateCode` |
-| `POST /auth/reset-password` | `ResetPwdGuard` | `PwdRecoveryService.updatePwd` + `AuthService.createCookie` |
+| `POST /auth/pwd-recovery-request` | public (class-level `@Public()`) | `PwdRecoveryService.createRecoveryCode` |
+| `POST /auth/code-validation` | public (class-level `@Public()`) | `PwdRecoveryService.validateCode` |
+| `POST /auth/reset-password` | `ResetPwdGuard` (only gate — class-level `@Public()` covers the global JWT guard) | `PwdRecoveryService.updatePwd` + `AuthService.createCookie` |
 
 ## Test coverage
 
 - `apps/api/src/auth/controllers/pwd-recovery.controller.spec.ts`
 - Covers: request-code delegation; code-validation delegation; reset-password
-  success (token from `user.token`, cookie set, session returned) and the
-  `x-forwarded-for` fallback when `request.ip` is missing.
+  success (token from `user.token`, cookie set, session returned); IP fallbacks:
+  direct `request.ip`, first `X-Forwarded-For` entry (chain trimmed), and
+  `0.0.0.0` when nothing is available.

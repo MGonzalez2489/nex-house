@@ -8,6 +8,7 @@ import {
 import { ResetPwdGuard, ResetTokenPayload } from '@auth/guards';
 import { AuthService, PwdRecoveryService } from '@auth/services';
 import { CurrentUser, Public } from '@core/decorators';
+import { getClientIp } from '@core/utils';
 import {
   Body,
   Controller,
@@ -19,7 +20,7 @@ import {
   Headers as NestHeaders,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SessionModel } from '@nexhouse/shared-domain/models';
 import {
   Request as ExpressRequest,
@@ -35,27 +36,30 @@ export class PwdRecoveryController {
     private readonly authService: AuthService,
   ) {}
 
-  @Public()
   @Post('pwd-recovery-request')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Request a password recovery code' })
   async pwdRecoveryRequest(
     @Body() dto: PwdRecoveryRequestDto,
   ): Promise<RecoveryCodeResponseDto> {
     return this.recoveryService.createRecoveryCode(dto.email);
   }
 
-  @Public()
   @Post('code-validation')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Validate a password recovery code' })
   async codeValidation(
     @Body() dto: CodeValidationDto,
   ): Promise<ResetPasswordTokenDto> {
     return this.recoveryService.validateCode(dto.code);
   }
 
+  // The class-level `@Public()` covers this route for the global JwtAuthGuard;
+  // `ResetPwdGuard` is the only gate enforcing the recovery credential here.
   @Post('reset-password')
   @UseGuards(ResetPwdGuard)
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Set a new password with a reset token' })
   async updatePassword(
     @Body() dto: ResetPwdDto,
     @Req() request: ExpressRequest,
@@ -63,14 +67,11 @@ export class PwdRecoveryController {
     @NestHeaders('user-agent') userAgent: string,
     @Res({ passthrough: true }) response: ExpressResponse,
   ): Promise<SessionModel> {
-    const ip =
-      request.ip || (request.headers['x-forwarded-for'] as string) || '0.0.0.0';
-
     const session = await this.recoveryService.updatePwd(
       user.email,
       dto.pwd,
       userAgent,
-      ip,
+      getClientIp(request),
       user.token,
     );
     this.authService.createCookie(response, session.refreshToken);

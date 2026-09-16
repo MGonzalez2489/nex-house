@@ -1,14 +1,55 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import {
+  Request as ExpressRequest,
+  Response as ExpressResponse,
+} from 'express';
 import { PwdRecoveryController } from './pwd-recovery.controller';
 import { PwdRecoveryService } from '../services/pwd-recovery.service';
 import { AuthService } from '../services/auth.service';
+import { ResetTokenPayload } from '@auth/guards';
+
+type TestRequest = {
+  ip?: string;
+  headers: Record<string, unknown>;
+};
 
 describe('PwdRecoveryController', () => {
   let controller: PwdRecoveryController;
   let mockRecoveryService: jest.Mocked<PwdRecoveryService>;
   let mockAuthService: jest.Mocked<AuthService>;
+
+  const session = {
+    token: 'session-jwt',
+    refreshToken: 'refresh-jwt',
+    exp: 12345,
+    user: {} as never,
+  };
+
+  const resetUser: ResetTokenPayload = {
+    email: 'dev@nexhouse.com',
+    sub: 'user-public-1',
+    purpose: 'password_reset',
+    token: 'reset-jwt',
+  };
+
+  const buildRequest = (overrides: {
+    ip?: string;
+    'x-forwarded-for'?: string;
+  } = {}): ExpressRequest => {
+    const request: TestRequest = {
+      ip: overrides.ip,
+      headers:
+        overrides['x-forwarded-for'] !== undefined
+          ? { 'x-forwarded-for': overrides['x-forwarded-for'] }
+          : {},
+    };
+    return request as unknown as ExpressRequest;
+  };
+
+  const buildResponse = (): ExpressResponse =>
+    ({ cookie: jest.fn() }) as unknown as ExpressResponse;
 
   beforeEach(async () => {
     mockRecoveryService = {
@@ -75,30 +116,15 @@ describe('PwdRecoveryController', () => {
 
   describe('updatePassword', () => {
     it('should update the password, set the auth cookie and return the session', async () => {
-      const session = {
-        token: 'session-jwt',
-        refreshToken: 'refresh-jwt',
-        exp: 12345,
-        user: {} as never,
-      };
       mockRecoveryService.updatePwd.mockResolvedValue(session);
 
-      const request: any = {
-        ip: '1.2.3.4',
-        headers: {},
-      };
-      const response: any = { cookie: jest.fn() };
-      const user = {
-        email: 'dev@nexhouse.com',
-        sub: 'user-public-1',
-        purpose: 'password_reset',
-        token: 'reset-jwt',
-      };
+      const request = buildRequest({ ip: '1.2.3.4' });
+      const response = buildResponse();
 
       const result = await controller.updatePassword(
         { pwd: 'new-password' },
         request,
-        user,
+        resetUser,
         'Mozilla/5.0',
         response,
       );
@@ -117,32 +143,17 @@ describe('PwdRecoveryController', () => {
       expect(result).toBe(session);
     });
 
-    it('should fall back to x-forwarded-for when request.ip is missing', async () => {
-      mockRecoveryService.updatePwd.mockResolvedValue({
-        token: 'session-jwt',
-        refreshToken: 'refresh-jwt',
-        exp: 12345,
-        user: {} as never,
-      });
+    it('should fall back to the first X-Forwarded-For entry when request.ip is missing', async () => {
+      mockRecoveryService.updatePwd.mockResolvedValue(session);
 
-      const request: any = {
-        headers: {
-          'x-forwarded-for': '9.9.9.9',
-        },
-      };
-      const response: any = { cookie: jest.fn() };
+      const request = buildRequest({ 'x-forwarded-for': '9.9.9.9, 10.0.0.1' });
 
       await controller.updatePassword(
         { pwd: 'new-password' },
         request,
-        {
-          email: 'dev@nexhouse.com',
-          sub: 's',
-          purpose: 'password_reset',
-          token: 'reset-jwt',
-        },
+        resetUser,
         'Mozilla/5.0',
-        response,
+        buildResponse(),
       );
 
       expect(mockRecoveryService.updatePwd).toHaveBeenCalledWith(
@@ -150,6 +161,28 @@ describe('PwdRecoveryController', () => {
         'new-password',
         'Mozilla/5.0',
         '9.9.9.9',
+        'reset-jwt',
+      );
+    });
+
+    it('should fall back to 0.0.0.0 when no ip source is available', async () => {
+      mockRecoveryService.updatePwd.mockResolvedValue(session);
+
+      const request = buildRequest();
+
+      await controller.updatePassword(
+        { pwd: 'new-password' },
+        request,
+        resetUser,
+        'Mozilla/5.0',
+        buildResponse(),
+      );
+
+      expect(mockRecoveryService.updatePwd).toHaveBeenCalledWith(
+        'dev@nexhouse.com',
+        'new-password',
+        'Mozilla/5.0',
+        '0.0.0.0',
         'reset-jwt',
       );
     });

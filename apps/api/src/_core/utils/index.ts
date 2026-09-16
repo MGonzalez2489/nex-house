@@ -1,3 +1,4 @@
+export * from './client-ip.util';
 export * from './pagination.util';
 export * from './env-detector.util';
 export * from './file.utils';

@@ -9,6 +9,8 @@ describe('JwtStrategy', () => {
   let configService: ConfigService;
   let userSearchService: UserSearchService;
 
+  const EXPECTED_RELATIONS = { neighborhood: true, role: true, status: true };
+
   const mockConfigService = {
     get: jest.fn((key: string) => {
       if (key === 'JWT_SECRET') {
@@ -23,6 +25,9 @@ describe('JwtStrategy', () => {
   };
 
   beforeEach(async () => {
+    mockConfigService.get.mockClear();
+    mockUserSearchService.findByEmail.mockClear();
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         JwtStrategy,
@@ -46,28 +51,28 @@ describe('JwtStrategy', () => {
     expect(strategy).toBeDefined();
   });
 
-  it('should configure JwtStrategy with correct secret', () => {
+  it('should configure JwtStrategy with the JWT_SECRET', () => {
     expect(configService.get).toHaveBeenCalledWith('JWT_SECRET');
   });
 
   describe('validate', () => {
+    const payload = { sub: '1', email: 'test@example.com', session: 's-1' };
+
     it('should return the user if found by UserSearchService', async () => {
-      const payload = { sub: 1, email: 'test@example.com', role: 'admin' };
       const user = { id: 1, email: 'test@example.com', name: 'Test User' };
-      mockUserSearchService.findByEmail.mockResolvedValue(user.email);
+      mockUserSearchService.findByEmail.mockResolvedValue(user);
 
       const result = await strategy.validate(payload);
 
       expect(userSearchService.findByEmail).toHaveBeenCalledWith(
         payload.email,
         undefined,
-        { neighborhood: true },
+        EXPECTED_RELATIONS,
       );
-      expect(result).toEqual(user.email);
+      expect(result).toBe(user);
     });
 
     it('should throw UnauthorizedException if user is not found by UserSearchService', async () => {
-      const payload = { sub: 1, email: 'test@example.com', role: 'admin' };
       mockUserSearchService.findByEmail.mockResolvedValue(null);
 
       await expect(strategy.validate(payload)).rejects.toThrow(
@@ -76,8 +81,17 @@ describe('JwtStrategy', () => {
       expect(userSearchService.findByEmail).toHaveBeenCalledWith(
         payload.email,
         undefined,
-        { neighborhood: true },
+        EXPECTED_RELATIONS,
       );
+    });
+
+    it('should throw UnauthorizedException without querying when the email claim is missing', async () => {
+      await expect(
+        strategy.validate(
+          { sub: 1 } as unknown as Parameters<typeof strategy.validate>[0],
+        ),
+      ).rejects.toThrow(new UnauthorizedException('jwt:Invalid token payload'));
+      expect(userSearchService.findByEmail).not.toHaveBeenCalled();
     });
   });
 });

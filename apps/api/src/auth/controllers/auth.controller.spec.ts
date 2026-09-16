@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { UnauthorizedException } from '@nestjs/common';
 import {
   Request as ExpressRequest,
   Response as ExpressResponse,
@@ -23,22 +24,41 @@ describe('AuthController', () => {
     refreshToken: 'mock-refresh-token',
     exp: 1719576000,
     user: {
-      email: '',
+      email: 'dev@nexhouse.com',
       isFirstAdmin: false,
       requirePwdChange: false,
       userUnits: [],
-      publicId: '',
+      publicId: 'user-public-1',
     },
   };
 
-  // Mocks bases para Express
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  let mockRequest: Partial<ExpressRequest>;
-  let mockResponse: Partial<ExpressResponse>;
+  const buildRequest = (overrides: {
+    ip?: string;
+    cookies?: Record<string, unknown>;
+    'x-forwarded-for'?: unknown;
+  } = {}) =>
+    ({
+      ip: overrides.ip,
+      cookies: overrides.cookies,
+      headers: overrides['x-forwarded-for'] !== undefined
+        ? { 'x-forwarded-for': overrides['x-forwarded-for'] }
+        : {},
+    }) as unknown as ExpressRequest;
+
+  const buildResponse = () => {
+    const response: Record<string, jest.Mock> = {
+      cookie: jest.fn(),
+      clearCookie: jest.fn(),
+    };
+    return response as unknown as ExpressResponse;
+  };
 
   beforeEach(async () => {
     mockAuthService = {
       login: jest.fn().mockResolvedValue(mockSession),
+      refreshAuthentication: jest.fn(),
+      logout: jest.fn().mockResolvedValue(undefined),
+      createCookie: jest.fn(),
     } as unknown as jest.Mocked<AuthService>;
 
     const module: TestingModule = await Test.createTestingModule({
@@ -52,13 +72,6 @@ describe('AuthController', () => {
     }).compile();
 
     controller = module.get<AuthController>(AuthController);
-
-    // Reiniciamos las instancias de los mocks de Express en cada test
-    mockRequest = {
-      ip: undefined,
-      headers: {},
-    };
-    mockResponse = {};
   });
 
   it('should be defined', () => {
@@ -66,17 +79,15 @@ describe('AuthController', () => {
   });
 
   describe('login', () => {
-    it('should extract the direct IP from the request object and execute login', async () => {
-      const mockExpressRequest = {
-        ip: '192.168.1.50',
-        headers: {},
-      } as unknown as ExpressRequest;
+    it('should use the direct IP and set the refresh cookie', async () => {
+      const request = buildRequest({ ip: '192.168.1.50' });
+      const response = buildResponse();
 
       const result = await controller.login(
         mockLoginDto,
-        mockExpressRequest,
+        request,
         mockUserAgent,
-        mockResponse as ExpressResponse,
+        response,
       );
 
       expect(mockAuthService.login).toHaveBeenCalledWith(
@@ -84,51 +95,111 @@ describe('AuthController', () => {
         mockUserAgent,
         '192.168.1.50',
       );
+      expect(mockAuthService.createCookie).toHaveBeenCalledWith(
+        response,
+        'mock-refresh-token',
+      );
       expect(result).toEqual(mockSession);
     });
 
-    it('should fallback to x-forwarded-for header when request.ip is undefined', async () => {
-      const mockExpressRequest = {
-        ip: undefined,
-        headers: {
-          'x-forwarded-for': '10.0.0.1, 172.16.0.1',
-        },
-      } as unknown as ExpressRequest;
+    it('should fall back to the first X-Forwarded-For entry when request.ip is missing', async () => {
+      const request = buildRequest({
+        'x-forwarded-for': '10.0.0.1, 172.16.0.1',
+      });
 
-      const result = await controller.login(
-        mockLoginDto,
-        mockExpressRequest,
-        mockUserAgent,
-        mockResponse as ExpressResponse,
-      );
+      await controller.login(mockLoginDto, request, mockUserAgent, buildResponse());
 
       expect(mockAuthService.login).toHaveBeenCalledWith(
         mockLoginDto,
         mockUserAgent,
-        '10.0.0.1, 172.16.0.1',
+        '10.0.0.1',
       );
-      expect(result).toEqual(mockSession);
     });
 
-    it('should fallback to 0.0.0.0 if both request.ip and x-forwarded-for header are missing', async () => {
-      const mockExpressRequest = {
-        ip: undefined,
-        headers: {},
-      } as unknown as ExpressRequest;
+    it('should fall back to 0.0.0.0 when no ip source is available', async () => {
+      const request = buildRequest();
 
-      const result = await controller.login(
-        mockLoginDto,
-        mockExpressRequest,
-        mockUserAgent,
-        mockResponse as ExpressResponse,
-      );
+      await controller.login(mockLoginDto, request, mockUserAgent, buildResponse());
 
       expect(mockAuthService.login).toHaveBeenCalledWith(
         mockLoginDto,
         mockUserAgent,
         '0.0.0.0',
       );
-      expect(result).toEqual(mockSession);
+    });
+  });
+
+  describe('refresh', () => {
+    it('should rotate the session, omit the refreshToken and set a new cookie', async () => {
+      const request = buildRequest({
+        ip: '10.0.0.2',
+        cookies: { refresh_token: 'old-refresh-token' },
+      });
+      const response = buildResponse();
+      mockAuthService.refreshAuthentication.mockResolvedValue(mockSession);
+
+      const result = await controller.refresh(request, mockUserAgent, response);
+
+      expect(mockAuthService.refreshAuthentication).toHaveBeenCalledWith(
+        'old-refresh-token',
+        mockUserAgent,
+        '10.0.0.2',
+      );
+      expect(mockAuthService.createCookie).toHaveBeenCalledWith(
+        response,
+        'mock-refresh-token',
+      );
+      expect(result).toEqual({
+        token: mockSession.token,
+        exp: mockSession.exp,
+        user: mockSession.user,
+      });
+      expect(result).not.toHaveProperty('refreshToken');
+    });
+
+    it('should throw UnauthorizedException when no refresh token cookie exists', async () => {
+      const request = buildRequest({ cookies: {} });
+
+      await expect(
+        controller.refresh(request, mockUserAgent, buildResponse()),
+      ).rejects.toThrow(new UnauthorizedException('No refresh token provided'));
+      expect(mockAuthService.refreshAuthentication).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('logout', () => {
+    it('should revoke the session when a refresh token cookie exists and clear the cookie', async () => {
+      const request = buildRequest({
+        cookies: { refresh_token: 'revoked-token' },
+      });
+      const response = buildResponse();
+
+      const result = await controller.logout(request, response);
+
+      expect(mockAuthService.logout).toHaveBeenCalledWith('revoked-token');
+      expect(response.clearCookie).toHaveBeenCalledWith('refresh_token', {
+        httpOnly: true,
+        secure: false, // isProd is false under jest (NODE_ENV=test)
+        sameSite: 'strict',
+        path: '/',
+      });
+      expect(result).toEqual({ message: 'Logged out successfully' });
+    });
+
+    it('should still clear the cookie when no refresh token cookie exists', async () => {
+      const request = buildRequest({ cookies: {} });
+      const response = buildResponse();
+
+      const result = await controller.logout(request, response);
+
+      expect(mockAuthService.logout).not.toHaveBeenCalled();
+      expect(response.clearCookie).toHaveBeenCalledWith('refresh_token', {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'strict',
+        path: '/',
+      });
+      expect(result).toEqual({ message: 'Logged out successfully' });
     });
   });
 });

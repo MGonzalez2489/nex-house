@@ -15,6 +15,7 @@ import { LoginDto } from '../dtos';
 import { AuthService } from '../services';
 
 import { Public } from '@core/decorators';
+import { getClientIp, isProd } from '@core/utils';
 import {
   Request as ExpressRequest,
   Response as ExpressResponse,
@@ -35,10 +36,11 @@ export class AuthController {
     @NestHeaders('user-agent') userAgent: string,
     @Res({ passthrough: true }) response: ExpressResponse,
   ): Promise<SessionModel> {
-    const ip =
-      request.ip || (request.headers['x-forwarded-for'] as string) || '0.0.0.0';
-
-    const session = await this.authService.login(loginDto, userAgent, ip);
+    const session = await this.authService.login(
+      loginDto,
+      userAgent,
+      getClientIp(request),
+    );
 
     this.authService.createCookie(response, session.refreshToken);
 
@@ -48,22 +50,24 @@ export class AuthController {
   @Public()
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Refresh session token' })
   async refresh(
     @Req() request: ExpressRequest,
     @NestHeaders('user-agent') userAgent: string,
     @Res({ passthrough: true }) response: ExpressResponse,
-  ) {
-    const oldToken = request.cookies['refresh_token'];
+  ): Promise<Omit<SessionModel, 'refreshToken'>> {
+    const oldToken = request.cookies?.['refresh_token'];
 
     if (!oldToken) {
       throw new UnauthorizedException('No refresh token provided');
     }
 
-    const ip =
-      request.ip || (request.headers['x-forwarded-for'] as string) || '0.0.0.0';
-
     const { refreshToken, ...sessionData } =
-      await this.authService.refreshAuthentication(oldToken, userAgent, ip);
+      await this.authService.refreshAuthentication(
+        oldToken,
+        userAgent,
+        getClientIp(request),
+      );
 
     this.authService.createCookie(response, refreshToken);
 
@@ -76,17 +80,18 @@ export class AuthController {
   async logout(
     @Req() request: ExpressRequest,
     @Res({ passthrough: true }) response: ExpressResponse,
-  ) {
-    const refreshToken = request.cookies['refresh_token'];
+  ): Promise<{ message: string }> {
+    const refreshToken = request.cookies?.['refresh_token'];
 
     if (refreshToken) {
       await this.authService.logout(refreshToken);
     }
 
-    // REMOVE cookie (overriding)
+    // Remove the cookie. `secure` must mirror the flag used by AuthService.createCookie
+    // (isProd) so strict clients can match and delete the stored cookie on HTTPS.
     response.clearCookie('refresh_token', {
       httpOnly: true,
-      secure: false,
+      secure: isProd,
       sameSite: 'strict',
       path: '/',
     });
