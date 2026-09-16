@@ -23,11 +23,12 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { CatalogsService } from '../services';
-import { BaseCatalog } from '@core/database/entities/_base';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { UserRoleEnum } from '@nexhouse/shared-domain/enums';
 import { Not } from 'typeorm';
+
+const ONE_DAY_IN_SECONDS = 60 * 60 * 24;
 
 @ApiTags('Catalogs')
 @Controller('catalogs')
@@ -36,19 +37,19 @@ export class CatalogsController {
   constructor(private readonly service: CatalogsService) {}
 
   /**
-   * Retrieves all registered systemic user role types.
+   * Retrieves all registered systemic user role types, excluding SUPERADMIN.
    *
    * @returns An array mapping core user role configurations.
    */
   @Get('user_roles')
   @HttpCode(HttpStatus.OK)
-  @CacheTTL(60 * 60 * 24) //TTL 24 hours
+  @CacheTTL(ONE_DAY_IN_SECONDS)
   @ApiOperation({ summary: 'Retrieve user roles catalog data' })
   @ApiResponse({
     status: 200,
     description: 'Catalog records fetched successfully.',
   })
-  async findUserRoles(): Promise<BaseCatalog[]> {
+  async findUserRoles(): Promise<UserRole[]> {
     return this.service.findAll(UserRole, {
       where: { name: Not(UserRoleEnum.SUPERADMIN) },
     });
@@ -60,14 +61,14 @@ export class CatalogsController {
    * @returns An array mapping user state boundaries.
    */
   @Get('user_statuses')
-  @CacheTTL(60 * 60 * 24) //TTL 24 hours
+  @CacheTTL(ONE_DAY_IN_SECONDS)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Retrieve user statuses catalog data' })
   @ApiResponse({
     status: 200,
     description: 'Catalog records fetched successfully.',
   })
-  async findUserStatuses(): Promise<BaseCatalog[]> {
+  async findUserStatuses(): Promise<UserStatus[]> {
     return this.service.findAll(UserStatus);
   }
 
@@ -77,14 +78,14 @@ export class CatalogsController {
    * @returns An array mapping tenant unit relation roles.
    */
   @Get('user_unit_roles')
-  @CacheTTL(60 * 60 * 24) //TTL 24 hours
+  @CacheTTL(ONE_DAY_IN_SECONDS)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Retrieve user unit roles catalog data' })
   @ApiResponse({
     status: 200,
     description: 'Catalog records fetched successfully.',
   })
-  async findUserUnitRoles(): Promise<BaseCatalog[]> {
+  async findUserUnitRoles(): Promise<UserUnitRole[]> {
     return this.service.findAll(UserUnitRole);
   }
 
@@ -94,14 +95,14 @@ export class CatalogsController {
    * @returns An array mapping property status values.
    */
   @Get('unit_statuses')
-  @CacheTTL(60 * 60 * 24) //TTL 24 hours
+  @CacheTTL(ONE_DAY_IN_SECONDS)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Retrieve unit statuses catalog data' })
   @ApiResponse({
     status: 200,
     description: 'Catalog records fetched successfully.',
   })
-  async findUnitStatuses(): Promise<BaseCatalog[]> {
+  async findUnitStatuses(): Promise<UnitStatus[]> {
     return this.service.findAll(UnitStatus);
   }
 
@@ -111,14 +112,14 @@ export class CatalogsController {
    * @returns An array mapping structural unit layout schemas.
    */
   @Get('unit_types')
-  @CacheTTL(60 * 60 * 24) //TTL 24 hours
+  @CacheTTL(ONE_DAY_IN_SECONDS)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Retrieve unit types catalog data' })
   @ApiResponse({
     status: 200,
     description: 'Catalog records fetched successfully.',
   })
-  async findUnitType(): Promise<BaseCatalog[]> {
+  async findUnitTypes(): Promise<UnitType[]> {
     return this.service.findAll(UnitType);
   }
 
@@ -128,14 +129,14 @@ export class CatalogsController {
    * @returns An array mapping system interaction environments.
    */
   @Get('transaction_sources')
-  @CacheTTL(60 * 60 * 24) //TTL 24 hours
+  @CacheTTL(ONE_DAY_IN_SECONDS)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Retrieve transaction sources catalog data' })
   @ApiResponse({
     status: 200,
     description: 'Catalog records fetched successfully.',
   })
-  async findTransactionSources(): Promise<BaseCatalog[]> {
+  async findTransactionSources(): Promise<TransactionSource[]> {
     return this.service.findAll(TransactionSource);
   }
 
@@ -145,14 +146,14 @@ export class CatalogsController {
    * @returns An array mapping ledger classification constants.
    */
   @Get('transaction_types')
-  @CacheTTL(60 * 60 * 24) //TTL 24 hours
+  @CacheTTL(ONE_DAY_IN_SECONDS)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Retrieve transaction types catalog data' })
   @ApiResponse({
     status: 200,
     description: 'Catalog records fetched successfully.',
   })
-  async findTransactionTypes(): Promise<BaseCatalog[]> {
+  async findTransactionTypes(): Promise<TransactionType[]> {
     return this.service.findAll(TransactionType);
   }
 
@@ -162,14 +163,14 @@ export class CatalogsController {
    * @returns An array mapping payment execution states.
    */
   @Get('payment_statuses')
-  @CacheTTL(60 * 60 * 24) //TTL 24 hours
+  @CacheTTL(ONE_DAY_IN_SECONDS)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Retrieve payment statuses catalog data' })
   @ApiResponse({
     status: 200,
     description: 'Catalog records fetched successfully.',
   })
-  async findPaymentStatuses(): Promise<BaseCatalog[]> {
+  async findPaymentStatuses(): Promise<PaymentStatus[]> {
     return this.service.findAll(PaymentStatus);
   }
 
@@ -179,14 +180,14 @@ export class CatalogsController {
    * @returns An array mapping fee balance states.
    */
   @Get('fee_statuses')
-  @CacheTTL(60 * 60 * 24) //TTL 24 hours
+  @CacheTTL(ONE_DAY_IN_SECONDS)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Retrieve fee statuses catalog data' })
   @ApiResponse({
     status: 200,
     description: 'Catalog records fetched successfully.',
   })
-  async findFeeStatuses(): Promise<BaseCatalog[]> {
+  async findFeeStatuses(): Promise<FeeStatus[]> {
     return this.service.findAll(FeeStatus);
   }
 
@@ -196,17 +197,16 @@ export class CatalogsController {
    * @returns An array mapping compound charge lifecycles.
    */
   @Get('charge_statuses')
-  @CacheTTL(60 * 60 * 24) //TTL 24 hours
+  @CacheTTL(ONE_DAY_IN_SECONDS)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Retrieve charge statuses catalog data' })
   @ApiResponse({
     status: 200,
     description: 'Catalog records fetched successfully.',
   })
-  async findChargeStatuses(): Promise<BaseCatalog[]> {
+  async findChargeStatuses(): Promise<ChargeStatus[]> {
     return this.service.findAll(ChargeStatus);
   }
-  /////////////////////////////////////////////////////////////////////////////////////////
 
   /**
    * Retrieves all registered countries.
@@ -214,7 +214,7 @@ export class CatalogsController {
    * @returns An array of countries.
    */
   @Get('countries')
-  @CacheTTL(60 * 60 * 24) //TTL 24 hours
+  @CacheTTL(ONE_DAY_IN_SECONDS)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Retrieve countries catalog data' })
   @ApiResponse({
@@ -226,13 +226,14 @@ export class CatalogsController {
   }
 
   /**
-   * Retrieves states based on a specific country ID.
+   * Retrieves states based on a specific country public ID.
    *
-   * @param countryId The ID of the country.
+   * @param countryId The public UUID of the country.
    * @returns An array of states belonging to the specified country.
+   * @throws NotFoundException when no country matches the provided public ID.
    */
   @Get('states/:countryId')
-  @CacheTTL(60 * 60 * 24) //TTL 24 hours
+  @CacheTTL(ONE_DAY_IN_SECONDS)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Retrieve states by country ID' })
   @ApiParam({
@@ -244,6 +245,7 @@ export class CatalogsController {
     status: 200,
     description: 'Catalog records fetched successfully.',
   })
+  @ApiResponse({ status: 404, description: 'Country not found.' })
   async findStatesByCountryId(
     @Param('countryId', ParseUUIDPipe) countryId: string,
   ): Promise<State[]> {
@@ -252,13 +254,14 @@ export class CatalogsController {
   }
 
   /**
-   * Retrieves cities based on a specific state ID.
+   * Retrieves cities based on a specific state public ID.
    *
-   * @param stateId The ID of the state.
+   * @param stateId The public UUID of the state.
    * @returns An array of cities belonging to the specified state.
+   * @throws NotFoundException when no state matches the provided public ID.
    */
   @Get('cities/:stateId')
-  @CacheTTL(60 * 60 * 24) //TTL 24 hours
+  @CacheTTL(ONE_DAY_IN_SECONDS)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Retrieve cities by state ID' })
   @ApiParam({
@@ -270,6 +273,7 @@ export class CatalogsController {
     status: 200,
     description: 'Catalog records fetched successfully.',
   })
+  @ApiResponse({ status: 404, description: 'State not found.' })
   async findCitiesByStateId(
     @Param('stateId', ParseUUIDPipe) stateId: string,
   ): Promise<City[]> {

@@ -22,7 +22,7 @@ NX monorepo. Two apps, one shared lib.
 ## Known broken state
 
 - **Jest + ESM (repo-wide):** jest detects ESM packages and fails with `ERR_REQUIRE_ESM` ("Must use import to load ES Module") whenever a `@nestjs/*` dependency is loaded unless Node runs with `NODE_OPTIONS=--experimental-vm-modules`. This is required for **every** jest run in this repo (API, e2e, and potentially web/shared-domain) — use `npm run test:api` (flag baked in) or prefix raw `nx test api` invocations with `NODE_OPTIONS=--experimental-vm-modules`. Note the `--watch` mode does not change anything; it is the Node flag that matters.
-- **Pre-existing spec type errors (unrelated to recent auth refactors):** `apps/api/src/catalogs/controllers/catalogs.controller.spec.ts` fails to compile (`Expected 1 arguments, but got 0`, lines 67/72). The old `@catalogs/*`-missing-alias issue in `tsconfig.spec.json` is fixed (present in both app and spec tsconfigs).
+- **Pre-existing spec type errors (unrelated to recent refactors):** several spec files under `apps/api/src/administration/*` fail to compile (dangling references to renamed/removed members, e.g. `neigh-street.*.spec.ts`, `resident.service.spec.ts`, `user*.service.spec.ts`). Touch them only when working on those modules. The `catalogs.controller.spec.ts` type errors (`Expected 1 arguments, but got 0`) are fixed as of the catalogs refactor.
 
 ## Database & entities (no migrations)
 

@@ -1,4 +1,4 @@
-import { BaseCatalog } from '@core/database/entities/_base';
+import { BaseCatalog, BaseEntity } from '@core/database/entities/_base';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import {
   EntityManager,
@@ -14,9 +14,10 @@ export class CatalogsService {
   /**
    * Retrieves all records from a specific catalog entity.
    * @param entity The target catalog entity class.
+   * @param findOptions Optional TypeORM find options (where, order, relations...).
    * @returns A promise that resolves to an array of entity instances.
    */
-  async findAll<T extends BaseCatalog>(
+  async findAll<T extends BaseEntity>(
     entity: EntityTarget<T>,
     findOptions?: FindManyOptions<T>,
   ): Promise<T[]> {
@@ -29,19 +30,15 @@ export class CatalogsService {
    * @param id The internal primary key ID.
    * @returns A promise that resolves to the entity instance or throws a NotFoundException.
    */
-  async findById<T extends BaseCatalog>(
+  async findById<T extends BaseEntity>(
     entity: EntityTarget<T>,
     id: number,
   ): Promise<T> {
-    const where = { id } as FindOptionsWhere<T>;
-    const record = await this.entityManager.findOneBy(entity, where);
-
-    if (!record) {
-      const entityName = typeof entity === 'function' ? entity.name : 'Catalog';
-      throw new NotFoundException(`${entityName} with ID ${id} not found`);
-    }
-
-    return record;
+    return this.findOneOrFail(
+      entity,
+      { id } as FindOptionsWhere<T>,
+      `with ID ${id} not found`,
+    );
   }
 
   /**
@@ -50,21 +47,15 @@ export class CatalogsService {
    * @param publicId The unique public UUID.
    * @returns A promise that resolves to the entity instance or throws a NotFoundException.
    */
-  async findByPublicId<T extends BaseCatalog>(
+  async findByPublicId<T extends BaseEntity>(
     entity: EntityTarget<T>,
     publicId: string,
   ): Promise<T> {
-    const where = { publicId } as FindOptionsWhere<T>;
-    const record = await this.entityManager.findOneBy(entity, where);
-
-    if (!record) {
-      const entityName = typeof entity === 'function' ? entity.name : 'Catalog';
-      throw new NotFoundException(
-        `${entityName} with Public ID ${publicId} not found`,
-      );
-    }
-
-    return record;
+    return this.findOneOrFail(
+      entity,
+      { publicId } as FindOptionsWhere<T>,
+      `with Public ID ${publicId} not found`,
+    );
   }
 
   /**
@@ -77,16 +68,39 @@ export class CatalogsService {
     entity: EntityTarget<T>,
     name: string,
   ): Promise<T> {
-    const where = { name } as FindOptionsWhere<T>;
+    return this.findOneOrFail(
+      entity,
+      { name } as FindOptionsWhere<T>,
+      `with Name '${name}' not found`,
+    );
+  }
+
+  /**
+   * Resolves a single record or throws a normalized NotFoundException.
+   * @param entity The target catalog entity class.
+   * @param where The TypeORM where clause.
+   * @param detail Message fragment appended to the entity name.
+   */
+  private async findOneOrFail<T extends BaseEntity>(
+    entity: EntityTarget<T>,
+    where: FindOptionsWhere<T>,
+    detail: string,
+  ): Promise<T> {
     const record = await this.entityManager.findOneBy(entity, where);
 
     if (!record) {
-      const entityName = typeof entity === 'function' ? entity.name : 'Catalog';
-      throw new NotFoundException(
-        `${entityName} with Name '${name}' not found`,
-      );
+      throw new NotFoundException(`${this.resolveEntityName(entity)} ${detail}`);
     }
 
     return record;
+  }
+
+  /**
+   * Resolves a human-readable entity name. Falls back to `Catalog` when the
+   * target is not a class (e.g. a string table alias or an EntitySchema).
+   * @param entity The target catalog entity class.
+   */
+  private resolveEntityName(entity: EntityTarget<BaseEntity>): string {
+    return typeof entity === 'function' ? entity.name : 'Catalog';
   }
 }
