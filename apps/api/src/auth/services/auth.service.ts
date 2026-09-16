@@ -120,8 +120,8 @@ export class AuthService {
     });
   }
 
-  async refreshAuthentication(token: string, userAgent: string) {
-    return this.sessionService.refreshSession(token, userAgent);
+  async refreshAuthentication(token: string, userAgent: string, ip?: string) {
+    return this.sessionService.refreshSession(token, userAgent, ip);
   }
 
   async logout(refreshToken: string) {

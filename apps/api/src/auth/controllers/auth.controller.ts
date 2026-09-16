@@ -59,8 +59,11 @@ export class AuthController {
       throw new UnauthorizedException('No refresh token provided');
     }
 
+    const ip =
+      request.ip || (request.headers['x-forwarded-for'] as string) || '0.0.0.0';
+
     const { refreshToken, ...sessionData } =
-      await this.authService.refreshAuthentication(oldToken, userAgent);
+      await this.authService.refreshAuthentication(oldToken, userAgent, ip);
 
     this.authService.createCookie(response, refreshToken);
 

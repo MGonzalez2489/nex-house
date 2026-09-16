@@ -1,12 +1,23 @@
+import {
+  REFRESH_TOKEN_DURATION,
+  REFRESH_TOKEN_REMEMBER_DURATION,
+} from '@auth/constants';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository, UpdateResult } from 'typeorm';
 import { UnauthorizedException } from '@nestjs/common';
+import { Repository, UpdateResult } from 'typeorm';
 import { SessionService } from './session.service';
 import { NexHouseToken } from './token.service';
 import { NxSession, User } from '@core/database';
 import { CryptoService } from '@core/services';
 import { TokenService } from './token.service';
+
+interface RefreshTokenPayload {
+  session: string;
+  sub: string;
+  iat?: number;
+  exp?: number;
+}
 
 describe('SessionService', () => {
   let service: SessionService;
@@ -24,7 +35,12 @@ describe('SessionService', () => {
     'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
   const mockIp = '192.168.1.25';
 
-  const buildAccessToken = (overrides: Partial<NexHouseToken> = {}) => {
+  const SEVEN_DAYS_SECONDS = REFRESH_TOKEN_DURATION / 1000;
+  const THIRTY_DAYS_SECONDS = REFRESH_TOKEN_REMEMBER_DURATION / 1000;
+
+  const buildAccessToken = (
+    overrides: Partial<NexHouseToken> = {},
+  ): NexHouseToken => {
     const expiresAt = Date.now() + 15 * 60 * 1000;
     return {
       type: 'access',
@@ -35,7 +51,9 @@ describe('SessionService', () => {
     };
   };
 
-  const buildRefreshToken = (overrides: Partial<NexHouseToken> = {}) => {
+  const buildRefreshToken = (
+    overrides: Partial<NexHouseToken> = {},
+  ): NexHouseToken => {
     const expiresAt = Date.now() + 7 * 24 * 60 * 60 * 1000;
     return {
       type: 'refresh',
@@ -45,6 +63,28 @@ describe('SessionService', () => {
       ...overrides,
     };
   };
+
+  const buildTokenPayload = (
+    session: string,
+    sub: string,
+    rememberMe: boolean,
+  ): RefreshTokenPayload => {
+    const iat = 1_700_000_000;
+    const exp = iat + (rememberMe ? THIRTY_DAYS_SECONDS : SEVEN_DAYS_SECONDS);
+    return { session, sub, iat, exp };
+  };
+
+  const buildSession = (overrides: Partial<NxSession> = {}) =>
+    ({
+      publicId: 'session-1',
+      revoked: false,
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+      refreshTokenHash: 'stored-hash',
+      socketId: undefined,
+      ipAddress: mockIp,
+      user: mockUser,
+      ...overrides,
+    }) as NxSession;
 
   beforeEach(async () => {
     mockRepository = {
@@ -59,7 +99,7 @@ describe('SessionService', () => {
       createRefreshAccessToken: jest
         .fn()
         .mockImplementation(() => buildRefreshToken()),
-      verifyToken: jest.fn(),
+      verifyToken: jest.fn().mockReturnValue({}),
     } as unknown as jest.Mocked<TokenService>;
 
     mockCryptoService = {
@@ -94,13 +134,13 @@ describe('SessionService', () => {
 
       expect(mockTokenService.createRefreshAccessToken).toHaveBeenCalledWith(
         mockUser.publicId,
-        expect.any(String) as any,
+        expect.any(String),
         false,
       );
       expect(mockTokenService.createAccessToken).toHaveBeenCalledWith(
         mockUser.email,
         mockUser.publicId,
-        expect.any(String) as any,
+        expect.any(String),
       );
 
       expect(mockRepository.create).toHaveBeenCalledWith(
@@ -111,7 +151,7 @@ describe('SessionService', () => {
           device: 'Desktop',
           ipAddress: mockIp,
           refreshTokenHash: 'mocked-secure-hash',
-          expiresAt: expect.any(String),
+          expiresAt: expect.any(Date),
         }),
       );
       expect(mockRepository.save).toHaveBeenCalledTimes(1);
@@ -129,9 +169,26 @@ describe('SessionService', () => {
 
       expect(mockTokenService.createRefreshAccessToken).toHaveBeenCalledWith(
         mockUser.publicId,
-        expect.any(String) as any,
+        expect.any(String),
         true,
       );
+    });
+
+    it('should store expiresAt as a Date matching the refresh token expiration', async () => {
+      const expiresAt = Date.now() + 7 * 24 * 60 * 60 * 1000;
+      mockTokenService.createRefreshAccessToken
+        .mockReturnValueOnce(buildRefreshToken({ expiresInMs: expiresAt }))
+        .mockReturnValue(buildRefreshToken());
+
+      await service.createSession(mockUser, mockUserAgent, mockIp, false);
+
+      expect(mockRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          expiresAt: expect.any(Date),
+        }),
+      );
+      const created = mockRepository.create.mock.calls[0][0] as NxSession;
+      expect(created.expiresAt.getTime()).toBe(expiresAt);
     });
 
     it('should fallback device definitions to Desktop if parser yields undefined models', async () => {
@@ -141,6 +198,22 @@ describe('SessionService', () => {
       expect(mockRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
           device: 'Desktop',
+        }),
+      );
+    });
+
+    it('should attach an existing socket id to the new session', async () => {
+      await service.createSession(
+        mockUser,
+        mockUserAgent,
+        mockIp,
+        false,
+        'socket-abc',
+      );
+
+      expect(mockRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          socketId: 'socket-abc',
         }),
       );
     });
@@ -158,11 +231,10 @@ describe('SessionService', () => {
       expect(mockRepository.findOne).not.toHaveBeenCalled();
     });
 
-    it('should throw UnauthorizedException when the session is missing or expired', async () => {
-      mockTokenService.verifyToken.mockReturnValue({
-        session: 'session-1',
-        sub: mockUser.publicId,
-      } as any);
+    it('should throw UnauthorizedException when the session is missing', async () => {
+      mockTokenService.verifyToken.mockReturnValue(
+        buildTokenPayload('session-1', mockUser.publicId, false),
+      );
       mockRepository.findOne.mockResolvedValue(null);
 
       await expect(
@@ -170,41 +242,60 @@ describe('SessionService', () => {
       ).rejects.toThrow(UnauthorizedException);
     });
 
-    it('should throw UnauthorizedException when the stored hash does not match', async () => {
-      mockTokenService.verifyToken.mockReturnValue({
-        session: 'session-1',
-        sub: mockUser.publicId,
-      } as any);
-      mockRepository.findOne.mockResolvedValue({
-        publicId: 'session-1',
-        revoked: false,
-        expiresAt: new Date(Date.now() + 60 * 60 * 1000),
-        refreshTokenHash: 'stored-hash',
-        socketId: undefined,
-        ipAddress: mockIp,
-        user: mockUser,
-      } as NxSession);
-      mockCryptoService.compare.mockResolvedValue(false);
+    it('should throw UnauthorizedException when the stored session is already expired', async () => {
+      mockTokenService.verifyToken.mockReturnValue(
+        buildTokenPayload('session-1', mockUser.publicId, false),
+      );
+      mockRepository.findOne.mockResolvedValue(
+        buildSession({ expiresAt: new Date(Date.now() - 1000) }),
+      );
 
       await expect(
         service.refreshSession('valid.refresh.token', mockUserAgent),
       ).rejects.toThrow(UnauthorizedException);
     });
 
-    it('should mint a fresh session when the refresh token and stored hash are valid', async () => {
-      mockTokenService.verifyToken.mockReturnValue({
-        session: 'session-1',
-        sub: mockUser.publicId,
-      } as any);
-      mockRepository.findOne.mockResolvedValue({
-        publicId: 'session-1',
-        revoked: false,
-        expiresAt: new Date(Date.now() + 60 * 60 * 1000),
-        refreshTokenHash: 'stored-hash',
-        socketId: undefined,
-        ipAddress: mockIp,
-        user: mockUser,
-      } as NxSession);
+    it('should throw UnauthorizedException when the token subject does not match the session user', async () => {
+      mockTokenService.verifyToken.mockReturnValue(
+        buildTokenPayload('session-1', 'another-public-id', false),
+      );
+      mockRepository.findOne.mockResolvedValue(buildSession());
+
+      await expect(
+        service.refreshSession('valid.refresh.token', mockUserAgent),
+      ).rejects.toThrow(UnauthorizedException);
+      expect(mockRepository.update).not.toHaveBeenCalled();
+    });
+
+    it('should throw UnauthorizedException when the session has no user relation', async () => {
+      mockTokenService.verifyToken.mockReturnValue(
+        buildTokenPayload('session-1', mockUser.publicId, false),
+      );
+      mockRepository.findOne.mockResolvedValue(buildSession({ user: null }));
+
+      await expect(
+        service.refreshSession('valid.refresh.token', mockUserAgent),
+      ).rejects.toThrow(UnauthorizedException);
+    });
+
+    it('should throw UnauthorizedException when the stored hash does not match', async () => {
+      mockTokenService.verifyToken.mockReturnValue(
+        buildTokenPayload('session-1', mockUser.publicId, false),
+      );
+      mockRepository.findOne.mockResolvedValue(buildSession());
+      mockCryptoService.compare.mockResolvedValue(false);
+
+      await expect(
+        service.refreshSession('valid.refresh.token', mockUserAgent),
+      ).rejects.toThrow(UnauthorizedException);
+      expect(mockRepository.update).not.toHaveBeenCalled();
+    });
+
+    it('should mint a fresh 7-day session when the presented token is 7 days old', async () => {
+      mockTokenService.verifyToken.mockReturnValue(
+        buildTokenPayload('session-1', mockUser.publicId, false),
+      );
+      mockRepository.findOne.mockResolvedValue(buildSession());
       mockCryptoService.compare.mockResolvedValue(true);
 
       const result = await service.refreshSession(
@@ -215,24 +306,128 @@ describe('SessionService', () => {
       expect(result.token).toBe('mocked-access-token');
       expect(mockTokenService.createRefreshAccessToken).toHaveBeenCalledWith(
         mockUser.publicId,
-        expect.any(String) as any,
+        expect.any(String),
+        false,
+      );
+    });
+
+    it('should mint a fresh 30-day session when the presented token was created with rememberMe', async () => {
+      mockTokenService.verifyToken.mockReturnValue(
+        buildTokenPayload('session-1', mockUser.publicId, true),
+      );
+      mockRepository.findOne.mockResolvedValue(buildSession());
+      mockCryptoService.compare.mockResolvedValue(true);
+
+      const result = await service.refreshSession(
+        'valid.refresh.token',
+        mockUserAgent,
+      );
+
+      expect(result.token).toBe('mocked-access-token');
+      expect(mockTokenService.createRefreshAccessToken).toHaveBeenCalledWith(
+        mockUser.publicId,
+        expect.any(String),
         true,
+      );
+    });
+
+    it('should default to a 7-day session when the token has no iat/exp claims', async () => {
+      mockTokenService.verifyToken.mockReturnValue({
+        session: 'session-1',
+        sub: mockUser.publicId,
+      });
+      mockRepository.findOne.mockResolvedValue(buildSession());
+      mockCryptoService.compare.mockResolvedValue(true);
+
+      await service.refreshSession('valid.refresh.token', mockUserAgent);
+
+      expect(mockTokenService.createRefreshAccessToken).toHaveBeenCalledWith(
+        mockUser.publicId,
+        expect.any(String),
+        false,
+      );
+    });
+
+    it('should record the current request IP on the rotated session when provided', async () => {
+      mockTokenService.verifyToken.mockReturnValue(
+        buildTokenPayload('session-1', mockUser.publicId, false),
+      );
+      mockRepository.findOne.mockResolvedValue(buildSession());
+      mockCryptoService.compare.mockResolvedValue(true);
+
+      await service.refreshSession(
+        'valid.refresh.token',
+        mockUserAgent,
+        '203.0.113.9',
+      );
+
+      expect(mockRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({ ipAddress: '203.0.113.9' }),
+      );
+    });
+
+    it('should fall back to the stored session IP when no current IP is provided', async () => {
+      mockTokenService.verifyToken.mockReturnValue(
+        buildTokenPayload('session-1', mockUser.publicId, false),
+      );
+      mockRepository.findOne.mockResolvedValue(buildSession());
+      mockCryptoService.compare.mockResolvedValue(true);
+
+      await service.refreshSession('valid.refresh.token', mockUserAgent);
+
+      expect(mockRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({ ipAddress: mockIp }),
+      );
+    });
+
+    it('should rotate the session and revoke the previously presented token', async () => {
+      mockTokenService.verifyToken.mockReturnValue(
+        buildTokenPayload('session-1', mockUser.publicId, false),
+      );
+      mockRepository.findOne.mockResolvedValue(buildSession());
+      mockCryptoService.compare.mockResolvedValue(true);
+
+      await service.refreshSession('valid.refresh.token', mockUserAgent);
+
+      expect(mockRepository.update).toHaveBeenCalledWith(
+        { publicId: 'session-1' },
+        expect.objectContaining({ revoked: true }),
+      );
+    });
+
+    it('should carry the existing socket id over to the rotated session', async () => {
+      mockTokenService.verifyToken.mockReturnValue(
+        buildTokenPayload('session-1', mockUser.publicId, false),
+      );
+      mockRepository.findOne.mockResolvedValue(
+        buildSession({ socketId: 'socket-abc' }),
+      );
+      mockCryptoService.compare.mockResolvedValue(true);
+
+      await service.refreshSession('valid.refresh.token', mockUserAgent);
+
+      expect(mockRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({ socketId: 'socket-abc' }),
       );
     });
   });
 
   describe('logout', () => {
-    it('should revoke the session matching the token payload', async () => {
+    it('should revoke the session, clear the socket and stamp the last activity', async () => {
       mockTokenService.verifyToken.mockReturnValue({
         session: 'session-1',
-      } as any);
+      } as RefreshTokenPayload);
       mockRepository.update.mockResolvedValue({ affected: 1 } as UpdateResult);
 
       await service.logout('valid.refresh.token');
 
       expect(mockRepository.update).toHaveBeenCalledWith(
         { publicId: 'session-1' },
-        expect.objectContaining({ revoked: true }),
+        expect.objectContaining({
+          revoked: true,
+          socketId: null,
+          lastActivity: expect.any(Date),
+        }),
       );
     });
 
