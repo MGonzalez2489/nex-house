@@ -85,13 +85,14 @@ describe('PwdRecoveryController', () => {
 
       const request: any = {
         ip: '1.2.3.4',
-        headers: { authorization: 'Bearer reset-jwt' },
+        headers: {},
       };
       const response: any = { cookie: jest.fn() };
       const user = {
         email: 'dev@nexhouse.com',
         sub: 'user-public-1',
         purpose: 'password_reset',
+        token: 'reset-jwt',
       };
 
       const result = await controller.updatePassword(
@@ -126,7 +127,6 @@ describe('PwdRecoveryController', () => {
 
       const request: any = {
         headers: {
-          authorization: 'Bearer reset-jwt',
           'x-forwarded-for': '9.9.9.9',
         },
       };
@@ -135,7 +135,12 @@ describe('PwdRecoveryController', () => {
       await controller.updatePassword(
         { pwd: 'new-password' },
         request,
-        { email: 'dev@nexhouse.com', sub: 's', purpose: 'password_reset' },
+        {
+          email: 'dev@nexhouse.com',
+          sub: 's',
+          purpose: 'password_reset',
+          token: 'reset-jwt',
+        },
         'Mozilla/5.0',
         response,
       );

@@ -1,9 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Reflector } from '@nestjs/core';
-import { ExecutionContext } from '@nestjs/common';
+import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { IS_PUBLIC_KEY } from '@core/decorators';
+import { throwError, of } from 'rxjs';
 
 describe('JwtAuthGuard', () => {
   let guard: JwtAuthGuard;
@@ -46,39 +47,73 @@ describe('JwtAuthGuard', () => {
     expect(canActivate).toBe(true);
   });
 
-  it('should delegate evaluation to super.canActivate and return true when route is private and token is valid', async () => {
-    mockReflector.getAllAndOverride.mockReturnValue(false);
+  describe('delegation to the passport strategy', () => {
+    let spySuperCanActivate: jest.SpyInstance;
 
-    const spySuperCanActivate = jest
-      .spyOn(AuthGuard('jwt').prototype, 'canActivate')
-      .mockImplementation(() => Promise.resolve(true));
+    afterEach(() => {
+      spySuperCanActivate?.mockRestore();
+    });
 
-    const canActivate = await guard.canActivate(mockExecutionContext);
+    it('should delegate evaluation and return true when super resolves with a promise of true', async () => {
+      mockReflector.getAllAndOverride.mockReturnValue(false);
 
-    expect(mockReflector.getAllAndOverride).toHaveBeenCalledWith(
-      IS_PUBLIC_KEY,
-      [mockExecutionContext.getHandler(), mockExecutionContext.getClass()],
-    );
-    expect(spySuperCanActivate).toHaveBeenCalledWith(mockExecutionContext);
-    expect(canActivate).toBe(true);
-    spySuperCanActivate.mockRestore();
-  });
+      spySuperCanActivate = jest
+        .spyOn(AuthGuard('jwt').prototype, 'canActivate')
+        .mockImplementation(() => Promise.resolve(true));
 
-  it('should delegate evaluation to super.canActivate and return false when route is private and token is invalid', async () => {
-    mockReflector.getAllAndOverride.mockReturnValue(false);
+      const canActivate = await guard.canActivate(mockExecutionContext);
 
-    const spySuperCanActivate = jest
-      .spyOn(AuthGuard('jwt').prototype, 'canActivate')
-      .mockImplementation(() => Promise.resolve(false));
+      expect(spySuperCanActivate).toHaveBeenCalledWith(mockExecutionContext);
+      expect(canActivate).toBe(true);
+    });
 
-    const canActivate = await guard.canActivate(mockExecutionContext);
+    it('should return false when super resolves with a synchronous false', async () => {
+      mockReflector.getAllAndOverride.mockReturnValue(false);
 
-    expect(mockReflector.getAllAndOverride).toHaveBeenCalledWith(
-      IS_PUBLIC_KEY,
-      [mockExecutionContext.getHandler(), mockExecutionContext.getClass()],
-    );
-    expect(spySuperCanActivate).toHaveBeenCalledWith(mockExecutionContext);
-    expect(canActivate).toBe(false);
-    spySuperCanActivate.mockRestore();
+      spySuperCanActivate = jest
+        .spyOn(AuthGuard('jwt').prototype, 'canActivate')
+        .mockImplementation(() => false);
+
+      const canActivate = await guard.canActivate(mockExecutionContext);
+
+      expect(canActivate).toBe(false);
+    });
+
+    it('should unwrap an rxjs Observable of true via the strategy stream', async () => {
+      mockReflector.getAllAndOverride.mockReturnValue(false);
+
+      spySuperCanActivate = jest
+        .spyOn(AuthGuard('jwt').prototype, 'canActivate')
+        .mockImplementation(() => of(true));
+
+      const canActivate = await guard.canActivate(mockExecutionContext);
+
+      expect(canActivate).toBe(true);
+    });
+
+    it('should propagate strategy stream errors as rejections', async () => {
+      mockReflector.getAllAndOverride.mockReturnValue(false);
+
+      const strategyError = new UnauthorizedException('Unauthorized');
+      spySuperCanActivate = jest
+        .spyOn(AuthGuard('jwt').prototype, 'canActivate')
+        .mockImplementation(() => throwError(() => strategyError));
+
+      await expect(guard.canActivate(mockExecutionContext)).rejects.toThrow(
+        strategyError,
+      );
+    });
+
+    it('should reject when the strategy observable emits false', async () => {
+      mockReflector.getAllAndOverride.mockReturnValue(false);
+
+      spySuperCanActivate = jest
+        .spyOn(AuthGuard('jwt').prototype, 'canActivate')
+        .mockImplementation(() => of(false));
+
+      const canActivate = await guard.canActivate(mockExecutionContext);
+
+      expect(canActivate).toBe(false);
+    });
   });
 });

@@ -2,11 +2,11 @@ import { IS_PUBLIC_KEY } from '@core/decorators';
 import { ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
-import { Observable } from 'rxjs';
+import { Observable, firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
-  constructor(private reflector: Reflector) {
+  constructor(private readonly reflector: Reflector) {
     super();
   }
 
@@ -16,7 +16,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
    * at both the handler (method) and controller (class) bounds before evaluating JWT strategies.
    *
    * @param context Host execution context providing access to target routing handlers and classes.
-   * @returns A boolean, or a promise/observable resolving to a boolean, indicating if the request may proceed.
+   * @returns A promise resolving to a boolean indicating if the request may proceed.
    */
   override async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
@@ -28,18 +28,14 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       return true;
     }
 
-    // Standardize execution stream as async/await since super.canActivate may return sync or async results
+    // super.canActivate may resolve from a boolean, a promise or an rxjs stream
+    // depending on the passport integration; normalize everything to a promise.
     const result = super.canActivate(context);
 
     if (result instanceof Observable) {
-      return new Promise((resolve, reject) => {
-        result.subscribe({
-          next: (valid) => resolve(valid),
-          error: (err) => reject(err),
-        });
-      });
+      return firstValueFrom(result);
     }
 
-    return (await result) as boolean;
+    return Promise.resolve(result);
   }
 }

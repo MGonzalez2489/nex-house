@@ -5,7 +5,7 @@ import {
   ResetPasswordTokenDto,
   ResetPwdDto,
 } from '@auth/dtos';
-import { ResetPwdGuard } from '@auth/guards';
+import { ResetPwdGuard, ResetTokenPayload } from '@auth/guards';
 import { AuthService, PwdRecoveryService } from '@auth/services';
 import { CurrentUser, Public } from '@core/decorators';
 import {
@@ -25,12 +25,6 @@ import {
   Request as ExpressRequest,
   Response as ExpressResponse,
 } from 'express';
-
-type ResetTokenPayload = {
-  email: string;
-  sub: string;
-  purpose: string;
-};
 
 @ApiTags('Authentication')
 @Public()
@@ -71,14 +65,13 @@ export class PwdRecoveryController {
   ): Promise<SessionModel> {
     const ip =
       request.ip || (request.headers['x-forwarded-for'] as string) || '0.0.0.0';
-    const token = request.headers.authorization?.split(' ')[1] ?? '';
 
     const session = await this.recoveryService.updatePwd(
       user.email,
       dto.pwd,
       userAgent,
       ip,
-      token,
+      user.token,
     );
     this.authService.createCookie(response, session.refreshToken);
 
