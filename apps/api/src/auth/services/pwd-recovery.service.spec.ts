@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { UserSearchService, UserService } from '@administration/user/services';
 import { User } from '@core/database';
+import { CryptoService } from '@core/services';
 import { UserRoleEnum, UserStatusEnum } from '@nexhouse/shared-domain/enums';
 import { SessionService } from './session.service';
 import { PwdRecoveryService } from './pwd-recovery.service';
@@ -17,6 +18,9 @@ describe('PwdRecoveryService', () => {
   let mockUserService: jest.Mocked<UserService>;
   let mockTokenService: jest.Mocked<TokenService>;
   let mockSessionService: jest.Mocked<SessionService>;
+  let mockCryptoService: jest.Mocked<CryptoService>;
+
+  const STRONG_PWD = 'Str0ng!Pwd';
 
   const baseMockUser = {
     id: 1,
@@ -35,6 +39,9 @@ describe('PwdRecoveryService', () => {
     ...baseMockUser,
     status: { name: UserStatusEnum.ACTIVE },
   } as unknown as User;
+
+  const callUpdatePwd = (token = 'reset-token-xyz', pwd = STRONG_PWD) =>
+    service.updatePwd(baseMockUser.email, pwd, 'user-agent', '1.2.3.4', token);
 
   beforeEach(async () => {
     mockUserSearchService = {
@@ -60,6 +67,10 @@ describe('PwdRecoveryService', () => {
       createSession: jest.fn(),
     } as unknown as jest.Mocked<SessionService>;
 
+    mockCryptoService = {
+      isPasswordStrong: jest.fn().mockReturnValue(true),
+    } as unknown as jest.Mocked<CryptoService>;
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PwdRecoveryService,
@@ -67,6 +78,7 @@ describe('PwdRecoveryService', () => {
         { provide: UserService, useValue: mockUserService },
         { provide: TokenService, useValue: mockTokenService },
         { provide: SessionService, useValue: mockSessionService },
+        { provide: CryptoService, useValue: mockCryptoService },
       ],
     }).compile();
 
@@ -79,9 +91,7 @@ describe('PwdRecoveryService', () => {
 
   describe('createRecoveryCode', () => {
     it('should generate a recovery code, persist it and return the code in non-prod environments', async () => {
-      mockUserSearchService.findByEmailOrThrow.mockResolvedValue(
-        baseMockUser,
-      );
+      mockUserSearchService.findByEmailOrThrow.mockResolvedValue(baseMockUser);
 
       const result = await service.createRecoveryCode(baseMockUser.email);
 
@@ -105,6 +115,19 @@ describe('PwdRecoveryService', () => {
       mockUserSearchService.findByEmailOrThrow.mockResolvedValue(
         inactiveNeighborhoodUser,
       );
+
+      await expect(
+        service.createRecoveryCode(baseMockUser.email),
+      ).rejects.toThrow(ForbiddenException);
+      expect(mockUserService.update).not.toHaveBeenCalled();
+    });
+
+    it('should throw ForbiddenException when a non-superadmin user has no neighborhood', async () => {
+      const detachedUser = {
+        ...baseMockUser,
+        neighborhood: null,
+      } as unknown as User;
+      mockUserSearchService.findByEmailOrThrow.mockResolvedValue(detachedUser);
 
       await expect(
         service.createRecoveryCode(baseMockUser.email),
@@ -163,6 +186,19 @@ describe('PwdRecoveryService', () => {
       expect(mockTokenService.createResetPasswordToken).not.toHaveBeenCalled();
     });
 
+    it('should throw BadRequestException when the recovery code has no expiration', async () => {
+      const noExpirationUser = {
+        ...baseMockUser,
+        recoveryCodeExpiration: null,
+      } as unknown as User;
+      mockUserSearchService.findOne.mockResolvedValue(noExpirationUser);
+
+      await expect(service.validateCode('ABC-123456')).rejects.toThrow(
+        BadRequestException,
+      );
+      expect(mockTokenService.createResetPasswordToken).not.toHaveBeenCalled();
+    });
+
     it('should create a purpose-limited reset token and persist it', async () => {
       mockUserSearchService.findOne.mockResolvedValue(baseMockUser);
 
@@ -179,7 +215,6 @@ describe('PwdRecoveryService', () => {
         baseMockUser,
       );
       expect(result.token).toBe('mocked-reset-jwt');
-      expect(result.exp).toBe(expect.any(Number));
       expect(result.exp).toBeGreaterThan(Date.now());
     });
   });
@@ -190,15 +225,7 @@ describe('PwdRecoveryService', () => {
         mockActiveUser,
       );
 
-      await expect(
-        service.updatePwd(
-          baseMockUser.email,
-          'new-password',
-          'user-agent',
-          '1.2.3.4',
-          'reset-token-xyz',
-        ),
-      ).rejects.toThrow(BadRequestException);
+      await expect(callUpdatePwd()).rejects.toThrow(BadRequestException);
     });
 
     it('should throw BadRequestException when recovery info is incomplete', async () => {
@@ -211,29 +238,28 @@ describe('PwdRecoveryService', () => {
         incompleteUser,
       );
 
-      await expect(
-        service.updatePwd(
-          baseMockUser.email,
-          'new-password',
-          'user-agent',
-          '1.2.3.4',
-          'reset-token-xyz',
-        ),
-      ).rejects.toThrow(BadRequestException);
+      await expect(callUpdatePwd()).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw BadRequestException for a weak password and not touch the account', async () => {
+      mockCryptoService.isPasswordStrong.mockReturnValue(false);
+      mockUserSearchService.findByEmailOrThrow.mockResolvedValue(baseMockUser);
+
+      await expect(callUpdatePwd('reset-token-xyz', 'short')).rejects.toThrow(
+        BadRequestException,
+      );
+      expect(
+        mockUserService.updatePasswordOnRecoveryProcess,
+      ).not.toHaveBeenCalled();
+      expect(mockSessionService.createSession).not.toHaveBeenCalled();
     });
 
     it('should throw UnauthorizedException when the presented token does not match the stored one', async () => {
       mockUserSearchService.findByEmailOrThrow.mockResolvedValue(baseMockUser);
 
-      await expect(
-        service.updatePwd(
-          baseMockUser.email,
-          'new-password',
-          'user-agent',
-          '1.2.3.4',
-          'stolen-or-forged-token',
-        ),
-      ).rejects.toThrow(UnauthorizedException);
+      await expect(callUpdatePwd('stolen-or-forged-token')).rejects.toThrow(
+        UnauthorizedException,
+      );
       expect(
         mockUserService.updatePasswordOnRecoveryProcess,
       ).not.toHaveBeenCalled();
@@ -248,17 +274,14 @@ describe('PwdRecoveryService', () => {
         user: {} as never,
       });
 
-      const result = await service.updatePwd(
-        baseMockUser.email,
-        'new-password',
-        'user-agent',
-        '1.2.3.4',
-        'reset-token-xyz',
-      );
+      const result = await callUpdatePwd();
 
+      expect(mockCryptoService.isPasswordStrong).toHaveBeenCalledWith(
+        STRONG_PWD,
+      );
       expect(
         mockUserService.updatePasswordOnRecoveryProcess,
-      ).toHaveBeenCalledWith(baseMockUser.id, 'new-password');
+      ).toHaveBeenCalledWith(baseMockUser.id, STRONG_PWD);
       expect(mockSessionService.createSession).toHaveBeenCalledWith(
         baseMockUser,
         'user-agent',

@@ -1,6 +1,7 @@
 import { UserSearchService, UserService } from '@administration/user/services';
 import { RecoveryCodeResponseDto, ResetPasswordTokenDto } from '@auth/dtos';
 import { isProd } from '@core/utils';
+import { CryptoService } from '@core/services';
 import {
   BadRequestException,
   ForbiddenException,
@@ -9,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { UserRoleEnum, UserStatusEnum } from '@nexhouse/shared-domain/enums';
 import { addMinutes, isPast } from 'date-fns';
+import { randomInt } from 'crypto';
 import { SessionService } from './session.service';
 import { TokenService } from './token.service';
 
@@ -19,6 +21,7 @@ export class PwdRecoveryService {
     private readonly userService: UserService,
     private readonly tokenService: TokenService,
     private readonly sessionService: SessionService,
+    private readonly cryptoService: CryptoService,
   ) {}
 
   private readonly RECOVERY_CODE_TTL_MINUTES = 30;
@@ -32,13 +35,17 @@ export class PwdRecoveryService {
       { neighborhood: true, status: true, role: true },
     );
 
-    if (
-      user.role.name !== UserRoleEnum.SUPERADMIN &&
-      !user.neighborhood.isActive
-    ) {
-      throw new ForbiddenException(
-        `El usuario pertenece a un fraccionamiento deshabilitado.`,
-      );
+    if (user.role.name !== UserRoleEnum.SUPERADMIN) {
+      if (!user.neighborhood) {
+        throw new ForbiddenException(
+          'El usuario no pertenece a un fraccionamiento.',
+        );
+      }
+      if (!user.neighborhood.isActive) {
+        throw new ForbiddenException(
+          'El usuario pertenece a un fraccionamiento deshabilitado.',
+        );
+      }
     }
     if (user.status.name === UserStatusEnum.INACTIVE) {
       throw new ForbiddenException(`El usuario esta deshabilitado`);
@@ -78,7 +85,10 @@ export class PwdRecoveryService {
       );
     }
 
-    if (isPast(new Date(user.recoveryCodeExpiration))) {
+    if (
+      !user.recoveryCodeExpiration ||
+      isPast(new Date(user.recoveryCodeExpiration))
+    ) {
       throw new BadRequestException(`El codigo de recuperacion ha expirado.`);
     }
 
@@ -117,6 +127,14 @@ export class PwdRecoveryService {
       throw new BadRequestException('Usuario fuera de proceso.');
     }
 
+    // Enforce the same strength rules used when creating accounts, instead of
+    // relying solely on the transport-level ResetPwdDto (which only checks length).
+    if (!this.cryptoService.isPasswordStrong(newPwd)) {
+      throw new BadRequestException(
+        'La contrasena no cumple con los requisitos de seguridad.',
+      );
+    }
+
     const hasRecoveryInfo = !!(
       user.recoveryCode &&
       user.recoveryCodeExpiration &&
@@ -139,21 +157,14 @@ export class PwdRecoveryService {
   }
 
   generateRecoveryCode(): string {
-    // Generate three random uppercase letters (A-Z)
-    const generateRandomLetter = (): string => {
-      const asciiA = 65; // ASCII code for 'A'
-      const alphabetSize = 26;
-      return String.fromCharCode(
-        asciiA + Math.floor(Math.random() * alphabetSize),
-      );
-    };
+    // Generate three random uppercase letters (A-Z) with a CSPRNG
+    const generateRandomLetter = (): string =>
+      String.fromCharCode(65 + randomInt(26));
 
     const prefix = `${generateRandomLetter()}${generateRandomLetter()}${generateRandomLetter()}`;
 
     // Generate a random 6-digit number
-    const min = 100000;
-    const max = 999999;
-    const recoveryNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+    const recoveryNumber = randomInt(100000, 1000000);
 
     // Combine the prefix and the number with a hyphen
     return `${prefix}-${recoveryNumber.toString()}`;
