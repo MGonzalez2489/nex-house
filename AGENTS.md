@@ -47,3 +47,18 @@ Conventional Commits is enforced by a husky hook: `type(scope): lowercase impera
 ## Code Standards
 
 - Use ./.agents/skills/web for every action required in the web application
+
+## Documentation (mandatory)
+
+Every change to the codebase — creating, editing, or deleting code — MUST be reflected in a Markdown document under the root `docs/` folder. This applies to **all** source artifacts: services, controllers, guards, modules, utilities, components, and any other code you write.
+
+- **Path replication:** docs mirror the source path, replacing the source root and the file extension with `.md`:
+  - `apps/api/src/auth/services/token.service.ts` → `docs/api/auth/services/token.service.md`
+  - `apps/api/src/auth/controllers/auth.controller.ts` → `docs/api/auth/controllers/auth.controller.md`
+  - `apps/web/src/app/...` → `docs/web/...`
+  - `libs/shared-domain/src/lib/...` → `docs/shared-domain/...`
+- **Format:** every documentation file MUST be written in Markdown with the `.md` extension and in **English**.
+- **Creating code:** each new source file requires its corresponding doc file in the same change.
+- **Editing code:** update or extend the existing doc so it always reflects the current behavior (new methods, params, options, edge cases, configuration, dependencies).
+- **Deleting code:** remove the corresponding doc file.
+- Documentation is part of the change: a code change is not complete until its docs are updated.
