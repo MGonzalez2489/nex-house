@@ -12,7 +12,7 @@ NX monorepo. Two apps, one shared lib.
 ## Commands
 
 - `nx serve api` / `nx serve web` — dev servers
-- `nx test api`, `nx test web`, `nx test shared-domain` — unit tests
+- `npm run test:api` — api unit tests (jest). **Repo-wide jest prerequisite:** NestJS publishes ESM-only packages, so every jest invocation must run with `NODE_OPTIONS=--experimental-vm-modules` (see Known broken state). The api script bakes the flag in; forward jest args through `--`, e.g. `npm run test:api -- --testPathPatterns=auth --watch`. Equivalent pattern for other projects: `NODE_OPTIONS=--experimental-vm-modules nx test web`.
 - `npm run test-api:cov` — `nx test api --coverage`
 - `nx lint api`, `nx lint web` — lint; root `npm run lint` lints everything
 - `nx e2e api-e2e` (jest) / `nx e2e web-e2e` (playwright)
@@ -21,7 +21,8 @@ NX monorepo. Two apps, one shared lib.
 
 ## Known broken state
 
-`nx test api` currently does not pass: `@catalogs/*` is missing from the path aliases in `apps/api/tsconfig.spec.json` (it exists only in `tsconfig.app.json`), so any spec importing from `@catalogs/services` fails to compile (e.g. `unit.service.spec.ts`).
+- **Jest + ESM (repo-wide):** jest detects ESM packages and fails with `ERR_REQUIRE_ESM` ("Must use import to load ES Module") whenever a `@nestjs/*` dependency is loaded unless Node runs with `NODE_OPTIONS=--experimental-vm-modules`. This is required for **every** jest run in this repo (API, e2e, and potentially web/shared-domain) — use `npm run test:api` (flag baked in) or prefix raw `nx test api` invocations with `NODE_OPTIONS=--experimental-vm-modules`. Note the `--watch` mode does not change anything; it is the Node flag that matters.
+- **Pre-existing spec type errors (unrelated to recent auth refactors):** `apps/api/src/catalogs/controllers/catalogs.controller.spec.ts` fails to compile (`Expected 1 arguments, but got 0`, lines 67/72). The old `@catalogs/*`-missing-alias issue in `tsconfig.spec.json` is fixed (present in both app and spec tsconfigs).
 
 ## Database & entities (no migrations)
 

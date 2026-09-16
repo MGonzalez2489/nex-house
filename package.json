@@ -6,7 +6,8 @@
     "prepare": "husky",
     "lint": "eslint . --ext .ts,.html",
     "lint:fix": "eslint . --ext .ts,.html --fix",
-    "test-api:cov": "nx test api --coverage"
+    "test:api": "NODE_OPTIONS=--experimental-vm-modules nx test api",
+    "test-api:cov": "NODE_OPTIONS=--experimental-vm-modules nx test api --coverage"
   },
   "devDependencies": {
     "@angular-devkit/core": "22.1.7",
