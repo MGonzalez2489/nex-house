@@ -3,10 +3,9 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { NeighborhoodSearchService } from './neighborhood-search.service';
 import { Neighborhood } from '@core/database';
-import { SearchDto } from '@core/dtos';
+import { SearchNeighDto } from '../dtos';
 import * as paginationUtils from '@core/utils';
 
-// Intercept pagination module
 jest.mock('@core/utils', () => ({
   ...jest.requireActual('@core/utils'),
   paginateQuery: jest.fn(),
@@ -56,19 +55,20 @@ describe('NeighborhoodSearchService', () => {
   });
 
   describe('findAll', () => {
-    it('should return a wrapped paginated response object by default', async () => {
-      const searchDto: SearchDto = {
-        first: 0,
-        rows: 10,
-        sortField: '',
-        sortOrder: 0,
-        showAll: false,
-      };
+    const baseDto = (): SearchNeighDto => ({
+      first: 0,
+      rows: 10,
+      sortField: 'createdAt',
+      sortOrder: -1,
+      showAll: false,
+    });
+
+    it('returns the paginated wrapper by default', async () => {
       jest
         .mocked(paginationUtils.paginateQuery)
         .mockResolvedValue(mockPaginationResult);
 
-      const result = await service.findAll(searchDto);
+      const result = await service.findAll(baseDto());
 
       expect(mockRepository.createQueryBuilder).toHaveBeenCalledWith(
         'neighborhood',
@@ -77,50 +77,52 @@ describe('NeighborhoodSearchService', () => {
         'neighborhood.streets',
         'streets',
       );
+      expect(mockQueryBuilder.leftJoinAndSelect).toHaveBeenCalledWith(
+        'neighborhood.address',
+        'address',
+      );
       expect(result).toEqual(mockPaginationResult);
     });
 
-    it('should unpack and return the raw entity data array if raw: true is passed', async () => {
-      const searchDto: SearchDto = {
-        first: 0,
-        rows: 10,
-        sortField: '',
-        sortOrder: 0,
-        showAll: false,
-      };
+    it('filters by activation state when isActive is provided', async () => {
       jest
         .mocked(paginationUtils.paginateQuery)
         .mockResolvedValue(mockPaginationResult);
 
-      const result = await service.findAll(searchDto, { raw: true });
+      await service.findAll({ ...baseDto(), isActive: true });
 
-      expect(result).toEqual(mockNeighborhoods);
-      expect(Array.isArray(result)).toBe(true);
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'neighborhood.isActive = :isActive',
+        { isActive: true },
+      );
     });
 
-    it('should append structured sub-brackets if globalFilter keywords are active', async () => {
-      const searchDto: SearchDto = {
-        first: 0,
-        rows: 10,
-        globalFilter: 'Palomas Del Real',
-        sortField: '',
-        sortOrder: 0,
-        showAll: false,
-      };
+    it('applies the global name filter when provided', async () => {
       jest
         .mocked(paginationUtils.paginateQuery)
         .mockResolvedValue(mockPaginationResult);
 
-      await service.findAll(searchDto);
+      await service.findAll({ ...baseDto(), globalFilter: 'palomas' });
 
       expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
         expect.any(Object),
       );
     });
+
+    it('returns raw entity rows when options.raw is true', async () => {
+      jest
+        .mocked(paginationUtils.paginateQuery)
+        .mockResolvedValue(mockPaginationResult);
+
+      const result = await service.findAll(baseDto(), { raw: true });
+
+      expect(Array.isArray(result)).toBe(true);
+      expect(result).toEqual(mockNeighborhoods);
+    });
   });
 
-  describe('findOneByCriteria methods', () => {
-    it('should query a single neighborhood by public ID using default relation scopes', async () => {
+  describe('single-row lookups', () => {
+    it('finds by publicId using default relation scopes', async () => {
       mockRepository.findOne.mockResolvedValue(mockNeighborhoods[0]);
 
       const result = await service.findByPublicId('uuid-1');
@@ -132,7 +134,7 @@ describe('NeighborhoodSearchService', () => {
       expect(result).toEqual(mockNeighborhoods[0]);
     });
 
-    it('should query a single neighborhood by name with customizable override relation mappings', async () => {
+    it('finds by name with a custom relation override', async () => {
       const customRelations = { streets: false };
       mockRepository.findOne.mockResolvedValue(null);
 
@@ -143,6 +145,19 @@ describe('NeighborhoodSearchService', () => {
         relations: customRelations,
       });
       expect(result).toBeNull();
+    });
+
+    it('finds by numeric id', async () => {
+      const customRelations = { streets: false };
+      mockRepository.findOne.mockResolvedValue(mockNeighborhoods[0]);
+
+      const result = await service.findById(1, customRelations);
+
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 1 },
+        relations: customRelations,
+      });
+      expect(result).toEqual(mockNeighborhoods[0]);
     });
   });
 });

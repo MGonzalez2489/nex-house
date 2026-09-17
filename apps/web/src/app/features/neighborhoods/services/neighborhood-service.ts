@@ -9,7 +9,6 @@ import {
 import {
   NeighborhoodModel,
   NeighStreetModel,
-  UnitModel,
 } from "@nexhouse/shared-domain/models";
 import { Observable } from "rxjs";
 
@@ -20,11 +19,17 @@ export class NeighborhoodService {
   private readonly request = inject(RequestService);
   private readonly endpoint = "/api/neighborhood";
 
+  private readonly defaultSearch: Search = {
+    rows: 10,
+    showAll: true,
+    first: 0,
+  };
+
   getAll(dto: Search): Observable<ApiResponse<NeighborhoodModel[]>> {
     return this.request.get<NeighborhoodModel[]>(this.endpoint, dto);
   }
 
-  getMine() {
+  getMine(): Observable<ApiResponse<NeighborhoodModel>> {
     return this.request.get<NeighborhoodModel>(`${this.endpoint}/mine`);
   }
 
@@ -45,19 +50,12 @@ export class NeighborhoodService {
     return this.request.patch<NeighborhoodModel>(`${this.endpoint}/${id}`, dto);
   }
 
-  //units
-  getUnits() {
-    return this.request.get<UnitModel[]>(`${this.endpoint}/units`, {
-      rows: 10,
-      showAll: true,
-      first: 0,
-    });
-  }
-  getStreets() {
-    return this.request.get<NeighStreetModel[]>(`${this.endpoint}/streets`, {
-      rows: 10,
-      showAll: true,
-      first: 0,
-    });
+  getStreets(
+    dto: Search = this.defaultSearch,
+  ): Observable<ApiResponse<NeighStreetModel[]>> {
+    return this.request.get<NeighStreetModel[]>(
+      `${this.endpoint}/streets`,
+      dto,
+    );
   }
 }

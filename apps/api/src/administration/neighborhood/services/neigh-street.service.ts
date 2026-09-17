@@ -1,26 +1,24 @@
 import { NeighStreet } from '@core/database';
 import { SearchDto } from '@core/dtos';
-import { paginateQuery } from '@core/utils';
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { PaginatedResult, paginateQuery } from '@core/utils';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, EntityManager, In, Repository } from 'typeorm';
 
 @Injectable()
 export class NeighStreetService {
-  private readonly logger = new Logger(NeighStreetService.name);
-
   constructor(
     @InjectRepository(NeighStreet)
     private readonly streetRepo: Repository<NeighStreet>,
   ) {}
 
   /**
-   * Spawns multiple street entries attached to a shared neighborhood parent context.
-   * Can hook seamlessly into external ACID transaction environments if an explicit manager is supplied.
+   * Creates multiple street records for a neighborhood. When an explicit
+   * transactional manager is supplied, the insert runs inside that transaction.
    *
-   * @param streets Formatted collection of raw name strings and parent target numerical IDs.
-   * @param transactionalManager Optional TypeORM context coordinator to sustain atomic boundaries.
-   * @returns An array containing the newly instantiated and persisted record maps.
+   * @param streets Raw street payloads (name + parent neighborhood ID).
+   * @param createdBy Actor ID stamping the new records.
+   * @param transactionalManager Optional manager to join an external transaction.
    */
   async createMany(
     streets: { name: string; neighborhoodId: number }[],
@@ -29,19 +27,22 @@ export class NeighStreetService {
   ): Promise<NeighStreet[]> {
     const manager = transactionalManager ?? this.streetRepo.manager;
 
-    const s = streets.map((f) => ({ ...f, createdBy }));
+    const entities = manager.create(
+      NeighStreet,
+      streets.map((street) => ({
+        ...street,
+        name: this.normalizeName(street.name),
+        createdBy,
+      })),
+    );
 
-    const entities = manager.create(NeighStreet, s);
     return await manager.save(NeighStreet, entities);
   }
 
   /**
-   * Mutates the descriptive properties of a specific street record.
+   * Updates the name of a single street identified by its public UUID.
    *
-   * @param publicId Cross-boundary unique secure identifier token.
-   * @param name Fresh descriptive string tracking the street title.
-   * @throws NotFoundException if target identity does not map to a persistent record.
-   * @returns The updated entity state snapshot.
+   * @throws NotFoundException if no street matches the public ID.
    */
   async update(
     publicId: string,
@@ -56,18 +57,17 @@ export class NeighStreetService {
       );
     }
 
-    street.name = name.trim().toLocaleLowerCase();
+    street.name = this.normalizeName(name);
     street.updatedBy = updatedBy;
     return await this.streetRepo.save(street);
   }
 
   /**
-   * Mutates the descriptive properties of multiple street records.
-   * Can hook seamlessly into external ACID transaction environments if an explicit manager is supplied.
+   * Updates the names of multiple streets in one pass, reusing partial
+   * entities (id + new values) so TypeORM resolves the correct rows.
    *
-   * @param streets Formatted collection of street IDs and new names.
-   * @param transactionalManager Optional TypeORM context coordinator to sustain atomic boundaries.
-   * @returns An array containing the updated and persisted record maps.
+   * @param streets Collection of street IDs and fresh names.
+   * @param transactionalManager Optional manager to join an external transaction.
    */
   async updateMany(
     streets: { id: number; name: string }[],
@@ -76,24 +76,22 @@ export class NeighStreetService {
   ): Promise<NeighStreet[]> {
     const manager = transactionalManager ?? this.streetRepo.manager;
 
-    // TypeORM's save method intelligently updates if entities have an ID.
-    // We create partial entities with just the ID and the new name.
-    const entitiesToUpdate = streets.map((street) =>
-      manager.create(NeighStreet, {
+    const entities = manager.create(
+      NeighStreet,
+      streets.map((street) => ({
         id: street.id,
-        name: street.name,
+        name: this.normalizeName(street.name),
         updatedBy,
-      }),
+      })),
     );
 
-    return await manager.save(NeighStreet, entitiesToUpdate);
+    return await manager.save(NeighStreet, entities);
   }
 
   /**
-   * Evicts a street record permanently from physical tables.
+   * Removes (soft delete) a single street by its public UUID.
    *
-   * @param publicId Cross-boundary unique secure identifier token.
-   * @throws NotFoundException if target identity does not map to a persistent record.
+   * @throws NotFoundException if no street matches the public ID.
    */
   async remove(publicId: string, deletedBy: number): Promise<void> {
     const street = await this.findByPublicId(publicId);
@@ -110,11 +108,10 @@ export class NeighStreetService {
   }
 
   /**
-   * Evicts multiple street records permanently from physical tables based on their IDs.
-   * Can hook seamlessly into external ACID transaction environments if an explicit manager is supplied.
+   * Removes (soft delete) multiple streets by their primary keys.
    *
-   * @param ids An array of primary numerical identifiers of the streets to remove.
-   * @param transactionalManager Optional TypeORM context coordinator to sustain atomic boundaries.
+   * @param ids Street primary keys to remove.
+   * @param transactionalManager Optional manager to join an external transaction.
    */
   async removeMany(
     ids: number[],
@@ -122,40 +119,44 @@ export class NeighStreetService {
     transactionalManager?: EntityManager,
   ): Promise<void> {
     if (ids.length === 0) {
-      return; // No IDs to remove, return early.
+      return;
     }
+
     const manager = transactionalManager ?? this.streetRepo.manager;
     const streets = await manager.find(NeighStreet, {
       where: { id: In(ids) },
     });
 
-    for (const street of streets) {
+    streets.forEach((street) => {
       street.deletedBy = deletedBy;
-    }
+    });
 
     await manager.save(streets);
     await manager.softRemove(NeighStreet, streets);
   }
 
   /**
-   * Internal lookup locating street entities against primary automatic increment keys.
-   *
-   * @param id Inter-system relational numerical identifier.
+   * Finds a street by its internal numerical identifier.
    */
   async findById(id: number): Promise<NeighStreet | null> {
     return await this.streetRepo.findOneBy({ id });
   }
 
   /**
-   * Evaluates system indices to find a specific street by its secure public UUID string.
-   *
-   * @param publicId Cross-boundary unique secure identifier token.
+   * Finds a street by its public UUID.
    */
   async findByPublicId(publicId: string): Promise<NeighStreet | null> {
     return await this.streetRepo.findOneBy({ publicId });
   }
 
-  async findAll(neighborhoodId: number, filters: SearchDto) {
+  /**
+   * Paginates the streets of a neighborhood, filtering each whitespace-separated
+   * term of `globalFilter` against the street name.
+   */
+  async findAll(
+    neighborhoodId: number,
+    filters: SearchDto,
+  ): Promise<PaginatedResult<NeighStreet>> {
     const query = this.streetRepo
       .createQueryBuilder('street')
       .where('street.neighborhoodId = :neighborhoodId', {
@@ -165,28 +166,31 @@ export class NeighStreetService {
     const { globalFilter } = filters;
 
     if (globalFilter) {
-      const globalFilterWords = globalFilter
+      const terms = globalFilter
         .split(' ')
-        .filter((word) => word.length > 0);
+        .filter((term) => term.length > 0);
 
-      if (globalFilterWords.length > 0) {
+      if (terms.length > 0) {
         query.andWhere(
           new Brackets((andQb) => {
-            globalFilterWords.forEach((word, index) => {
-              const paramName = `globalFilterWord${index}`;
-              andQb.andWhere(
-                new Brackets((orQb) => {
-                  orQb.where(`street.name LIKE :${paramName}`, {
-                    [paramName]: `%${word}%`,
-                  });
-                }),
-              );
+            terms.forEach((term, index) => {
+              const paramName = `globalFilterTerm${index}`;
+              andQb.andWhere(`street.name LIKE :${paramName}`, {
+                [paramName]: `%${term}%`,
+              });
             });
           }),
         );
       }
     }
-    const result = await paginateQuery(query, filters);
-    return result;
+
+    return await paginateQuery(query, filters);
+  }
+
+  /**
+   * Normalizes free-form names to a consistent searchable casing.
+   */
+  private normalizeName(name: string): string {
+    return name.trim().toLocaleLowerCase();
   }
 }

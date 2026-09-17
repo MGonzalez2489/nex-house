@@ -1,6 +1,6 @@
 import { Neighborhood } from '@core/database';
 import { PaginatedResult, paginateQuery } from '@core/utils';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   Brackets,
@@ -10,10 +10,16 @@ import {
 } from 'typeorm';
 import { SearchNeighDto } from '../dtos';
 
+interface FindAllOptions {
+  /**
+   * When `true`, the raw entity rows are returned instead of the paginated
+   * wrapper. Used internally by consumers that need the bare dataset.
+   */
+  raw?: boolean;
+}
+
 @Injectable()
 export class NeighborhoodSearchService {
-  private readonly logger = new Logger(NeighborhoodSearchService.name);
-
   private readonly defaultRelations: FindOptionsRelations<Neighborhood> = {
     streets: true,
   };
@@ -24,16 +30,7 @@ export class NeighborhoodSearchService {
   ) {}
 
   /**
-   * Retrieves a listing of neighborhoods omitting raw metadata wrappers.
-   * Activated internally when the options payload explicitly passes raw: true.
-   */
-  async findAll(
-    filters: SearchNeighDto,
-    options: { raw: true },
-  ): Promise<Neighborhood[]>;
-
-  /**
-   * Retrieves a structured paginated array of neighborhoods alongside interface header metadata.
+   * Retrieves a paginated listing of neighborhoods plus header metadata.
    * Standard access path for consumer controllers.
    */
   async findAll(
@@ -42,13 +39,23 @@ export class NeighborhoodSearchService {
   ): Promise<PaginatedResult<Neighborhood>>;
 
   /**
-   * Core matrix querying handling conditional global strings tokens, dynamic relations maps, and output formatting.
+   * Retrieves raw neighborhood rows, skipping the pagination wrapper.
+   * Used internally when `options.raw` is explicitly true.
    */
   async findAll(
-    search: SearchNeighDto,
-    options?: { raw?: boolean },
+    filters: SearchNeighDto,
+    options: { raw: true },
+  ): Promise<Neighborhood[]>;
+
+  /**
+   * Core query handling conditional global name tokens, activation filters and
+   * output shaping.
+   */
+  async findAll(
+    filters: SearchNeighDto,
+    options?: FindAllOptions,
   ): Promise<PaginatedResult<Neighborhood> | Neighborhood[]> {
-    const { globalFilter, isActive } = search;
+    const { globalFilter, isActive } = filters;
 
     const query = this.repository
       .createQueryBuilder('neighborhood')
@@ -71,20 +78,16 @@ export class NeighborhoodSearchService {
       query.andWhere('neighborhood.isActive = :isActive', { isActive });
     }
 
-    const result = await paginateQuery(query, search);
+    const result = await paginateQuery(query, filters);
 
-    if (options?.raw === true) {
-      return result.data;
-    }
-
-    return result;
+    return options?.raw === true ? result.data : result;
   }
 
   /**
-   * Resolves a unique neighborhood instance tracking against its secure cross-boundary public UUID.
+   * Finds a neighborhood by its public UUID.
    *
-   * @param publicId Validated unique identifier token.
-   * @param relations Override criteria mapping object.
+   * @param publicId Public identifier token.
+   * @param relations Relation map override (defaults to `streets`).
    */
   async findByPublicId(
     publicId: string,
@@ -94,10 +97,10 @@ export class NeighborhoodSearchService {
   }
 
   /**
-   * Validates name presence constraints across core tenant registrations.
+   * Finds a neighborhood by its registered name.
    *
-   * @param name Descriptive legal registration string.
-   * @param relations Override criteria mapping object.
+   * @param name Neighborhood display name.
+   * @param relations Relation map override (defaults to `streets`).
    */
   async findByName(
     name: string,
@@ -106,6 +109,12 @@ export class NeighborhoodSearchService {
     return this.findOneByCriteria({ name }, relations);
   }
 
+  /**
+   * Finds a neighborhood by its internal numerical identifier.
+   *
+   * @param id Primary key.
+   * @param relations Relation map override (defaults to `streets`).
+   */
   async findById(
     id: number,
     relations?: FindOptionsRelations<Neighborhood>,
@@ -114,16 +123,14 @@ export class NeighborhoodSearchService {
   }
 
   /**
-   * Dynamic isolation helper querying database rows via granular configuration schemas.
+   * Single-row lookup backed by the provided where criteria and relation map.
    */
   private async findOneByCriteria(
     criteria: FindOptionsWhere<Neighborhood>,
     relations?: FindOptionsRelations<Neighborhood>,
   ): Promise<Neighborhood | null> {
-    const whereCondition: FindOptionsWhere<Neighborhood> = { ...criteria };
-
     return this.repository.findOne({
-      where: whereCondition,
+      where: { ...criteria },
       relations: relations ?? this.defaultRelations,
     });
   }
