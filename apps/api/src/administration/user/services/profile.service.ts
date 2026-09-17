@@ -4,7 +4,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
-  Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -16,8 +16,6 @@ import { UserSearchService } from './user-search.service';
 
 @Injectable()
 export class ProfileService {
-  private readonly logger = new Logger(ProfileService.name);
-
   constructor(
     @InjectRepository(UserProfile)
     private readonly repository: Repository<UserProfile>,
@@ -26,45 +24,64 @@ export class ProfileService {
     private readonly configService: ConfigService,
   ) {}
 
-  async getByUserId(userId: number) {
+  /**
+   * Loads the profile owned by a user.
+   *
+   * @param userId Internal id of the user.
+   * @returns The matching profile with its avatar, or null when none exists.
+   */
+  async getByUserId(userId: number): Promise<UserProfile | null> {
     return this.repository.findOne({
-      where: {
-        userId,
-      },
-      relations: {
-        avatar: true,
-      },
+      where: { userId },
+      relations: { avatar: true },
     });
   }
 
+  /**
+   * Updates the profile of a user, enforcing unique phone numbers and
+   * persisting an optional avatar upload.
+   *
+   * @param publicId Public unique identifier of the user.
+   * @param dto Editable profile fields.
+   * @param avatar Optional uploaded avatar file.
+   * @returns The reloaded profile.
+   *
+   * @throws {NotFoundException} If the user or their profile does not exist.
+   * @throws {BadRequestException} If the phone format is invalid.
+   * @throws {ConflictException} If the phone is already in use.
+   */
   async update(
-    userId: string,
+    publicId: string,
     dto: UpdateUserProfileDto,
     avatar?: Express.Multer.File,
-  ) {
+  ): Promise<UserProfile | null> {
     const existingUser = await this.searchService.findByPublicIdOrThrow(
-      userId,
+      publicId,
       undefined,
       { profile: true },
     );
+
     const profile = existingUser.profile;
+    if (!profile) {
+      throw new NotFoundException('User profile not found.');
+    }
 
     if (dto.firstName) profile.firstName = dto.firstName.trim();
     if (dto.lastName) profile.lastName = dto.lastName.trim();
 
     if (dto.phone) {
-      const formatedPhone = formatPhone(dto.phone);
-      if (formatedPhone !== profile.phone) {
-        if (!validatePhone(formatedPhone)) {
+      const formattedPhone = formatPhone(dto.phone);
+      if (formattedPhone !== profile.phone) {
+        if (!validatePhone(formattedPhone)) {
           throw new BadRequestException('User phone format not valid.');
         }
         const existsPhone = await this.repository.exists({
-          where: { phone: formatedPhone },
+          where: { phone: formattedPhone },
         });
         if (existsPhone) {
           throw new ConflictException(`Phone ${dto.phone} already in use.`);
         }
-        profile.phone = formatedPhone;
+        profile.phone = formattedPhone;
       }
     }
 

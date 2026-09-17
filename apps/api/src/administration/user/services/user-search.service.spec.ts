@@ -1,16 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository, FindOptionsRelations, SelectQueryBuilder } from 'typeorm';
-import { NotFoundException, Logger } from '@nestjs/common';
+import { FindOptionsRelations, Repository } from 'typeorm';
+import { NotFoundException } from '@nestjs/common';
 import { UserSearchService } from './user-search.service';
 import { User } from '@core/database';
-import { SearchUserDto } from '../dtos';
-import * as paginationUtils from '@core/utils';
-
-jest.mock('@core/utils', () => ({
-  ...jest.requireActual('@core/utils'),
-  paginateQuery: jest.fn(),
-}));
 
 describe('UserSearchService', () => {
   let service: UserSearchService;
@@ -20,7 +13,6 @@ describe('UserSearchService', () => {
     id: 1,
     publicId: 'user-uuid-123',
     email: 'dev@nexhouse.com',
-    name: 'Manuel Gonzalez',
   } as unknown as User;
 
   const defaultRelations: FindOptionsRelations<User> = {
@@ -43,124 +35,40 @@ describe('UserSearchService', () => {
     }).compile();
 
     service = module.get<UserSearchService>(UserSearchService);
-
-    const loggerInstance = (service as unknown as { logger: Logger }).logger;
-    jest.spyOn(loggerInstance, 'error').mockImplementation(() => undefined);
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  describe('findAll', () => {
-    let mockQueryBuilder: jest.Mocked<SelectQueryBuilder<User>>;
-    let mockSearchUserDto: SearchUserDto;
+  describe('findOne', () => {
+    it('should query by the provided predicate using default relations', async () => {
+      mockRepository.findOne.mockResolvedValue(mockUser);
 
-    const mockUserList: User[] = [
-      {
-        id: 1,
-        firstName: 'Manuel',
-        lastName: 'Gonzalez',
-        email: 'dev@nexhouse.com',
-      } as User,
-    ];
+      const result = await service.findOne({ email: 'dev@nexhouse.com' });
 
-    const mockPaginationResult = {
-      data: mockUserList,
-      meta: { total: 1, page: 1, lastPage: 1, limit: 10 },
-    };
-
-    beforeEach(() => {
-      mockQueryBuilder = {
-        leftJoinAndSelect: jest.fn().mockReturnThis(),
-        where: jest.fn().mockReturnThis(),
-        andWhere: jest.fn().mockReturnThis(),
-        addSelect: jest.fn().mockReturnThis(),
-        addOrderBy: jest.fn().mockReturnThis(),
-      } as unknown as jest.Mocked<SelectQueryBuilder<User>>;
-
-      mockRepository.createQueryBuilder = jest
-        .fn()
-        .mockReturnValue(mockQueryBuilder);
-
-      mockSearchUserDto = {
-        first: 0,
-        rows: 10,
-        sortField: 'firstName',
-        sortOrder: 1,
-        showAll: false,
-      };
-
-      jest.mocked(paginationUtils.paginateQuery).mockReset();
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        where: { email: 'dev@nexhouse.com' },
+        relations: defaultRelations,
+      });
+      expect(result).toEqual(mockUser);
     });
 
-    it('should retrieve a paginated structure when options.raw is omitted or false', async () => {
-      jest
-        .mocked(paginationUtils.paginateQuery)
-        .mockResolvedValue(mockPaginationResult);
+    it('should honor custom relations when provided', async () => {
+      mockRepository.findOne.mockResolvedValue(mockUser);
+      const relations: FindOptionsRelations<User> = { status: true };
 
-      const result = await service.findAll(1, mockSearchUserDto);
+      await service.findOne({ email: 'dev@nexhouse.com' }, relations);
 
-      expect(mockRepository.createQueryBuilder).toHaveBeenCalledWith('users');
-      expect(mockQueryBuilder.leftJoinAndSelect).toHaveBeenCalledTimes(4); // neighborhood, units, unit
-      expect(mockQueryBuilder.where).toHaveBeenCalledWith(
-        'neighborhood.id = :neighborhoodId',
-        { neighborhoodId: 1 },
-      );
-
-      expect(result).toEqual(mockPaginationResult);
-    });
-
-    it('should bypass the metadata wrapper and return a raw array when options.raw is true', async () => {
-      jest
-        .mocked(paginationUtils.paginateQuery)
-        .mockResolvedValue(mockPaginationResult);
-
-      const result = await service.findAll(1, mockSearchUserDto, { raw: true });
-
-      expect(result).toEqual(mockUserList);
-      expect(Array.isArray(result)).toBe(true);
-    });
-
-    it('should correctly inject exact match filters for role and status if present', async () => {
-      jest
-        .mocked(paginationUtils.paginateQuery)
-        .mockResolvedValue(mockPaginationResult);
-      mockSearchUserDto.role = 'ADMIN';
-      mockSearchUserDto.status = 'ACTIVE';
-
-      await service.findAll(1, mockSearchUserDto);
-
-      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
-        'users.role = :role',
-        { role: 'ADMIN' },
-      );
-      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
-        'users.status = :status',
-        { status: 'ACTIVE' },
-      );
-    });
-
-    it('should dynamically parse globalFilter string into multiple nested words brackets', async () => {
-      jest
-        .mocked(paginationUtils.paginateQuery)
-        .mockResolvedValue(mockPaginationResult);
-      mockSearchUserDto.globalFilter = 'Manuel Unit10';
-
-      await service.findAll(1, mockSearchUserDto);
-
-      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
-        expect.any(Object),
-      );
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        where: { email: 'dev@nexhouse.com' },
+        relations,
+      });
     });
   });
 
   describe('findByPublicId', () => {
-    it('should successfully find a user by publicId using default relations', async () => {
+    it('should find a user by publicId using default relations', async () => {
       mockRepository.findOne.mockResolvedValue(mockUser);
 
       const result = await service.findByPublicId('user-uuid-123');
@@ -172,7 +80,7 @@ describe('UserSearchService', () => {
       expect(result).toEqual(mockUser);
     });
 
-    it('should append neighborhoodId to where criteria when provided', async () => {
+    it('should append the neighborhoodId criteria when provided', async () => {
       mockRepository.findOne.mockResolvedValue(mockUser);
 
       await service.findByPublicId('user-uuid-123', 99);
@@ -186,11 +94,9 @@ describe('UserSearchService', () => {
       });
     });
 
-    it('should override default relations when custom relations are explicitly passed', async () => {
+    it('should override default relations when custom relations are passed', async () => {
       mockRepository.findOne.mockResolvedValue(mockUser);
-      const customRelations: FindOptionsRelations<User> = {
-        neighborhood: true,
-      };
+      const customRelations: FindOptionsRelations<User> = { profile: true };
 
       await service.findByPublicId('user-uuid-123', undefined, customRelations);
 
@@ -200,35 +106,33 @@ describe('UserSearchService', () => {
       });
     });
 
-    it('should return null if the user is not found', async () => {
+    it('should return null when the user does not exist', async () => {
       mockRepository.findOne.mockResolvedValue(null);
 
-      const result = await service.findByPublicId('non-existent');
-
-      expect(result).toBeNull();
+      await expect(service.findByPublicId('non-existent')).resolves.toBeNull();
     });
   });
 
   describe('findByPublicIdOrThrow', () => {
-    it('should return the user if found', async () => {
+    it('should return the user when found', async () => {
       jest.spyOn(service, 'findByPublicId').mockResolvedValue(mockUser);
 
-      const result = await service.findByPublicIdOrThrow('user-uuid-123');
-
-      expect(result).toEqual(mockUser);
+      await expect(
+        service.findByPublicIdOrThrow('user-uuid-123'),
+      ).resolves.toEqual(mockUser);
     });
 
-    it('should throw a NotFoundException if user does not exist', async () => {
+    it('should throw NotFoundException when the user does not exist', async () => {
       jest.spyOn(service, 'findByPublicId').mockResolvedValue(null);
 
       await expect(service.findByPublicIdOrThrow('invalid-id')).rejects.toThrow(
-        new NotFoundException("User with public ID 'invalid-id' not found"),
+        NotFoundException,
       );
     });
   });
 
   describe('findByEmail', () => {
-    it('should successfully find a user by email using default relations', async () => {
+    it('should find a user by email using default relations', async () => {
       mockRepository.findOne.mockResolvedValue(mockUser);
 
       const result = await service.findByEmail('dev@nexhouse.com');
@@ -240,7 +144,7 @@ describe('UserSearchService', () => {
       expect(result).toEqual(mockUser);
     });
 
-    it('should append neighborhoodId to where criteria for email query when provided', async () => {
+    it('should append the neighborhoodId criteria when provided', async () => {
       mockRepository.findOne.mockResolvedValue(mockUser);
 
       await service.findByEmail('dev@nexhouse.com', 50);
@@ -256,24 +160,20 @@ describe('UserSearchService', () => {
   });
 
   describe('findByEmailOrThrow', () => {
-    it('should return the user if found via email', async () => {
+    it('should return the user when found by email', async () => {
       jest.spyOn(service, 'findByEmail').mockResolvedValue(mockUser);
 
-      const result = await service.findByEmailOrThrow('dev@nexhouse.com');
-
-      expect(result).toEqual(mockUser);
+      await expect(
+        service.findByEmailOrThrow('dev@nexhouse.com'),
+      ).resolves.toEqual(mockUser);
     });
 
-    it('should throw a NotFoundException if email does not exist', async () => {
+    it('should throw NotFoundException when the email does not exist', async () => {
       jest.spyOn(service, 'findByEmail').mockResolvedValue(null);
 
       await expect(
         service.findByEmailOrThrow('missing@nexhouse.com'),
-      ).rejects.toThrow(
-        new NotFoundException(
-          "User with email 'missing@nexhouse.com' not found",
-        ),
-      );
+      ).rejects.toThrow(NotFoundException);
     });
   });
 });

@@ -1,12 +1,10 @@
 import { User } from '@core/database';
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
 
 @Injectable()
 export class UserSearchService {
-  private readonly logger = new Logger(UserSearchService.name);
-
   /**
    * Default relations to load when no custom relations are provided.
    */

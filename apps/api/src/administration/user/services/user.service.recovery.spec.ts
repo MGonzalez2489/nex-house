@@ -1,7 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
-import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserSearchService } from './user-search.service';
 import { User, UserRole, UserStatus } from '@core/database';
@@ -162,14 +165,14 @@ describe('UserService password recovery flows', () => {
       expect(recoveryUser.recoveryToken).toBe('previous-reset-token');
     });
 
-    it('should throw InternalServerErrorException when a code is provided without an expiration', async () => {
+    it('should throw BadRequestException when a code is provided without an expiration', async () => {
       await expect(
         service.update(10, 'user-public-uuid', { recoveryCode: 'XYZ-654321' }, currentUser),
-      ).rejects.toThrow(InternalServerErrorException);
+      ).rejects.toThrow(BadRequestException);
       expect(mockCatalogsService.findByName).not.toHaveBeenCalled();
     });
 
-    it('should throw InternalServerErrorException when an expiration is provided without a code', async () => {
+    it('should throw BadRequestException when an expiration is provided without a code', async () => {
       await expect(
         service.update(
           10,
@@ -177,7 +180,7 @@ describe('UserService password recovery flows', () => {
           { recoveryCodeExpiration: '2099-01-01T00:00:00.000Z' },
           currentUser,
         ),
-      ).rejects.toThrow(InternalServerErrorException);
+      ).rejects.toThrow(BadRequestException);
     });
   });
 

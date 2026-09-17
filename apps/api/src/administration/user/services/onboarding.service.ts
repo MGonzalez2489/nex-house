@@ -1,5 +1,5 @@
 import { User, UserStatus } from '@core/database';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   OnboardingStepEnum,
@@ -17,36 +17,45 @@ export class OnboardingService {
     private readonly catalogsService: CatalogsService,
   ) {}
 
+  /**
+   * Computes the onboarding progress for a user, including which steps are
+   * required and which one is pending.
+   *
+   * @param publicId Public unique identifier of the user.
+   * @returns The current onboarding status and its step list.
+   *
+   * @throws {NotFoundException} If the user does not exist.
+   */
   async getOnboardingStatus(
-    userId: string,
+    publicId: string,
   ): Promise<OnboardingStatusResponseDto> {
     const user = await this.userRepository.findOne({
-      where: { publicId: userId },
-      relations: { role: true, status: true, userUnits: true, profile: true }, //['role', 'status', 'userUnits'],
+      where: { publicId },
+      relations: { role: true, status: true, userUnits: true, profile: true },
     });
 
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundException(`User with public ID '${publicId}' not found`);
     }
 
-    // 1. Evaluar si debe crear unidad (Solo Admin inicial sin unidades)
-    const isAdmin = user.isFirstAdmin; // O según el código/id de tu catálogo de roles
-    const hasUnits = user.userUnits && user.userUnits.length > 0;
-    const requiresUnitCreation = isAdmin;
+    // Only the initial admin is expected to create their own unit.
+    const requiresUnitCreation = user.isFirstAdmin;
+    const hasUnits = (user.userUnits?.length ?? 0) > 0;
 
-    // 2. Evaluar cuáles pasos fueron completados
     const isSecurityCompleted = !user.requirePwdChange;
     const isProfileCompleted = Boolean(
-      user.profile.firstName && user.profile.lastName && user.profile.phone,
+      user.profile?.firstName && user.profile?.lastName && user.profile?.phone,
     );
     const isUnitCompleted = !requiresUnitCreation || hasUnits;
+    const isCompleted =
+      user.status?.name === UserStatusEnum.ACTIVE ||
+      (!requiresUnitCreation && isSecurityCompleted && isProfileCompleted);
 
-    // 3. Construir lista dinámica de pasos
     const steps: OnboardingStepDto[] = [
       {
         id: OnboardingStepEnum.WELCOME,
         label: 'Bienvenida',
-        completed: isSecurityCompleted, // Paso informativo
+        completed: isSecurityCompleted,
         required: true,
       },
       {
@@ -63,7 +72,7 @@ export class OnboardingService {
       },
     ];
 
-    // Condicional para insertar el paso solo si aplica al usuario
+    // The unit creation step only applies to the initial admin.
     if (requiresUnitCreation) {
       steps.push({
         id: OnboardingStepEnum.CREATE_UNIT,
@@ -80,12 +89,8 @@ export class OnboardingService {
       required: true,
     });
 
-    // 4. Determinar el paso actual
     const currentStep =
-      steps.find((s) => !s.completed) || steps[steps.length - 1];
-    const isCompleted =
-      user.status?.name === UserStatusEnum.ACTIVE ||
-      (!requiresUnitCreation && isSecurityCompleted && isProfileCompleted);
+      steps.find((step) => !step.completed) ?? steps[steps.length - 1];
 
     return {
       isCompleted,
@@ -94,6 +99,11 @@ export class OnboardingService {
     };
   }
 
+  /**
+   * Marks the onboarding as completed by activating the user status.
+   *
+   * @param userId Internal id of the user finishing onboarding.
+   */
   async completeOnboarding(userId: number): Promise<void> {
     const activeStatus = await this.catalogsService.findByName(
       UserStatus,

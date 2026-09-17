@@ -19,11 +19,12 @@ import {
   OnboardingStatusResponseDto,
   UpdateUserProfileDto,
 } from '../dtos';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UnitService } from '@administration/units/services';
 import { CreateUnitDto } from '@administration/neighborhood/dtos';
 import { FileInterceptor } from '@nestjs/platform-express';
 
+@ApiTags('Onboarding')
 @Controller('onboarding')
 export class OnboardingController {
   constructor(
@@ -34,6 +35,7 @@ export class OnboardingController {
   ) {}
 
   @Get('status')
+  @ApiOperation({ summary: 'Get the onboarding progress of the user' })
   async getStatus(
     @CurrentUser() user: User,
   ): Promise<OnboardingStatusResponseDto> {
@@ -41,9 +43,9 @@ export class OnboardingController {
   }
 
   @Patch('security')
-  @HttpCode(HttpStatus.OK) // Return 204 No Content on successful password change
-  @ApiOperation({ summary: 'Change current user password' })
-  @ApiResponse({ status: 204, description: 'Password successfully changed.' })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Change the current user password' })
+  @ApiResponse({ status: 200, description: 'Password successfully changed.' })
   @ApiResponse({
     status: 400,
     description: 'Invalid password details provided.',
@@ -68,11 +70,12 @@ export class OnboardingController {
 
   @Patch('profile')
   @UseInterceptors(FileInterceptor('avatar'))
+  @ApiOperation({ summary: 'Update the profile of the current user' })
   async updateProfile(
     @Body() dto: UpdateUserProfileDto,
     @CurrentUser() user: User,
     @UploadedFile() avatar?: Express.Multer.File,
-  ) {
+  ): Promise<OnboardingStatusResponseDto> {
     const updatedProfile = await this.profileService.update(
       user.publicId,
       dto,
@@ -87,6 +90,7 @@ export class OnboardingController {
   }
 
   @Post('unit')
+  @ApiOperation({ summary: 'Create the initial unit of the onboarding admin' })
   async createUnit(
     @Body() dto: CreateUnitDto,
     @CurrentUser() user: User,
@@ -96,6 +100,7 @@ export class OnboardingController {
   }
 
   @Post('complete')
+  @ApiOperation({ summary: 'Mark the onboarding as completed' })
   async complete(@CurrentUser() user: User): Promise<{ success: boolean }> {
     await this.onboardingService.completeOnboarding(user.id);
     return { success: true };

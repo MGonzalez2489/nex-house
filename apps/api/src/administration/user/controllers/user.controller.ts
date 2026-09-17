@@ -1,7 +1,8 @@
 import { Neighborhood, User } from '@core/database';
 import { CurrentNeigh, CurrentUser } from '@core/decorators';
 import { Body, Controller, Get, Patch } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { UserStats } from '@nexhouse/shared-domain/interfaces';
 import { UpdateUserDto } from '../dtos';
 import { UserSearchService, UserService, UserStatsService } from '../services';
 
@@ -15,7 +16,8 @@ export class UserController {
   ) {}
 
   @Get()
-  async get(@CurrentUser() user: User) {
+  @ApiOperation({ summary: 'Get the authenticated user with its relations' })
+  async get(@CurrentUser() user: User): Promise<User> {
     return this.userSearchService.findByPublicIdOrThrow(
       user.publicId,
       undefined,
@@ -27,21 +29,19 @@ export class UserController {
     );
   }
 
-  //TODO: convert statos into own stats
   @Get('stats')
-  async findStats(@CurrentNeigh() neigh: Neighborhood) {
-    return await this.statsService.getStats(neigh.id);
+  @ApiOperation({ summary: 'Get user metrics for the active neighborhood' })
+  async findStats(@CurrentNeigh() neigh: Neighborhood): Promise<UserStats> {
+    return this.statsService.getStats(neigh.id);
   }
 
   @Patch()
-  @ApiOperation({ summary: 'Update an existing user' })
-  @ApiParam({ name: 'publicId', description: 'The public UUID of the user' })
+  @ApiOperation({ summary: 'Update the authenticated user' })
   async update(
     @Body() dto: UpdateUserDto,
     @CurrentUser() user: User,
     @CurrentNeigh() neigh: Neighborhood,
-  ) {
-    //TODO: rework update to reduce params number
-    return await this.usersService.update(neigh.id, user.publicId, dto, user);
+  ): Promise<User> {
+    return this.usersService.update(neigh.id, user.publicId, dto, user);
   }
 }

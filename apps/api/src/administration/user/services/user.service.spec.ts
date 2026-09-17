@@ -2,26 +2,27 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
 import {
-  ForbiddenException,
-  ConflictException,
   BadRequestException,
+  ConflictException,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserSearchService } from './user-search.service';
 import {
+  NeighStreet,
+  Unit,
+  UnitStatus,
+  UnitType,
   User,
   UserRole,
   UserStatus,
-  UserUnitRole,
-  Unit,
-  NeighStreet,
   UserUnit,
+  UserUnitRole,
 } from '@core/database';
-import { CreateUserDto, UpdateUserDto } from '../dtos';
 import { CryptoService } from '@core/services';
 import { CatalogsService } from 'src/catalogs/services';
+import { UnitStatusEnum, UserStatusEnum } from '@nexhouse/shared-domain/enums';
 
 describe('UserService', () => {
   let service: UserService;
@@ -33,53 +34,47 @@ describe('UserService', () => {
   let mockSearchService: jest.Mocked<UserSearchService>;
 
   const currentUser = { id: 1, neighborhoodId: 10 } as User;
-  const mockDto: CreateUserDto = {
-    email: 'test@nexhouse.com',
-    firstName: 'John',
-    lastName: 'Doe',
-    phone: '1234567890',
-    roleId: 'role-uuid',
-    assignUnits: {
-      unitId: 'unit-uuid',
-      userUnitRoleId: 'user-unit-role-uuid',
-      isOccupant: true,
-    },
-  };
-  const mockUpdateDto: UpdateUserDto = {
-    firstName: 'John Updated',
-    email: 'updated@nexhouse.com',
-    phone: '0987654321',
-    roleId: 'new-role-uuid',
-    assignUnits: {
-      unitId: 'new-unit-uuid',
-      userUnitRoleId: 'user-unit-role-uuid',
-      isOccupant: true,
-    },
-  };
 
   const mockRole = { id: 2, publicId: 'role-uuid' } as UserRole;
   const mockNewRole = { id: 22, publicId: 'new-role-uuid' } as UserRole;
-  const mockStatus = { id: 3, name: 'pending' } as UserStatus;
+  const mockRecoveryStatus = {
+    id: 33,
+    name: UserStatusEnum.PASSWORD_RECOVERY,
+  } as unknown as UserStatus;
+  const mockActiveStatus = {
+    id: 3,
+    name: UserStatusEnum.ACTIVE,
+  } as unknown as UserStatus;
   const mockUserUnitRole = {
     id: 4,
     publicId: 'user-unit-role-uuid',
   } as UserUnitRole;
   const mockUnit = { id: 5, publicId: 'unit-uuid' } as Unit;
-  const mockNewUnit = { id: 55, publicId: 'new-unit-uuid' } as Unit;
+  const mockUnitType = { id: 7, publicId: 'type-uuid' } as UnitType;
+  const mockUnitStatus = {
+    id: 8,
+    name: UnitStatusEnum.OCCUPIED,
+  } as unknown as UnitStatus;
   const mockStreet = { id: 6, publicId: 'street-uuid' } as NeighStreet;
-  const mockSavedUser = {
-    id: 100,
-    publicId: 'user-public-uuid',
-    email: 'test@nexhouse.com',
-    phone: '1234567890',
-    role: mockRole,
-  } as User;
 
-  //
+  const buildUser = () =>
+    ({
+      id: 100,
+      publicId: 'user-public-uuid',
+      email: 'user@nexhouse.com',
+      neighborhoodId: 10,
+      role: mockRole,
+      status: mockActiveStatus,
+    }) as unknown as User;
+
+  let existingUser: User;
+  let savedUser: User;
+
   beforeEach(async () => {
     mockUserRepository = {
-      exists: jest.fn(),
       findOne: jest.fn(),
+      save: jest.fn(),
+      update: jest.fn(),
     } as unknown as jest.Mocked<Repository<User>>;
 
     mockQueryRunner = {
@@ -89,7 +84,7 @@ describe('UserService', () => {
       rollbackTransaction: jest.fn().mockResolvedValue(undefined),
       release: jest.fn().mockResolvedValue(undefined),
       manager: {
-        create: jest.fn().mockImplementation((entity, data) => data),
+        create: jest.fn().mockImplementation((_entity, data) => data),
         save: jest.fn(),
         findOne: jest.fn(),
         update: jest.fn().mockResolvedValue({}),
@@ -107,11 +102,17 @@ describe('UserService', () => {
 
     mockCryptoService = {
       hash: jest.fn().mockResolvedValue('hashed_pwd'),
+      compare: jest.fn(),
     } as unknown as jest.Mocked<CryptoService>;
 
     mockSearchService = {
       findByPublicId: jest.fn(),
     } as unknown as jest.Mocked<UserSearchService>;
+
+    existingUser = buildUser();
+    savedUser = buildUser();
+    mockUserRepository.findOne.mockResolvedValue(existingUser);
+    mockSearchService.findByPublicId.mockResolvedValue(savedUser);
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -131,239 +132,411 @@ describe('UserService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('create', () => {
-    it('should throw ForbiddenException if neighborhood scope is invalid', async () => {
-      await expect(service.create(99, mockDto, currentUser)).rejects.toThrow(
-        ForbiddenException,
-      );
-    });
-
-    it('should throw ConflictException if email is already registered', async () => {
-      mockUserRepository.exists.mockResolvedValueOnce(true);
-
-      await expect(service.create(10, mockDto, currentUser)).rejects.toThrow(
-        ConflictException,
-      );
-    });
-
-    it('should throw ConflictException if phone is already registered', async () => {
-      mockUserRepository.exists
-        .mockResolvedValueOnce(false) // email check
-        .mockResolvedValueOnce(true); // phone check
-
-      await expect(service.create(10, mockDto, currentUser)).rejects.toThrow(
-        ConflictException,
-      );
-    });
-
-    it('should throw BadRequestException if target user role catalog is missing', async () => {
-      mockUserRepository.exists.mockResolvedValue(false);
-      mockCatalogsService.findByPublicId.mockResolvedValueOnce(null);
-
-      await expect(service.create(10, mockDto, currentUser)).rejects.toThrow(
-        BadRequestException,
-      );
-    });
-
-    it('should create user and associate to an existing unit within a transaction', async () => {
-      mockUserRepository.exists.mockResolvedValue(false);
-      mockCatalogsService.findByPublicId
-        .mockResolvedValueOnce(mockRole)
-        .mockResolvedValueOnce(mockUserUnitRole);
-      mockCatalogsService.findByName.mockResolvedValueOnce(mockStatus);
-
-      (mockQueryRunner.manager.save as jest.Mock)
-        .mockResolvedValueOnce(mockSavedUser) // user
-        .mockResolvedValueOnce({}); // userUnit assignment
-
-      (mockQueryRunner.manager.findOne as jest.Mock).mockResolvedValueOnce(
-        mockUnit,
-      ); // existing unit
-      mockSearchService.findByPublicId.mockResolvedValueOnce(mockSavedUser);
-
-      const result = await service.create(10, mockDto, currentUser);
-
-      expect(mockQueryRunner.connect).toHaveBeenCalled();
-      expect(mockQueryRunner.startTransaction).toHaveBeenCalled();
-      expect(mockQueryRunner.manager.create).toHaveBeenCalledWith(
-        User,
-        expect.any(Object),
-      );
-      expect(mockQueryRunner.manager.create).toHaveBeenCalledWith(
-        UserUnit,
-        expect.any(Object),
-      );
-      expect(mockQueryRunner.commitTransaction).toHaveBeenCalled();
-      expect(mockQueryRunner.release).toHaveBeenCalled();
-      expect(result).toEqual(mockSavedUser);
-    });
-
-    it('should create user and instantiate a new unit when unitId is absent', async () => {
-      const dtoWithNewUnit: CreateUserDto = {
-        ...mockDto,
-        assignUnits: {
-          unitIdentifier: 'A-101',
-          streetId: 'street-uuid',
-          userUnitRoleId: 'user-unit-role-uuid',
-          isOccupant: true,
-        },
-      };
-
-      mockUserRepository.exists.mockResolvedValue(false);
-      mockCatalogsService.findByPublicId
-        .mockResolvedValueOnce(mockRole)
-        .mockResolvedValueOnce(mockUserUnitRole);
-      mockCatalogsService.findByName.mockResolvedValueOnce(mockStatus);
-
-      (mockQueryRunner.manager.findOne as jest.Mock).mockResolvedValueOnce(
-        mockStreet,
-      );
-      (mockQueryRunner.manager.save as jest.Mock)
-        .mockResolvedValueOnce(mockSavedUser) // user
-        .mockResolvedValueOnce(mockUnit) // new unit
-        .mockResolvedValueOnce({}); // assignment
-
-      mockSearchService.findByPublicId.mockResolvedValueOnce(mockSavedUser);
-
-      await service.create(10, dtoWithNewUnit, currentUser);
-
-      expect(mockQueryRunner.manager.create).toHaveBeenCalledWith(Unit, {
-        streetId: mockStreet.id,
-        identifier: 'A-101',
-        neighborhoodId: 10,
-      });
-      expect(mockQueryRunner.commitTransaction).toHaveBeenCalled();
-    });
-
-    it('should rollback transaction and throw InternalServerErrorException on generic failure', async () => {
-      mockUserRepository.exists.mockResolvedValue(false);
-      mockCatalogsService.findByPublicId.mockResolvedValueOnce(mockRole);
-      mockCatalogsService.findByName.mockResolvedValueOnce(mockStatus);
-
-      mockQueryRunner.manager.save = jest
-        .fn()
-        .mockRejectedValueOnce(new Error('DB connection lost'));
-
-      await expect(service.create(10, mockDto, currentUser)).rejects.toThrow(
-        InternalServerErrorException,
-      );
-      expect(mockQueryRunner.rollbackTransaction).toHaveBeenCalled();
-      expect(mockQueryRunner.release).toHaveBeenCalled();
-    });
-  });
-
   describe('update', () => {
-    it('should throw NotFoundException if user is not found within neighborhood scope', async () => {
+    it('should throw NotFoundException when the user is outside the neighborhood scope', async () => {
       mockUserRepository.findOne.mockResolvedValueOnce(null);
 
       await expect(
-        service.update(10, 'invalid-uuid', mockUpdateDto, currentUser),
+        service.update(10, 'missing-user', {}, currentUser),
       ).rejects.toThrow(NotFoundException);
+
+      expect(mockDataSource.createQueryRunner).not.toHaveBeenCalled();
     });
 
-    it('should throw ConflictException if updated email is already registered to another user', async () => {
-      mockUserRepository.findOne.mockResolvedValueOnce(mockSavedUser);
-      mockUserRepository.exists.mockResolvedValueOnce(true);
-
-      await expect(
-        service.update(10, 'user-public-uuid', mockUpdateDto, currentUser),
-      ).rejects.toThrow(ConflictException);
-    });
-
-    it('should throw ConflictException if updated phone is already registered to another user', async () => {
-      mockUserRepository.findOne.mockResolvedValueOnce(mockSavedUser);
-      mockUserRepository.exists
-        .mockResolvedValueOnce(false)
-        .mockResolvedValueOnce(true);
-
-      await expect(
-        service.update(10, 'user-public-uuid', mockUpdateDto, currentUser),
-      ).rejects.toThrow(ConflictException);
-    });
-
-    it('should throw BadRequestException if target user role catalog is missing', async () => {
-      mockUserRepository.findOne.mockResolvedValueOnce(mockSavedUser);
-      mockUserRepository.exists.mockResolvedValue(false);
-      mockCatalogsService.findByPublicId.mockResolvedValueOnce(null);
-
-      await expect(
-        service.update(10, 'user-public-uuid', mockUpdateDto, currentUser),
-      ).rejects.toThrow(BadRequestException);
-    });
-
-    it('should successfully update user details and assign units within transaction', async () => {
-      mockUserRepository.findOne.mockResolvedValueOnce(mockSavedUser);
-      mockUserRepository.exists.mockResolvedValue(false);
-      mockCatalogsService.findByPublicId
-        .mockResolvedValueOnce(mockNewRole)
-        .mockResolvedValueOnce(mockUserUnitRole);
-
-      (mockQueryRunner.manager.findOne as jest.Mock).mockResolvedValueOnce(
-        mockNewUnit,
+    it('should resolve and persist a new role when it differs from the current one', async () => {
+      mockCatalogsService.findByPublicId.mockResolvedValueOnce(mockNewRole);
+      (mockQueryRunner.manager.save as jest.Mock).mockResolvedValueOnce(
+        savedUser,
       );
-      (mockQueryRunner.manager.save as jest.Mock).mockImplementation(
-        (entity, data) => data,
-      );
-      mockSearchService.findByPublicId.mockResolvedValueOnce({
-        ...mockSavedUser,
-        ...mockUpdateDto,
-      } as any);
 
       const result = await service.update(
         10,
         'user-public-uuid',
-        mockUpdateDto,
+        { userRoleId: 'new-role-uuid' },
         currentUser,
       );
 
-      expect(mockQueryRunner.connect).toHaveBeenCalled();
-      expect(mockQueryRunner.startTransaction).toHaveBeenCalled();
+      expect(mockCatalogsService.findByPublicId).toHaveBeenCalledWith(
+        UserRole,
+        'new-role-uuid',
+      );
+      expect(existingUser.role).toBe(mockNewRole);
+      expect(mockQueryRunner.manager.save).toHaveBeenCalledWith(
+        User,
+        existingUser,
+      );
+      expect(mockQueryRunner.commitTransaction).toHaveBeenCalled();
+      expect(mockQueryRunner.release).toHaveBeenCalled();
+      expect(result).toEqual(savedUser);
+    });
+
+    it('should not resolve a role when the payload repeats the current one', async () => {
+      (mockQueryRunner.manager.save as jest.Mock).mockResolvedValueOnce(
+        savedUser,
+      );
+
+      await service.update(
+        10,
+        'user-public-uuid',
+        { userRoleId: 'role-uuid' },
+        currentUser,
+      );
+
+      expect(mockCatalogsService.findByPublicId).not.toHaveBeenCalled();
+    });
+
+    it('should throw BadRequestException when a recovery code has no expiration', async () => {
+      await expect(
+        service.update(
+          10,
+          'user-public-uuid',
+          { recoveryCode: 'ABC-123456' },
+          currentUser,
+        ),
+      ).rejects.toThrow(BadRequestException);
+
+      expect(mockCatalogsService.findByName).not.toHaveBeenCalled();
+    });
+
+    it('should throw BadRequestException when an expiration has no recovery code', async () => {
+      await expect(
+        service.update(
+          10,
+          'user-public-uuid',
+          { recoveryCodeExpiration: '2099-01-01T00:00:00.000Z' },
+          currentUser,
+        ),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should store the recovery code, expiration and PASSWORD_RECOVERY status', async () => {
+      mockCatalogsService.findByName.mockResolvedValueOnce(mockRecoveryStatus);
+      (mockQueryRunner.manager.save as jest.Mock).mockResolvedValueOnce(
+        savedUser,
+      );
+
+      await service.update(
+        10,
+        'user-public-uuid',
+        {
+          recoveryCode: 'XYZ-654321',
+          recoveryCodeExpiration: '2099-01-01T00:00:00.000Z',
+        },
+        currentUser,
+      );
+
+      expect(mockCatalogsService.findByName).toHaveBeenCalledWith(
+        UserStatus,
+        UserStatusEnum.PASSWORD_RECOVERY,
+      );
+      expect(existingUser.recoveryCode).toBe('XYZ-654321');
+      expect(existingUser.recoveryCodeExpiration).toBe(
+        '2099-01-01T00:00:00.000Z',
+      );
+      expect(existingUser.status).toBe(mockRecoveryStatus);
+    });
+
+    it('should store only the recovery token, keeping step 1 data intact', async () => {
+      existingUser.recoveryCode = 'ABC-123456';
+
+      (mockQueryRunner.manager.save as jest.Mock).mockResolvedValueOnce(
+        savedUser,
+      );
+
+      await service.update(
+        10,
+        'user-public-uuid',
+        { recoveryToken: 'new-reset-token' },
+        currentUser,
+      );
+
+      expect(mockCatalogsService.findByName).not.toHaveBeenCalled();
+      expect(existingUser.recoveryCode).toBe('ABC-123456');
+      expect(existingUser.recoveryToken).toBe('new-reset-token');
+    });
+
+    it('should assign an existing unit scoped to the neighborhood and deactivate the previous occupant', async () => {
+      (mockQueryRunner.manager.findOne as jest.Mock).mockResolvedValueOnce(
+        mockUnit,
+      );
+      mockCatalogsService.findByPublicId.mockResolvedValueOnce(mockUserUnitRole);
+      (mockQueryRunner.manager.save as jest.Mock)
+        .mockResolvedValueOnce(savedUser)
+        .mockResolvedValueOnce({});
+
+      await service.update(
+        10,
+        'user-public-uuid',
+        {
+          unit: {
+            unitId: 'unit-uuid',
+            unitRoleId: 'user-unit-role-uuid',
+            isCurrentOccupant: true,
+          },
+        },
+        currentUser,
+      );
+
+      expect(mockQueryRunner.manager.findOne).toHaveBeenCalledWith(Unit, {
+        where: { publicId: 'unit-uuid', neighborhoodId: 10 },
+      });
       expect(mockQueryRunner.manager.update).toHaveBeenCalledWith(
         UserUnit,
-        { userId: mockSavedUser.id, isCurrentOccupant: true },
+        { userId: savedUser.id, isCurrentOccupant: true },
         { isCurrentOccupant: false },
       );
       expect(mockQueryRunner.manager.create).toHaveBeenCalledWith(
         UserUnit,
-        expect.any(Object),
+        expect.objectContaining({
+          unitId: mockUnit.id,
+          userId: savedUser.id,
+          userUnitRole: mockUserUnitRole,
+        }),
       );
       expect(mockQueryRunner.commitTransaction).toHaveBeenCalled();
-      expect(result.firstName).toBe('John Updated');
     });
 
-    it('should rollback transaction and throw InternalServerErrorException on update failure', async () => {
-      mockUserRepository.findOne.mockResolvedValueOnce(mockSavedUser);
-      mockUserRepository.exists.mockResolvedValue(false);
-      mockCatalogsService.findByPublicId.mockResolvedValueOnce(mockNewRole);
+    it('should create a new unit with type and status when an identifier is provided', async () => {
+      (mockQueryRunner.manager.findOne as jest.Mock).mockResolvedValueOnce(
+        mockStreet,
+      );
+      mockCatalogsService.findByPublicId
+        .mockResolvedValueOnce(mockUnitType)
+        .mockResolvedValueOnce(mockUserUnitRole);
+      mockCatalogsService.findByName.mockResolvedValueOnce(mockUnitStatus);
+      (mockQueryRunner.manager.save as jest.Mock)
+        .mockResolvedValueOnce(savedUser)
+        .mockResolvedValueOnce(mockUnit)
+        .mockResolvedValueOnce({});
 
-      mockQueryRunner.manager.save = jest
-        .fn()
-        .mockRejectedValueOnce(new Error('Transaction Failed'));
+      await service.update(
+        10,
+        'user-public-uuid',
+        {
+          unit: {
+            unitIdentifier: 'a-101',
+            streetId: 'street-uuid',
+            unitTypeId: 'type-uuid',
+            unitRoleId: 'user-unit-role-uuid',
+            isCurrentOccupant: true,
+          },
+        },
+        currentUser,
+      );
+
+      expect(mockCatalogsService.findByPublicId).toHaveBeenCalledWith(
+        UnitType,
+        'type-uuid',
+      );
+      expect(mockCatalogsService.findByName).toHaveBeenCalledWith(
+        UnitStatus,
+        UnitStatusEnum.OCCUPIED,
+      );
+      expect(mockQueryRunner.manager.create).toHaveBeenCalledWith(Unit, {
+        streetId: mockStreet.id,
+        identifier: 'A-101',
+        neighborhoodId: 10,
+        typeId: mockUnitType.id,
+        statusId: mockUnitStatus.id,
+        createdBy: currentUser.id,
+      });
+      expect(mockQueryRunner.commitTransaction).toHaveBeenCalled();
+    });
+
+    it('should throw NotFoundException when the referenced unit is not in the neighborhood', async () => {
+      (mockQueryRunner.manager.findOne as jest.Mock).mockResolvedValueOnce(null);
 
       await expect(
-        service.update(10, 'user-public-uuid', mockUpdateDto, currentUser),
+        service.update(
+          10,
+          'user-public-uuid',
+          {
+            unit: {
+              unitId: 'foreign-unit',
+              unitRoleId: 'user-unit-role-uuid',
+              isCurrentOccupant: true,
+            },
+          },
+          currentUser,
+        ),
+      ).rejects.toThrow(NotFoundException);
+
+      expect(mockQueryRunner.rollbackTransaction).toHaveBeenCalled();
+    });
+
+    it('should throw NotFoundException when the referenced street is not in the neighborhood', async () => {
+      (mockQueryRunner.manager.findOne as jest.Mock).mockResolvedValueOnce(null);
+
+      await expect(
+        service.update(
+          10,
+          'user-public-uuid',
+          {
+            unit: {
+              unitIdentifier: 'A-101',
+              streetId: 'foreign-street',
+              unitTypeId: 'type-uuid',
+              unitRoleId: 'user-unit-role-uuid',
+              isCurrentOccupant: true,
+            },
+          },
+          currentUser,
+        ),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw BadRequestException when creating a unit without a type', async () => {
+      (mockQueryRunner.manager.findOne as jest.Mock).mockResolvedValueOnce(
+        mockStreet,
+      );
+
+      await expect(
+        service.update(
+          10,
+          'user-public-uuid',
+          {
+            unit: {
+              unitIdentifier: 'A-101',
+              streetId: 'street-uuid',
+              unitRoleId: 'user-unit-role-uuid',
+              isCurrentOccupant: true,
+            },
+          },
+          currentUser,
+        ),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should rethrow NotFoundException raised by catalog lookups instead of wrapping it', async () => {
+      (mockQueryRunner.manager.findOne as jest.Mock).mockResolvedValueOnce(
+        mockUnit,
+      );
+      mockCatalogsService.findByPublicId.mockRejectedValueOnce(
+        new NotFoundException('User unit role not found'),
+      );
+      (mockQueryRunner.manager.save as jest.Mock).mockResolvedValueOnce(
+        savedUser,
+      );
+
+      await expect(
+        service.update(
+          10,
+          'user-public-uuid',
+          {
+            unit: {
+              unitId: 'unit-uuid',
+              unitRoleId: 'missing-role',
+              isCurrentOccupant: true,
+            },
+          },
+          currentUser,
+        ),
+      ).rejects.toThrow(NotFoundException);
+
+      expect(mockQueryRunner.rollbackTransaction).toHaveBeenCalled();
+    });
+
+    it('should rethrow ConflictException raised inside the transaction', async () => {
+      (mockQueryRunner.manager.save as jest.Mock).mockRejectedValueOnce(
+        new ConflictException('duplicated assignment'),
+      );
+
+      await expect(
+        service.update(10, 'user-public-uuid', {}, currentUser),
+      ).rejects.toThrow(ConflictException);
+      expect(mockQueryRunner.rollbackTransaction).toHaveBeenCalled();
+      expect(mockQueryRunner.release).toHaveBeenCalled();
+    });
+
+    it('should rollback and throw InternalServerErrorException on database failure', async () => {
+      (mockQueryRunner.manager.save as jest.Mock).mockRejectedValueOnce(
+        new Error('DB connection lost'),
+      );
+
+      await expect(
+        service.update(10, 'user-public-uuid', {}, currentUser),
       ).rejects.toThrow(InternalServerErrorException);
       expect(mockQueryRunner.rollbackTransaction).toHaveBeenCalled();
       expect(mockQueryRunner.release).toHaveBeenCalled();
     });
   });
-});
 
-// import { Test, TestingModule } from '@nestjs/testing';
-// import { UserService } from './user.service';
-//
-// describe('UserService', () => {
-//   let service: UserService;
-//
-//   beforeEach(async () => {
-//     const module: TestingModule = await Test.createTestingModule({
-//       providers: [UserService],
-//     }).compile();
-//
-//     service = module.get<UserService>(UserService);
-//   });
-//
-//   it('should be defined', () => {
-//     expect(service).toBeDefined();
-//   });
-// });
+  describe('changePassword', () => {
+    it('should return false when the user does not exist', async () => {
+      mockUserRepository.findOne.mockResolvedValueOnce(null);
+
+      await expect(
+        service.changePassword('missing', 'old', 'new'),
+      ).resolves.toBe(false);
+    });
+
+    it('should return false when the new password equals the old one', async () => {
+      await expect(
+        service.changePassword('user-public-uuid', 'same', 'same'),
+      ).resolves.toBe(false);
+
+      expect(mockCryptoService.compare).not.toHaveBeenCalled();
+    });
+
+    it('should return false when the old password does not match', async () => {
+      mockCryptoService.compare.mockResolvedValueOnce(false);
+
+      await expect(
+        service.changePassword('user-public-uuid', 'wrong', 'new'),
+      ).resolves.toBe(false);
+
+      expect(mockUserRepository.save).not.toHaveBeenCalled();
+    });
+
+    it('should hash the new password, clear requirePwdChange and return true', async () => {
+      mockCryptoService.compare.mockResolvedValueOnce(true);
+
+      await expect(
+        service.changePassword('user-public-uuid', 'old', 'new'),
+      ).resolves.toBe(true);
+
+      expect(mockCryptoService.hash).toHaveBeenCalledWith('new');
+      expect(existingUser.password).toBe('hashed_pwd');
+      expect(existingUser.requirePwdChange).toBe(false);
+      expect(mockUserRepository.save).toHaveBeenCalledWith(existingUser);
+    });
+  });
+
+  describe('updatePasswordOnRecoveryProcess', () => {
+    it('should hash the password, activate the user and clear recovery data', async () => {
+      mockUserRepository.update.mockResolvedValue({ affected: 1 } as never);
+      mockCatalogsService.findByName.mockResolvedValueOnce(mockActiveStatus);
+
+      await service.updatePasswordOnRecoveryProcess(100, 'new-secret-pwd');
+
+      expect(mockCryptoService.hash).toHaveBeenCalledWith('new-secret-pwd');
+      expect(mockCatalogsService.findByName).toHaveBeenCalledWith(
+        UserStatus,
+        UserStatusEnum.ACTIVE,
+      );
+      expect(mockUserRepository.update).toHaveBeenCalledWith(100, {
+        password: 'hashed_pwd',
+        statusId: mockActiveStatus.id,
+        recoveryCode: null,
+        recoveryCodeExpiration: null,
+        recoveryToken: null,
+      });
+    });
+  });
+
+  describe('cleanPwdRecoveryState', () => {
+    it('should restore the active status and clear recovery data', async () => {
+      mockUserRepository.update.mockResolvedValue({ affected: 1 } as never);
+      mockCatalogsService.findByName.mockResolvedValueOnce(mockActiveStatus);
+
+      await service.cleanPwdRecoveryState(100);
+
+      expect(mockUserRepository.update).toHaveBeenCalledWith(100, {
+        statusId: mockActiveStatus.id,
+        recoveryCode: null,
+        recoveryCodeExpiration: null,
+        recoveryToken: null,
+      });
+    });
+  });
+});

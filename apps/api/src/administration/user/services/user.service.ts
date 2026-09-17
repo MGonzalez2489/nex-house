@@ -1,6 +1,8 @@
 import {
   NeighStreet,
   Unit,
+  UnitStatus,
+  UnitType,
   User,
   UserRole,
   UserStatus,
@@ -21,7 +23,7 @@ import { CatalogsService } from 'src/catalogs/services';
 import { DataSource, IsNull, Repository } from 'typeorm';
 import { UpdateUserDto } from '../dtos';
 import { UserSearchService } from './user-search.service';
-import { UserStatusEnum } from '@nexhouse/shared-domain/enums';
+import { UnitStatusEnum, UserStatusEnum } from '@nexhouse/shared-domain/enums';
 
 @Injectable()
 export class UserService {
@@ -38,10 +40,16 @@ export class UserService {
   /**
    * Updates an existing user profile and optionally modifies unit assignments.
    * Resolves unique constraint validations and manages atomic database states.
-   * * @param neighId Active neighborhood identifier context.
+   *
+   * @param neighId Active neighborhood identifier context.
    * @param userPublicId Public unique identifier of the user to be updated.
-   * @param dto Partial updates including credentials, roles, or unit associations.
+   * @param dto Partial updates including role, recovery payloads or unit associations.
    * @param currentUser Actor session executing the update operation.
+   * @returns The persisted user reloaded with status and role relations.
+   *
+   * @throws {NotFoundException} If the user, target unit or street is not found in scope.
+   * @throws {BadRequestException} If a recovery/unit payload is inconsistent.
+   * @throws {InternalServerErrorException} If an unexpected database error occurs.
    */
   async update(
     neighId: number,
@@ -49,11 +57,6 @@ export class UserService {
     dto: UpdateUserDto,
     currentUser: User,
   ): Promise<User> {
-    //TODO: review this
-    // const activeUserStatus = await this.catalogsService.findByName(
-    //   UserStatus,
-    //   UserStatusEnum.ACTIVE,
-    // );
     const existingUser = await this.repository.findOne({
       where: { publicId: userPublicId, neighborhoodId: neighId ?? IsNull() },
       relations: { role: true, status: true },
@@ -65,30 +68,28 @@ export class UserService {
       );
     }
 
-    let updatedRole: UserRole;
+    let updatedRole: UserRole | undefined;
     if (dto.userRoleId && dto.userRoleId !== existingUser.role?.publicId) {
-      const role = await this.catalogsService.findByPublicId(
+      updatedRole = await this.catalogsService.findByPublicId(
         UserRole,
         dto.userRoleId,
       );
-
-      updatedRole = role;
     }
 
-    //pass recovery validations
+    // Step 1 of the recovery flow sends both fields together; step 2 only
+    // sends the token. Receiving only one of the pair is a malformed request.
     if (dto.recoveryCode && !dto.recoveryCodeExpiration) {
-      throw new InternalServerErrorException(
+      throw new BadRequestException(
         'No expiration date provided for recovery code.',
       );
     }
     if (!dto.recoveryCode && dto.recoveryCodeExpiration) {
-      throw new InternalServerErrorException(
-        'No recovery code for expiration date.',
-      );
+      throw new BadRequestException('No recovery code for expiration date.');
     }
-    // Only touch recovery fields/status when a recovery payload is explicitly provided.
-    // This keeps regular profile updates (and the token-only step of the recovery
-    // flow) from wiping the recovery data stored in step 1.
+
+    // Only touch recovery fields/status when a recovery payload is explicitly
+    // provided, so regular profile updates and the token-only step of the
+    // recovery flow do not wipe the data stored in step 1.
     if (dto.recoveryCode && dto.recoveryCodeExpiration) {
       const recoveryStatus = await this.catalogsService.findByName(
         UserStatus,
@@ -111,47 +112,22 @@ export class UserService {
 
       const savedUser = await queryRunner.manager.save(User, existingUser);
 
-      // Handle unit assignment updates if provided
-      let targetUnit: Unit | null = null;
+      if (dto.unit?.unitId || dto.unit?.unitIdentifier) {
+        const targetUnit = await this.resolveTargetUnit(
+          queryRunner,
+          neighId,
+          dto,
+          currentUser.id,
+        );
 
-      if (dto.unit?.unitId) {
-        targetUnit = await queryRunner.manager.findOne(Unit, {
-          where: { publicId: dto.unit.unitId },
-        });
-      } else if (dto.unit?.unitIdentifier) {
-        const street = await queryRunner.manager.findOne(NeighStreet, {
-          where: { publicId: dto.unit.streetId },
-        });
-
-        if (!street) {
-          throw new BadRequestException(
-            'Target neighborhood street not found.',
-          );
-        }
-
-        // Create new unit if it does not exist under that identifier
-        const newUnit = queryRunner.manager.create(Unit, {
-          streetId: street.id,
-          identifier: dto.unit.unitIdentifier,
-          neighborhoodId: neighId,
-        });
-        targetUnit = await queryRunner.manager.save(newUnit);
-      }
-
-      //TODO: review this
-      if (targetUnit) {
         const userUnitRole = await this.catalogsService.findByPublicId(
           UserUnitRole,
-          dto.unit?.unitRoleId,
+          dto.unit.unitRoleId,
         );
-        if (!userUnitRole) {
-          throw new BadRequestException(
-            'Target unit assignment role not found.',
-          );
-        }
 
-        // Deactivate previous active unit allocations if necessary
-        if (dto.unit?.isCurrentOccupant) {
+        // Deactivate previous active unit allocations when the new link
+        // represents the current occupant.
+        if (dto.unit.isCurrentOccupant) {
           await queryRunner.manager.update(
             UserUnit,
             { userId: savedUser.id, isCurrentOccupant: true },
@@ -159,13 +135,12 @@ export class UserService {
           );
         }
 
-        // Create the new assignment record
         const assignment = queryRunner.manager.create(UserUnit, {
           unitId: targetUnit.id,
           userId: savedUser.id,
           createdBy: currentUser.id,
           userUnitRole,
-          isCurrentOccupant: dto.unit?.isCurrentOccupant,
+          isCurrentOccupant: dto.unit.isCurrentOccupant,
         });
 
         await queryRunner.manager.save(assignment);
@@ -183,12 +158,13 @@ export class UserService {
     } catch (error) {
       await queryRunner.rollbackTransaction();
       this.logger.error(
-        `🔴 Transaction failed during user update sequence: ${error.message}`,
+        `Transaction failed during user update sequence: ${error.message}`,
       );
 
       if (
         error instanceof ConflictException ||
-        error instanceof BadRequestException
+        error instanceof BadRequestException ||
+        error instanceof NotFoundException
       ) {
         throw error;
       }
@@ -196,6 +172,77 @@ export class UserService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  /**
+   * Resolves the unit referenced by an update payload, either by loading an
+   * existing unit or by creating a new one inside the neighborhood.
+   *
+   * @param queryRunner Active transaction runner.
+   * @param neighId Active neighborhood identifier context.
+   * @param dto Update payload carrying the unit reference.
+   * @param currentUserId Internal id of the acting user, stored as audit trail.
+   * @returns The existing or newly created unit.
+   *
+   * @throws {NotFoundException} If the referenced unit or street does not exist in scope.
+   * @throws {BadRequestException} If the payload is missing the unit type.
+   */
+  private async resolveTargetUnit(
+    queryRunner: ReturnType<DataSource['createQueryRunner']>,
+    neighId: number,
+    dto: UpdateUserDto,
+    currentUserId: number,
+  ): Promise<Unit> {
+    if (dto.unit.unitId) {
+      const unit = await queryRunner.manager.findOne(Unit, {
+        where: { publicId: dto.unit.unitId, neighborhoodId: neighId },
+      });
+
+      if (!unit) {
+        throw new NotFoundException(
+          'Target unit not found in this neighborhood.',
+        );
+      }
+
+      return unit;
+    }
+
+    const { unitIdentifier, streetId, unitTypeId } = dto.unit;
+
+    if (!unitIdentifier) {
+      throw new BadRequestException('Unit identifier is required.');
+    }
+    if (!streetId || !unitTypeId) {
+      throw new BadRequestException(
+        'Unit creation requires street and unit type references.',
+      );
+    }
+
+    const street = await queryRunner.manager.findOne(NeighStreet, {
+      where: { publicId: streetId, neighborhoodId: neighId },
+    });
+
+    if (!street) {
+      throw new NotFoundException(
+        'Target neighborhood street not found in this neighborhood.',
+      );
+    }
+
+    const [unitType, unitStatus] = await Promise.all([
+      this.catalogsService.findByPublicId(UnitType, unitTypeId),
+      this.catalogsService.findByName(UnitStatus, UnitStatusEnum.OCCUPIED),
+    ]);
+
+    const newUnit = queryRunner.manager.create(Unit, {
+      streetId: street.id,
+      identifier: unitIdentifier.trim().toUpperCase(),
+      neighborhoodId: neighId,
+      typeId: unitType.id,
+      statusId: unitStatus.id,
+      createdBy: currentUserId,
+    });
+
+    return queryRunner.manager.save(newUnit);
   }
 
   /**
@@ -225,7 +272,6 @@ export class UserService {
       return false;
     }
 
-    // Verify the old password
     const isOldPasswordValid = await this.cryptoService.compare(
       oldPassword,
       user.password,
@@ -238,17 +284,8 @@ export class UserService {
       return false;
     }
 
-    // if (!this.cryptoService.isPasswordStrong(newPassword)) {
-    //   this.logger.warn(
-    //     `Failed password change for user '${publicId}': New password does not meet strength requirements.`,
-    //   );
-    //   return false;
-    // }
-
-    // Hash the new password
     const hashedNewPassword = await this.cryptoService.hash(newPassword);
 
-    // Update and save the user
     user.password = hashedNewPassword;
     user.requirePwdChange = false;
     await this.repository.save(user);
@@ -257,6 +294,13 @@ export class UserService {
     return true;
   }
 
+  /**
+   * Finalizes a password recovery by storing the new password and clearing the
+   * recovery state, restoring the user to the ACTIVE status.
+   *
+   * @param id Internal id of the user being recovered.
+   * @param newPwd Plain text password to hash and persist.
+   */
   async updatePasswordOnRecoveryProcess(
     id: number,
     newPwd: string,
@@ -274,7 +318,14 @@ export class UserService {
       recoveryToken: null,
     });
   }
-  async cleanPwdRecoveryState(id: number) {
+
+  /**
+   * Clears any pending recovery state and restores the user to ACTIVE, used
+   * when a user logs in successfully while a recovery was in progress.
+   *
+   * @param id Internal id of the user.
+   */
+  async cleanPwdRecoveryState(id: number): Promise<void> {
     const status = await this.catalogsService.findByName(
       UserStatus,
       UserStatusEnum.ACTIVE,
@@ -286,14 +337,5 @@ export class UserService {
       recoveryCodeExpiration: null,
       recoveryToken: null,
     });
-  }
-
-  async restorePwd(userId: number): Promise<void> {
-    const user = await this.repository.findOne({
-      where: { id: Number(userId) },
-    });
-    const pwd = await this.cryptoService.hash('1234');
-    user.password = pwd;
-    await this.repository.save(user);
   }
 }
