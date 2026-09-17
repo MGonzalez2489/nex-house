@@ -9,7 +9,7 @@ describe('NeighborhoodScopeGuard', () => {
   beforeEach(() => {
     guard = new NeighborhoodScopeGuard();
     mockRequest = {
-      user: { id: 1, neighborhoodId: 10 },
+      user: { id: 1, neighborhood: { publicId: '10' } },
       params: { neighborhoodId: '10' },
     };
     mockExecutionContext = {

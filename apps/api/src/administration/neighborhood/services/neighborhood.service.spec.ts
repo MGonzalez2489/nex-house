@@ -1,21 +1,30 @@
-import { Neighborhood, NeighStreet, User } from '@core/database';
+import {
+  Neighborhood,
+  NeighStreet,
+  User,
+} from '@core/database';
 import {
   BadRequestException,
   ConflictException,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Test, TestingModule } from '@nestjs/testing';
+import { ResidentSearchService, ResidentService } from '@administration/residents/services';
+import { CatalogsService } from 'src/catalogs/services';
 import { DataSource, QueryRunner } from 'typeorm';
 import { CreateNeighborhoodDto } from '../dtos';
 import { NeighStreetService } from './neigh-street.service';
 import { NeighborhoodSearchService } from './neighborhood-search.service';
 import { NeighborhoodService } from './neighborhood.service';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 describe('NeighborhoodService', () => {
   let service: NeighborhoodService;
   let mockNeighStreetService: jest.Mocked<NeighStreetService>;
   let mockSearchService: jest.Mocked<NeighborhoodSearchService>;
+  let mockResidentService: jest.Mocked<ResidentService>;
+  let mockResidentSearchService: jest.Mocked<ResidentSearchService>;
+  let mockCatalogService: jest.Mocked<CatalogsService>;
   let mockDataSource: jest.Mocked<DataSource>;
   let mockQueryRunner: jest.Mocked<QueryRunner>;
 
@@ -24,11 +33,16 @@ describe('NeighborhoodService', () => {
   const mockUser = { id: 100 } as User;
   const mockDto: CreateNeighborhoodDto = {
     name: 'Residencial Del Real',
-    streets: ['Calle Primera', 'Calle Segunda'],
+    adminEmail: 'admin@nexhouse.com',
+    isActive: true,
+    zipCode: '31000',
+    cityId: 'city-uuid-1',
+    streets: [{ name: 'Calle Primera' }, { name: 'Calle Segunda' }],
   };
 
   const mockSavedNeighborhood = {
     id: 1,
+    publicId: 'neighborhood-uuid-1',
     name: 'residencial del real',
     createdBy: 100,
   } as Neighborhood;
@@ -64,6 +78,18 @@ describe('NeighborhoodService', () => {
       findByPublicId: jest.fn(),
     } as unknown as jest.Mocked<NeighborhoodSearchService>;
 
+    mockResidentService = {
+      createFirstAdmin: jest.fn(),
+    } as unknown as jest.Mocked<ResidentService>;
+
+    mockResidentSearchService = {
+      findByEmail: jest.fn(),
+    } as unknown as jest.Mocked<ResidentSearchService>;
+
+    mockCatalogService = {
+      findByPublicId: jest.fn(),
+    } as unknown as jest.Mocked<CatalogsService>;
+
     mockCacheManager = {
       store: {
         keys: jest.fn().mockResolvedValue([]),
@@ -71,6 +97,12 @@ describe('NeighborhoodService', () => {
       del: jest.fn().mockResolvedValue(undefined),
       clear: jest.fn().mockResolvedValue(undefined),
     };
+
+    mockResidentSearchService.findByEmail.mockResolvedValue(null);
+    mockCatalogService.findByPublicId.mockResolvedValue({
+      id: 5,
+      publicId: 'city-uuid-1',
+    });
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -84,6 +116,12 @@ describe('NeighborhoodService', () => {
           provide: NeighborhoodSearchService,
           useValue: mockSearchService,
         },
+        { provide: ResidentService, useValue: mockResidentService },
+        {
+          provide: ResidentSearchService,
+          useValue: mockResidentSearchService,
+        },
+        { provide: CatalogsService, useValue: mockCatalogService },
         { provide: CACHE_MANAGER, useValue: mockCacheManager },
       ],
     }).compile();
@@ -120,6 +158,11 @@ describe('NeighborhoodService', () => {
       expect(mockQueryRunner.rollbackTransaction).not.toHaveBeenCalled();
       expect(mockQueryRunner.release).toHaveBeenCalled();
 
+      expect(mockResidentSearchService.findByEmail).toHaveBeenCalledWith(
+        mockDto.adminEmail,
+      );
+      expect(mockCatalogService.findByPublicId).toHaveBeenCalled();
+
       expect(mockQueryRunner.manager.findOne).toHaveBeenCalledWith(
         Neighborhood,
         {
@@ -135,7 +178,7 @@ describe('NeighborhoodService', () => {
       });
     });
 
-    it('should delegate street creation to NeighStreetService inside the transaction', async () => {
+    it('should delegate street creation and first admin creation to their services inside the transaction', async () => {
       (mockQueryRunner.manager.findOne as jest.Mock).mockResolvedValue(null);
       (mockQueryRunner.manager.save as jest.Mock).mockResolvedValue(
         mockSavedNeighborhood,
@@ -147,6 +190,7 @@ describe('NeighborhoodService', () => {
       });
 
       mockNeighStreetService.createMany.mockResolvedValue(mockSavedStreets);
+      mockResidentService.createFirstAdmin.mockResolvedValue({ id: 200 } as any);
 
       const result = await service.create(mockDto, mockUser);
 
@@ -157,6 +201,13 @@ describe('NeighborhoodService', () => {
           { name: 'calle primera', neighborhoodId: 1 },
           { name: 'calle segunda', neighborhoodId: 1 },
         ],
+        mockUser.id,
+        mockQueryRunner.manager,
+      );
+      expect(mockResidentService.createFirstAdmin).toHaveBeenCalledWith(
+        1,
+        mockDto.adminEmail,
+        mockUser,
         mockQueryRunner.manager,
       );
       expect(result).toEqual({
@@ -166,12 +217,29 @@ describe('NeighborhoodService', () => {
     });
 
     it('should throw BadRequestException without opening a transaction if the streets array is empty', async () => {
-      const invalidDto = { name: 'Altares', streets: [] };
+      const invalidDto = {
+        name: 'Altares',
+        adminEmail: 'admin@nexhouse.com',
+        isActive: true,
+        zipCode: '31000',
+        cityId: 'city-uuid-1',
+        streets: [],
+      } as CreateNeighborhoodDto;
 
       await expect(service.create(invalidDto, mockUser)).rejects.toThrow(
         new BadRequestException(
           'At least one street validation string is required.',
         ),
+      );
+
+      expect(mockDataSource.createQueryRunner).not.toHaveBeenCalled();
+    });
+
+    it('should throw ConflictException without opening a transaction if the admin email already exists', async () => {
+      mockResidentSearchService.findByEmail.mockResolvedValue({ id: 9 } as any);
+
+      await expect(service.create(mockDto, mockUser)).rejects.toThrow(
+        new ConflictException('User admin@nexhouse.com already exists.'),
       );
 
       expect(mockDataSource.createQueryRunner).not.toHaveBeenCalled();
