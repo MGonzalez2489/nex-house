@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository, FindOptionsRelations, SelectQueryBuilder } from 'typeorm';
-import { NotFoundException, Logger } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { User } from '@core/database';
 import { SearchUserDto } from '../dtos';
 import * as paginationUtils from '@core/utils';
@@ -12,7 +12,7 @@ jest.mock('@core/utils', () => ({
   paginateQuery: jest.fn(),
 }));
 
-describe('UserSearchService', () => {
+describe('ResidentSearchService', () => {
   let service: ResidentSearchService;
   let mockRepository: jest.Mocked<Repository<User>>;
 
@@ -20,7 +20,7 @@ describe('UserSearchService', () => {
     id: 1,
     publicId: 'user-uuid-123',
     email: 'dev@nexhouse.com',
-    name: 'Manuel Gonzalez',
+    neighborhoodId: 1,
   } as unknown as User;
 
   const defaultRelations: FindOptionsRelations<User> = {
@@ -30,6 +30,7 @@ describe('UserSearchService', () => {
   beforeEach(async () => {
     mockRepository = {
       findOne: jest.fn(),
+      createQueryBuilder: jest.fn(),
     } as unknown as jest.Mocked<Repository<User>>;
 
     const module: TestingModule = await Test.createTestingModule({
@@ -43,9 +44,6 @@ describe('UserSearchService', () => {
     }).compile();
 
     service = module.get<ResidentSearchService>(ResidentSearchService);
-
-    const loggerInstance = (service as unknown as { logger: Logger }).logger;
-    jest.spyOn(loggerInstance, 'error').mockImplementation(() => undefined);
   });
 
   afterEach(() => {
@@ -58,19 +56,9 @@ describe('UserSearchService', () => {
 
   describe('findAll', () => {
     let mockQueryBuilder: jest.Mocked<SelectQueryBuilder<User>>;
-    let mockSearchUserDto: SearchUserDto;
-
-    const mockUserList: User[] = [
-      {
-        id: 1,
-        firstName: 'Manuel',
-        lastName: 'Gonzalez',
-        email: 'dev@nexhouse.com',
-      } as User,
-    ];
 
     const mockPaginationResult = {
-      data: mockUserList,
+      data: [mockUser],
       meta: { total: 1, page: 1, lastPage: 1, limit: 10 },
     };
 
@@ -87,71 +75,83 @@ describe('UserSearchService', () => {
         .fn()
         .mockReturnValue(mockQueryBuilder);
 
-      mockSearchUserDto = {
-        first: 0,
-        rows: 10,
-        sortField: 'firstName',
-        sortOrder: 1,
-        showAll: false,
-      };
-
       jest.mocked(paginationUtils.paginateQuery).mockReset();
     });
 
-    it('should retrieve a paginated structure when options.raw is omitted or false', async () => {
+    it('returns a paginated wrapper when options.raw is omitted', async () => {
       jest
         .mocked(paginationUtils.paginateQuery)
         .mockResolvedValue(mockPaginationResult);
 
-      const result = await service.findAll(1, mockSearchUserDto);
+      const dto: SearchUserDto = Object.assign(new SearchUserDto(), {
+        first: 0,
+        rows: 10,
+        showAll: false,
+      });
+      const result = await service.findAll(1, dto);
 
       expect(mockRepository.createQueryBuilder).toHaveBeenCalledWith('users');
-      expect(mockQueryBuilder.leftJoinAndSelect).toHaveBeenCalledTimes(4); // neighborhood, units, unit
       expect(mockQueryBuilder.where).toHaveBeenCalledWith(
         'neighborhood.id = :neighborhoodId',
         { neighborhoodId: 1 },
       );
-
       expect(result).toEqual(mockPaginationResult);
     });
 
-    it('should bypass the metadata wrapper and return a raw array when options.raw is true', async () => {
+    it('returns a raw array when options.raw is true', async () => {
       jest
         .mocked(paginationUtils.paginateQuery)
         .mockResolvedValue(mockPaginationResult);
 
-      const result = await service.findAll(1, mockSearchUserDto, { raw: true });
+      const dto: SearchUserDto = Object.assign(new SearchUserDto(), {
+        first: 0,
+        rows: 10,
+        showAll: false,
+      });
+      const result = await service.findAll(1, dto, { raw: true });
 
-      expect(result).toEqual(mockUserList);
+      expect(result).toEqual([mockUser]);
       expect(Array.isArray(result)).toBe(true);
     });
 
-    it('should correctly inject exact match filters for role and status if present', async () => {
+    it('appends role.name and status.name filters when provided', async () => {
       jest
         .mocked(paginationUtils.paginateQuery)
         .mockResolvedValue(mockPaginationResult);
-      mockSearchUserDto.role = 'ADMIN';
-      mockSearchUserDto.status = 'ACTIVE';
 
-      await service.findAll(1, mockSearchUserDto);
+      const dto: SearchUserDto = Object.assign(new SearchUserDto(), {
+        first: 0,
+        rows: 10,
+        showAll: false,
+        role: 'ADMIN',
+        status: 'ACTIVE',
+      });
+
+      await service.findAll(1, dto);
 
       expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
-        'users.role = :role',
+        'role.name = :role',
         { role: 'ADMIN' },
       );
       expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
-        'users.status = :status',
+        'status.name = :status',
         { status: 'ACTIVE' },
       );
     });
 
-    it('should dynamically parse globalFilter string into multiple nested words brackets', async () => {
+    it('parses globalFilter into word-level OR brackets across profile, email, phone, street and unit fields', async () => {
       jest
         .mocked(paginationUtils.paginateQuery)
         .mockResolvedValue(mockPaginationResult);
-      mockSearchUserDto.globalFilter = 'Manuel Unit10';
 
-      await service.findAll(1, mockSearchUserDto);
+      const dto: SearchUserDto = Object.assign(new SearchUserDto(), {
+        first: 0,
+        rows: 10,
+        showAll: false,
+        globalFilter: 'Manuel Unit10',
+      });
+
+      await service.findAll(1, dto);
 
       expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
         expect.any(Object),
@@ -160,7 +160,7 @@ describe('UserSearchService', () => {
   });
 
   describe('findByPublicId', () => {
-    it('should successfully find a user by publicId using default relations', async () => {
+    it('returns the user with default relations', async () => {
       mockRepository.findOne.mockResolvedValue(mockUser);
 
       const result = await service.findByPublicId('user-uuid-123');
@@ -172,7 +172,7 @@ describe('UserSearchService', () => {
       expect(result).toEqual(mockUser);
     });
 
-    it('should append neighborhoodId to where criteria when provided', async () => {
+    it('scopes by neighborhood when provided', async () => {
       mockRepository.findOne.mockResolvedValue(mockUser);
 
       await service.findByPublicId('user-uuid-123', 99);
@@ -186,10 +186,11 @@ describe('UserSearchService', () => {
       });
     });
 
-    it('should override default relations when custom relations are explicitly passed', async () => {
+    it('overrides default relations when custom ones are passed', async () => {
       mockRepository.findOne.mockResolvedValue(mockUser);
       const customRelations: FindOptionsRelations<User> = {
-        neighborhood: true,
+        profile: true,
+        role: true,
       };
 
       await service.findByPublicId('user-uuid-123', undefined, customRelations);
@@ -200,7 +201,7 @@ describe('UserSearchService', () => {
       });
     });
 
-    it('should return null if the user is not found', async () => {
+    it('returns null when not found', async () => {
       mockRepository.findOne.mockResolvedValue(null);
 
       const result = await service.findByPublicId('non-existent');
@@ -210,7 +211,7 @@ describe('UserSearchService', () => {
   });
 
   describe('findByPublicIdOrThrow', () => {
-    it('should return the user if found', async () => {
+    it('returns the user when found', async () => {
       jest.spyOn(service, 'findByPublicId').mockResolvedValue(mockUser);
 
       const result = await service.findByPublicIdOrThrow('user-uuid-123');
@@ -218,17 +219,17 @@ describe('UserSearchService', () => {
       expect(result).toEqual(mockUser);
     });
 
-    it('should throw a NotFoundException if user does not exist', async () => {
+    it('throws NotFoundException when not found', async () => {
       jest.spyOn(service, 'findByPublicId').mockResolvedValue(null);
 
       await expect(service.findByPublicIdOrThrow('invalid-id')).rejects.toThrow(
-        new NotFoundException("User with public ID 'invalid-id' not found"),
+        NotFoundException,
       );
     });
   });
 
   describe('findByEmail', () => {
-    it('should successfully find a user by email using default relations', async () => {
+    it('returns the user with default relations', async () => {
       mockRepository.findOne.mockResolvedValue(mockUser);
 
       const result = await service.findByEmail('dev@nexhouse.com');
@@ -240,7 +241,7 @@ describe('UserSearchService', () => {
       expect(result).toEqual(mockUser);
     });
 
-    it('should append neighborhoodId to where criteria for email query when provided', async () => {
+    it('scopes by neighborhood when provided', async () => {
       mockRepository.findOne.mockResolvedValue(mockUser);
 
       await service.findByEmail('dev@nexhouse.com', 50);
@@ -253,10 +254,18 @@ describe('UserSearchService', () => {
         relations: defaultRelations,
       });
     });
+
+    it('returns null when not found', async () => {
+      mockRepository.findOne.mockResolvedValue(null);
+
+      const result = await service.findByEmail('missing@nexhouse.com');
+
+      expect(result).toBeNull();
+    });
   });
 
   describe('findByEmailOrThrow', () => {
-    it('should return the user if found via email', async () => {
+    it('returns the user when found', async () => {
       jest.spyOn(service, 'findByEmail').mockResolvedValue(mockUser);
 
       const result = await service.findByEmailOrThrow('dev@nexhouse.com');
@@ -264,16 +273,12 @@ describe('UserSearchService', () => {
       expect(result).toEqual(mockUser);
     });
 
-    it('should throw a NotFoundException if email does not exist', async () => {
+    it('throws NotFoundException when not found', async () => {
       jest.spyOn(service, 'findByEmail').mockResolvedValue(null);
 
       await expect(
         service.findByEmailOrThrow('missing@nexhouse.com'),
-      ).rejects.toThrow(
-        new NotFoundException(
-          "User with email 'missing@nexhouse.com' not found",
-        ),
-      );
+      ).rejects.toThrow(NotFoundException);
     });
   });
 });

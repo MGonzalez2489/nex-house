@@ -1,6 +1,6 @@
 import { User } from '@core/database';
 import { PaginatedResult, paginateQuery } from '@core/utils';
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserRoleEnum } from '@nexhouse/shared-domain/enums';
 import {
@@ -13,11 +13,6 @@ import { SearchUserDto } from '../dtos';
 
 @Injectable()
 export class ResidentSearchService {
-  private readonly logger = new Logger(ResidentSearchService.name);
-
-  /**
-   * Default relations to load when no custom relations are provided.
-   */
   private readonly defaultRelations: FindOptionsRelations<User> = {
     neighborhood: true,
   };
@@ -28,13 +23,7 @@ export class ResidentSearchService {
   ) {}
 
   /**
-   * Retrieves a raw array of User entities for internal business logic processing.
-   * Activated by passing `{ raw: true }` in the options argument.
-   *
-   * @param neighborhoodId The context neighborhood identifier.
-   * @param filters Filtering criteria.
-   * @param options Execution configuration flags.
-   * @returns A promise that resolves to an array of User entities.
+   * Retrieves raw user entities for internal processing.
    */
   async findAll(
     neighborhoodId: number,
@@ -43,13 +32,7 @@ export class ResidentSearchService {
   ): Promise<User[]>;
 
   /**
-   * Retrieves a paginated matrix of users including API metadata headers.
-   * Standard execution path used by API controllers.
-   *
-   * @param neighborhoodId The context neighborhood identifier.
-   * @param filters Filtering and pagination bounds.
-   * @param options Optional execution configuration flags.
-   * @returns A promise that resolves to a structured PaginatedResult.
+   * Retrieves a paginated list of users with metadata headers.
    */
   async findAll(
     neighborhoodId: number,
@@ -57,9 +40,6 @@ export class ResidentSearchService {
     options?: { raw?: false },
   ): Promise<PaginatedResult<User>>;
 
-  /**
-   * Core implementation handling conditional filters, global search parsing, and dynamic formatting.
-   */
   async findAll(
     neighborhoodId: number,
     filters: SearchUserDto,
@@ -76,7 +56,6 @@ export class ResidentSearchService {
       .leftJoinAndSelect('userUnits.userUnitRole', 'userUnitRole')
       .leftJoinAndSelect('unit.street', 'street')
       .leftJoinAndSelect('unit.type', 'unitType')
-
       .where('neighborhood.id = :neighborhoodId', {
         neighborhoodId,
       });
@@ -84,12 +63,11 @@ export class ResidentSearchService {
     const { globalFilter, role, status } = filters;
 
     if (role) {
-      query.andWhere('role = :role', { role });
+      query.andWhere('role.name = :role', { role });
     }
     if (status) {
-      query.andWhere('status = :status', { status });
+      query.andWhere('status.name = :status', { status });
     }
-    //TODO: analize if street should be an ID
 
     if (globalFilter) {
       const globalFilterWords = globalFilter
@@ -131,7 +109,7 @@ export class ResidentSearchService {
     }
 
     query.addSelect(
-      `CASE users.role WHEN '${UserRoleEnum.ADMIN}' THEN 1 WHEN '${UserRoleEnum.RESIDENT}' THEN 2 ELSE 3 END`,
+      `CASE role.name WHEN '${UserRoleEnum.ADMIN}' THEN 1 WHEN '${UserRoleEnum.RESIDENT}' THEN 2 ELSE 3 END`,
       'roleOrder',
     );
     query.addOrderBy('roleOrder', 'ASC');
@@ -148,12 +126,7 @@ export class ResidentSearchService {
   }
 
   /**
-   * Finds a user by their publicId with optional custom relations.
-   *
-   * @param publicId The unique public identifier of the user.
-   * @param neighborhoodId Optional neighborhood context identifier.
-   * @param relations Optional custom entity relations to load. Passes default relations if omitted.
-   * @returns A promise that resolves to the User entity or null if not found.
+   * Finds a user by publicId with optional neighborhood scope and custom relations.
    */
   async findByPublicId(
     publicId: string,
@@ -164,13 +137,7 @@ export class ResidentSearchService {
   }
 
   /**
-   * Finds a user by their publicId or throws a NotFoundException if they do not exist.
-   *
-   * @param publicId The unique public identifier of the user.
-   * @param neighborhoodId Optional neighborhood context identifier.
-   * @param relations Optional custom entity relations to load. Passes default relations if omitted.
-   * @throws NotFoundException if the user is not found.
-   * @returns A promise that resolves to the User entity.
+   * Finds a user by publicId or throws NotFoundException.
    */
   async findByPublicIdOrThrow(
     publicId: string,
@@ -187,12 +154,7 @@ export class ResidentSearchService {
   }
 
   /**
-   * Finds a user by their email address with optional custom relations.
-   *
-   * @param email The unique email address of the user.
-   * @param neighborhoodId Optional neighborhood context identifier.
-   * @param relations Optional custom entity relations to load. Passes default relations if omitted.
-   * @returns A promise that resolves to the User entity or null if not found.
+   * Finds a user by email with optional neighborhood scope and custom relations.
    */
   async findByEmail(
     email: string,
@@ -203,13 +165,7 @@ export class ResidentSearchService {
   }
 
   /**
-   * Finds a user by their email address or throws a NotFoundException if they do not exist.
-   *
-   * @param email The unique email address of the user.
-   * @param neighborhoodId Optional neighborhood context identifier.
-   * @param relations Optional custom entity relations to load. Passes default relations if omitted.
-   * @throws NotFoundException if the user is not found.
-   * @returns A promise that resolves to the User entity.
+   * Finds a user by email or throws NotFoundException.
    */
   async findByEmailOrThrow(
     email: string,
@@ -223,9 +179,6 @@ export class ResidentSearchService {
     return user;
   }
 
-  /**
-   * Centralized private method to execute user lookups with dynamic criteria and relations.
-   */
   private async findOneByCriteria(
     criteria: FindOptionsWhere<User>,
     neighborhoodId?: number,

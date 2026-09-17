@@ -1,5 +1,5 @@
 import { User } from '@core/database';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserRoleEnum } from '@nexhouse/shared-domain/enums';
 import { UserStats } from '@nexhouse/shared-domain/interfaces';
@@ -7,13 +7,15 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class ResidentStatsService {
-  private readonly logger = new Logger(ResidentStatsService.name);
-
   constructor(
     @InjectRepository(User)
     private readonly repository: Repository<User>,
   ) {}
 
+  /**
+   * Returns aggregated resident counts grouped by role and status,
+   * scoped to a single neighborhood. Excludes super-admin accounts.
+   */
   async getStats(neighborhoodId: number): Promise<UserStats> {
     const rawRoleStats = await this.repository
       .createQueryBuilder('user')
@@ -36,6 +38,7 @@ export class ResidentStatsService {
       .where('role.name != :superAdminRole', {
         superAdminRole: UserRoleEnum.SUPERADMIN,
       })
+      .andWhere('user.neighborhoodId = :neighborhoodId', { neighborhoodId })
       .groupBy('status.name')
       .getRawMany<{ statusCode: string; count: string }>();
 
