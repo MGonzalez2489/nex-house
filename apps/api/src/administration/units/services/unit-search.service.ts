@@ -1,21 +1,26 @@
 import { Unit } from '@core/database';
 import { SearchDto } from '@core/dtos';
-import { paginateQuery } from '@core/utils';
-import { Injectable, Logger } from '@nestjs/common';
+import { PaginatedResult, paginateQuery } from '@core/utils';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UnitStats } from '@nexhouse/shared-domain/interfaces';
 import { Brackets, Repository } from 'typeorm';
 
 @Injectable()
 export class UnitSearchService {
-  private readonly logger = new Logger(UnitSearchService.name);
-
   constructor(
     @InjectRepository(Unit)
     private readonly repository: Repository<Unit>,
   ) {}
 
-  async findAll(filters: SearchDto, neighborhoodId: number) {
+  /**
+   * Returns a paginated list of units for a neighborhood, filtering the
+   * identifier and street name by `globalFilter` when provided.
+   */
+  async findAll(
+    filters: SearchDto,
+    neighborhoodId: number,
+  ): Promise<PaginatedResult<Unit>> {
     const { globalFilter } = filters;
 
     const query = this.repository
@@ -32,79 +37,75 @@ export class UnitSearchService {
         new Brackets((qb) => {
           qb.where('units.identifier LIKE :filter', {
             filter: `%${globalFilter}%`,
-          }).orWhere(`street.name LIKE :filter`, {
+          }).orWhere('street.name LIKE :filter', {
             filter: `%${globalFilter}%`,
           });
         }),
       );
     }
 
-    const result = await paginateQuery(query, filters);
-
-    return result;
+    return paginateQuery(query, filters);
   }
 
+  /**
+   * Aggregates unit counts for a neighborhood grouped by status, type and
+   * street. Uses `displayName` as the grouping label for status and type, and
+   * the street `name` for streets.
+   */
   async findStats(neighborhoodId: number): Promise<UnitStats> {
-    // 1. Conteo por Estado
     const rawStatusStats = await this.repository
       .createQueryBuilder('unit')
       .innerJoin('unit.status', 'status')
-      .where('unit.neighborhoodId = :neighborhoodId', {
-        neighborhoodId,
-      })
+      .where('unit.neighborhoodId = :neighborhoodId', { neighborhoodId })
       .select('status.displayName', 'name')
       .addSelect('COUNT(unit.id)', 'count')
       .groupBy('status.displayName')
       .getRawMany<{ name: string; count: string }>();
 
-    // 2. Conteo por Tipo
     const rawTypeStats = await this.repository
       .createQueryBuilder('unit')
       .innerJoin('unit.type', 'type')
-      .where('unit.neighborhoodId = :neighborhoodId', {
-        neighborhoodId,
-      })
+      .where('unit.neighborhoodId = :neighborhoodId', { neighborhoodId })
       .select('type.displayName', 'name')
       .addSelect('COUNT(unit.id)', 'count')
       .groupBy('type.displayName')
       .getRawMany<{ name: string; count: string }>();
 
-    // 3. Conteo por Calle
     const rawStreetStats = await this.repository
       .createQueryBuilder('unit')
       .innerJoin('unit.street', 'street')
-      .where('unit.neighborhoodId = :neighborhoodId', {
-        neighborhoodId,
-      })
+      .where('unit.neighborhoodId = :neighborhoodId', { neighborhoodId })
       .select('street.name', 'name')
       .addSelect('COUNT(unit.id)', 'count')
       .groupBy('street.name')
       .getRawMany<{ name: string; count: string }>();
 
-    // Mapeo a diccionario y cálculo del total
-    const byStatus: Record<string, number> = {};
-    let totalUnits = 0;
-    for (const row of rawStatusStats) {
-      const count = parseInt(row.count, 10);
-      byStatus[row.name] = count;
-      totalUnits += count;
-    }
-
-    const byType: Record<string, number> = {};
-    for (const row of rawTypeStats) {
-      byType[row.name] = parseInt(row.count, 10);
-    }
-
-    const byStreet: Record<string, number> = {};
-    for (const row of rawStreetStats) {
-      byStreet[row.name] = parseInt(row.count, 10);
-    }
+    const byStatus = this.toCountMap(rawStatusStats);
+    const totalUnits = rawStatusStats.reduce(
+      (total, row) => total + parseInt(row.count, 10),
+      0,
+    );
 
     return {
       summary: { totalUnits },
       byStatus,
-      byType,
-      byStreet,
+      byType: this.toCountMap(rawTypeStats),
+      byStreet: this.toCountMap(rawStreetStats),
     };
+  }
+
+  /**
+   * Maps raw `{ name, count }` rows into a `{ name: count }` dictionary.
+   */
+  private toCountMap(
+    rows: { name: string; count: string }[],
+  ): Record<string, number> {
+    const map: Record<string, number> = {};
+
+    for (const row of rows) {
+      map[row.name] = parseInt(row.count, 10);
+    }
+
+    return map;
   }
 }

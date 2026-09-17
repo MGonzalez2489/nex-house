@@ -35,13 +35,14 @@ export class UnitService {
    *
    * @param neighId - The ID of the neighborhood where the unit is being registered.
    * @param dto - Data Transfer Object containing unit specifications and optional initial assignment payload.
-   * @param currentUserId - Public or internal ID of the authenticated user performing the creation.
+   * @param currentUserId - Internal ID of the authenticated user performing the creation.
    * @returns The newly created Unit entity.
    *
-   * @throws {BadRequestException} If the unit identifier format is invalid or required referenced entities are missing.
-   * @throws {NotFoundException} If the user specified for assignment does not exist in the given neighborhood.
+   * @throws {BadRequestException} If required fields are missing, the identifier format is invalid,
+   *   the unit role is missing when assigning a user, or the street does not belong to the neighborhood.
+   * @throws {NotFoundException} If a referenced catalog is missing or the assigned user is not found.
    * @throws {ConflictException} If a unit with the same street, type, and identifier already exists in the neighborhood.
-   * @throws {InternalServerErrorException} If a database exception occurs during transaction execution.
+   * @throws {InternalServerErrorException} If an unexpected database exception occurs during the transaction.
    */
   async create(
     neighId: number,
@@ -56,33 +57,43 @@ export class UnitService {
       );
     }
 
-    // 1. Sanitize input before acquiring heavy database connections
-    const sanitizedIdentifier = this.validateAndSanitizeUnitIdentifier(
-      unitIdentifier,
-    );
+    if (dto.userId && !dto.unitRoleId) {
+      throw new BadRequestException(
+        'Unit assignment requires a unit role catalog reference.',
+      );
+    }
 
-    // 2. Resolve target unit status name based on initial user assignment presence
+    const sanitizedIdentifier =
+      this.validateAndSanitizeUnitIdentifier(unitIdentifier);
+
     const unitStatusEnumValue = dto.userId
       ? UnitStatusEnum.OCCUPIED
       : UnitStatusEnum.VACANT;
 
-    // 3. Resolve catalog & relational dependencies in parallel
-    const [unitType, userUnitRole, street, unitStatus] = await Promise.all([
+    const [unitType, street, unitStatus, userUnitRole] = await Promise.all([
       this.catalogsService.findByPublicId(UnitType, unitTypeId),
-      dto.unitRoleId
-        ? this.catalogsService.findByPublicId(UserUnitRole, dto.unitRoleId)
-        : Promise.resolve(null),
       this.neighStreetService.findByPublicId(streetId),
       this.catalogsService.findByName(UnitStatus, unitStatusEnumValue),
+      dto.userId
+        ? this.catalogsService.findByPublicId(UserUnitRole, dto.unitRoleId)
+        : Promise.resolve(null),
     ]);
 
-    // 4. Initialize Database Transaction
+    if (!street) {
+      throw new BadRequestException('Target neighborhood street not found.');
+    }
+
+    if (street.neighborhoodId !== neighId) {
+      throw new BadRequestException(
+        'Target street does not belong to this neighborhood.',
+      );
+    }
+
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      // 5. Concurrency Safeguard: Verify uniqueness within the active transaction context
       const existingUnit = await queryRunner.manager.findOne(Unit, {
         where: {
           identifier: sanitizedIdentifier,
@@ -98,10 +109,9 @@ export class UnitService {
         );
       }
 
-      // 6. Instantiate & persist the new Unit
       const newUnit = queryRunner.manager.create(Unit, {
         streetId: street.id,
-        identifier: sanitizedIdentifier, // Ensure sanitized uppercase version is saved
+        identifier: sanitizedIdentifier,
         neighborhoodId: neighId,
         typeId: unitType.id,
         statusId: unitStatus.id,
@@ -110,7 +120,6 @@ export class UnitService {
 
       const savedUnit = await queryRunner.manager.save(newUnit);
 
-      // 7. Handle optional User Assignment pipeline
       if (dto.userId) {
         const user = await queryRunner.manager.findOne(User, {
           where: {
@@ -121,7 +130,7 @@ export class UnitService {
 
         if (!user) {
           throw new NotFoundException(
-            `User assigned to this unit was not found in this neighborhood.`,
+            'User assigned to this unit was not found in this neighborhood.',
           );
         }
 
@@ -129,26 +138,23 @@ export class UnitService {
           unitId: savedUnit.id,
           userId: user.id,
           createdBy: currentUserId,
-          roleId: userUnitRole?.id,
+          userUnitRole,
           isCurrentOccupant: dto.isCurrentOccupant ?? true,
-          userUnitRoleId: userUnitRole.id,
         });
 
         await queryRunner.manager.save(assignment);
       }
 
-      // 8. Commit and return transaction result
       await queryRunner.commitTransaction();
       return savedUnit;
     } catch (error) {
       await queryRunner.rollbackTransaction();
 
       this.logger.error(
-        `🔴 Transaction failed during unit creation pipeline: ${error.message}`,
+        `Transaction failed during unit creation pipeline: ${error.message}`,
         error.stack,
       );
 
-      // Re-throw known domain exceptions directly
       if (
         error instanceof ConflictException ||
         error instanceof BadRequestException ||
@@ -192,22 +198,3 @@ export class UnitService {
     return sanitized;
   }
 }
-
-// @IsString()
-// unitIdentifier: string;
-
-// @IsString()
-// streetId: string;
-//
-// @IsString()
-// unitTypeId: string;
-// @IsString()
-// unitRoleId: string;
-//
-// //
-// @IsString()
-// @IsOptional()
-// userId?: string;
-// @IsBoolean()
-// isCurrentOccupant: boolean;
-//
