@@ -30,14 +30,13 @@ export class NeighSearchController {
   ) {}
 
   /**
-   * Exposes a public query-driven endpoint returning validated, paginated listings of neighborhood profiles.
+   * Returns a paginated list of neighborhoods mapped to API models.
    *
-   * @param searchDto Injected query payload processing validation and bounds criteria.
-   * @returns Structured object wrapping data arrays and pagination headers.
+   * @param searchDto Query criteria (pagination, ordering, global filter, state).
    */
   @Get()
   @UseInterceptors(HttpCacheInterceptor)
-  @CacheTTL(60 * 5) //5 mins cache
+  @CacheTTL(60 * 5) // 5 minutes
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get a paginated list of neighborhoods' })
   @ApiResponse({
@@ -50,12 +49,15 @@ export class NeighSearchController {
     const response = await this.searchService.findAll(searchDto);
 
     return {
-      data: response.data.map((f) => NeighborhoodToModelMapper(f)),
+      data: response.data.map((neighborhood) =>
+        NeighborhoodToModelMapper(neighborhood),
+      ),
       meta: response.meta,
     };
   }
 
   @Get('mine')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Return assigned neighborhood.' })
   @ApiResponse({
     status: 200,
@@ -72,13 +74,19 @@ export class NeighSearchController {
     );
 
     if (!neighborhood) {
-      throw new NotFoundException(`Neighborhood not assigned.`);
+      throw new NotFoundException('Neighborhood not assigned.');
     }
 
     return neighborhood;
   }
 
   @Get('streets')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Return paginated streets for the current user' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns a paginated list of streets.',
+  })
   async findStreets(
     @Query() filters: SearchDto,
     @CurrentUser() user: User,
@@ -87,13 +95,13 @@ export class NeighSearchController {
   }
 
   /**
-   * Resolves specific tenant configuration structures mapped exclusively against cross-boundary UUID tokens.
+   * Returns a single neighborhood matching the public UUID.
    *
-   * @param publicId String UUID validated inline prior to interceptor handoff.
-   * @throws NotFoundException if the service layer resolves a null pointer reference.
-   * @returns Completed entity mapping profiles.
+   * @param publicId Public UUID of the neighborhood.
+   * @throws NotFoundException if no neighborhood matches the public ID.
    */
   @Get(':publicId')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Return a neighborhood by publicId.' })
   @ApiResponse({
     status: 200,

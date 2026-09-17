@@ -22,12 +22,11 @@ export class NeighborhoodController {
   constructor(private readonly service: NeighborhoodService) {}
 
   /**
-   * Registers a fresh neighborhood configuration map alongside its relational street index catalogs.
-   * Leverages full ACID execution pipelines to guarantee cross-boundary structural safety.
+   * Creates a new neighborhood atomically with its streets and first admin.
    *
-   * @param createNeighborhoodDto Body payload containing name and street list string tokens.
-   * @param user Injected operational metadata capturing the current administrative author profile.
-   * @returns The fully populated, newly instantiated Neighborhood entity tree structure.
+   * @param dto Neighborhood payload (name, streets, admin email, location).
+   * @param user Authenticated actor creating the neighborhood.
+   * @returns The created neighborhood with its relations.
    */
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -52,17 +51,17 @@ export class NeighborhoodController {
     @Body() createNeighborhoodDto: CreateNeighborhoodDto,
     @CurrentUser() user: User,
   ): Promise<Neighborhood> {
-    return await this.service.create(createNeighborhoodDto, user);
+    return this.service.create(createNeighborhoodDto, user);
   }
 
   /**
-   * Updates an existing neighborhood and its associated streets.
-   * Handles street additions, updates, and removals within a transaction.
+   * Updates an existing neighborhood, adding/updating/removing its streets
+   * within a single transaction.
    *
-   * @param publicId The public ID of the neighborhood to update.
-   * @param updateNeighborhoodDto Data payload capturing changes to neighborhood and streets.
-   * @param user The active operational user session triggering the update context.
-   * @returns The fully populated, updated Neighborhood entity tree structure.
+   * @param publicId Public UUID of the neighborhood to update.
+   * @param updateNeighborhoodDto Mutable neighborhood fields.
+   * @param user Authenticated actor performing the update.
+   * @returns The updated neighborhood with its relations.
    */
   @Patch(':publicId')
   @HttpCode(HttpStatus.OK)
@@ -90,6 +89,6 @@ export class NeighborhoodController {
     @Body() updateNeighborhoodDto: UpdateNeighborhoodDto,
     @CurrentUser() user: User,
   ): Promise<Neighborhood> {
-    return await this.service.update(publicId, updateNeighborhoodDto, user);
+    return this.service.update(publicId, updateNeighborhoodDto, user);
   }
 }
