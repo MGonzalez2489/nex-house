@@ -1,25 +1,27 @@
 <div>
   <div class="text-center mb-8">
-    <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Valida tu codigo</h2>
+    <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Valida tu código</h1>
     <p class="text-slate-500 text-sm mt-2">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit...
+      Escribe el código de 6 dígitos que enviamos a tu correo electrónico.
     </p>
   </div>
 
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <div class="form-control">
-      <label for="code" class="form-label">Codigo de validación</label>
+      <label for="code" class="form-label">Código de validación</label>
       <input
         pInputText
         id="code"
         type="text"
         formControlName="code"
-        placeholder="ABC-123"
+        placeholder="ABC-123456"
+        autocomplete="one-time-code"
+        maxlength="10"
         fluid
         [invalid]="form.controls.code.invalid && form.controls.code.touched"
         [attr.aria-invalid]="form.controls.code.invalid && form.controls.code.touched"
         [attr.aria-describedby]="
-          form.controls.code.touched && form.controls.code.errors ? 'code-error' : null
+          form.controls.code.touched && form.controls.code.errors ? 'code-errors' : null
         "
       />
 
@@ -27,12 +29,18 @@
         id="code-errors"
         [touched]="form.controls.code.touched"
         [errors]="form.controls.code.errors"
-        label="Codigo"
+        label="Código"
       />
     </div>
 
     <div class="pt-5">
-      <app-form-options [submitFullWidth]="true" [showCancel]="false" submitLabel="Enviar" />
+      <app-form-options
+        [submitFullWidth]="true"
+        [showCancel]="false"
+        submitLabel="Enviar"
+        [isLoading]="store.loading()"
+        [callState]="store.callState()"
+      />
     </div>
   </form>
 </div>

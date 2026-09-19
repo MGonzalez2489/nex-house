@@ -10,7 +10,7 @@ describe("AuthStore", () => {
 
   const mockSession: SessionModel = {
     token: "jwt-access-token-987",
-    exp: 1718820000,
+    exp: Date.now() + 3_600_000,
     refreshToken: "refresh-token",
     user: {
       email: "resident@nexhouse.com",
@@ -24,6 +24,7 @@ describe("AuthStore", () => {
 
     const authSpy = {
       login: jest.fn(),
+      logout: jest.fn(),
       recoveryRequest: jest.fn(),
       codeValidation: jest.fn(),
       resetPwd: jest.fn(),
@@ -73,6 +74,78 @@ describe("AuthStore", () => {
       );
 
       setItemSpy.mockRestore();
+    });
+  });
+
+  describe("session expiry", () => {
+    it("keeps the user authenticated while the session has not expired", () => {
+      const store = TestBed.inject(AuthStore);
+
+      store.loadSession({token: "fresh-token", exp: Date.now() + 60_000});
+
+      expect(store.isSessionExpired()).toBe(false);
+      expect(store.isAuthenticated()).toBe(true);
+    });
+
+    it("marks the session as expired and unauthenticated once exp is in the past", () => {
+      const store = TestBed.inject(AuthStore);
+
+      store.loadSession({token: "stale-token", exp: Date.now() - 1_000});
+
+      expect(store.isSessionExpired()).toBe(true);
+      expect(store.isAuthenticated()).toBe(false);
+    });
+  });
+
+  describe("clearSession", () => {
+    it("removes only the session keys and leaves unrelated localStorage entries intact", () => {
+      localStorage.setItem(APP_CONSTANTS.TOKEN_STORAGE_KEY, "jwt-access-token");
+      localStorage.setItem(APP_CONSTANTS.TOKEN_EXP, "123");
+      localStorage.setItem(APP_CONSTANTS.TOKEN_RESET_PWD, "reset-jwt");
+      localStorage.setItem("unrelated-key", "keep-me");
+      const store = TestBed.inject(AuthStore);
+
+      store.clearSession();
+
+      expect(localStorage.getItem(APP_CONSTANTS.TOKEN_STORAGE_KEY)).toBeNull();
+      expect(localStorage.getItem(APP_CONSTANTS.TOKEN_EXP)).toBeNull();
+      expect(localStorage.getItem(APP_CONSTANTS.TOKEN_RESET_PWD)).toBeNull();
+      expect(localStorage.getItem("unrelated-key")).toBe("keep-me");
+      expect(store.token()).toBeNull();
+      expect(store.exp()).toBe(0);
+      expect(store.resetPwdToken()).toBeNull();
+      expect(store.isAuthenticated()).toBe(false);
+    });
+  });
+
+  describe("logout", () => {
+    it("calls the API and clears the local session, returning true", async () => {
+      authServiceMock.logout.mockReturnValue(
+        of({ message: "Logged out successfully", data: { message: "ok" } }),
+      );
+      const store = TestBed.inject(AuthStore);
+      store.loadSession(mockSession);
+
+      const result = await store.logout();
+
+      expect(authServiceMock.logout).toHaveBeenCalledTimes(1);
+      expect(result).toBe(true);
+      expect(store.token()).toBeNull();
+      expect(localStorage.getItem(APP_CONSTANTS.TOKEN_STORAGE_KEY)).toBeNull();
+    });
+
+    it("clears the local session and returns false when the API call fails", async () => {
+      authServiceMock.logout.mockReturnValue(
+        throwError(() => new Error("Network down")),
+      );
+      const store = TestBed.inject(AuthStore);
+      store.loadSession(mockSession);
+
+      const result = await store.logout();
+
+      expect(result).toBe(false);
+      expect(store.token()).toBeNull();
+      expect(localStorage.getItem(APP_CONSTANTS.TOKEN_STORAGE_KEY)).toBeNull();
     });
   });
 

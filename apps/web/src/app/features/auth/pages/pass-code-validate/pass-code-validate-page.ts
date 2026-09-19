@@ -12,7 +12,6 @@ const RECOVERY_CODE_PATTERN = /^[A-Z]{3}-\d{6}$/;
   selector: 'app-pass-code-validate-page',
   imports: [InputTextModule, FormOptions, ReactiveFormsModule, FormValidationErrorComponent],
   templateUrl: './pass-code-validate-page.html',
-  styleUrl: './pass-code-validate-page.css',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

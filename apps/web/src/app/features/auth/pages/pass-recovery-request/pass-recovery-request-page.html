@@ -1,37 +1,13 @@
 <div>
   <div class="text-center mb-8">
-    <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Encuentra tu cuenta</h2>
+    <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Encuentra tu cuenta</h1>
     <p class="text-slate-500 text-sm mt-2">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit...
+      Ingresa el correo asociado a tu cuenta y te enviaremos un código de verificación.
     </p>
   </div>
 
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <div class="form-control">
-      <label for="email" class="form-label">Correo Electrónico</label>
-      <p-iconfield>
-        <p-inputicon class="pi pi-envelope" />
-        <input
-          pInputText
-          id="email"
-          type="email"
-          formControlName="email"
-          placeholder="nombre@ejemplo.com"
-          fluid
-          [invalid]="form.controls.email.invalid && form.controls.email.touched"
-          [attr.aria-invalid]="form.controls.email.invalid && form.controls.email.touched"
-          [attr.aria-describedby]="
-            form.controls.email.touched && form.controls.email.errors ? 'email-error' : null
-          "
-        />
-      </p-iconfield>
-      <app-form-validation-error
-        id="email-errors"
-        [touched]="form.controls.email.touched"
-        [errors]="form.controls.email.errors"
-        label="Email"
-      />
-    </div>
+    <app-auth-email-field [control]="form.controls.email" />
 
     <div class="pt-5">
       <app-form-options
@@ -48,7 +24,7 @@
         [routerLink]="['/auth', PASS_VALIDATE_CODE]"
         class="text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
       >
-        Ya tengo codigo
+        Ya tengo código
       </a>
     </div>
   </form>

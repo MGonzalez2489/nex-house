@@ -1,15 +1,13 @@
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Router, RouterLink} from '@angular/router';
+import {AuthEmailField} from '@auth/components';
 import {LoginForm} from './login-form';
 
 import {AuthStore} from '@auth/store';
 import {DASHBOARD_ROUTES_ENUM} from '@dashboard/index';
 import {Login} from '@nexhouse/shared-domain/interfaces';
 import {Checkbox} from '@openng/optimus-ui/checkbox';
-import {IconFieldModule} from '@openng/optimus-ui/iconfield';
-import {InputIconModule} from '@openng/optimus-ui/inputicon';
-import {InputTextModule} from '@openng/optimus-ui/inputtext';
 import {PasswordModule} from '@openng/optimus-ui/password';
 import {FormOptions, FormValidationErrorComponent} from '@shared/components/forms';
 import {StartupStore} from '@stores/startup.store';
@@ -19,16 +17,13 @@ import {StartupStore} from '@stores/startup.store';
   imports: [
     ReactiveFormsModule,
     PasswordModule,
-    InputTextModule,
-    InputIconModule,
-    IconFieldModule,
     RouterLink,
     Checkbox,
     FormValidationErrorComponent,
     FormOptions,
+    AuthEmailField,
   ],
   templateUrl: './login-page.html',
-  styleUrl: './login-page.css',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

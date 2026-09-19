@@ -88,4 +88,22 @@ describe('PassRecoveryPage', () => {
     expect(armLoading).not.toHaveBeenCalled();
     expect(navigateByUrl).not.toHaveBeenCalled();
   });
+
+  it('renders a single h1 heading', () => {
+    fixture.detectChanges();
+
+    const headings = fixture.nativeElement.querySelectorAll('h1');
+    expect(headings).toHaveLength(1);
+    expect(headings[0].textContent).toContain('Reestablecer Contraseña');
+  });
+
+  it('describes the confirm password field with the mismatch message when passwords differ', () => {
+    component.form.markAllAsTouched();
+    component.form.controls.password.setValue('new-secret');
+    component.form.controls.confirmPassword.setValue('different-secret');
+    fixture.detectChanges();
+
+    expect(component.confirmPasswordDescribedBy()).toContain('confirm-password-mismatch');
+    expect(fixture.nativeElement.querySelector('#confirm-password-mismatch')).not.toBeNull();
+  });
 });

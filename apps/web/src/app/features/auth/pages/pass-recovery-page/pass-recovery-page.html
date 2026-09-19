@@ -1,9 +1,7 @@
 <div>
   <div class="text-center mb-8">
-    <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Reestablecer Contraseña</h2>
-    <p class="text-slate-500 text-sm mt-2">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, labore...
-    </p>
+    <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Reestablecer Contraseña</h1>
+    <p class="text-slate-500 text-sm mt-2">Crea una nueva contraseña para tu cuenta.</p>
   </div>
 
   <form [formGroup]="form" (ngSubmit)="doSubmit()" class="space-y-6">
@@ -18,11 +16,13 @@
         [toggleMask]="true"
         placeholder="••••••••"
         fluid
-        autocomplete="off"
+        autocomplete="new-password"
         [invalid]="form.controls.password.invalid && form.controls.password.touched"
         [attr.aria-invalid]="form.controls.password.invalid && form.controls.password.touched"
         [attr.aria-describedby]="
-          form.controls.password.touched && form.controls.password.errors ? 'password-error' : null
+          form.controls.password.touched && form.controls.password.errors
+            ? 'password-error'
+            : null
         "
       ></p-password>
       <app-form-validation-error
@@ -44,16 +44,12 @@
         [toggleMask]="true"
         placeholder="••••••••"
         fluid
-        autocomplete="off"
+        autocomplete="new-password"
         [invalid]="form.controls.confirmPassword.invalid && form.controls.confirmPassword.touched"
         [attr.aria-invalid]="
           form.controls.confirmPassword.invalid && form.controls.confirmPassword.touched
         "
-        [attr.aria-describedby]="
-          form.controls.confirmPassword.touched && form.controls.confirmPassword.errors
-            ? 'confirm-password-error'
-            : null
-        "
+        [attr.aria-describedby]="confirmPasswordDescribedBy()"
       ></p-password>
       <app-form-validation-error
         id="confirm-password-error"
@@ -73,7 +69,7 @@
       [submitFullWidth]="true"
       [showCancel]="false"
       [callState]="store.callState()"
-      submitLabel="Iniciar Sesión"
+      submitLabel="Restablecer Contraseña"
       [isLoading]="store.loading()"
     />
   </form>

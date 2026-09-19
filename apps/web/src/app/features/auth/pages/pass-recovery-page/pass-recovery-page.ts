@@ -40,7 +40,6 @@ const passwordMatchValidator: ValidatorFn = (
     FormOptions,
   ],
   templateUrl: './pass-recovery-page.html',
-  styleUrl: './pass-recovery-page.css',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -62,6 +61,14 @@ export class PassRecoveryPage {
     },
     {validators: passwordMatchValidator},
   );
+
+  protected confirmPasswordDescribedBy(): string | null {
+    const ids: string[] = [];
+    const control = this.form.controls.confirmPassword;
+    if (control.touched && control.errors) ids.push('confirm-password-error');
+    if (this.form.touched && this.form.errors) ids.push('confirm-password-mismatch');
+    return ids.length ? ids.join(' ') : null;
+  }
 
   async doSubmit() {
     this.form.markAllAsTouched();

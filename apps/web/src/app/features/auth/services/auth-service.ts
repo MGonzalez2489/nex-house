@@ -20,8 +20,17 @@ export class AuthService {
     return this.request.post<SessionModel>(`${this.endpoint}/login`, credentials);
   }
 
-  refreshSession() {
-    return this.request.post<SessionModel>(`${this.endpoint}/refresh`, {}, undefined, {
+  refreshSession(): Observable<ApiResponse<Omit<SessionModel, 'refreshToken'>>> {
+    return this.request.post<Omit<SessionModel, 'refreshToken'>>(
+      `${this.endpoint}/refresh`,
+      {},
+      undefined,
+      {withCredentials: true},
+    );
+  }
+
+  logout(): Observable<ApiResponse<{message: string}>> {
+    return this.request.post<{message: string}>(`${this.endpoint}/logout`, {}, undefined, {
       withCredentials: true,
     });
   }

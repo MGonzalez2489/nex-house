@@ -61,4 +61,16 @@ describe('PassRecoveryRequestPage', () => {
 
     expect(navigateByUrl).not.toHaveBeenCalled();
   });
+
+  it('renders a single h1 and an accessible email field', () => {
+    fixture.detectChanges();
+
+    const headings = fixture.nativeElement.querySelectorAll('h1');
+    expect(headings).toHaveLength(1);
+    expect(headings[0].textContent).toContain('Encuentra tu cuenta');
+
+    const email: HTMLInputElement = fixture.nativeElement.querySelector('input#email');
+    expect(email).not.toBeNull();
+    expect(email.getAttribute('autocomplete')).toBe('email');
+  });
 });

@@ -2,25 +2,14 @@ import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Router, RouterLink} from '@angular/router';
 import {AUTH_ROUTES_ENUM} from '@auth/auth.routes';
+import {AuthEmailField} from '@auth/components';
 import {AuthStore} from '@auth/store';
-import {IconFieldModule} from '@openng/optimus-ui/iconfield';
-import {InputIconModule} from '@openng/optimus-ui/inputicon';
-import {InputTextModule} from '@openng/optimus-ui/inputtext';
-import {FormOptions, FormValidationErrorComponent} from '@shared/components/forms';
+import {FormOptions} from '@shared/components/forms';
 
 @Component({
   selector: 'app-pass-recovery-request-page',
-  imports: [
-    InputTextModule,
-    FormOptions,
-    ReactiveFormsModule,
-    FormValidationErrorComponent,
-    RouterLink,
-    InputIconModule,
-    IconFieldModule,
-  ],
+  imports: [FormOptions, ReactiveFormsModule, RouterLink, AuthEmailField],
   templateUrl: './pass-recovery-request-page.html',
-  styleUrl: './pass-recovery-request-page.css',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

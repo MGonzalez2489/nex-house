@@ -154,6 +154,47 @@ describe("AuthService", () => {
       });
     });
   });
+
+  describe("session lifecycle endpoints", () => {
+    it("should POST to refresh with credentials enabled", (done) => {
+      const { token, exp, user } = mockSession;
+      requestServiceMock.post.mockReturnValue(
+        of({ message: "ok", data: { token, exp, user } }),
+      );
+
+      service.refreshSession().subscribe({
+        next: (response) => {
+          expect(requestServiceMock.post).toHaveBeenCalledWith(
+            "/api/auth/refresh",
+            {},
+            undefined,
+            { withCredentials: true },
+          );
+          expect(response.data.token).toBe(mockSession.token);
+          done();
+        },
+      });
+    });
+
+    it("should POST to logout with credentials enabled", (done) => {
+      requestServiceMock.post.mockReturnValue(
+        of({ message: "ok", data: { message: "Logged out successfully" } }),
+      );
+
+      service.logout().subscribe({
+        next: (response) => {
+          expect(requestServiceMock.post).toHaveBeenCalledWith(
+            "/api/auth/logout",
+            {},
+            undefined,
+            { withCredentials: true },
+          );
+          expect(response.data.message).toBe("Logged out successfully");
+          done();
+        },
+      });
+    });
+  });
 });
 
 // describe('AuthService', () => {

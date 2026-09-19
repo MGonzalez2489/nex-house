@@ -50,11 +50,19 @@ export const AuthStore = signalStore(
   withProps(() => ({
     _authService: inject(AuthService),
   })),
-  withComputed(({token}) => ({
-    isAuthenticated: computed(() => !!token()),
+  withComputed(({token, exp}) => ({
+    isSessionExpired: computed(() => {
+      const expiration = exp();
+      return !!expiration && expiration <= Date.now();
+    }),
+    isAuthenticated: computed(() => {
+      if (!token()) return false;
+      const expiration = exp();
+      return !expiration || expiration > Date.now();
+    }),
   })),
   withMethods((store) => ({
-    loadSession: (newSession: SessionModel) => {
+    loadSession: (newSession: Pick<SessionModel, 'token' | 'exp'>) => {
       localStorage.setItem(APP_CONSTANTS.TOKEN_STORAGE_KEY, newSession.token);
       localStorage.setItem(APP_CONSTANTS.TOKEN_EXP, newSession.exp.toString());
       patchState(store, {
@@ -65,9 +73,11 @@ export const AuthStore = signalStore(
   })),
   withMethods((store) => ({
     clearSession: () => {
-      localStorage.clear();
+      localStorage.removeItem(APP_CONSTANTS.TOKEN_STORAGE_KEY);
+      localStorage.removeItem(APP_CONSTANTS.TOKEN_EXP);
+      localStorage.removeItem(APP_CONSTANTS.TOKEN_RESET_PWD);
       store.resetState();
-      patchState(store, {token: null, exp: 0});
+      patchState(store, {token: null, exp: 0, resetPwdToken: null});
     },
   })),
   withMethods((store) => {
@@ -84,15 +94,18 @@ export const AuthStore = signalStore(
           return false;
         }
       },
-      logout: async () => {
+      logout: async (): Promise<boolean> => {
         patchState(store, setLoading());
         try {
-          // await lastValueFrom(store._authService.logout());
-          store.clearSession();
+          await lastValueFrom(store._authService.logout());
+          return true;
         } catch (error) {
-          console.log('error', error);
           patchState(store, setError(error));
-          return undefined;
+          return false;
+        } finally {
+          // The local session must always be cleared, even when the server
+          // revocation fails, so the user is never left with a stale token.
+          store.clearSession();
         }
       },
     };

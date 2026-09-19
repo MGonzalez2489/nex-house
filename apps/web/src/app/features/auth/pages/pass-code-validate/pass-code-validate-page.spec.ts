@@ -64,4 +64,20 @@ describe('PassCodeValidatePage', () => {
 
     expect(navigateByUrl).not.toHaveBeenCalled();
   });
+
+  it('renders a single h1 and links the code input to its error element', () => {
+    fixture.detectChanges();
+
+    const headings = fixture.nativeElement.querySelectorAll('h1');
+    expect(headings).toHaveLength(1);
+    expect(headings[0].textContent).toContain('Valida tu código');
+
+    component.form.controls.code.setValue('BAD');
+    component.form.markAllAsTouched();
+    fixture.detectChanges();
+
+    const code: HTMLInputElement = fixture.nativeElement.querySelector('input#code');
+    expect(code.getAttribute('aria-describedby')).toBe('code-errors');
+    expect(fixture.nativeElement.querySelector('#code-errors')).not.toBeNull();
+  });
 });

@@ -1,0 +1,24 @@
+<div class="form-control">
+  <label [for]="inputId()" class="form-label">{{ label() }}</label>
+  <p-iconfield>
+    <p-inputicon class="pi pi-envelope" />
+    <input
+      pInputText
+      [id]="inputId()"
+      type="email"
+      autocomplete="email"
+      [formControl]="control()"
+      placeholder="nombre@ejemplo.com"
+      fluid
+      [invalid]="control().invalid && control().touched"
+      [attr.aria-invalid]="control().invalid && control().touched"
+      [attr.aria-describedby]="control().touched && control().errors ? errorId() : null"
+    />
+  </p-iconfield>
+  <app-form-validation-error
+    [id]="errorId()"
+    [touched]="control().touched"
+    [errors]="control().errors"
+    label="Email"
+  />
+</div>

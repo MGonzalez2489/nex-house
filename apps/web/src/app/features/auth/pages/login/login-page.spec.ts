@@ -71,4 +71,16 @@ describe('LoginPage', () => {
     expect(login).not.toHaveBeenCalled();
     expect(armLoading).not.toHaveBeenCalled();
   });
+
+  it('renders a single h1 heading and an accessible email field', () => {
+    fixture.detectChanges();
+
+    const headings = fixture.nativeElement.querySelectorAll('h1');
+    expect(headings).toHaveLength(1);
+    expect(headings[0].textContent).toContain('Bienvenido de vuelta');
+
+    const email: HTMLInputElement = fixture.nativeElement.querySelector('input#email');
+    expect(email).not.toBeNull();
+    expect(email.getAttribute('autocomplete')).toBe('email');
+  });
 });
