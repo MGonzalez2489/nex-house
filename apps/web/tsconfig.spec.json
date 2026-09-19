@@ -2,10 +2,11 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
-    "module": "commonjs",
-    "target": "es2016",
+    "module": "ES2022",
+    "target": "es2022",
+    "esModuleInterop": true,
     "types": ["jest", "node"],
-    "moduleResolution": "node10",
+    "moduleResolution": "Bundler",
     "paths": {
       "@nexhouse/shared-domain/enums": [
         "../../libs/shared-domain/src/lib/enums/index.ts"

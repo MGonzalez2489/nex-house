@@ -12,7 +12,8 @@ NX monorepo. Two apps, one shared lib.
 ## Commands
 
 - `nx serve api` / `nx serve web` — dev servers
-- `npm run test:api` — api unit tests (jest). **Repo-wide jest prerequisite:** NestJS publishes ESM-only packages, so every jest invocation must run with `NODE_OPTIONS=--experimental-vm-modules` (see Known broken state). The api script bakes the flag in; forward jest args through `--`, e.g. `npm run test:api -- --testPathPatterns=auth --watch`. Equivalent pattern for other projects: `NODE_OPTIONS=--experimental-vm-modules nx test web`.
+- `npm run test:api` — api unit tests (jest). **API prerequisite:** NestJS publishes ESM-only packages, so api/e2e jest invocations must run with `NODE_OPTIONS=--experimental-vm-modules` (see Known broken state). The api script bakes the flag in; forward jest args through `--`, e.g. `npm run test:api -- --testPathPatterns=auth --watch`.
+- `npm run test:web` — web unit tests (jest). **Do NOT pass `--experimental-vm-modules` for web**: jest-preset-angular v17 esbuilds `.mjs` files into CommonJS, and under the vm-modules flag jest places that output in an ESM sandbox → `ReferenceError: module is not defined`. Web jest requires `apps/web/tsconfig.spec.json` to keep `module: ES2022` / `moduleResolution: Bundler`.
 - `npm run test-api:cov` — `nx test api --coverage`
 - `nx lint api`, `nx lint web` — lint; root `npm run lint` lints everything
 - `nx e2e api-e2e` (jest) / `nx e2e web-e2e` (playwright)
@@ -21,7 +22,8 @@ NX monorepo. Two apps, one shared lib.
 
 ## Known broken state
 
-- **Jest + ESM (repo-wide):** jest detects ESM packages and fails with `ERR_REQUIRE_ESM` ("Must use import to load ES Module") whenever a `@nestjs/*` dependency is loaded unless Node runs with `NODE_OPTIONS=--experimental-vm-modules`. This is required for **every** jest run in this repo (API, e2e, and potentially web/shared-domain) — use `npm run test:api` (flag baked in) or prefix raw `nx test api` invocations with `NODE_OPTIONS=--experimental-vm-modules`. Note the `--watch` mode does not change anything; it is the Node flag that matters.
+- **Jest + ESM (API only):** jest detects ESM packages and fails with `ERR_REQUIRE_ESM` ("Must use import to load ES Module") whenever a `@nestjs/*` dependency is loaded unless Node runs with `NODE_OPTIONS=--experimental-vm-modules`. This is required for every API/e2e jest run — use `npm run test:api` (flag baked in) or prefix raw `nx test api` invocations with `NODE_OPTIONS=--experimental-vm-modules`. Note the `--watch` mode does not change anything; it is the Node flag that matters. **Web jest is the opposite**: run `npm run test:web` with no flag; passing `--experimental-vm-modules` breaks it with `ReferenceError: module is not defined` (jest-preset-angular v17 transforms `.mjs` to CJS, which the ESM sandbox rejects).
+- **Web test suite (pre-existing failures outside auth):** the web jest infrastructure is now fixed, but 13 spec files outside `features/auth` still fail at runtime (e.g. `sidebar-item.spec.ts` → `NG0950` required input missing in tests). Touch them only when working on those components.
 - **Pre-existing spec type errors (unrelated to recent refactors):** several spec files under `apps/api/src/administration/*` fail to compile (dangling references to renamed/removed members, e.g. `neigh-street.*.spec.ts`, `resident.service.spec.ts`, `user*.service.spec.ts`). Touch them only when working on those modules. The `catalogs.controller.spec.ts` type errors (`Expected 1 arguments, but got 0`) are fixed as of the catalogs refactor.
 
 ## Database & entities (no migrations)
