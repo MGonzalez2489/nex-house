@@ -1,85 +1,88 @@
-<div class="flex w-full items-center justify-center px-4 sm:px-6 md:py-8">
-  <div class="flex w-full max-w-210 justify-between">
+<div class="mx-auto w-full max-w-2xl px-4 sm:px-6 pb-24 lg:pb-6">
+  <!-- Cabecera -->
+  <div class="flex items-center justify-between">
     <p-button icon="pi pi-sign-out" class="scale-x-[-1]" text (click)="sessionService.logout()" />
     <app-brand-component />
     <p></p>
   </div>
-</div>
 
-<div class="flex w-full items-center justify-center px-4 sm:px-6">
-  <p-stepper [value]="activeStepIndex()">
-    <!-- CABECERA DEL STEPPER -->
-    <p-step-list>
-      @for (step of steps(); track step.id; let i = $index) {
-        <p-step [value]="i">
-          {{ step.label }}
-        </p-step>
-      }
-    </p-step-list>
+  <!-- Stepper -->
+  <div class="pt-6">
+    <p-stepper [value]="activeStepIndex()">
+      <!-- CABECERA DEL STEPPER -->
+      <p-step-list>
+        @for (step of steps(); track step.id; let i = $index) {
+          <p-step [value]="i">
+            {{ step.label }}
+          </p-step>
+        }
+      </p-step-list>
 
-    <!-- PANELS DE CONTENIDO DE CADA PASO -->
-    <p-step-panels>
-      @for (step of steps(); track step.id; let i = $index) {
-        <p-step-panel [value]="i">
-          <ng-template pTemplate="content">
-            <div class="py-6">
-              @switch (step.id) {
-                @case ('welcome') {
-                  <app-onboarding-welcome-component (next)="finishWelcome()" />
+      <!-- PANELS DE CONTENIDO DE CADA PASO -->
+      <p-step-panels>
+        @for (step of steps(); track step.id; let i = $index) {
+          <p-step-panel [value]="i">
+            <ng-template pTemplate="content">
+              <div class="py-6">
+                @switch (step.id) {
+                  @case ('welcome') {
+                    <app-onboarding-welcome-component (next)="finishWelcome()" />
+                  }
+                  @case ('security') {
+                    <app-onboarding-pwd-change-component
+                      [isLoading]="store.loading()"
+                      [callState]="store.callState()"
+                      [user]="userStore.user()"
+                      class="block"
+                      (prev)="goBack()"
+                      (doSubmit)="changePwd($event)"
+                      (next)="changePwd()"
+                    />
+                  }
+                  @case ('general-form') {
+                    <app-onboarding-general-component
+                      [isLoading]="store.loading()"
+                      [callState]="store.callState()"
+                      [profile]="userStore.profile()"
+                      class="block"
+                      (doSubmit)="updateProfile($event)"
+                      (prev)="goBack()"
+                      (next)="goNext()"
+                    />
+                  }
+                  @case ('create-unit') {
+                    <app-onboarding-unit-component
+                      [isLoading]="store.loading()"
+                      [callState]="store.callState()"
+                      [unitRoles]="catalogsStore.UserUnitRoles()"
+                      [unitTypes]="catalogsStore.UnitTypes()"
+                      [streets]="contextStore.streets()"
+                      [user]="userStore.user()"
+                      (prev)="goBack()"
+                      (next)="goNext()"
+                      (doSubmit)="createUnit($event)"
+                    />
+                  }
+                  @case ('complete') {
+                    <app-onboarding-finish-component
+                      [profile]="userStore.profile()"
+                      [user]="userStore.user()"
+                      [role]="userStore.role()"
+                      [units]="userStore.units()"
+                      (complete)="completeOnboarding()"
+                    />
+                  }
                 }
-                @case ('security') {
-                  <app-onboarding-pwd-change-component
-                    [isLoading]="store.loading()"
-                    [callState]="store.callState()"
-                    [user]="userStore.user()"
-                    class="block"
-                    (prev)="goBack()"
-                    (doSubmit)="changePwd($event)"
-                    (next)="changePwd()"
-                  />
-                }
-                @case ('general-form') {
-                  <app-onboarding-general-component
-                    [isLoading]="store.loading()"
-                    [callState]="store.callState()"
-                    [profile]="userStore.profile()"
-                    class="block"
-                    (doSubmit)="updateProfile($event)"
-                    (prev)="goBack()"
-                    (next)="goNext()"
-                  />
-                }
-                @case ('create-unit') {
-                  <app-onboarding-unit-component
-                    [isLoading]="store.loading()"
-                    [callState]="store.callState()"
-                    [unitRoles]="catalogsStore.UserUnitRoles()"
-                    [unitTypes]="catalogsStore.UnitTypes()"
-                    [streets]="contextStore.streets()"
-                    [user]="userStore.user()"
-                    (prev)="goBack()"
-                    (next)="goNext()"
-                    (doSubmit)="createUnit($event)"
-                  />
-                }
-                @case ('complete') {
-                  <app-onboarding-finish-component
-                    [profile]="userStore.profile()"
-                    [user]="userStore.user()"
-                    [role]="userStore.role()"
-                    [units]="userStore.units()"
-                    (complete)="completeOnboarding()"
-                  />
-                }
-              }
-            </div>
-          </ng-template>
-        </p-step-panel>
-      }
-    </p-step-panels>
-  </p-stepper>
+              </div>
+            </ng-template>
+          </p-step-panel>
+        }
+      </p-step-panels>
+    </p-stepper>
+  </div>
+
+  <p class="pt-8 text-center text-xs text-slate-400 dark:text-slate-500">
+    ¿Necesitas ayuda?
+    <a href="#" class="text-cyan-600 dark:text-cyan-400 hover:underline">Contáctanos</a>
+  </p>
 </div>
-<p class="px-4 text-center text-xs text-slate-400 dark:text-slate-500 mt-6">
-  ¿Necesitas ayuda?
-  <a href="#" class="text-cyan-600 dark:text-cyan-400 hover:underline">Contáctanos</a>
-</p>

@@ -32,9 +32,18 @@ changed" optimization.
 
 ## Responsive (mobile-first) layout
 
-- Outer wrappers are `w-full` with `px-4 sm:px-6` horizontal padding; the header
-  row caps at `max-w-210` (≈840px) instead of a fixed `w-210`, so the wizard fits
-  any viewport without being clipped.
+- The whole page lives in a single centered column:
+  `mx-auto w-full max-w-2xl px-4 sm:px-6 pb-24 lg:pb-6` — the exact container used
+  by `resident-form-page` / `neigh-form-page`. On desktop the wizard occupies only
+  the needed width (`max-w-2xl`, 672px) centered on screen with `pb-24 lg:pb-6`
+  gutter at the bottom to clear the mobile nav bar.
+- The header row (`logout` / `brand` / spacer) and the Optimus-UI stepper share
+  this one container, so they stay aligned with the wizard instead of scrolling
+  independently.
+- Mobile-first: the container is `w-full` with `px-4 sm:px-6` horizontal padding,
+  so nothing overflows the viewport. The stepper's own step-list scrolls
+  horizontally (`overflow-x: auto`) and each step form collapses its grids
+  (`grid-cols-1 md:grid-cols-*`) on small screens.
 - No viewport-based widths/fixed pixel containers; the Optimus-UI stepper stacks
   its panel below the step list on small screens on its own.
 
