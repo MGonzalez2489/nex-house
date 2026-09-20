@@ -1,26 +1,109 @@
-@if (profile(); as profile) {
-  <p-panel showHeader="false" class="pt-4">
-    <div class="text-center py-4">
-      <div
-        class="h-16 w-16 rounded-full bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center mx-auto mb-5"
-      >
-        <i
-          class="pi pi-check text-emerald-600 dark:text-emerald-400 text-2xl"
-        ></i>
-      </div>
-      <h1
-        class="font-display text-2xl capi font-semibold text-slate-900 dark:text-white"
-      >
-        ¡Todo listo,
-        <span id="doneName" class="capitalize">{{ profile.firstName }}</span
-        >!
-      </h1>
-      <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">
-        Tu perfil se configuró correctamente. Ya puedes comenzar a usar Nimbus.
-      </p>
-      <div class="mt-12">
-        <p-button label="Ir al Dashboard" fluid (click)="complete.emit()" />
-      </div>
+<p-panel showHeader="false" class="pt-4">
+  <div class="text-center py-4">
+    <div
+      class="h-16 w-16 rounded-full bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center mx-auto mb-5"
+    >
+      <i class="pi pi-check text-emerald-600 dark:text-emerald-400 text-2xl" aria-hidden="true"></i>
     </div>
-  </p-panel>
-}
+    <h1 class="font-display text-2xl font-semibold text-slate-900 dark:text-white" id="doneTitle">
+      @if (firstName()) {
+        ¡Todo listo, <span class="capitalize">{{ firstName() }}</span>!
+      } @else {
+        ¡Todo listo!
+      }
+    </h1>
+    <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">
+      Tu cuenta se configuró correctamente. Ya puedes comenzar a usar Nimbus.
+    </p>
+  </div>
+
+  <section aria-label="Resumen de tu cuenta" class="mt-3 grid gap-3 sm:grid-cols-2 text-left">
+    <article
+      class="rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 p-4"
+    >
+      <div class="flex items-center gap-2">
+        <i class="pi pi-user text-sm text-cyan-600 dark:text-cyan-400" aria-hidden="true"></i>
+        <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+          Tu cuenta
+        </h2>
+      </div>
+
+      <dl class="mt-4 space-y-2.5 text-sm">
+        <div class="flex items-center justify-between gap-3">
+          <dt class="text-slate-400 dark:text-slate-500">Nombre</dt>
+          <dd class="font-medium text-slate-700 dark:text-slate-200 capitalize truncate">
+            {{ displayName() || '—' }}
+          </dd>
+        </div>
+        <div class="flex items-center justify-between gap-3">
+          <dt class="text-slate-400 dark:text-slate-500">Correo</dt>
+          <dd class="font-medium text-slate-700 dark:text-slate-200 truncate">
+            {{ user()?.email || '—' }}
+          </dd>
+        </div>
+        @if (role(); as role) {
+          <div class="flex items-center justify-between gap-3">
+            <dt class="text-slate-400 dark:text-slate-500">Rol</dt>
+            <dd class="font-medium text-slate-700 dark:text-slate-200">{{ role.displayName }}</dd>
+          </div>
+        }
+      </dl>
+    </article>
+
+    <article
+      class="rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 p-4"
+    >
+      <div class="flex items-center gap-2">
+        <i class="pi pi-home text-sm text-cyan-600 dark:text-cyan-400" aria-hidden="true"></i>
+        <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+          Tu unidad
+        </h2>
+      </div>
+
+@if (unit(); as unit) {
+          <dl class="mt-4 space-y-2.5 text-sm">
+            <div class="flex items-center justify-between gap-3">
+              <dt class="text-slate-400 dark:text-slate-500">Identificador</dt>
+              <dd class="font-medium text-slate-700 dark:text-slate-200 uppercase truncate">
+                {{ unit.unit.identifier }}
+              </dd>
+            </div>
+            @if (unit.unit.street; as street) {
+              <div class="flex items-center justify-between gap-3">
+                <dt class="text-slate-400 dark:text-slate-500">Calle</dt>
+                <dd class="font-medium text-slate-700 dark:text-slate-200">{{ street.name }}</dd>
+              </div>
+            }
+            @if (unit.unit.type; as type) {
+              <div class="flex items-center justify-between gap-3">
+                <dt class="text-slate-400 dark:text-slate-500">Tipo</dt>
+                <dd class="font-medium text-slate-700 dark:text-slate-200">{{ type.displayName }}</dd>
+              </div>
+            }
+            @if (unit.userUnitRole; as role) {
+              <div class="flex items-center justify-between gap-3">
+                <dt class="text-slate-400 dark:text-slate-500">Relación</dt>
+                <dd class="font-medium text-slate-700 dark:text-slate-200">
+                  {{ role.displayName }}
+                </dd>
+              </div>
+            }
+            <div class="flex items-center justify-between gap-3">
+              <dt class="text-slate-400 dark:text-slate-500">Habita la unidad</dt>
+              <dd class="font-semibold text-slate-700 dark:text-slate-200">
+                {{ unit.isCurrentOccupant ? 'Sí' : 'No' }}
+              </dd>
+            </div>
+          </dl>
+        } @else {
+        <p class="mt-4 text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+          Aún no tienes una unidad asignada.
+        </p>
+      }
+    </article>
+  </section>
+
+  <div class="mt-10">
+    <p-button label="Ir al Dashboard" fluid (click)="complete.emit()" />
+  </div>
+</p-panel>

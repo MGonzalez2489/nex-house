@@ -10,14 +10,20 @@ import {
 } from '@angular/forms';
 import {ChangePassword} from '@nexhouse/shared-domain/interfaces';
 import {UserModel} from '@nexhouse/shared-domain/models';
-import {Button} from '@openng/optimus-ui/button';
+import {CallState} from '@ngrx-toolkit/core';
 import {Panel} from '@openng/optimus-ui/panel';
 import {PasswordModule} from '@openng/optimus-ui/password';
-import {FormValidationErrorComponent} from '@shared/components/forms';
+import {FormOptions, FormValidationErrorComponent} from '@shared/components/forms';
 
 @Component({
   selector: 'app-onboarding-pwd-change-component',
-  imports: [PasswordModule, ReactiveFormsModule, FormValidationErrorComponent, Panel, Button],
+  imports: [
+    PasswordModule,
+    ReactiveFormsModule,
+    FormValidationErrorComponent,
+    FormOptions,
+    Panel,
+  ],
   templateUrl: './onboarding-pwd-change-component.html',
   styleUrl: './onboarding-pwd-change-component.css',
   standalone: true,
@@ -27,6 +33,7 @@ export class OnboardingPwdChangeComponent {
   protected readonly Validators = Validators;
 
   isLoading = input.required<boolean>();
+  callState = input<CallState>();
   user = input<UserModel>();
   next = output();
   doSubmit = output<ChangePassword>();

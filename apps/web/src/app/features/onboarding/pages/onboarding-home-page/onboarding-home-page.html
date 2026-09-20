@@ -1,12 +1,12 @@
-<div class="flex items-center justify-center md:py-8">
-  <div class="flex justify-between w-210">
+<div class="flex w-full items-center justify-center px-4 sm:px-6 md:py-8">
+  <div class="flex w-full max-w-210 justify-between">
     <p-button icon="pi pi-sign-out" class="scale-x-[-1]" text (click)="sessionService.logout()" />
     <app-brand-component />
     <p></p>
   </div>
 </div>
 
-<div class="flex items-center justify-center">
+<div class="flex w-full items-center justify-center px-4 sm:px-6">
   <p-stepper [value]="activeStepIndex()">
     <!-- CABECERA DEL STEPPER -->
     <p-step-list>
@@ -30,6 +30,7 @@
                 @case ('security') {
                   <app-onboarding-pwd-change-component
                     [isLoading]="store.loading()"
+                    [callState]="store.callState()"
                     [user]="userStore.user()"
                     class="block"
                     (prev)="goBack()"
@@ -40,6 +41,7 @@
                 @case ('general-form') {
                   <app-onboarding-general-component
                     [isLoading]="store.loading()"
+                    [callState]="store.callState()"
                     [profile]="userStore.profile()"
                     class="block"
                     (doSubmit)="updateProfile($event)"
@@ -49,6 +51,8 @@
                 }
                 @case ('create-unit') {
                   <app-onboarding-unit-component
+                    [isLoading]="store.loading()"
+                    [callState]="store.callState()"
                     [unitRoles]="catalogsStore.UserUnitRoles()"
                     [unitTypes]="catalogsStore.UnitTypes()"
                     [streets]="contextStore.streets()"
@@ -61,6 +65,9 @@
                 @case ('complete') {
                   <app-onboarding-finish-component
                     [profile]="userStore.profile()"
+                    [user]="userStore.user()"
+                    [role]="userStore.role()"
+                    [units]="userStore.units()"
                     (complete)="completeOnboarding()"
                   />
                 }
@@ -72,7 +79,7 @@
     </p-step-panels>
   </p-stepper>
 </div>
-<p class="text-center text-xs text-slate-400 dark:text-slate-500 mt-6">
+<p class="px-4 text-center text-xs text-slate-400 dark:text-slate-500 mt-6">
   ¿Necesitas ayuda?
   <a href="#" class="text-cyan-600 dark:text-cyan-400 hover:underline">Contáctanos</a>
 </p>

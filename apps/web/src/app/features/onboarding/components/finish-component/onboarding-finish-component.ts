@@ -1,13 +1,18 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  inject,
+  computed,
   input,
   output,
 } from "@angular/core";
 import { Button } from "@openng/optimus-ui/button";
 import { Panel } from "@openng/optimus-ui/panel";
-import { UserProfileModel } from "@nexhouse/shared-domain/models";
+import {
+  UserModel,
+  UserProfileModel,
+  UserRoleModel,
+  UserUnitModel,
+} from "@nexhouse/shared-domain/models";
 
 @Component({
   selector: "app-onboarding-finish-component",
@@ -19,17 +24,21 @@ import { UserProfileModel } from "@nexhouse/shared-domain/models";
 })
 export class OnboardingFinishComponent {
   profile = input<UserProfileModel>();
+  user = input<UserModel>();
+  role = input<UserRoleModel>();
+  units = input<UserUnitModel[]>([]);
+
   complete = output();
 
-  // private readonly router = inject(Router);
-  // readonly user = input<UserModel>();
-  // readonly profile = input<UserProfileModel>();
-  //
-  // goDashboard() {
-  //   // this.router.resetConfig(DASHBOARD_ROUTES);
-  //   // const urlTree = this.router.createUrlTree([
-  //   //   `/${DASHBOARD_ROUTES_ENUM.HOME}`,
-  //   // ]);
-  //   this.router.navigateByUrl(`/${DASHBOARD_ROUTES_ENUM.HOME}`);
-  // }
+  protected readonly firstName = computed(() => this.profile()?.firstName);
+
+  protected readonly displayName = computed(() => {
+    const fullName = this.profile()?.fullName;
+    if (fullName && fullName !== "null") {
+      return fullName;
+    }
+    return this.user()?.email ?? "";
+  });
+
+  protected readonly unit = computed(() => this.units()[0]);
 }

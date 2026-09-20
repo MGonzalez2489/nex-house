@@ -52,7 +52,7 @@ describe('UserController', () => {
       {
         status: true,
         role: true,
-        userUnits: { unit: true, userUnitRole: true },
+        userUnits: { unit: { street: true, type: true }, userUnitRole: true },
       },
     );
   });

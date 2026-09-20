@@ -97,6 +97,14 @@ export class OnboardingHomePage {
   }
   protected async updateProfile(dto?: FormData) {
     if (dto) {
+      // ProfileFormComponent#preparePayload only appends the fields that
+      // changed, so an empty payload means the data already exists and is
+      // unchanged: advance without hitting the server.
+      const hasChanges = Array.from(dto.keys()).length > 0;
+      if (!hasChanges) {
+        this.goNext();
+        return;
+      }
       await this.store.updateProfile(dto);
       this.userStore.loadProfile();
     } else {
@@ -105,7 +113,14 @@ export class OnboardingHomePage {
   }
   protected async createUnit(dto?: CreateUnit) {
     if (dto) {
+      // The user already has a unit assigned (e.g. revisiting the step), so
+      // advancing without sending a request avoids a duplicate creation.
+      if (this.userStore.units().length > 0) {
+        this.goNext();
+        return;
+      }
       await this.store.createUnit(dto);
+      await this.userStore.loadUser();
     } else {
       this.goNext();
     }

@@ -8,7 +8,7 @@ Exposes the authenticated user's own account operations under `user`.
 
 | Method | Route | Description |
 |---|---|---|
-| `GET` | `/user` | Returns the authenticated user with `status`, `role` and `userUnits` (`unit`, `userUnitRole`) relations |
+| `GET` | `/user` | Returns the authenticated user with `status`, `role` and `userUnits` relations (`unit` includes `street` and `type`; plus `userUnitRole`) |
 | `GET` | `/user/stats` | Returns neighborhood-scoped user metrics (`UserStats`) |
 | `PATCH` | `/user` | Updates the authenticated user (role and/or unit assignment) |
 

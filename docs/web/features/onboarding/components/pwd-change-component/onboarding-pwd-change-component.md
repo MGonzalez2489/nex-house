@@ -13,6 +13,8 @@ continuing.
 
 - `isLoading = input.required<boolean>()` — disables inputs and flips the submit
   button to its loading state while the password change request is in flight.
+- `callState = input<CallState>()` — passed to `FormOptions` so a failed password
+  change surfaces its server error through `FormFeedback`.
 - `user = input<UserModel>()` — used by `requirePwdChange()` to decide whether the
   panel shows the form (temporary password present) or the success/continuation
   message.
@@ -22,7 +24,7 @@ continuing.
 - `prev`, `next` — step navigation events.
 - `doSubmit` — emits the `ChangePassword` payload from `onSubmit()`.
 
-## Behandaivior
+## Behavior
 
 - `requirePwdChange()` returns `true` when `user()` is missing or
   `user().requirePwdChange` is `true`.
@@ -30,6 +32,11 @@ continuing.
   `passwordsMatchValidator` (non-null group validator), and trims whitespace.
 - `FormValidationErrorComponent` (`@shared/components/forms`) surfaces per-field
   validation messages.
+- Both branches render `app-form-options` (Continuar/Atrás): in the form branch it
+  sits inside the `<form (ngSubmit)>` (submit is `type="submit"`), while the
+  post-success branch wraps it in its own `<form (ngSubmit)="next.emit()">`.
+  `FormOptions` uses `flex-col-reverse sm:flex-row` so the buttons stack
+  full-width on mobile.
 
 ## Template notes
 

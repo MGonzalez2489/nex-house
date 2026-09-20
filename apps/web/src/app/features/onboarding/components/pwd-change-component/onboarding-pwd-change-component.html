@@ -98,24 +98,13 @@
         />
       </div>
       <!-- options -->
-      <div class="flex items-center gap-3 pt-2">
-        <p-button
-          label="Atrás"
-          icon="pi pi-arrow-left"
-          variant="outlined"
-          severity="secondary"
-          [disabled]="isLoading()"
-          (click)="prev.emit()"
-        />
-
-        <p-button
-          label="Continuar"
-          icon="pi pi-arrow-right"
-          iconPos="right"
-          fluid
-          type="submit"
-          class="w-full"
-          [loading]="isLoading()"
+      <div class="pt-2">
+        <app-form-options
+          submitLabel="Continuar"
+          cancelLabel="Atrás"
+          [callState]="callState()"
+          [isLoading]="isLoading()"
+          (doCancel)="prev.emit()"
         />
       </div>
     </form>
@@ -131,25 +120,15 @@
       </h2>
     </div>
 
-    <div class="flex items-center gap-3 pt-2">
-      <p-button
-        label="Atrás"
-        icon="pi pi-arrow-left"
-        variant="outlined"
-        severity="secondary"
-        [disabled]="isLoading()"
-        (click)="prev.emit()"
-      />
-
-      <p-button
-        label="Continuar"
-        icon="pi pi-arrow-right"
-        iconPos="right"
-        fluid
-        [loading]="isLoading()"
-        (click)="next.emit()"
-        class="w-full"
-      />
-    </div>
+    <form (ngSubmit)="next.emit()">
+      <div class="pt-2">
+        <app-form-options
+          submitLabel="Continuar"
+          cancelLabel="Atrás"
+          [isLoading]="isLoading()"
+          (doCancel)="prev.emit()"
+        />
+      </div>
+    </form>
   }
 </p-panel>

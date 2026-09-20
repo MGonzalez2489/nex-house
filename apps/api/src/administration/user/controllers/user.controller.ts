@@ -24,10 +24,9 @@ export class UserController {
       {
         status: true,
         role: true,
-        userUnits: { unit: true, userUnitRole: true },
+        userUnits: { unit: { street: true, type: true }, userUnitRole: true },
       },
-    );
-  }
+    );  }
 
   @Get('stats')
   @ApiOperation({ summary: 'Get user metrics for the active neighborhood' })
