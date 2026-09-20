@@ -11,6 +11,7 @@ describe("OnboardingPwdChangeComponent", () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(OnboardingPwdChangeComponent);
+    fixture.componentRef.setInput("isLoading", false);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

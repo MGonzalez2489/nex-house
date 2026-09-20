@@ -56,6 +56,11 @@ export const OnboardingStore = signalStore(
       try {
         const res = await lastValueFrom(store._service.changePassword(dto));
         patchState(store, {...res.data}, setLoaded());
+
+        // The API flips `requirePwdChange` server-side; refresh the cached user
+        // so the security step (and any downstream "changed" branch) stay in sync.
+        await store._userStore.loadUser();
+
         return true;
       } catch (err) {
         patchState(store, setError(err));
@@ -87,12 +92,18 @@ export const OnboardingStore = signalStore(
     complete: async () => {
       patchState(store, setLoading());
       try {
-        const res = await lastValueFrom(store._service.complete());
-        patchState(store, {...res.data});
+        // The API `complete` endpoint answers with `{success: boolean}`, not an
+        // onboarding-status payload, so we must NOT spread it into the store.
+        await lastValueFrom(store._service.complete());
 
+        // Once onboarding is done, the user's status flips to ACTIVE server-side.
         await store._userStore.loadUser();
 
-        patchState(store, setLoaded());
+        patchState(
+          store,
+          {isCompleted: true, currentStepId: OnboardingStepEnum.COMPLETE},
+          setLoaded(),
+        );
         return true;
       } catch (err) {
         patchState(store, setError(err));

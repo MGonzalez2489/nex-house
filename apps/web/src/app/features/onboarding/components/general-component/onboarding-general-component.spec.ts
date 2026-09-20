@@ -11,6 +11,7 @@ describe("OnboardingGeneralComponent", () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(OnboardingGeneralComponent);
+    fixture.componentRef.setInput("isLoading", false);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

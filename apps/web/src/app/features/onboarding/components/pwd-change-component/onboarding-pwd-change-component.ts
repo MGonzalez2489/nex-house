@@ -24,6 +24,8 @@ import {FormValidationErrorComponent} from '@shared/components/forms';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OnboardingPwdChangeComponent {
+  protected readonly Validators = Validators;
+
   isLoading = input.required<boolean>();
   user = input<UserModel>();
   next = output();
@@ -40,7 +42,6 @@ export class OnboardingPwdChangeComponent {
   private passwordsMatchValidator: ValidatorFn = (
     control: AbstractControl,
   ): ValidationErrors | null => {
-    // Ensure the control is a FormGroup before proceeding
     if (!(control instanceof FormGroup)) {
       return null;
     }
@@ -48,18 +49,23 @@ export class OnboardingPwdChangeComponent {
     const newPwd = formGroup.get('newPwd');
     const confirmPwd = formGroup.get('confirmPwd');
 
-    // Only validate if both controls exist and have values
-    if (newPwd && confirmPwd && newPwd.value !== confirmPwd.value) {
-      // Set error on the confirmPwd control for better UX
-      confirmPwd.setErrors({mismatch: true});
-      return {mismatch: true}; // Return error at the form group level
+    if (!newPwd || !confirmPwd) {
+      return null;
     }
 
-    // If they match, clear the error from confirmPwd if it was previously set
-    if (confirmPwd && confirmPwd.hasError('passwordsMismatch')) {
-      confirmPwd.setErrors(null);
+    if (newPwd.value !== confirmPwd.value) {
+      confirmPwd.setErrors({mismatch: true});
+      return {mismatch: true};
     }
-    return null; // Pass validation
+
+    if (confirmPwd.hasError('mismatch')) {
+      const remainingErrors = {...confirmPwd.errors};
+      delete remainingErrors.mismatch;
+      confirmPwd.setErrors(
+        Object.keys(remainingErrors).length > 0 ? remainingErrors : null,
+      );
+    }
+    return null;
   };
 
   protected readonly form = new FormGroup(

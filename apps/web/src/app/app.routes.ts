@@ -1,6 +1,7 @@
 import {Route} from '@angular/router';
 import {AuthGuard} from '@auth/guards';
 import {AccessGuard} from '@core/guards';
+import {onboardingRequiredGuard} from './_core/guards/onboarding-required-guard';
 import {ShellResolver} from '@core/resolvers';
 import {DASHBOARD_ROUTES_ENUM} from '@dashboard/index';
 import {UserRoleEnum} from '@nexhouse/shared-domain/enums';
@@ -22,14 +23,13 @@ export const appRoutes: Route[] = [
   {
     path: '',
     component: MainLayout,
-    // canActivate: [AuthGuard, onboardingRequiredGuard],
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, onboardingRequiredGuard],
     resolve: {shell: ShellResolver},
     children: [
       {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
       {
         path: ONBOARDING_ROUTES_ENUM.HOME,
-        // canActivate: [onboardingRequiredGuard],
+        canActivate: [onboardingRequiredGuard],
         loadChildren: () =>
           import('./features/onboarding/onboarding.routes').then((m) => m.ONBOARDING_ROUTES),
       },

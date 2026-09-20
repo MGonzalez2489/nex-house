@@ -111,8 +111,10 @@ export class OnboardingHomePage {
     }
   }
   protected async completeOnboarding() {
-    await this.store.complete();
-    this.router.navigateByUrl(`/${DASHBOARD_ROUTES_ENUM.HOME}`);
+    const completed = await this.store.complete();
+    if (completed) {
+      this.router.navigateByUrl(`/${DASHBOARD_ROUTES_ENUM.HOME}`);
+    }
   }
 
   protected goBack() {
