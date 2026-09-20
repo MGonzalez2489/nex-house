@@ -60,10 +60,8 @@ export class OnboardingPwdChangeComponent {
 
     if (confirmPwd.hasError('mismatch')) {
       const remainingErrors = {...confirmPwd.errors};
-      delete remainingErrors.mismatch;
-      confirmPwd.setErrors(
-        Object.keys(remainingErrors).length > 0 ? remainingErrors : null,
-      );
+      delete remainingErrors['mismatch'];
+      confirmPwd.setErrors(Object.keys(remainingErrors).length > 0 ? remainingErrors : null);
     }
     return null;
   };

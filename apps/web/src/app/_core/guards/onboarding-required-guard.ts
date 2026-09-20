@@ -12,7 +12,11 @@ export const onboardingRequiredGuard: CanActivateFn = (route, state) => {
   const dashboardRoute = `/${DASHBOARD_ROUTES_ENUM.HOME}`;
 
   const status = profileStore.status();
-  if (!status) return false;
+  // Profile not loaded yet (e.g. right after login, before the ShellResolver ran):
+  // there is nothing to decide, so let the resolver initialize the app and redirect
+  // PENDING_ONBOARDING users. Returning false here would cancel the navigation and
+  // leave the splash stuck on LOADING with the URL still on /auth/login.
+  if (!status) return true;
 
   //if pending and not going to onboarding -> redirect to onboarding
   if (status.name === UserStatusEnum.PENDING_ONBOARDING && !state.url.includes(onboardingRoute)) {

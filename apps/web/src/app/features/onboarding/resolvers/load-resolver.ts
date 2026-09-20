@@ -1,14 +1,14 @@
-import { inject } from "@angular/core";
-import { ResolveFn, Router } from "@angular/router";
-import { OnboardingStore } from "@onboarding/onboarding.store";
-import { PAGES_ROUTES_ENUM } from "../../../pages/pages.routes";
-import { UserStore } from "@user/user.store";
-import { UserStatusEnum } from "@nexhouse/shared-domain/enums";
-import { DASHBOARD_ROUTES_ENUM } from "@dashboard/dashboard.routes";
+import {inject} from '@angular/core';
+import {ResolveFn, Router} from '@angular/router';
+import {PAGES_ROUTES_ENUM} from '../../../pages/pages.routes';
+import {UserStore} from '@user/user.store';
+import {UserStatusEnum} from '@nexhouse/shared-domain/enums';
+import {DASHBOARD_ROUTES_ENUM} from '@dashboard/dashboard.routes';
+import {OnboardingStore} from '@onboarding/onboarding.store';
 
 export const loadResolver: ResolveFn<boolean> = async (route, state) => {
   const router = inject(Router);
-  const onboardingStore = inject(OnboardingStoreExecutor);
+  const onboardingStore = inject(OnboardingStore);
   const userStore = inject(UserStore);
 
   // Deduplicate: skip a redundant load if we already have data or are fetching.
