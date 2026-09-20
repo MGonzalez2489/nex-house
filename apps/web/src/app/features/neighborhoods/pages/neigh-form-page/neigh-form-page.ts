@@ -1,4 +1,12 @@
-import {ChangeDetectionStrategy, Component, inject, input, OnInit, signal} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  input,
+  OnInit,
+  signal,
+} from "@angular/core";
 import {
   FormArray,
   FormBuilder,
@@ -10,11 +18,7 @@ import {
 import {Router} from '@angular/router';
 import {NEIGHBORHOOD_ROUTES_ENUM} from '@neighborhoods/neighborhood.routes';
 import {NeighborhoodsStore} from '@neighborhoods/neighborhood.store';
-import {
-  CreateNeighStreet,
-  UpdateNeighborhood,
-  UpdateNeighStreet,
-} from '@nexhouse/shared-domain/interfaces';
+import { CreateNeighStreet } from "@nexhouse/shared-domain/interfaces";
 import {NeighborhoodModel} from '@nexhouse/shared-domain/models';
 import {Badge} from '@openng/optimus-ui/badge';
 import {Button} from '@openng/optimus-ui/button';
@@ -25,6 +29,7 @@ import {FormOptions, FormValidationErrorComponent} from '@shared/components/form
 
 import {SelectModule} from '@openng/optimus-ui/select';
 import {CatalogsStore} from '@stores/catalogs.store';
+import {mapCreateNeighborhoodPayload, mapUpdateNeighborhoodPayload} from './neigh-form.mapper';
 @Component({
   selector: 'app-neigh-form-page',
   imports: [
@@ -51,6 +56,8 @@ export class NeighFormPage implements OnInit {
 
   readonly id = input<string>();
   readonly neighborhood = signal<NeighborhoodModel | undefined>(undefined);
+
+  readonly isEdit = computed(() => Boolean(this.id()));
 
   readonly form = this.fb.nonNullable.group({
     name: this.fb.nonNullable.control('', [Validators.required, Validators.minLength(3)]),
@@ -88,18 +95,18 @@ export class NeighFormPage implements OnInit {
     const cStates = this.catStore.states();
     const cCities = this.catStore.cities();
 
-    if (cCountry.length === 0) return;
-    if (cStates.length === 0) return;
-    if (cCities.length === 0) return;
+    if (cCountry.length === 0 || cStates.length === 0 || cCities.length === 0) {
+      return;
+    }
 
-    const mex = cCountry[0];
+    const mex = cCountry.find((f) => f.name === 'mexico');
     const chi = cStates.find((f) => f.name === 'chihuahua');
     const chic = cCities.find((f) => f.name === 'chihuahua');
 
     this.form.patchValue({
-      countryId: mex.publicId,
-      stateId: chi?.publicId,
-      cityId: chic?.publicId,
+      countryId: mex?.publicId ?? '',
+      stateId: chi?.publicId ?? '',
+      cityId: chic?.publicId ?? '',
     });
     this.form.updateValueAndValidity();
   }
@@ -156,6 +163,7 @@ export class NeighFormPage implements OnInit {
   }
 
   private initForCreate() {
+    this.setCreationFieldsEnabled(true);
     this.addStreet();
   }
   private async initForUpdate(id: string) {
@@ -165,7 +173,15 @@ export class NeighFormPage implements OnInit {
     this.form.patchValue({
       name: cN.name,
       active: cN.isActive,
+      zipCode: cN.address?.zipCode ?? '',
     });
+
+    if (cN.address?.city) {
+      this.form.patchValue({
+        stateId: cN.address.city.state?.publicId ?? this.form.controls.stateId.value,
+        cityId: cN.address.city.publicId ?? this.form.controls.cityId.value,
+      });
+    }
 
     while (this.streets.length !== 0) {
       this.streets.removeAt(0);
@@ -178,20 +194,35 @@ export class NeighFormPage implements OnInit {
     if (cN.streets.length === 0) {
       this.streets.push(this.createStreetFormGroup());
     }
+
+    // The PATCH endpoint does not manage location or the first admin, so those
+    // fields are locked on creation only forms.
+    this.setCreationFieldsEnabled(false);
+    this.form.updateValueAndValidity();
+  }
+
+  /**
+   * Enables/disables the creation-only controls (location + first admin). In
+   * edit mode the controls stay disabled so their validators do not block the
+   * update submit while the payload remains API-compatible.
+   */
+  private setCreationFieldsEnabled(enabled: boolean): void {
+    const controls = [
+      this.form.controls.countryId,
+      this.form.controls.stateId,
+      this.form.controls.cityId,
+      this.form.controls.zipCode,
+      this.form.controls.firstAdminEmail,
+    ];
+    controls.forEach((control) =>
+      enabled ? control.enable() : control.disable(),
+    );
   }
 
   private async create() {
-    const {name, active, streets, firstAdminEmail, cityId, zipCode} = this.form.getRawValue();
-    const response = await this.store.create({
-      name,
-      adminEmail: firstAdminEmail,
-      streets: streets.map((streetFormValue) => {
-        return {name: streetFormValue.name};
-      }),
-      isActive: active,
-      cityId,
-      zipCode: zipCode,
-    });
+    const response = await this.store.create(
+      mapCreateNeighborhoodPayload(this.form.getRawValue()),
+    );
     return response;
   }
 
@@ -199,27 +230,10 @@ export class NeighFormPage implements OnInit {
     const cId = this.id();
     if (!cId) return;
 
-    const {name, active, streets} = this.form.getRawValue();
-
-    // Map the form values to CreateNeighStreet, conditionally including publicId
-    const fStreets: UpdateNeighStreet[] = streets.map((streetFormValue) => {
-      const newStreet: UpdateNeighStreet = {
-        name: streetFormValue.name,
-      };
-      // Only include publicId if it exists (for existing streets)
-      if (streetFormValue.publicId) {
-        newStreet.publicId = streetFormValue.publicId;
-      }
-      return newStreet;
-    });
-
-    const payload: UpdateNeighborhood = {
-      name,
-      isActive: active,
-      streets: fStreets, // Use the mapped streets array
-    };
-
-    const response = await this.store.update(cId, payload);
+    const response = await this.store.update(
+      cId,
+      mapUpdateNeighborhoodPayload(this.form.getRawValue()),
+    );
     return response;
   }
 }

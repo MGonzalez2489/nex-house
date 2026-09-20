@@ -6,5 +6,5 @@ export interface NeighborhoodModel extends BaseModel {
   name: string;
   isActive: boolean;
   streets: NeighStreetModel[];
-  address: NeighAddressModel;
+  address?: NeighAddressModel;
 }

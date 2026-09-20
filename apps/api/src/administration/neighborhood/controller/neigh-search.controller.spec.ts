@@ -104,16 +104,22 @@ describe('NeighSearchController', () => {
   });
 
   describe('findMine', () => {
-    it('resolves the neighborhood assigned to the current user', async () => {
+    it('resolves the assigned neighborhood mapped to the API model', async () => {
       mockSearchService.findById.mockResolvedValue(mockNeighborhood);
 
       const result = await controller.findMine(mockUser);
 
       expect(mockSearchService.findById).toHaveBeenCalledWith(
         mockUser.neighborhoodId,
-        { streets: true },
+        { streets: true, address: { city: { state: true } } },
       );
-      expect(result).toEqual(mockNeighborhood);
+      expect(result).toEqual({
+        publicId: mockNeighborhood.publicId,
+        name: mockNeighborhood.name,
+        isActive: mockNeighborhood.isActive,
+        streets: [{ publicId: undefined, name: 'calle primera' }],
+        address: undefined,
+      });
     });
 
     it('throws NotFoundException when the user has no assigned neighborhood', async () => {
@@ -143,15 +149,22 @@ describe('NeighSearchController', () => {
   });
 
   describe('findOne', () => {
-    it('returns the neighborhood matching the public ID', async () => {
+    it('returns the neighborhood mapped to the API model', async () => {
       mockSearchService.findByPublicId.mockResolvedValue(mockNeighborhood);
 
       const result = await controller.findOne(mockUserUuid);
 
       expect(mockSearchService.findByPublicId).toHaveBeenCalledWith(
         mockUserUuid,
+        { streets: true, address: { city: { state: true } } },
       );
-      expect(result).toEqual(mockNeighborhood);
+      expect(result).toEqual({
+        publicId: mockNeighborhood.publicId,
+        name: mockNeighborhood.name,
+        isActive: mockNeighborhood.isActive,
+        streets: [{ publicId: undefined, name: 'calle primera' }],
+        address: undefined,
+      });
     });
 
     it('throws NotFoundException when the public ID does not match', async () => {

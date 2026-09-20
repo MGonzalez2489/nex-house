@@ -1,82 +1,147 @@
-<p-panel header="Fraccionamientos" class="overflow-x-auto">
+<p-panel header="Fraccionamientos">
   <ng-template #icons>
     <app-neigh-table-filters class="block" (filter)="filter($event)" />
   </ng-template>
-  <p-table
-    #dt
-    [value]="items()"
-    [rows]="pagination()?.limit || 10"
-    [paginator]="pagination() && items().length > 0"
-    [showPageLinks]="items().length > 0"
-    [totalRecords]="pagination()?.total || 0"
-    [loading]="isLoading()"
-    [showCurrentPageReport]="true"
-    [lazy]="true"
-    [lazyLoadOnInit]="true"
-    (onLazyLoad)="search($event)"
-    showFirstLastIcon="false"
-    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
-    paginatorStyleClass="mt-5"
-  >
-    <ng-template #header>
-      @if (items().length > 0) {
-        <tr>
-          <th style="width: 10%"></th>
-          <th style="width: 30%">Nombre</th>
-          <th style="width: 25%">Calles</th>
-          <th style="width: 25%">Estatus</th>
-          <th style="width: 10%"></th>
-        </tr>
-      }
-    </ng-template>
-    <ng-template #body let-neigh>
-      <tr>
-        <td>
-          <app-avatar-component [text]="neigh.name" />
-        </td>
-        <td>
-          <p class="font-semibold capitalize">{{ neigh.name ?? "--" }}</p>
-          <p class="text-sm text-slate-400">
-            {{ neigh.address?.city?.displayName }},
-            {{ neigh.address?.city?.state?.displayName }}
-          </p>
-        </td>
 
-        <td>
-          {{ neigh.streets.length }}
-        </td>
-        <td>
-          <app-neigh-status-tag [isActive]="neigh.isActive" />
-        </td>
-        <td>
-          <p-button
-            icon="pi pi-search"
-            severity="secondary"
-            text
-            size="small"
-            (click)="view.emit(neigh.publicId)"
-          />
-        </td>
-      </tr>
-    </ng-template>
-    <ng-template #emptymessage>
-      <tr>
-        <td colspan="5">
-          <div class="py-14 flex flex-col items-center text-center px-4">
-            <div
-              class="h-12 w-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 mb-3"
-            >
-              <i class="pi pi-sun"></i>
+  <div class="hidden md:block overflow-x-auto">
+    <p-table
+      #dt
+      [value]="items()"
+      [rows]="pagination()?.limit || 10"
+      [paginator]="pagination() && items().length > 0"
+      [showPageLinks]="items().length > 0"
+      [totalRecords]="pagination()?.total || 0"
+      [loading]="isLoading()"
+      [showCurrentPageReport]="true"
+      [lazy]="true"
+      [lazyLoadOnInit]="true"
+      (onLazyLoad)="search($event)"
+      showFirstLastIcon="false"
+      currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+      paginatorStyleClass="mt-5"
+    >
+      <ng-template #header>
+        @if (items().length > 0) {
+          <tr>
+            <th scope="col" class="w-1/12"></th>
+            <th scope="col" class="w-1/3">Nombre</th>
+            <th scope="col" class="w-1/4">Calles</th>
+            <th scope="col" class="w-1/4">Estatus</th>
+            <th scope="col" class="w-1/12"></th>
+          </tr>
+        }
+      </ng-template>
+      <ng-template #body let-neigh>
+        <tr>
+          <td>
+            <app-avatar-component [text]="neigh.name" />
+          </td>
+          <td>
+            <p class="font-semibold capitalize">{{ neigh.name ?? "--" }}</p>
+            <p class="text-sm text-slate-400">
+              {{ neigh.address?.city?.displayName }},
+              {{ neigh.address?.city?.state?.displayName }}
+            </p>
+          </td>
+
+          <td>
+            {{ neigh.streets.length }}
+          </td>
+          <td>
+            <app-neigh-status-tag [isActive]="neigh.isActive" />
+          </td>
+          <td>
+            <p-button
+              icon="pi pi-search"
+              severity="secondary"
+              text
+              size="small"
+              aria-label="Ver detalle de {{ neigh.name }}"
+              (click)="view.emit(neigh.publicId)"
+            />
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="5">
+            <div class="py-14 flex flex-col items-center text-center px-4">
+              <div
+                class="h-12 w-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 mb-3"
+              >
+                <i class="pi pi-sun"></i>
+              </div>
+              <p class="text-sm font-medium text-slate-700 dark:text-slate-200">
+                No se encontraron fraccionamientos
+              </p>
+              <p class="text-xs text-slate-400 mt-1">
+                Intenta con otros filtros o registra uno nuevo.
+              </p>
             </div>
-            <p class="text-sm font-medium text-slate-700 dark:text-slate-200">
-              No se encontraron fraccionamientos
-            </p>
-            <p class="text-xs text-slate-400 mt-1">
-              Intenta con otros filtros o registra uno nuevo.
-            </p>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  @if (isMobile()) {
+    <div class="flex flex-col gap-3 md:hidden">
+      @for (neigh of items(); track neigh.publicId) {
+        <button
+          type="button"
+          (click)="view.emit(neigh.publicId)"
+          class="w-full text-start rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm hover:border-slate-300 dark:hover:border-slate-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
+        >
+          <span class="flex items-center justify-between gap-3">
+            <span class="flex items-center gap-3 min-w-0">
+              <app-avatar-component [text]="neigh.name" />
+              <span class="min-w-0">
+                <span class="block font-semibold capitalize truncate text-slate-900 dark:text-white">
+                  {{ neigh.name ?? "--" }}
+                </span>
+                <span class="block text-xs text-slate-500 dark:text-slate-400 truncate">
+                  {{ neigh.address?.city?.displayName }},
+                  {{ neigh.address?.city?.state?.displayName }}
+                </span>
+              </span>
+            </span>
+            <span class="flex items-center gap-3 shrink-0">
+              <app-neigh-status-tag [isActive]="neigh.isActive" />
+              <i class="pi pi-chevron-right text-slate-400" aria-hidden="true"></i>
+            </span>
+          </span>
+          <span class="flex items-center gap-1.5 mt-3 text-xs text-slate-500 dark:text-slate-400">
+            <i class="pi pi-map-marker" aria-hidden="true"></i>
+            {{ neigh.streets.length }} calles
+          </span>
+        </button>
+      } @empty {
+        <div class="py-14 flex flex-col items-center text-center px-4">
+          <div
+            class="h-12 w-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 mb-3"
+          >
+            <i class="pi pi-sun"></i>
           </div>
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
+          <p class="text-sm font-medium text-slate-700 dark:text-slate-200">
+            No se encontraron fraccionamientos
+          </p>
+          <p class="text-xs text-slate-400 mt-1">
+            Intenta con otros filtros o registra uno nuevo.
+          </p>
+        </div>
+      }
+
+      @if (pagination() && items().length > 0) {
+        <p-paginator
+          [first]="pageFirst()"
+          [rows]="pageRows()"
+          [totalRecords]="pagination()?.total || 0"
+          [rowsPerPageOptions]="[10, 20, 50]"
+          showFirstLastIcon="false"
+          (onPageChange)="paginateMobile($event)"
+          class="mt-2"
+        />
+      }
+    </div>
+  }
 </p-panel>

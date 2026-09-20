@@ -10,6 +10,6 @@ export const NeighAddressToModelMapper = (
     latitude: address.latitude,
     longitud: address.longitude,
     publicId: address.publicId,
-    city: address.city ?? CatalogToModelMapper(address.city),
+    city: address.city ? CatalogToModelMapper(address.city) : undefined,
   };
 };

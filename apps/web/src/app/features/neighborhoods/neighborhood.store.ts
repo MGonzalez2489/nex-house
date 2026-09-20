@@ -75,12 +75,7 @@ export const NeighborhoodsStore = signalStore(
                   },
                   setLoaded(),
                 ),
-              error: (err: any) =>
-                patchState(store, {
-                  callState: {
-                    error: err.error?.message || "Load buildings failed",
-                  },
-                }),
+              error: (err) => patchState(store, setError(err)),
             }),
           ),
         ),

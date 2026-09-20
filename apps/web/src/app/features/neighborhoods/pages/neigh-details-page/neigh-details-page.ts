@@ -9,6 +9,7 @@ import {
 } from "@angular/core";
 import { Router } from "@angular/router";
 import { NeighStatusTag } from "@neighborhoods/components";
+import { NEIGHBORHOOD_ROUTES_ENUM } from "@neighborhoods/neighborhood.routes";
 import { NeighborhoodsStore } from "@neighborhoods/neighborhood.store";
 import { NeighborhoodModel } from "@nexhouse/shared-domain/models";
 import { Button } from "@openng/optimus-ui/button";
@@ -44,11 +45,11 @@ export class NeighDetailsPage {
   }
 
   back(): void {
-    this.router.navigate(["/neighborhoods"]);
+    this.router.navigate([NEIGHBORHOOD_ROUTES_ENUM.HOME]);
   }
   edit() {
     this.router.navigate([
-      "/neighborhoods",
+      NEIGHBORHOOD_ROUTES_ENUM.HOME,
       this.neighborhood()?.publicId,
       "edit",
     ]);

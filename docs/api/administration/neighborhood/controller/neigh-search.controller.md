@@ -1,48 +1,79 @@
 # NeighSearchController
 
-Read-only REST controller for querying neighborhoods, the current user's
-assigned neighborhood, and its streets.
+Read-only REST controller exposing neighborhood listing, assigned-neighborhood
+and detail lookups. All responses are shaped through `NeighborhoodToModelMapper`
+so the frontend always consumes the `NeighborhoodModel` contract.
 
 - **File:** `apps/api/src/administration/neighborhood/controller/neigh-search.controller.ts`
 - **Scope:** `neighborhood` module — registered in `NeighborhoodModule` alongside `NeighborhoodController`.
 - **Route prefix:** `/api/neighborhood` (global `api` prefix from main.ts).
 - **Swagger tag:** `Neighborhood` (docs at `/api/docs`).
 
-## Route map (all `GET`)
+## Route map
 
-| Route | Method | Service call | Purpose |
-|---|---|---|---|
-| `/api/neighborhood` | `findAll` | `NeighborhoodSearchService.findAll(dto)` | Paginated list mapped to `NeighborhoodModel` |
-| `/api/neighborhood/mine` | `findMine` | `findById(user.neighborhoodId, { streets: true })` | Neighborhood assigned to current user |
-| `/api/neighborhood/streets` | `findStreets` | `NeighStreetService.findAll(user.neighborhoodId, filters)` | Paginated streets of current neighborhood |
-| `/api/neighborhood/:publicId` | `findOne` | `NeighborhoodSearchService.findByPublicId(publicId)` | Single neighborhood by public UUID |
+| Route | Method | Controller method | Service call | HTTP |
+|---|---|---|---|---|
+| `/api/neighborhood` | `GET` | `findAll` | `NeighborhoodSearchService.findAll(dto)` | `200` |
+| `/api/neighborhood/mine` | `GET` | `findMine` | `findById(user.neighborhoodId, ...)` | `200` / `404` |
+| `/api/neighborhood/streets` | `GET` | `findStreets` | `NeighStreetService.findAll(user.neighborhoodId, filters)` | `200` |
+| `/api/neighborhood/:publicId` | `GET` | `findOne` | `findByPublicId(publicId, ...)` | `200` / `404` |
 
 ## Endpoint details
 
-- **`findAll`** — query `SearchNeighDto` (pagination via `SearchDto` + `isActive`
-  bool). `@UseInterceptors(HttpCacheInterceptor)` + `@CacheTTL(60 * 5)` cache each
-  `cache:<url>` key (query params included) in memory for 5 minutes. Results are
-  mapped with `NeighborhoodToModelMapper` (address city / state + streets) and
-  returned as `PaginatedResult<NeighborhoodModel>`.
-- **`findMine`** — resolves the current user's neighborhood from
-  `user.neighborhoodId` (from the JWT via `@CurrentUser`). Throws
-  `NotFoundException('Neighborhood not assigned.')` (404) when missing.
-- **`findStreets`** — delegates to `NeighStreetService.findAll` scoped to
-  `user.neighborhoodId` with the `SearchDto` filters; returns
-  `PaginatedResult<NeighStreet>`.
-- **`findOne`** — `publicId` validated with `ParseUUIDPipe` → 400 for non-UUID.
-  Throws `NotFoundException` (404) when no neighborhood matches.
+### `GET /api/neighborhood` — `findAll`
 
-## Route ordering
+- Uses `HttpCacheInterceptor` + `CacheTTL(60*5)`; the cache key namespace is
+  `cache:/api/neighborhood*` and is evicted by `NeighborhoodService` on every
+  write operation.
+- Maps every row through `NeighborhoodToModelMapper` and returns the
+  `PaginatedResult<NeighborhoodModel>` wrapper (`data` + `meta`).
 
-Static routes (`mine`, `streets`) are declared **before** the parameterized
-`:publicId` route so they are never shadowed by UUID matching.
+### `GET /api/neighborhood/mine` — `findMine`
+
+- Resolves the neighborhood assigned to the current user via
+  `findById(user.neighborhoodId, { streets, address.city.state })`.
+- `404` when `user.neighborhoodId` does not map to a record.
+- Returns a single `NeighborhoodModel` (mapped).
+
+### `GET /api/neighborhood/streets` — `findStreets`
+
+- Delegates to `NeighStreetService.findAll(user.neighborhoodId, filters)` and
+  returns `PaginatedResult<NeighStreet>`. Only usable by actors with an
+  assigned neighborhood.
+
+### `GET /api/neighborhood/:publicId` — `findOne`
+
+- `publicId` validated with `ParseUUIDPipe` → `400` for non-UUID.
+- Loads `streets` and `address.city.state` explicitly so the mapped model
+  includes the full location graph.
+- `404` when no record matches the public ID.
+- Returns a single `NeighborhoodModel` (mapped).
+
+## Mapper contract
+
+<details>
+<summary>Shape produced by <code>NeighborhoodToModelMapper</code></summary>
+
+```ts
+interface NeighborhoodModel {
+  publicId: string;
+  name: string;
+  isActive: boolean;
+  streets: { publicId?: string; name: string }[];
+  address?: {
+    publicId: string;
+    zipCode: string;
+    latitude: number;
+    longitud: number;
+    city?: { publicId: string; name: string; displayName: string };
+  };
+}
+```
+</details>
 
 ## Test coverage
 
 - `apps/api/src/administration/neighborhood/controller/neigh-search.controller.spec.ts`
-- Covers (with mocked search/street services and `CACHE_MANAGER` + `Reflector`
-  for the HTTP-cache interceptor's DI): `findAll` mapping to `NeighborhoodModel`
-  with `meta` passthrough; `findMine` success and `NotFoundException`; `findStreets`
-  delegation with the user's neighborhood scope; `findOne` success and
-  `NotFoundException`.
+- Covers: paginated `findAll` mapping, `findMine` assigned lookup plus `404`,
+  `findStreets` delegation, and `findOne` detail lookup with explicit relations
+  plus `404`.

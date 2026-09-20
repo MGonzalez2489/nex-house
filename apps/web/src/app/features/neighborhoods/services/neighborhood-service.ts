@@ -19,11 +19,11 @@ export class NeighborhoodService {
   private readonly request = inject(RequestService);
   private readonly endpoint = "/api/neighborhood";
 
-  private readonly defaultSearch: Search = {
+  private readonly defaultSearch: Readonly<Search> = Object.freeze({
     rows: 10,
     showAll: true,
     first: 0,
-  };
+  });
 
   getAll(dto: Search): Observable<ApiResponse<NeighborhoodModel[]>> {
     return this.request.get<NeighborhoodModel[]>(this.endpoint, dto);
@@ -51,7 +51,7 @@ export class NeighborhoodService {
   }
 
   getStreets(
-    dto: Search = this.defaultSearch,
+    dto: Search = { ...this.defaultSearch },
   ): Observable<ApiResponse<NeighStreetModel[]>> {
     return this.request.get<NeighStreetModel[]>(
       `${this.endpoint}/streets`,

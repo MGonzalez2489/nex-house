@@ -1,4 +1,4 @@
-import { Neighborhood, NeighStreet, User } from '@core/database';
+import { NeighStreet, User } from '@core/database';
 import { CurrentUser } from '@core/decorators';
 import { SearchDto } from '@core/dtos';
 import { HttpCacheInterceptor } from '@core/interceptors';
@@ -67,17 +67,17 @@ export class NeighSearchController {
     status: 404,
     description: 'Target neighborhood record could not be located.',
   })
-  async findMine(@CurrentUser() user: User): Promise<Neighborhood> {
+  async findMine(@CurrentUser() user: User): Promise<NeighborhoodModel> {
     const neighborhood = await this.searchService.findById(
       user.neighborhoodId,
-      { streets: true },
+      { streets: true, address: { city: { state: true } } },
     );
 
     if (!neighborhood) {
       throw new NotFoundException('Neighborhood not assigned.');
     }
 
-    return neighborhood;
+    return NeighborhoodToModelMapper(neighborhood);
   }
 
   @Get('streets')
@@ -113,8 +113,11 @@ export class NeighSearchController {
   })
   async findOne(
     @Param('publicId', ParseUUIDPipe) publicId: string,
-  ): Promise<Neighborhood> {
-    const neighborhood = await this.searchService.findByPublicId(publicId);
+  ): Promise<NeighborhoodModel> {
+    const neighborhood = await this.searchService.findByPublicId(publicId, {
+      streets: true,
+      address: { city: { state: true } },
+    });
 
     if (!neighborhood) {
       throw new NotFoundException(
@@ -122,6 +125,6 @@ export class NeighSearchController {
       );
     }
 
-    return neighborhood;
+    return NeighborhoodToModelMapper(neighborhood);
   }
 }

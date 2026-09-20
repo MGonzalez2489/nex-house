@@ -1,4 +1,5 @@
-<div class="space-y-6">
+<div class="relative">
+  <div class="space-y-6">
   <!-- Header -->
   <div
     class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
@@ -13,7 +14,7 @@
         <span
           class="text-xs font-medium text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 rounded-full px-2 py-0.5"
         >
-          {{ entries().length }} registrados · {{ activeEntries() }} activos
+          {{ totalRegistered() }} registrados · {{ activeEntries() }} activos
         </span>
       </div>
       <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
@@ -30,6 +31,9 @@
   </div>
 
   <!-- Lista de resultados -->
+  @if (neighStore.error()) {
+    <app-form-feedback [callState]="neighStore.callState()" />
+  }
   <app-neighborhoods-table
     [items]="entries()"
     [pagination]="neighStore.pagination()"
@@ -38,8 +42,15 @@
     (paginate)="onSearch($event)"
     (view)="onView($event)"
   />
-</div>
+  </div>
 
-<div class="absolute right-4 bottom-4 md:hidden">
-  <p-button icon="pi pi-plus" rounded size="large" (click)="onCreate()" />
+  <div class="absolute right-4 bottom-4 md:hidden">
+    <p-button
+      icon="pi pi-plus"
+      rounded
+      size="large"
+      aria-label="Registrar nuevo fraccionamiento"
+      (click)="onCreate()"
+    />
+  </div>
 </div>

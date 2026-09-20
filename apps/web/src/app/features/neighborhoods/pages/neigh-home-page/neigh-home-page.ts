@@ -2,9 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  effect,
   inject,
-  signal,
 } from "@angular/core";
 import { Router } from "@angular/router";
 import { SessionService } from "@core/services";
@@ -12,11 +10,12 @@ import { NEIGHBORHOOD_ROUTES_ENUM } from "@neighborhoods/neighborhood.routes";
 import { NeighborhoodsStore } from "@neighborhoods/neighborhood.store";
 import { SearchNeigh } from "@nexhouse/shared-domain/interfaces";
 import { Button } from "@openng/optimus-ui/button";
+import { FormFeedback } from "@shared/components/forms";
 import { NeighborhoodsTable } from "../../components";
 
 @Component({
   selector: "app-neigh-home-page",
-  imports: [NeighborhoodsTable, Button],
+  imports: [NeighborhoodsTable, Button, FormFeedback],
   templateUrl: "./neigh-home-page.html",
   styleUrl: "./neigh-home-page.css",
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -31,16 +30,9 @@ export class NeighHomePage {
   protected readonly activeEntries = computed(
     () => this.entries().filter((g) => g.isActive).length,
   );
-  protected readonly isFiltering = signal<boolean>(false);
-
-  constructor() {
-    effect(() => {
-      const isCMobile = this.sessionService.isMobile();
-      if (isCMobile) {
-        this.isFiltering.set(true);
-      }
-    });
-  }
+  protected readonly totalRegistered = computed(
+    () => this.neighStore.pagination()?.total ?? this.entries().length,
+  );
 
   onCreate(): void {
     this.router.navigate([

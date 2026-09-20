@@ -45,13 +45,17 @@ happens server-side).
 ### `getStreets(dto?: Search): Observable<ApiResponse<NeighStreetModel[]>>`
 
 `GET /api/neighborhood/streets` — paginated streets for the current user's
-neighborhood. Defaults to `{ rows: 10, showAll: true, first: 0 }`.
+neighborhood. When called without criteria it defaults to a fresh copy of
+`{ rows: 10, showAll: true, first: 0 }` (`{ ...defaultSearch }`) so the frozen
+baseline object is never mutated by `RequestService` param conversion.
 
 ## Internal helpers
 
-### `defaultSearch: Search`
+### `defaultSearch: Readonly<Search>`
 
 Baseline pagination applied when `getStreets` is called without criteria.
+`Object.freeze`-ed (`rows: 10, showAll: true, first: 0`) to prevent accidental
+mutation; `getAll` callers pass their own DTO.
 
 ## Notes
 

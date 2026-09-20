@@ -1,35 +1,19 @@
 <form
   [formGroup]="form"
+  (ngSubmit)="onFormSubmit($event)"
   class="flex flex-col lg:flex-row lg:items-center gap-3 text-xs"
 >
   <!-- search input -->
-  <p-iconfield class="w-full">
+  <p-iconfield class="w-full lg:w-auto">
     <p-inputicon class="pi pi-search" />
     <input
       pInputText
       pSize="small"
-      class="min-w-100 w-50"
+      aria-label="Buscar fraccionamiento por nombre o municipio"
+      class="w-full lg:min-w-80"
       formControlName="hint"
       type="text"
       placeholder="Buscar por nombre o municipio…"
     />
   </p-iconfield>
-  <!-- filter by state -->
-  <!-- <p-selectbutton -->
-  <!--   [options]="statusOptions" -->
-  <!--   optionLabel="label" -->
-  <!--   optionValue="value" -->
-  <!--   formControlName="active" -->
-  <!--   aria-labelledby="basic" -->
-  <!--   class="hidden lg:inline-block lg:flex-none" -->
-  <!-- /> -->
-  <!-- button -->
-  <p-button
-    icon="pi pi-filter"
-    class="hidden md:block"
-    size="small"
-    disabled
-    severity="secondary"
-    variant="outlined"
-  />
 </form>

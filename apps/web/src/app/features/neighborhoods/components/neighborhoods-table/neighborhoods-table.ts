@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   input,
   output,
 } from "@angular/core";
@@ -12,6 +13,7 @@ import { NeighborhoodModel } from "@nexhouse/shared-domain/models";
 import { AvatarComponent } from "@shared/components";
 import { Button } from "@openng/optimus-ui/button";
 import { Panel } from "@openng/optimus-ui/panel";
+import { Paginator } from "@openng/optimus-ui/paginator";
 import { TableLazyLoadEvent, TableModule } from "@openng/optimus-ui/table";
 import { NeighStatusTag } from "../neigh-status-tag/neigh-status-tag";
 import { NeighTableFilters } from "../neigh-table-filters/neigh-table-filters";
@@ -19,9 +21,9 @@ import { NeighTableFilters } from "../neigh-table-filters/neigh-table-filters";
 @Component({
   selector: "app-neighborhoods-table",
   imports: [
-    NeighStatusTag,
     Button,
     Panel,
+    Paginator,
     NeighStatusTag,
     AvatarComponent,
     TableModule,
@@ -41,9 +43,25 @@ export class NeighborhoodsTable {
   readonly paginate = output<Partial<SearchNeigh>>();
   readonly view = output<string>();
 
+  protected readonly pageFirst = computed(() => {
+    const pagination = this.pagination();
+    return pagination ? (pagination.page - 1) * pagination.limit : 0;
+  });
+
+  protected readonly pageRows = computed(
+    () => this.pagination()?.limit ?? 10,
+  );
+
   search(event: TableLazyLoadEvent) {
     this.paginate.emit({
       first: event.first,
+      rows: event.rows || 10,
+    });
+  }
+
+  paginateMobile(event: { first?: number; rows?: number }) {
+    this.paginate.emit({
+      first: event.first ?? 0,
       rows: event.rows || 10,
     });
   }

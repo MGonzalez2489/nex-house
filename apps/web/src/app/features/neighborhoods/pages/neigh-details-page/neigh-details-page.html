@@ -57,7 +57,7 @@
         </h2>
       </ng-template>
       <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-        @for (street of n.streets; track street) {
+        @for (street of n.streets; track street.publicId) {
           <li
             class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 rounded-lg px-3 py-2"
           >
