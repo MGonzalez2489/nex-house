@@ -5,16 +5,17 @@
     <div class="flex h-full w-full flex-col">
       <!-- ============ TOPBAR ============ -->
       @if (showNavComponentes()) {
-        <app-nav-bar [user]="userData.user" [profile]="userData.profile" />
+        <app-nav-bar
+          [user]="userData.user"
+          [profile]="userData.profile"
+          (logout)="sessionService.logout()"
+        />
       }
 
       <!-- ============ CUERPO: sidebar + contenido ============ -->
       <div class="relative flex flex-1 min-h-0">
         <!-- Overlay móvil -->
-        <div
-          id="overlay"
-          class="hidden fixed inset-0 bg-slate-900/50 z-40 lg:hidden"
-        ></div>
+        <div id="overlay" class="hidden fixed inset-0 bg-slate-900/50 z-40 lg:hidden"></div>
 
         <!-- ============ CONTENIDO PRINCIPAL ============ -->
         <main class="flex-1 min-w-0 overflow-y-auto thin-scroll">
