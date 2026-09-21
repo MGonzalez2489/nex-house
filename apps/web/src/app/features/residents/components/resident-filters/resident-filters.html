@@ -1,22 +1,39 @@
-<form [formGroup]="form" class="flex items-center gap-3">
-  <p-iconfield class="w-full">
+<form
+  [formGroup]="form"
+  (ngSubmit)="onFormSubmit($event)"
+  class="md:flex flex-wrap md:gap-3 items-center w-full"
+>
+  <p-iconfield>
     <p-inputicon class="pi pi-search" />
 
     <input
       pInputText
       placeholder="Buscar..."
       pSize="small"
-      class="min-w-100 w-50"
+      fluid
       formControlName="globalFilter"
+      [variant]="isMobile() ? 'outlined' : 'filled'"
+      aria-label="Buscar residente por nombre, correo o unidad"
     />
   </p-iconfield>
-  <!-- TODO: implement extra filters -->
-  <p-button
-    icon="pi pi-filter"
-    class="hidden md:block"
+
+  <p-select
+    formControlName="role"
+    [options]="roleOptions()"
+    optionLabel="displayName"
+    optionValue="name"
+    placeholder="Rol"
     size="small"
-    disabled
-    severity="secondary"
-    variant="outlined"
+    class="hidden md:flex"
+  />
+
+  <p-select
+    formControlName="status"
+    [options]="statusOptions()"
+    optionLabel="displayName"
+    optionValue="name"
+    placeholder="Estatus"
+    size="small"
+    class="hidden md:flex"
   />
 </form>

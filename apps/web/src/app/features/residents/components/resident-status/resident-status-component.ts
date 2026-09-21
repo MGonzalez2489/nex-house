@@ -30,6 +30,8 @@ export class ResidentStatusComponent {
         return "secondary";
       case UserStatusEnum.PENDING_ONBOARDING:
         return "warn";
+      case UserStatusEnum.PASSWORD_RECOVERY:
+        return "danger";
       default:
         return "secondary";
     }

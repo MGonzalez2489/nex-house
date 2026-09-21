@@ -14,10 +14,12 @@
       >
         <div>
           <span class="text-xs font-bold tracking-wider text-blue-600 uppercase"
-            >Total Registrar de Usuarios</span
+            >Total de registros</span
           >
-          <div class="text-3xl sm:text-4xl font-extrabold text-gray-900 mt-1">
-            {{ stats?.summary?.totalUsers }}
+          <div
+            class="text-3xl sm:text-4xl font-extrabold text-gray-900 mt-1"
+          >
+            {{ stats.summary.totalUsers }}
           </div>
         </div>
         <div
@@ -26,9 +28,10 @@
           <i class="pi pi-users"></i>
         </div>
       </div>
-      <!-- 2. Grid de Distribución por Rol y Estado (Mobile First: 1 col, md: 2 cols) -->
+
+      <!-- 2. Distribución por Rol y Estado -->
       <div class="grid grid-cols-1 md:grid-cols-1 gap-6">
-        <!-- Tarjeta: Distribución por Rol -->
+        <!-- Distribución por Rol -->
         <p-panel class="bg-gray-50/50">
           <ng-template #header>
             <div class="pt-4 pb-2">
@@ -42,43 +45,31 @@
           </ng-template>
 
           <div class="space-y-2">
-            <!-- Administrador -->
-            <div
-              class="flex items-center justify-between p-2.5 bg-white rounded-lg border border-gray-100 shadow-2xs"
-            >
-              <div class="flex items-center gap-2.5">
-                <span class="w-2 h-2 rounded-full bg-purple-500"></span>
-                <span class="text-sm font-medium text-gray-600"
-                  >Administradores</span
-                >
-              </div>
-              <span
-                class="text-sm font-bold text-gray-800 px-2.5 py-0.5 rounded-md"
+            @for (role of roleRows(); track role.code) {
+              <div
+                class="flex items-center justify-between p-2.5 bg-white rounded-lg border border-gray-100 shadow-2xs"
               >
-                {{ stats?.byRole!["admin"] || 0 }}
-              </span>
-            </div>
-
-            <!-- Residente -->
-            <div
-              class="flex items-center justify-between p-2.5 bg-white rounded-lg border border-gray-100 shadow-2xs"
-            >
-              <div class="flex items-center gap-2.5">
-                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-                <span class="text-sm font-medium text-gray-600"
-                  >Residentes</span
+                <div class="flex items-center gap-2.5">
+                  <span [class]="'w-2 h-2 rounded-full ' + role.dotClass"></span>
+                  <span class="text-sm font-medium text-gray-600">{{
+                    role.label
+                  }}</span>
+                </div>
+                <span
+                  class="text-sm font-bold text-gray-800 px-2.5 py-0.5 rounded-md"
                 >
+                  {{ role.count }}
+                </span>
               </div>
-              <span
-                class="text-sm font-bold text-gray-800 px-2.5 py-0.5 rounded-md"
-              >
-                {{ stats?.byRole!["resident"] || 0 }}
-              </span>
-            </div>
+            } @empty {
+              <p class="text-sm text-slate-400 text-center py-4">
+                Sin datos por rol.
+              </p>
+            }
           </div>
         </p-panel>
 
-        <!-- Tarjeta: Distribución por Estado -->
+        <!-- Distribución por Estado -->
         <p-panel class="bg-gray-50/50">
           <ng-template #header>
             <div class="pt-4 pb-2">
@@ -92,62 +83,29 @@
           </ng-template>
 
           <div class="space-y-2">
-            <!-- Activo -->
-            <div
-              class="flex items-center justify-between p-2.5 bg-white rounded-lg border border-gray-100 shadow-2xs"
-            >
-              <div class="flex items-center gap-2">
-                <p-tag
-                  severity="success"
-                  value="Activo"
-                  [rounded]="true"
-                  icon="pi pi-check-circle"
-                ></p-tag>
-              </div>
-              <span
-                class="text-sm font-bold text-gray-800 px-2.5 py-0.5 rounded-md"
+            @for (row of statusRows(); track row.code) {
+              <div
+                class="flex items-center justify-between p-2.5 bg-white rounded-lg border border-gray-100 shadow-2xs"
               >
-                {{ stats?.byStatus!["active"] || 0 }}
-              </span>
-            </div>
-
-            <!-- Pendiente -->
-            <div
-              class="flex items-center justify-between p-2.5 bg-white rounded-lg border border-gray-100 shadow-2xs"
-            >
-              <div class="flex items-center gap-2">
-                <p-tag
-                  severity="warn"
-                  value="Pendiente"
-                  [rounded]="true"
-                  icon="pi pi-clock"
-                ></p-tag>
+                <div class="flex items-center gap-2">
+                  <p-tag
+                    [severity]="row.severity"
+                    [value]="row.label"
+                    [rounded]="true"
+                    [icon]="row.icon"
+                  ></p-tag>
+                </div>
+                <span
+                  class="text-sm font-bold text-gray-800 px-2.5 py-0.5 rounded-md"
+                >
+                  {{ row.count }}
+                </span>
               </div>
-              <span
-                class="text-sm font-bold text-gray-800 px-2.5 py-0.5 rounded-md"
-              >
-                {{ stats?.byStatus!["pending_completion"] || 0 }}
-              </span>
-            </div>
-
-            <!-- Inactivo -->
-            <div
-              class="flex items-center justify-between p-2.5 bg-white rounded-lg border border-gray-100 shadow-2xs"
-            >
-              <div class="flex items-center gap-2">
-                <p-tag
-                  severity="danger"
-                  value="Inactivo"
-                  [rounded]="true"
-                  icon="pi pi-ban"
-                ></p-tag>
-              </div>
-              <span
-                class="text-sm font-bold text-gray-800 px-2.5 py-0.5 rounded-md"
-              >
-                {{ stats?.byStatus!["inactive"] || 0 }}
-              </span>
-            </div>
+            } @empty {
+              <p class="text-sm text-slate-400 text-center py-4">
+                Sin datos por estado.
+              </p>
+            }
           </div>
         </p-panel>
       </div>

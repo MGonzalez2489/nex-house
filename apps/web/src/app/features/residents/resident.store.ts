@@ -26,7 +26,13 @@ import {
   withProps,
   withState,
 } from '@ngrx/signals';
-import {addEntity, entityConfig, setAllEntities, withEntities} from '@ngrx/signals/entities';
+import {
+  addEntity,
+  entityConfig,
+  setAllEntities,
+  updateEntity,
+  withEntities,
+} from '@ngrx/signals/entities';
 import {rxMethod} from '@ngrx/signals/rxjs-interop';
 import {ContextStore} from '@stores/context.store';
 import {lastValueFrom, pipe, switchMap, tap} from 'rxjs';
@@ -135,25 +141,29 @@ export const ResidentStore = signalStore(
       try {
         patchState(store, setLoading());
         const response = await lastValueFrom(store._residentService.getById(n.publicId, id));
-        patchState(store, setLoaded());
+        patchState(store, addEntity(response.data, config), setLoaded());
         return response.data;
       } catch (err) {
         patchState(store, setError(err));
         return null;
       }
     },
-    update: async (id: string, dto: UpdateUser) => {
+    update: async (id: string, dto: UpdateUser): Promise<boolean> => {
       const n = store._contextStore.neighborhood();
-      if (!n) return null;
+      if (!n) return false;
 
       try {
         patchState(store, setLoading());
         const response = await lastValueFrom(store._residentService.update(n.publicId, id, dto));
-        patchState(store, setLoaded());
-        return response.data;
+        patchState(
+          store,
+          updateEntity({id, changes: response.data}, config),
+          setLoaded(),
+        );
+        return true;
       } catch (err) {
         patchState(store, setError(err));
-        return null;
+        return false;
       }
     },
   })),

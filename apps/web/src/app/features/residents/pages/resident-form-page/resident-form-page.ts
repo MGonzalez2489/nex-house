@@ -39,11 +39,16 @@ import {CreateResidentForm} from './resident-form';
 })
 export class ResidentFormPage {
   private readonly router = inject(Router);
-  protected readonly id = input();
+  protected readonly id = input<string | undefined>();
   protected readonly catStore = inject(CatalogsStore);
   protected readonly contextStore = inject(ContextStore);
   protected readonly residentStore = inject(ResidentStore);
   protected readonly unitStore = inject(UnitStore);
+
+  protected readonly user = signal<UserModel | undefined>(undefined);
+
+  private originalUserRoleId: string | undefined;
+  private originalUnit: CreateUnit | undefined;
   private readonly isLoadingComplete = signal<boolean>(false);
 
   protected readonly form = new FormGroup<CreateResidentForm>({
@@ -59,29 +64,19 @@ export class ResidentFormPage {
     unit: new FormControl<CreateUnit | null>(null, [Validators.required]),
   });
 
-  protected readonly user = signal<UserModel | undefined>(undefined);
-
   constructor() {
     effect(() => {
-      const cIsLoadingComplete = this.isLoadingComplete();
-      if (cIsLoadingComplete) return;
+      if (this.isLoadingComplete()) return;
 
-      const loaded = this.catStore.loaded();
+      const catalogsLoaded = this.catStore.loaded();
       const streets = this.contextStore.streets();
+      if (!catalogsLoaded || streets.length === 0) return;
 
-      if (!loaded || streets.length === 0) return;
-
-      // this.initCreate();
       this.isLoadingComplete.set(true);
-    });
 
-    effect(() => {
-      const cId = this.id();
-      const cIsLoadingComp = this.isLoadingComplete();
-      if (!cIsLoadingComp) return;
-
-      if (cId) {
-        this.initUpdate();
+      const id = this.id();
+      if (id) {
+        void this.initUpdate(id);
       } else {
         this.initCreate();
       }
@@ -99,21 +94,18 @@ export class ResidentFormPage {
     this.form.markAllAsTouched();
     if (this.form.invalid) return;
 
-    const response = this.user()
-      ? await this.residentStore.update(this.id() as string, this.buildUpdatePayload())
+    const id = this.id();
+    const ok = id
+      ? await this.residentStore.update(id, this.buildUpdatePayload())
       : await this.residentStore.create(this.form.value as CreateUser);
-    if (!response) {
-      return;
-    }
+    if (!ok) return;
 
     this.router.navigateByUrl(`/${RESIDENT_ROUTES_ENUM.HOME}`);
   }
+
   cancel() {
     this.router.navigate([`/${RESIDENT_ROUTES_ENUM.HOME}`]);
   }
-
-  private originalUserRoleId: string | undefined;
-  private originalUnit: CreateUnit | undefined;
 
   private buildUpdatePayload(): UpdateUser {
     const current = this.form.value;
@@ -154,8 +146,7 @@ export class ResidentFormPage {
     );
   }
 
-  //private
-  private initCreate() {
+  private initCreate(): void {
     const roles = this.catStore.UserRoles();
 
     const userRole = roles.find((f) => f.name === UserRoleEnum.RESIDENT);
@@ -165,11 +156,13 @@ export class ResidentFormPage {
     });
   }
 
-  private async initUpdate() {
-    const rId = this.id() as string;
+  private async initUpdate(rId: string): Promise<void> {
     const cResident = await this.residentStore.loadById(rId);
 
-    if (!cResident) return;
+    if (!cResident) {
+      this.router.navigateByUrl(`/${RESIDENT_ROUTES_ENUM.HOME}`);
+      return;
+    }
 
     this.user.set(cResident);
 

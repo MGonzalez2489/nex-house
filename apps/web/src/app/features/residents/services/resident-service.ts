@@ -16,32 +16,43 @@ import {Observable} from 'rxjs';
 export class ResidentService {
   private readonly request = inject(RequestService);
 
-  getAll(neighborhood: string, dto: SearchUser): Observable<ApiResponse<UserModel[]>> {
-    return this.request.get<UserModel[]>(`${this.buildUrl(neighborhood)}`, dto);
+  getAll(
+    neighborhoodId: string,
+    dto: SearchUser,
+  ): Observable<ApiResponse<UserModel[]>> {
+    return this.request.get<UserModel[]>(this.buildUrl(neighborhoodId), dto);
   }
 
-  getById(neighborhood: string, id: string): Observable<ApiResponse<UserModel>> {
-    return this.request.get<UserModel>(`${this.buildUrl(neighborhood)}/${id}`);
+  getById(
+    neighborhoodId: string,
+    id: string,
+  ): Observable<ApiResponse<UserModel>> {
+    return this.request.get<UserModel>(`${this.buildUrl(neighborhoodId)}/${id}`);
   }
 
-  create(neighborhood: string, dto: CreateUser): Observable<ApiResponse<UserModel>> {
-    return this.request.post<UserModel>(this.buildUrl(neighborhood), dto);
+  create(
+    neighborhoodId: string,
+    dto: CreateUser,
+  ): Observable<ApiResponse<UserModel>> {
+    return this.request.post<UserModel>(this.buildUrl(neighborhoodId), dto);
   }
 
   getStats(neighborhoodId: string): Observable<ApiResponse<UserStats>> {
     return this.request.get<UserStats>(`${this.buildUrl(neighborhoodId)}/stats`);
   }
 
-  update(neighborhood: string, id: string, dto: UpdateUser): Observable<ApiResponse<UserModel>> {
-    return this.request.patch<UserModel>(`${this.buildUrl(neighborhood)}/${id}`, dto);
+  update(
+    neighborhoodId: string,
+    id: string,
+    dto: UpdateUser,
+  ): Observable<ApiResponse<UserModel>> {
+    return this.request.patch<UserModel>(
+      `${this.buildUrl(neighborhoodId)}/${id}`,
+      dto,
+    );
   }
 
-  delete(neighborhood: string, id: string): Observable<ApiResponse<boolean>> {
-    return this.request.delete<boolean>(`${this.buildUrl(neighborhood)}/${id}`);
-  }
-
-  private buildUrl(neighborhood: string) {
-    return `/api/neighborhoods/${neighborhood}/residents`;
-    // return `${this.endpoint}/${neighborhood}/users`;
+  private buildUrl(neighborhoodId: string) {
+    return `/api/neighborhoods/${neighborhoodId}/residents`;
   }
 }

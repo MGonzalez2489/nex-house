@@ -3,7 +3,7 @@ import { CreateUnit } from "@nexhouse/shared-domain/interfaces";
 
 export type CreateResidentForm = {
   email: FormControl<string>;
-  userRoleId: FormControl<string | undefined>;
+  userRoleId: FormControl<string>;
 
   unit: FormControl<CreateUnit | null>;
 };

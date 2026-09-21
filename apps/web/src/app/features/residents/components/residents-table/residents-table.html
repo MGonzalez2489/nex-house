@@ -1,58 +1,166 @@
-<p-panel header="Residentes" class="overflow-x-auto">
-  <ng-template #icons>
-    <app-resident-filters (filter)="filter($event)" />
-  </ng-template>
-  <p-table
-    [value]="items()"
-    [paginator]="true"
-    [rows]="pagination()?.limit || 10"
-    showFirstLastIcon="false"
-    #dt
-    [paginator]="pagination()"
-    [totalRecords]="pagination()?.total || 0"
-    [loading]="isLoading()"
-    [showCurrentPageReport]="true"
-    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
-    paginatorStyleClass="mt-5"
-    [lazy]="true"
-    [lazyLoadOnInit]="true"
-    (onLazyLoad)="search($event)"
-  >
-    <ng-template #header>
-      <tr>
-        <th style="width: 10%"></th>
-        <th style="width: 30%">Nombre</th>
-        <th style="width: 25%">Rol</th>
-        <th style="width: 25%">Estatus</th>
-        <th style="width: 10%"></th>
-      </tr>
-    </ng-template>
-    <ng-template #body let-user>
-      <tr>
-        <td>
-          <app-avatar-component [text]="user.profile?.fullName" />
-        </td>
-        <td>
-          <p class="font-semibold capitalize">{{ user.profile?.fullName ?? '--' }}</p>
-          <p class="text-sm text-slate-400">{{ user.email }}</p>
-        </td>
+<p-panel
+  [pt]="{
+    'root': isMobile() ? 'bg-transparent border-0' : '',
+    'content': isMobile() ? 'px-0' : '',
+    'header': isMobile() ? 'px-0 pt-0' : '',
+  }"
+>
+  <ng-template #header>
+    <div class="md:flex items-center justify-between w-full">
+      <h2 class="hidden md:block">Residentes</h2>
 
-        <td>
-          {{ user.role.displayName }}
-        </td>
-        <td>
-          <app-resident-status-component [status]="user.status" />
-        </td>
-        <td>
-          <p-button
-            icon="pi pi-search"
-            severity="secondary"
-            text
-            size="small"
-            (click)="view.emit(user.publicId)"
-          />
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
+      <app-resident-filters
+        class="block"
+        [roles]="roles()"
+        [statuses]="statuses()"
+        [isMobile]="isMobile()"
+        (filter)="filter($event)"
+      />
+    </div>
+  </ng-template>
+  <ng-template #icons> </ng-template>
+
+  @if (isMobile()) {
+    <div class="flex flex-col gap-3 md:hidden">
+      @for (user of items(); track user.publicId) {
+        <button
+          type="button"
+          (click)="view.emit(user.publicId)"
+          class="w-full text-start rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm hover:border-slate-300 dark:hover:border-slate-600 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-500"
+        >
+          <span class="flex items-center justify-between gap-3">
+            <span class="flex items-center gap-3 min-w-0">
+              <app-avatar-component [text]="user.profile?.fullName" />
+              <span class="min-w-0">
+                <span
+                  class="block font-semibold capitalize truncate text-slate-900 dark:text-white"
+                >
+                  {{ user.profile?.fullName ?? '--' }}
+                </span>
+                <span class="block text-xs text-slate-500 dark:text-slate-400 truncate">
+                  {{ user.email }}
+                </span>
+              </span>
+            </span>
+            <span class="flex items-center gap-3 shrink-0">
+              @if (user.status; as status) {
+                <app-resident-status-component [status]="status" />
+              }
+              <i class="pi pi-chevron-right text-slate-400" aria-hidden="true"></i>
+            </span>
+          </span>
+          <span class="flex items-center gap-1.5 mt-3 text-xs text-slate-500 dark:text-slate-400">
+            <i class="pi pi-id-card" aria-hidden="true"></i>
+            {{ user.role?.displayName ?? 'Sin rol' }}
+          </span>
+        </button>
+      } @empty {
+        <div class="py-14 flex flex-col items-center text-center px-4">
+          <div
+            class="h-12 w-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 mb-3"
+          >
+            <i class="pi pi-users"></i>
+          </div>
+          <p class="text-sm font-medium text-slate-700 dark:text-slate-200">
+            No se encontraron residentes
+          </p>
+          <p class="text-xs text-slate-400 mt-1">Intenta con otros filtros o registra uno nuevo.</p>
+        </div>
+      }
+
+      @if (pagination() && items().length > 0) {
+        <p-paginator
+          [first]="pageFirst()"
+          [rows]="pageRows()"
+          [totalRecords]="pagination()?.total || 0"
+          [showFirstLastIcon]="false"
+          showPageLinks="3"
+          (onPageChange)="paginateMobile($event)"
+          class="mt-2"
+        />
+      }
+    </div>
+  } @else {
+    <div class="overflow-x-auto">
+      <p-table
+        #dt
+        [value]="items()"
+        [rows]="pagination()?.limit || 10"
+        [paginator]="pagination() && items().length > 0"
+        [showPageLinks]="items().length > 0"
+        [totalRecords]="pagination()?.total || 0"
+        [loading]="isLoading()"
+        [showCurrentPageReport]="true"
+        [lazy]="true"
+        [lazyLoadOnInit]="false"
+        (onLazyLoad)="search($event)"
+        [showFirstLastIcon]="false"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+        paginatorStyleClass="mt-5"
+      >
+        <ng-template #header>
+          @if (items().length > 0) {
+            <tr>
+              <th scope="col" class="w-1/12"></th>
+              <th scope="col" class="w-1/4">Nombre</th>
+              <th scope="col" class="w-1/4">Rol</th>
+              <th scope="col" class="w-1/4">Estatus</th>
+              <th scope="col" class="w-1/12"></th>
+            </tr>
+          }
+        </ng-template>
+        <ng-template #body let-user>
+          <tr>
+            <td>
+              <app-avatar-component [text]="user.profile?.fullName" />
+            </td>
+            <td>
+              <p class="font-semibold capitalize">
+                {{ user.profile?.fullName ?? '--' }}
+              </p>
+              <p class="text-sm text-slate-400">{{ user.email }}</p>
+            </td>
+
+            <td>
+              {{ user.role?.displayName ?? '--' }}
+            </td>
+            <td>
+              @if (user.status; as status) {
+                <app-resident-status-component [status]="status" />
+              }
+            </td>
+            <td>
+              <p-button
+                icon="pi pi-search"
+                severity="secondary"
+                text
+                size="small"
+                aria-label="Ver detalle de {{ user.profile?.fullName ?? user.email }}"
+                (click)="view.emit(user.publicId)"
+              />
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template #emptymessage>
+          <tr>
+            <td colspan="5">
+              <div class="py-14 flex flex-col items-center text-center px-4">
+                <div
+                  class="h-12 w-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 mb-3"
+                >
+                  <i class="pi pi-users"></i>
+                </div>
+                <p class="text-sm font-medium text-slate-700 dark:text-slate-200">
+                  No se encontraron residentes
+                </p>
+                <p class="text-xs text-slate-400 mt-1">
+                  Intenta con otros filtros o registra uno nuevo.
+                </p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  }
 </p-panel>

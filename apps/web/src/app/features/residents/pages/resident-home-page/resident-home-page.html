@@ -1,41 +1,51 @@
-<div class="space-y-6">
+<div class="relative space-y-6">
   <!-- Header -->
-  <div
-    class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
-  >
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
     <div>
       <div class="flex items-center gap-2 flex-wrap">
-        <h1
-          class="text-xl sm:text-2xl font-display font-semibold text-slate-900 dark:text-white"
-        >
+        <h1 class="text-xl sm:text-2xl font-display font-semibold text-slate-900 dark:text-white">
           Residentes
         </h1>
       </div>
       <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
-        Busca, filtra y administra los redientes de la plataforma.
+        Busca, filtra y administra los residentes de la plataforma.
       </p>
     </div>
 
-    <div class="flex items-center gap-3">
-      <p-button
-        icon="pi pi-plus"
-        label="Nuevo"
-        (click)="create()"
-        class="hidden md:block"
-      />
+    <div class="hidden md:flex items-center gap-3">
+      <p-button icon="pi pi-plus" label="Nuevo" (click)="create()" />
     </div>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+  @if (store.error()) {
+    <app-form-feedback [callState]="store.callState()" />
+  }
+
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
     <app-residents-table
-      class="col-span-2"
+      class="col-span-3"
       [isLoading]="store.loading()"
       [items]="store.entities()"
       [pagination]="store.pagination()"
+      [isMobile]="sessionService.isMobile()"
+      [roles]="catStore.UserRoles()"
+      [statuses]="catStore.UserStatus()"
       (paginate)="onSearch($event)"
       (view)="view($event)"
     />
 
-    <app-resident-stats [stats]="store.stats()" />
+    <app-resident-stats class="hidden md:block" [stats]="store.stats()" />
   </div>
+
+  @if (sessionService.isMobile()) {
+    <div class="absolute right-4 bottom-4 hidden md:hidden">
+      <p-button
+        icon="pi pi-plus"
+        rounded
+        size="large"
+        aria-label="Registrar nuevo residente"
+        (click)="create()"
+      />
+    </div>
+  }
 </div>
