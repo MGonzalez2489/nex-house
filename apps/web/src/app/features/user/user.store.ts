@@ -27,7 +27,8 @@ import { lastValueFrom } from "rxjs";
 import { AuthStore } from "@auth/store";
 import { UserService } from "./services";
 
-interface ProfileState {  user: UserModel | undefined;
+interface ProfileState {
+  user: UserModel | undefined;
   profile: UserProfileModel | undefined;
   status: UserStatusModel | undefined;
   role: UserRoleModel | undefined;
@@ -53,59 +54,48 @@ export const UserStore = signalStore(
     _profileService: inject(ProfileService),
   })),
   withMethods((store) => ({
-    loadProfile: async () => {
+    loadProfile: async (): Promise<boolean> => {
       try {
         patchState(store, setLoading());
         const prof = await lastValueFrom(store._profileService.get());
 
         patchState(store, { profile: prof.data }, setLoaded());
+        return true;
       } catch (error) {
         patchState(store, setError(error));
+        return false;
       }
     },
-    loadUser: async () => {
+    loadUser: async (): Promise<boolean> => {
       patchState(store, setLoading());
 
       try {
         const res = await lastValueFrom(store._userService.get());
-
-        const state = {
-          status: res.data.status,
-          role: res.data.role,
-          units: res.data.userUnits,
-        };
-
-        const user = res.data;
-        if (user.status) {
-          state.status = user.status;
-          delete user.status;
-        }
-        if (user.role) {
-          state.role = user.role;
-          delete user.role;
-        }
-        if (user.userUnits) {
-          state.units = user.userUnits;
-          user.userUnits = [];
-        }
+        const { status, role, userUnits, ...rest } = res.data;
 
         patchState(
           store,
-          { user, status: state.status, role: state.role, units: state.units },
+          {
+            user: { ...rest, userUnits: [] },
+            status,
+            role,
+            units: userUnits,
+          },
           setLoaded(),
         );
+        return true;
       } catch (error) {
         patchState(store, setError(error));
+        return false;
       }
     },
-    update: async (dto: FormData) => {
+    update: async (dto: FormData): Promise<boolean> => {
       patchState(store, setLoading());
       try {
         const response = await lastValueFrom(store._profileService.update(dto));
 
         patchState(store, { profile: response.data }, setLoaded());
-
-        return response.data;
+        return true;
       } catch (err) {
         patchState(store, setError(err));
         return false;

@@ -1,30 +1,49 @@
 <p-panel header="Domicilio registrado" class="space-y-4">
-  @if (userUnits() && neighborhood()) {
+  @if (userUnits().length === 0) {
+    <div class="flex flex-col items-center justify-center py-4 text-slate-400">
+      <p class="text-sm">No hay unidad asignada</p>
+    </div>
+  } @else {
     <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div>
         <dt class="text-xs text-slate-400">Fraccionamiento</dt>
         <dd
           class="text-sm text-slate-700 dark:text-slate-200 mt-0.5 capitalize"
         >
-          {{ neighborhood()?.name || "no hay" }}
-        </dd>
-      </div>
-      <div>
-        <dt class="text-xs text-slate-400">Calle y número</dt>
-        <dd
-          class="text-sm text-slate-700 dark:text-slate-200 mt-0.5 capitalize"
-        >
-          {{ current()?.street?.name }} {{ current()?.identifier }}
+          {{ neighborhood()?.name || "—" }}
         </dd>
       </div>
     </dl>
+
+    <ul class="mt-4 space-y-3">
+      @for (userUnit of userUnits(); track userUnit.publicId) {
+        <li
+          class="flex items-center justify-between gap-3 border-t border-slate-200 dark:border-slate-800 pt-3 first:pt-0 first:border-t-0"
+        >
+          <div>
+            <p
+              class="text-sm font-medium text-slate-700 dark:text-slate-200 capitalize"
+            >
+              {{ userUnit.unit.street.name }} {{ userUnit.unit.identifier }}
+            </p>
+            <p class="text-xs text-slate-400 mt-0.5">
+              {{ userUnit.userUnitRole.displayName }}
+            </p>
+          </div>
+          @if (userUnit.isCurrentOccupant) {
+            <span
+              class="shrink-0 text-xs font-medium text-emerald-600 dark:text-emerald-400"
+            >
+              Residencia actual
+            </span>
+          }
+        </li>
+      }
+    </ul>
+
     <p class="text-xs text-slate-400 mt-5">
       ¿Necesitas actualizar tu domicilio? Contacta a un administrador desde la
       sección de tu fraccionamiento.
     </p>
-  } @else {
-    <div class="flex items-center justify-center text-slate-400">
-      <h3>No hay unidad asignada</h3>
-    </div>
   }
 </p-panel>

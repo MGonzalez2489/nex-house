@@ -1,16 +1,47 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed } from "@angular/core/testing";
+import { RequestService } from "@core/services";
+import { of } from "rxjs";
+import { ProfileService } from "./profile-service";
 
-import { ProfileService } from './profile-service';
-
-describe('ProfileService', () => {
+describe("ProfileService", () => {
   let service: ProfileService;
+  let request: {
+    get: jest.Mock;
+    patch: jest.Mock;
+  };
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    request = {
+      get: jest.fn().mockReturnValue(of({ data: {}, message: "ok" })),
+      patch: jest.fn().mockReturnValue(of({ data: {}, message: "ok" })),
+    };
+
+    TestBed.configureTestingModule({
+      providers: [
+        ProfileService,
+        { provide: RequestService, useValue: request },
+      ],
+    });
+
     service = TestBed.inject(ProfileService);
   });
 
-  it('should be created', () => {
+  it("should be created", () => {
     expect(service).toBeTruthy();
+  });
+
+  it("get delegates to GET /api/user/profile", () => {
+    service.get().subscribe();
+
+    expect(request.get).toHaveBeenCalledWith("/api/user/profile");
+  });
+
+  it("update delegates to PATCH /api/user/profile with the FormData payload", () => {
+    const dto = new FormData();
+    dto.append("firstName", "Juan");
+
+    service.update(dto).subscribe();
+
+    expect(request.patch).toHaveBeenCalledWith("/api/user/profile", dto);
   });
 });

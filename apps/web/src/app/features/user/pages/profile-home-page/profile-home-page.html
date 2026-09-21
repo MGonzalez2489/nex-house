@@ -14,24 +14,22 @@
   </div>
 
   <div class="space-y-4">
-    @if (user() && profile()) {
-      <!-- <app-profile-card -->
-      <!--   [user]="user()!" -->
-      <!--   [profile]="profile()!" -->
-      <!--   class="block" -->
-      <!--   (refresh)="store.load()" -->
-      <!-- /> -->
+    @if (vm(); as data) {
       <app-profile-info-form
-        [user]="user()!"
-        [profile]="profile()!"
+        [user]="data.user"
+        [profile]="data.profile"
+        [isLoading]="store.loading()"
+        [callState]="store.callState()"
         class="block"
         (save)="store.update($event)"
       />
       <app-profile-unit
         class="block"
         [userUnits]="store.units()"
-        [neighborhood]="$safeNavigationMigration(user()?.neighborhood)"
+        [neighborhood]="neighborhood()"
       />
+    } @else if (store.error()) {
+      <app-form-feedback [callState]="store.callState()" />
     }
   </div>
 </div>

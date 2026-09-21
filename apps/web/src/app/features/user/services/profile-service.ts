@@ -1,6 +1,8 @@
 import { inject, Injectable } from "@angular/core";
 import { RequestService } from "@core/services";
+import { ApiResponse } from "@nexhouse/shared-domain/interfaces";
 import { UserProfileModel } from "@nexhouse/shared-domain/models";
+import { Observable } from "rxjs";
 
 @Injectable({
   providedIn: "root",
@@ -9,11 +11,11 @@ export class ProfileService {
   private readonly request = inject(RequestService);
   private readonly endpoint = "/api/user/profile";
 
-  get() {
+  get(): Observable<ApiResponse<UserProfileModel>> {
     return this.request.get<UserProfileModel>(this.endpoint);
   }
 
-  update(dto: FormData) {
+  update(dto: FormData): Observable<ApiResponse<UserProfileModel>> {
     return this.request.patch<UserProfileModel>(this.endpoint, dto);
   }
 }

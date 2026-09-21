@@ -7,7 +7,7 @@
         text
         severity="secondary"
         size="small"
-        (click)="changeMode()"
+        (click)="edit()"
       />
     }
   </ng-template>
@@ -24,13 +24,17 @@
         id="email"
         type="text"
         fluid
-        [(ngModel)]="user().email"
+        [value]="user().email"
         disabled
       />
     </div>
 
     @if (mode() === "form") {
-      <app-form-options (doCancel)="cancel()" />
+      <app-form-options
+        [callState]="callState()"
+        [isLoading]="isLoading()"
+        (doCancel)="cancel()"
+      />
     }
   </app-profile-form-component>
 </p-panel>

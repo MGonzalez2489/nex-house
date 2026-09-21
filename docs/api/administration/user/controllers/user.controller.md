@@ -8,7 +8,7 @@ Exposes the authenticated user's own account operations under `user`.
 
 | Method | Route | Description |
 |---|---|---|
-| `GET` | `/user` | Returns the authenticated user with `status`, `role` and `userUnits` relations (`unit` includes `street` and `type`; plus `userUnitRole`) |
+| `GET` | `/user` | Returns the authenticated user with `status`, `role`, `neighborhood` and `userUnits` relations (`unit` includes `street` and `type`; plus `userUnitRole`) |
 | `GET` | `/user/stats` | Returns neighborhood-scoped user metrics (`UserStats`) |
 | `PATCH` | `/user` | Updates the authenticated user (role and/or unit assignment) |
 
@@ -26,5 +26,6 @@ Delegates to `UserService.update(neigh.id, user.publicId, dto, user)`, always op
 
 ## Notes
 
+- The `neighborhood` relation is loaded with a TypeORM LEFT JOIN, so users without a neighborhood (e.g. the seeded super admin) still resolve with `neighborhood: null` instead of failing; the same relation is already loaded by `JwtStrategy.validate`.
 - The previous `@ApiParam({ name: 'publicId' })` decorator was misleading because the route has no such parameter; it was removed.
 - Response entities are serialized with the global `ClassSerializerInterceptor`, so `User.password` and other `@Exclude()` fields are not exposed.

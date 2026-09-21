@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  input,
-} from "@angular/core";
+import { ChangeDetectionStrategy, Component, input } from "@angular/core";
 import {
   NeighborhoodModel,
   UserUnitModel,
@@ -19,10 +14,6 @@ import { Panel } from "@openng/optimus-ui/panel";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileUnit {
-  neighborhood = input<NeighborhoodModel>();
-  userUnits = input<UserUnitModel[]>();
-
-  current = computed(
-    () => this.userUnits()?.find((f) => f.isCurrentOccupant)?.unit,
-  );
+  readonly neighborhood = input<NeighborhoodModel>();
+  readonly userUnits = input<UserUnitModel[]>([]);
 }
