@@ -1,5 +1,5 @@
 @if (callState()) {
-  <app-form-feedback [callState]="callState()!" />
+  <app-form-feedback [callState]="callState()" />
 }
 
 <div
@@ -21,7 +21,6 @@
     class="w-full"
     fluid
     type="submit"
-    [fluid]="true"
     [label]="submitLabel()"
     [loading]="isLoading()"
     [severity]="submitSeverity()"

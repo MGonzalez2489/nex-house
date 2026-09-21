@@ -5,7 +5,7 @@ import {
   input,
 } from "@angular/core";
 import { ValidationErrors } from "@angular/forms";
-import { ERROR_MESSAGES } from "./form-errror-messages";
+import { ERROR_MESSAGES } from "./form-error-messages";
 
 @Component({
   selector: "app-form-validation-error",

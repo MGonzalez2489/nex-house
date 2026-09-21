@@ -7,7 +7,7 @@ export interface FormattedError {
   message: string;
   statusCode?: number;
   originalError?: any;
-  translationKey?: string; // Para futuras traducciones
+  translationKey?: string; // For future translations
 }
 
 @Injectable({
@@ -15,10 +15,10 @@ export interface FormattedError {
 })
 export class ErrorService {
   /**
-   * Maneja un error, lo formatea, lo loguea y muestra una notificación al usuario.
-   * Luego re-lanza un Observable de error formateado.
-   * @param error El error original (puede ser HttpErrorResponse, Error, o cualquier otro).
-   * @returns Un Observable que emite un error formateado.
+   * Handles an error, formats it, logs it, and shows a notification to the user.
+   * Then re-throws a formatted error Observable.
+   * @param error The original error (can be HttpErrorResponse, Error, or any other).
+   * @returns An Observable that emits a formatted error.
    */
   handleError(error: any): Observable<never> {
     const formattedError: FormattedError = formatError(error);
@@ -27,14 +27,14 @@ export class ErrorService {
     this._logError(formattedError);
     this._showNotification(formattedError.message);
 
-    // Aquí podrías añadir lógica para navegar a una página de error específica
+    // You could add logic here to navigate to a specific error page
     // if (formattedError.statusCode === 401) {
     //   this.router.navigate(['/login']);
     // } else if (formattedError.statusCode === 404) {
     //   this.router.navigate(['/not-found']);
     // }
 
-    // Re-lanza el error formateado para que otros catchError o suscriptores puedan manejarlo
+    // Re-throws the formatted error so other catchError handlers or subscribers can handle it
     return throwError(() => formattedError);
   }
 
@@ -43,16 +43,16 @@ export class ErrorService {
       message: formattedError.message,
       statusCode: formattedError.statusCode,
       translationKey: formattedError.translationKey,
-      originalError: formattedError.originalError, // Puedes decidir si quieres loguear todo el error original
+      originalError: formattedError.originalError, // You can decide whether to log the entire original error
     });
-    // Aquí podrías integrar con un servicio de logging externo (ej. Sentry, DataDog)
+    // You could integrate with an external logging service here (e.g. Sentry, DataDog)
   }
 
   private _showNotification(message: string): void {
-    // Implementa aquí tu lógica para mostrar notificaciones al usuario.
-    // Podrías inyectar un servicio de Angular Material SnackBar, OptimusUI MessageService, etc.
+    // Implement your logic here to show notifications to the user.
+    // You could inject an Angular Material SnackBar service, OptimusUI MessageService, etc.
     console.warn(`ErrorService - Notificación al usuario: ${message}`);
-    // Ejemplo ficticio:
+    // Hypothetical example:
     // this.toastService.error(message);
   }
 }
@@ -65,31 +65,31 @@ export function formatError(error: any): FormattedError {
   if (error instanceof HttpErrorResponse) {
     statusCode = error.status;
     if (error.error instanceof ErrorEvent) {
-      // Error de red o del cliente (ej. error en el script)
+      // Network or client error (e.g. script error)
       message = `Error de red: ${error.error.message}`;
       translationKey = "errors.network";
     } else if (error.status === 0) {
-      // El backend no responde o el usuario está sin conexión
+      // The backend is not responding or the user is offline
       message =
         "No se pudo conectar al servidor. Por favor, verifica tu conexión a internet.";
       translationKey = "errors.noConnection";
     } else if (error.error && typeof error.error === "object") {
-      // Error de la API con una estructura de respuesta específica (ej. ApiResponse)
+      // API error with a specific response structure (e.g. ApiResponse)
       const apiError = error.error as ApiResponse<any>;
       if (apiError.message) {
         message = apiError.message;
-        translationKey = `errors.api.${statusCode}`; // O una clave más genérica si no hay una específica
+        translationKey = `errors.api.${statusCode}`; // Or a more generic key if there is no specific one
       } else if (typeof error.error === "string") {
-        // A veces el backend devuelve un string puro en error.error
+        // Sometimes the backend returns a plain string in error.error
         message = error.error;
         translationKey = `errors.api.${statusCode}`;
       } else {
-        // Fallback para errores de servidor con estructura desconocida
+        // Fallback for server errors with an unknown structure
         message = `Error del servidor (Código: ${statusCode}): ${error.statusText || "Error desconocido"}.`;
         translationKey = `errors.server.${statusCode}`;
       }
     } else {
-      // Otros errores HTTP desconocidos
+      // Other unknown HTTP errors
       message = `Error en la solicitud (Código: ${statusCode}): ${error.message || error.statusText || "Error desconocido"}.`;
       translationKey = `errors.http.${statusCode}`;
     }
@@ -100,7 +100,7 @@ export function formatError(error: any): FormattedError {
     typeof error.message === "string" &&
     "statusCode" in error
   ) {
-    // Si el error es directamente un objeto que cumple nuestra ApiResponse
+    // If the error is directly an object that satisfies our ApiResponse
     const apiError = error as ApiResponse<any>;
     statusCode = apiError.statusCode;
     if (statusCode && statusCode >= 400 && statusCode < 600) {
@@ -108,12 +108,12 @@ export function formatError(error: any): FormattedError {
       translationKey = `errors.api.${statusCode}`;
     }
   } else if (error instanceof Error) {
-    // Errores de JavaScript genéricos
+    // Generic JavaScript errors
     message = `Error de la aplicación: ${error.message}`;
     translationKey = "errors.application";
   }
 
-  // Opcional: Loguear el error original para depuración
+  // Optional: Log the original error for debugging
   console.error("Error original interceptado:", error);
 
   return {

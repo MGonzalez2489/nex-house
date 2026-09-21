@@ -1,5 +1,5 @@
 <div class="mx-auto w-full max-w-2xl px-4 sm:px-6 pb-24 lg:pb-6">
-  <!-- Cabecera -->
+  <!-- Header -->
   <div class="flex items-center justify-between">
     <p-button icon="pi pi-sign-out" class="scale-x-[-1]" text (click)="sessionService.logout()" />
     <app-brand-component />
@@ -9,7 +9,7 @@
   <!-- Stepper -->
   <div class="pt-6">
     <p-stepper [value]="activeStepIndex()">
-      <!-- CABECERA DEL STEPPER -->
+      <!-- STEPPER HEADER -->
       <p-step-list>
         @for (step of steps(); track step.id; let i = $index) {
           <p-step [value]="i">
@@ -18,7 +18,7 @@
         }
       </p-step-list>
 
-      <!-- PANELS DE CONTENIDO DE CADA PASO -->
+      <!-- CONTENT PANELS FOR EACH STEP -->
       <p-step-panels>
         @for (step of steps(); track step.id; let i = $index) {
           <p-step-panel [value]="i">

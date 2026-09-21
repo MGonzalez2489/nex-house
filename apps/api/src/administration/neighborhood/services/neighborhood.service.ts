@@ -339,7 +339,7 @@ export class NeighborhoodService {
           await this.cacheManager.del(key);
         }
       } else {
-        // Fallback para in-memory cache básico
+        // Fallback for the basic in-memory cache
         await this.cacheManager.clear();
       }
       this.logger.log('🧹 Neighborhoods cache successfully evicted.');

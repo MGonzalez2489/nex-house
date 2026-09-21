@@ -2,7 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  effect,
+  inject,
   input,
   output,
   signal,
@@ -11,12 +11,19 @@ import { UserRoleEnum } from "@nexhouse/shared-domain/enums";
 import { UserModel, UserProfileModel } from "@nexhouse/shared-domain/models";
 import { AvatarComponent, BrandComponent } from "@shared/components";
 import { USER_ROUTES_ENUM } from "@user/user.routes";
+import { ThemeService } from "@core/services";
 import { MenuItem } from "@openng/optimus-ui/api";
 import { Button } from "@openng/optimus-ui/button";
 import { MenuModule } from "@openng/optimus-ui/menu";
 
-//TODO: $safeNavigationMigration
-
+/**
+ * Barra superior común a todos los layouts autenticados.
+ *
+ * - Presentacional: recibe `user`/`profile` y emite `toggleSidebar`/`logout`.
+ * - El tema claro/oscuro se delega en `ThemeService` (deja de vivir aquí).
+ * - No contiene datos de mock: el menú de usuario y las notificaciones son
+ *   el esqueleto a conectar con sus features reales.
+ */
 @Component({
   selector: "app-nav-bar",
   imports: [Button, BrandComponent, MenuModule, AvatarComponent],
@@ -31,18 +38,8 @@ export class NavBar {
   toggleSidebar = output();
   logout = output();
 
-  protected readonly darkMode = signal<boolean>(
-    //light mode by default
-    typeof window !== "undefined"
-      ? window.localStorage.getItem("theme") === "dark"
-      : false,
-    //system preference
-    // typeof window !== "undefined"
-    //   ? window.localStorage.getItem("theme") === "dark" ||
-    //       (!("theme" in window.localStorage) &&
-    //         window.matchMedia("(prefers-color-scheme: dark)").matches)
-    //   : false,
-  );
+  protected readonly themeService = inject(ThemeService);
+
   protected readonly menuItems = signal<MenuItem[]>([
     {
       label: "Mi Perfil",
@@ -60,27 +57,7 @@ export class NavBar {
     },
   ]);
 
-  // protected readonly sessionService = inject(SessionService);
-
   isResident = computed(
     () => this.user()?.role?.name === UserRoleEnum.RESIDENT,
   );
-
-  constructor() {
-    effect(() => {
-      if (typeof window !== "undefined") {
-        const isDark = this.darkMode();
-        document.documentElement.classList.toggle("dark", isDark);
-        window.localStorage.setItem("theme", isDark ? "dark" : "light");
-      }
-    });
-  }
-
-  toggleTheme() {
-    this.darkMode.update((dark) => !dark);
-  }
-
-  // toggleSidebar() {
-  //   this.sessionService.toggleSession();
-  // }
 }

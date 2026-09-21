@@ -25,22 +25,15 @@ type AppLayout = Type<RootLayout | AdminLayout | ResidentLayout>;
 export class MainLayout {
   protected readonly store = inject(UserStore);
 
+  private readonly layoutByRole: Partial<Record<UserRoleEnum, AppLayout>> = {
+    [UserRoleEnum.SUPERADMIN]: RootLayout,
+    [UserRoleEnum.ADMIN]: AdminLayout,
+    [UserRoleEnum.RESIDENT]: ResidentLayout,
+  };
+
   protected readonly activeLayout = computed<AppLayout | null>(() => {
     const role = this.store.role();
-
     if (!role) return null;
-
-    switch (role.name) {
-      case UserRoleEnum.SUPERADMIN:
-        return RootLayout;
-      case UserRoleEnum.ADMIN:
-        return AdminLayout;
-      default: {
-        console.log(
-          `======== LAYOUT UNDEFINED WITH ROLE: ${role?.displayName}`,
-        );
-        return ResidentLayout;
-      }
-    }
+    return this.layoutByRole[role.name] ?? ResidentLayout;
   });
 }

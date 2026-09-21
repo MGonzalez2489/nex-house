@@ -11,7 +11,7 @@ export const getAppBaseUrl = (): string => {
 export const buildPublicUrl = (path?: string | null): string | undefined => {
   if (!path) return undefined;
 
-  // Si ya es una URL absoluta (S3, Cloudinary, OAuth), la devuelve intacta
+  // If it is already an absolute URL (S3, Cloudinary, OAuth), return it untouched
   if (path.startsWith('http://') || path.startsWith('https://')) {
     return path;
   }

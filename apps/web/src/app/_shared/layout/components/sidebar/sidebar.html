@@ -35,7 +35,7 @@
         >
           <div class="flex gap-3">
             <app-avatar-component
-              [url]="$safeNavigationMigration(profile().avatar?.url)"
+              [url]="profile().avatar?.url"
               [text]="profile().fullName"
             />
 

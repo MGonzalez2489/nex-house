@@ -28,7 +28,7 @@ export async function paginate<T extends ObjectLiteral>(
     ...findOptions,
     skip: first,
     take: rows,
-    order: { [sortField]: sortOrder } as FindOptionsOrder<T>, // Solucionado el 'as any'
+    order: { [sortField]: sortOrder } as FindOptionsOrder<T>, // Fixed the 'as any'
   });
 
   return {

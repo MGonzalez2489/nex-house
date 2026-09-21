@@ -11,7 +11,7 @@ export const NxPreset = definePreset(Aura, {
             background: "{slate.50}",
             // text-slate-800
             color: "{slate.800}",
-            // border (color por defecto)
+            // border (default color)
             borderColor: "{slate.200}",
             // placeholder:text-slate-400
             placeholderColor: "{slate.400}",
@@ -24,9 +24,9 @@ export const NxPreset = definePreset(Aura, {
             background: "{slate.800}",
             // dark:text-slate-200
             color: "{slate.200}",
-            // border (color en dark)
+            // border (color in dark)
             borderColor: "{slate.700}",
-            // placeholder:text-slate-400 (ajustar si es diferente en dark)
+            // placeholder:text-slate-400 (adjust if different in dark)
             placeholderColor: "{slate.500}",
             // focus:border-cyan-500
             focusBorderColor: "{cyan.500}",
@@ -50,7 +50,7 @@ export const NxPreset = definePreset(Aura, {
             background: "{slate.50}",
             // text-slate-800
             color: "{slate.800}",
-            // border (color por defecto)
+            // border (default color)
             borderColor: "{slate.200}",
             // placeholder:text-slate-400
             placeholderColor: "{slate.400}",
@@ -63,9 +63,9 @@ export const NxPreset = definePreset(Aura, {
             background: "{slate.800}",
             // dark:text-slate-200
             color: "{slate.200}",
-            // border (color en dark)
+            // border (color in dark)
             borderColor: "{slate.700}",
-            // placeholder:text-slate-400 (ajustar si es diferente en dark)
+            // placeholder:text-slate-400 (adjust if different in dark)
             placeholderColor: "{slate.500}",
             // focus:border-cyan-500
             focusBorderColor: "{cyan.500}",
@@ -100,25 +100,25 @@ export const NxPreset = definePreset(Aura, {
     datatable: {
       root: {
         // fontSize: '0.875rem', // text-sm
-        // borderWidth: '0', // El borde se maneja en celdas/header
+        // borderWidth: '0', // Border is handled in cells/header
         borderColor: "{slate.800}", // border-slate-100 (base)
         transitionDuration: "{transition.duration.normal}",
       },
 
       header: {
-        background: "#fff", // Sin fondo extra
+        background: "#fff", // No extra background
         borderColor: "{slate.100}", // border-b
-        borderWidth: "0 0 1px 0", // Solo borde inferior
-        padding: "0", // El padding va en las celdas
+        borderWidth: "0 0 1px 0", // Bottom border only
+        padding: "0", // Padding is applied at the cells
         color: "{slate.400}", // text-slate-400
       },
       headerCell: {
-        background: "#fff", // Sin fondo extra
-        borderColor: "{slate.100}", // border-b heredado o explícito
+        background: "#fff", // No extra background
+        borderColor: "{slate.100}", // border-b inherited or explicit
         color: "{slate.400}", // text-slate-400
-        padding: "0.50rem 1.25rem", // py-3 px-5 (ajustado: 12px/20px)
+        padding: "0.50rem 1.25rem", // py-3 px-5 (adjusted: 12px/20px)
 
-        hoverBackground: "transparent", // Sin hover en header por defecto en tu ejemplo
+        hoverBackground: "transparent", // No header hover by default in your example
         focusRing: {
           width: "0",
           style: "none",
@@ -137,10 +137,10 @@ export const NxPreset = definePreset(Aura, {
       colorScheme: {
         light: {
           row: {
-            background: "#fff", // Sin fondo extra
-            color: "{slate.500}", // text-slate-500 (default para celdas)
+            background: "#fff", // No extra background
+            color: "{slate.500}", // text-slate-500 (default for cells)
             hoverBackground: "{slate.800}", // hover:bg-slate-50
-            hoverColor: "{slate.800}", // Opcional: oscurecer texto al hover
+            hoverColor: "{slate.800}", // Optional: darken text on hover
           },
         },
         dark: {

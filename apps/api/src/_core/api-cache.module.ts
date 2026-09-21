@@ -15,7 +15,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         if (useRedis) {
           // we'll import redis store in the future
           return {
-            ttl: 60 * 60, // 1 hora por defecto
+            ttl: 60 * 60, // 1 hour by default
           };
         }
 

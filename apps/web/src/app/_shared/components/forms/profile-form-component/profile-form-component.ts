@@ -1,8 +1,9 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
+  DestroyRef,
   effect,
+  inject,
   input,
   output,
   signal,
@@ -43,14 +44,9 @@ export class ProfileFormComponent {
   doSubmit = output<FormData>();
   disabledForm = input<boolean>(false);
 
-  protected avatarPreview = signal<string | null>(null);
-  protected readonly previewUrl = computed(() => {
-    const file = this.formChanges()?.avatar;
-    if (!file) return null;
-
-    const value = URL.createObjectURL(file as File);
-    return value;
-  });
+  protected readonly previewUrl = signal<string | null>(null);
+  private currentObjectUrl: string | null = null;
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly form = new FormGroup({
     firstName: new FormControl("", {
@@ -67,6 +63,17 @@ export class ProfileFormComponent {
   protected formChanges = toSignal(this.form.valueChanges);
 
   constructor() {
+    effect(() => {
+      const cFile = this.formChanges()?.avatar;
+      this.setPreviewUrl(
+        cFile instanceof File ? URL.createObjectURL(cFile) : null,
+      );
+    });
+
+    this.destroyRef.onDestroy(() => {
+      if (this.currentObjectUrl) URL.revokeObjectURL(this.currentObjectUrl);
+    });
+
     effect(async () => {
       const cProfile = this.profile();
       if (!cProfile) return;
@@ -106,7 +113,7 @@ export class ProfileFormComponent {
     const raw = this.form.getRawValue();
     const formData = new FormData();
 
-    // Helper para añadir solo si cambió o si es nuevo
+    // Helper that appends only if changed or new
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const appendIfChanged = (key: string, value: any, original?: any) => {
       if (!ex || value !== original) {

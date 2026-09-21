@@ -32,16 +32,16 @@ export class NxSession extends BaseEntity {
   socketId: string | null;
 
   @Column({ nullable: true })
-  browser: string; // Ej: Chrome
+  browser: string; // E.g.: Chrome
 
   @Column({ nullable: true })
   browserVersion: string;
 
   @Column({ nullable: true })
-  os: string; // Ej: macOS
+  os: string; // E.g.: macOS
 
   @Column({ nullable: true })
-  device: string; // Ej: iPhone, Macintosh
+  device: string; // E.g.: iPhone, Macintosh
 
   @Column({ nullable: true })
   ipAddress: string;

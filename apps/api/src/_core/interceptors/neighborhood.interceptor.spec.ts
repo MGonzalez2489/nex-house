@@ -35,7 +35,7 @@ describe('NeighborhoodInterceptor', () => {
       headers: {},
     };
 
-    // Mock anidated hierarchy for ExecutionContext
+    // Mock nested hierarchy for ExecutionContext
     mockExecutionContext = {
       switchToHttp: jest.fn().mockReturnThis(),
       getRequest: jest.fn().mockReturnValue(mockRequest),
