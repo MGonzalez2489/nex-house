@@ -1,6 +1,7 @@
 import { Component, input, output } from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { CallState } from "@ngrx-toolkit/core";
+import { ProfileEditPayload } from "@core/models/profile-edit-payload";
 import {
   NeighborhoodModel,
   UserModel,
@@ -53,7 +54,7 @@ class StubInfoForm {
   readonly profile = input<UserProfileModel>();
   readonly isLoading = input<boolean>();
   readonly callState = input<CallState>();
-  readonly save = output<FormData>();
+  readonly save = output<ProfileEditPayload>();
 }
 
 @Component({
@@ -197,7 +198,7 @@ describe("ProfileHomePage", () => {
     configure(storeStub);
     await mount();
 
-    const dto = new FormData();
+    const dto: ProfileEditPayload = { phone: "6145550101" };
     infoForm()?.save.emit(dto);
 
     expect(storeStub.update).toHaveBeenCalledWith(dto);

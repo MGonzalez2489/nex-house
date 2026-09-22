@@ -41,12 +41,15 @@ on failure patches `setError` and returns `false`.
 on bootstrap (and by the onboarding flow after profile/unit updates); the page
 does not trigger them.
 
-### `update(dto: FormData): Promise<boolean>`
+### `update(dto: ProfileEditPayload): Promise<boolean>`
 
 Patches the profile via `ProfileService.update(dto)`
-(`PATCH /api/user/profile`, multipart with the `avatar` file field) and stores
-the returned profile on success. Returns `true` on success; on failure patches
-`setError` and returns `false`.
+(`PATCH /api/user/profile`, multipart carrying the changed text fields and, when
+present, the `avatar` file) and stores the returned profile on success. `dto` is
+the typed diff emitted by `ProfileFormComponent` (`@core/models/
+profile-edit-payload`) — it only contains fields the user actually changed, so an
+empty object means nothing to send. Returns `true` on success; on failure
+patches `setError` and returns `false`.
 
 > All methods return `Promise<boolean>` so pages and flows can branch on success
 > without reading `error()`.

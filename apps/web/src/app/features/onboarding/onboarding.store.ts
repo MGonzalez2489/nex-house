@@ -8,6 +8,7 @@ import {
 } from '@ngrx-toolkit/core';
 import {effect, inject} from '@angular/core';
 import {OnboardingStepModel} from '@nexhouse/shared-domain/models';
+import {ProfileEditPayload} from '@core/models/profile-edit-payload';
 import {patchState, signalStore, withHooks, withMethods, withProps, withState} from '@ngrx/signals';
 import {OnboardingService} from './services/onboarding-service';
 import {lastValueFrom} from 'rxjs';
@@ -67,7 +68,7 @@ export const OnboardingStore = signalStore(
         return false;
       }
     },
-    updateProfile: async (dto: FormData): Promise<boolean> => {
+    updateProfile: async (dto: ProfileEditPayload): Promise<boolean> => {
       patchState(store, setLoading());
       try {
         const res = await lastValueFrom(store._service.updateProfile(dto));

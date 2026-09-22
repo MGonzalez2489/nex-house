@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { OnboardingHomePage } from "./onboarding-home-page";
+import { ProfileEditPayload } from "@core/models/profile-edit-payload";
 import { OnboardingStepEnum } from "@nexhouse/shared-domain/enums";
 import { CreateUnit } from "@nexhouse/shared-domain/interfaces";
 import {
@@ -8,7 +9,7 @@ import {
 } from "@nexhouse/shared-domain/models";
 
 interface OnboardingStoreLike {
-  updateProfile: (dto: FormData) => Promise<unknown>;
+  updateProfile: (dto: ProfileEditPayload) => Promise<unknown>;
   createUnit: (dto: CreateUnit) => Promise<unknown>;
 }
 
@@ -21,7 +22,7 @@ interface UserStoreLike {
 interface PageLike {
   store: OnboardingStoreLike;
   userStore: UserStoreLike;
-  updateProfile: (dto?: FormData) => Promise<void>;
+  updateProfile: (dto?: ProfileEditPayload) => Promise<void>;
   createUnit: (dto?: CreateUnit) => Promise<void>;
 }
 
@@ -42,7 +43,7 @@ describe("OnboardingHomePage", () => {
   function withStores(): {
     store: OnboardingStoreLike;
     userStore: UserStoreLike;
-    page: { updateProfile: (dto?: FormData) => Promise<void>; createUnit: (dto?: CreateUnit) => Promise<void> };
+    page: { updateProfile: (dto?: ProfileEditPayload) => Promise<void>; createUnit: (dto?: CreateUnit) => Promise<void> };
   } {
     const page = component as unknown as PageLike;
     return { store: page.store, userStore: page.userStore, page };
@@ -86,7 +87,7 @@ describe("OnboardingHomePage", () => {
       const updateSpy = jest.spyOn(store, "updateProfile");
       const loadSpy = jest.spyOn(userStore, "loadProfile");
 
-      await page.updateProfile(new FormData());
+      await page.updateProfile({});
 
       expect(updateSpy).not.toHaveBeenCalled();
       expect(loadSpy).not.toHaveBeenCalled();
@@ -103,8 +104,7 @@ describe("OnboardingHomePage", () => {
         .spyOn(userStore, "loadProfile")
         .mockResolvedValue(undefined);
 
-      const dto = new FormData();
-      dto.append("firstName", "Ana");
+      const dto: ProfileEditPayload = { firstName: "Ana" };
       await page.updateProfile(dto);
 
       expect(updateSpy).toHaveBeenCalledWith(dto);

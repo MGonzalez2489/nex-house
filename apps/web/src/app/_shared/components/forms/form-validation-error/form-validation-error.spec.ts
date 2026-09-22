@@ -58,7 +58,17 @@ describe("FormValidationErrorComponent", () => {
 
     const errorContainers = errorElement.querySelectorAll("small");
     expect(errorContainers.length).toBe(1);
-    expect(errorContainers[0].textContent?.trim()).toBe("Email is required.");
+    expect(errorContainers[0].textContent?.trim()).toBe("Email es obligatorio.");
+  });
+
+  it("should expose the error list as an alert region", () => {
+    hostComponent.errors.set({ required: true });
+    hostComponent.touched.set(true);
+    fixture.detectChanges();
+
+    const alertRegion = errorElement.querySelector("[role='alert']");
+    expect(alertRegion).not.toBeNull();
+    expect(alertRegion?.textContent?.trim()).toContain("Email es obligatorio.");
   });
 
   it("should format message with dynamic limit constraints (minlength)", () => {
@@ -70,7 +80,7 @@ describe("FormValidationErrorComponent", () => {
     const errorContainers = errorElement.querySelectorAll("small");
     expect(errorContainers.length).toBe(1);
     expect(errorContainers[0].textContent?.trim()).toBe(
-      "Password must be at least 8 characters.",
+      "Password debe tener al menos 8 caracteres.",
     );
   });
 
@@ -96,10 +106,10 @@ describe("FormValidationErrorComponent", () => {
     const errorContainers = errorElement.querySelectorAll("small");
     expect(errorContainers.length).toBe(2);
     expect(errorContainers[0].textContent?.trim()).toBe(
-      "Profile URL is required.",
+      "Profile URL es obligatorio.",
     );
     expect(errorContainers[1].textContent?.trim()).toBe(
-      "Profile URL format is invalid.",
+      "El formato de Profile URL es inválido.",
     );
   });
 });

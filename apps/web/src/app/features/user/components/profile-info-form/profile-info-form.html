@@ -15,6 +15,7 @@
   <app-profile-form-component
     [profile]="profile()"
     [disabledForm]="mode() === 'info'"
+    [resyncKey]="resyncKey()"
     (doSubmit)="doSubmit($event)"
   >
     <div class="form-control">

@@ -10,6 +10,7 @@ import {
 } from "@angular/core";
 import { TestBed } from "@angular/core/testing";
 import { CallState } from "@ngrx-toolkit/core";
+import { ProfileEditPayload } from "@core/models/profile-edit-payload";
 import { UserModel, UserProfileModel } from "@nexhouse/shared-domain/models";
 import { FormOptions, ProfileFormComponent } from "@shared/components/forms";
 import { Button } from "@openng/optimus-ui/button";
@@ -64,7 +65,8 @@ class StubButton {}
 class StubProfileForm {
   readonly profile = input<UserProfileModel>();
   readonly disabledForm = input<boolean>();
-  readonly doSubmit = output<FormData>();
+  readonly resyncKey = input<number>();
+  readonly doSubmit = output<ProfileEditPayload>();
 }
 
 @Component({
@@ -144,10 +146,9 @@ describe("ProfileInfoForm", () => {
     ).toBeTruthy();
   });
 
-  it("emits save with the submitted FormData", async () => {
-    const dto = new FormData();
-    dto.append("firstName", "Maria");
-    let emitted: FormData | undefined;
+  it("emits save with the submitted payload", async () => {
+    const dto: ProfileEditPayload = { firstName: "Maria" };
+    let emitted: ProfileEditPayload | undefined;
     component.save.subscribe((value) => (emitted = value));
 
     fixture.nativeElement.querySelector(".stub-edit")?.click();
@@ -171,6 +172,19 @@ describe("ProfileInfoForm", () => {
     expect(
       fixture.nativeElement.querySelector(".stub-cancel"),
     ).not.toBeTruthy();
+  });
+
+  it("bumps resyncKey when the user cancels", async () => {
+    const profileForm = fixture.debugElement.query(
+      (el) => el.componentInstance instanceof StubProfileForm,
+    )?.componentInstance as StubProfileForm;
+
+    fixture.nativeElement.querySelector(".stub-edit")?.click();
+    await fixture.whenStable();
+    fixture.nativeElement.querySelector(".stub-cancel")?.click();
+    await fixture.whenStable();
+
+    expect(profileForm.resyncKey()).toBe(1);
   });
 
   it("returns to info mode after a successful save", async () => {

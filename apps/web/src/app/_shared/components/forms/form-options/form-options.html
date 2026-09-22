@@ -1,10 +1,8 @@
-@if (callState()) {
-  <app-form-feedback [callState]="callState()" />
+@if (callState(); as callState) {
+  <app-form-feedback [callState]="callState" />
 }
 
-<div
-  class="flex flex-col-reverse sm:flex-row justify-end items-center gap-3 w-full"
->
+<div class="flex flex-col-reverse sm:flex-row justify-end items-center gap-3 w-full">
   @if (showCancel()) {
     <p-button
       class="w-full md:w-30 bg-white dark:bg-slate-700 rounded-lg"

@@ -14,7 +14,7 @@ import { ERROR_MESSAGES } from "./form-error-messages";
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (shouldShowErrors()) {
-      <div class="flex flex-col gap-1 ms-1">
+      <div role="alert" class="flex flex-col gap-1 ms-1">
         @for (error of errorMessages(); track error) {
           <small
             class="block animate-fade-in text-[10px] font-medium text-rose-500 mt-1.5 tracking-wide"

@@ -20,14 +20,19 @@ complete/normalize their profile (phone, avatar, …) before continuing.
 ## Outputs
 
 - `next`, `prev` — step navigation events.
-- `doSubmit = output<FormData>()` — re-emits the trimmed `FormData` built by the
-  shared `ProfileFormComponent` (only fields that changed).
+- `doSubmit = output<ProfileEditPayload>()` — re-emits the typed diff payload
+  built by the shared `ProfileFormComponent` (only fields that changed); the
+  multipart `FormData` is built downstream by `OnboardingService.updateProfile`
+  via `toProfileFormData`.
 
 ## Behavior
 
 - The shared form lives inside the component's own `<form (ngSubmit)>`, so the
   `FormOptions` submit button (`type="submit"`) triggers `doSubmit.emit()` with
-  the payload; the cancel button emits `prev`.
+  the payload; the cancel button (`doCancel`) calls `onPrev()`, which bumps an
+  internal `resyncKey` signal bound to the shared form (discarding unsaved
+  edits, e.g. a freshly-uploaded avatar preview) before emitting `prev` for
+  step navigation.
 - Designed mobile-first: the shared form already switches from a one-column stack
   to a multi-column grid at `md:`, and `FormOptions` stacks its buttons
   full-width in a column on small screens before becoming a row at `sm:`.

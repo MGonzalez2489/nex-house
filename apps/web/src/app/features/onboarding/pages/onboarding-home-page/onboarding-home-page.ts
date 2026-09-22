@@ -1,8 +1,14 @@
-import {ChangeDetectionStrategy, Component, computed, effect, inject, signal} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  linkedSignal,
+} from '@angular/core';
 import {SessionService} from '@core/services';
+import {ProfileEditPayload} from '@core/models/profile-edit-payload';
 import {OnboardingStepEnum} from '@nexhouse/shared-domain/enums';
 import {ChangePassword, CreateUnit} from '@nexhouse/shared-domain/interfaces';
-import {OnboardingStepModel} from '@nexhouse/shared-domain/models';
 import {OnboardingStore} from '@onboarding/onboarding.store';
 import {BrandComponent} from '@shared/components';
 import {Button} from '@openng/optimus-ui/button';
@@ -47,37 +53,11 @@ export class OnboardingHomePage {
   protected readonly contextStore = inject(ContextStore);
   protected readonly catalogsStore = inject(CatalogsStore);
 
-  // protected readonly onboarding = signal<
-  //   OnboardingStatusResponseModel | undefined
-  // >(undefined); // = this.store.onboarding;
-  // protected readonly steps = this.onboarding?.steps; //this.store.onboarding()?.steps || [];
+protected currentStepId = linkedSignal(() => this.store.currentStepId());
+  protected readonly steps = linkedSignal(() => this.store.steps());
 
-  currentStepId = signal<OnboardingStepEnum>(OnboardingStepEnum.WELCOME);
-  steps = signal<OnboardingStepModel[]>([]);
-
-  // protected readonly currentStepProgress = computed(() => {
-  //   const eSteps = this.enabledSteps();
-  //   const cIndex = eSteps.findIndex((f) => f.id === this.currentStepId());
-  //   return cIndex + 1;
-  // });
-
-  protected activeIndex = computed(() => {
+  protected readonly activeStepIndex = computed(() => {
     const index = this.steps().findIndex((s) => s.id === this.currentStepId());
-    return index !== -1 ? index : 0;
-  });
-
-  constructor() {
-    effect(() => {
-      const cStepId = this.store.currentStepId();
-      this.currentStepId.set(cStepId);
-      const cSteps = this.store.steps();
-      this.steps.set(cSteps);
-    });
-  }
-
-  protected activeStepIndex = computed(() => {
-    const index = this.steps().findIndex((step) => step.id === this.currentStepId());
-
     return index !== -1 ? index : 0;
   });
 
@@ -95,12 +75,12 @@ export class OnboardingHomePage {
       this.goNext();
     }
   }
-  protected async updateProfile(dto?: FormData) {
+  protected async updateProfile(dto?: ProfileEditPayload) {
     if (dto) {
-      // ProfileFormComponent#preparePayload only appends the fields that
+      // ProfileFormComponent#preparePayload only includes the fields that
       // changed, so an empty payload means the data already exists and is
       // unchanged: advance without hitting the server.
-      const hasChanges = Array.from(dto.keys()).length > 0;
+      const hasChanges = Object.keys(dto).length > 0;
       if (!hasChanges) {
         this.goNext();
         return;
@@ -133,15 +113,19 @@ export class OnboardingHomePage {
   }
 
   protected goBack() {
-    const cIndex = this.activeIndex();
+    const cIndex = this.activeStepIndex();
     const prevIndex = cIndex - 1;
     const prevItem = this.steps()[prevIndex];
-    this.currentStepId.set(prevItem.id);
+    if (prevItem) {
+      this.currentStepId.set(prevItem.id);
+    }
   }
   protected goNext() {
-    const cIndex = this.activeIndex();
+    const cIndex = this.activeStepIndex();
     const nextIndex = cIndex + 1;
     const nextItem = this.steps()[nextIndex];
-    this.currentStepId.set(nextItem.id);
+    if (nextItem) {
+      this.currentStepId.set(nextItem.id);
+    }
   }
 }

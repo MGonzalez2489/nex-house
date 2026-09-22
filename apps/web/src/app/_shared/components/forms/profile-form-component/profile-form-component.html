@@ -1,145 +1,123 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
   <div class="flex flex-col items-center">
-    <div class="flex items-center">
-      <!-- Avatar -->
-      <p-fileupload
-        mode="advanced"
-        accept="image/*"
-        maxFileSize="1000000"
-        formControlName="avatar"
-        [customUpload]="true"
-        uploadHandler="handleUpload"
-        [pt]="{
-          header: 'h-0',
-          root: 'bg-transparent w-30 border-none',
-          content: 'p-0',
-        }"
+    <div class="relative">
+      <button
+        type="button"
+        (click)="onChoose()"
+        [disabled]="disabledForm()"
+        aria-label="Subir foto de perfil"
+        aria-describedby="avatar-hint"
+        class="group relative rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan-500 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        <ng-template
-          #header
-          let-files
-          let-chooseCallback="chooseCallback"
-          let-clearCallback="clearCallback"
-          let-uploadCallback="uploadCallback"
+        <span
+          [class]="previewUrl() ? '' : 'flex items-center justify-center'"
+          class="block h-24 w-24 overflow-hidden rounded-full border-2 border-dashed border-slate-300 bg-slate-100 text-slate-400 transition group-hover:border-cyan-400 group-hover:text-cyan-500 sm:h-32 sm:w-32 md:h-36 md:w-36 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:group-hover:border-cyan-400 dark:group-hover:text-cyan-400"
         >
-          <div
-            class="flex flex-wrap justify-between items-center flex-1 gap-4 relative top-30 left-18"
-          >
-            <p-button
-              (onClick)="chooseCallback($event, chooseCallback)"
-              [disabled]="disabledForm()"
-              icon="pi pi-images"
-              [rounded]="true"
-              class="rounded-full bg-cyan-600 hover:bg-cyan-700 text-white flex items-center justify-center ring-4 ring-white dark:ring-slate-900 transition"
-            />
-          </div>
-        </ng-template>
+          @let preview = previewUrl();
+          @if (preview) {
+            <img [src]="preview" alt="" class="h-full w-full object-cover" />
+          } @else {
+            <i class="pi pi-user text-6xl" aria-hidden="true"></i>
+          }
+        </span>
 
-        <ng-template #content>
-          <button
-            type="button"
-            id="avatarButton"
-            aria-label="Subir foto de perfil"
-            class="h-30 w-30 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-center overflow-hidden text-slate-400 hover:border-cyan-400 hover:text-cyan-500 transition"
-          >
-            @if (previewUrl()) {
-              <img
-                id="avatarPreview"
-                [src]="previewUrl()"
-                alt="avatar preview"
-                class="h-full w-full object-cover"
-              />
-            } @else {
-              <i class="pi pi-user text-3xl"></i>
-            }
-          </button>
-        </ng-template>
-        <ng-template #file>es el file</ng-template>
-      </p-fileupload>
+        <span
+          aria-hidden="true"
+          class="absolute bottom-0 right-0 grid h-8 w-8 translate-x-1 translate-y-1 place-items-center rounded-full bg-cyan-600 text-white shadow-sm ring-4 ring-white transition-transform group-hover:scale-110 sm:h-9 sm:w-9 dark:bg-cyan-600 dark:ring-slate-900 dark:group-hover:bg-cyan-500"
+        >
+          <i class="pi pi-camera text-sm" aria-hidden="true"></i>
+        </span>
+      </button>
+
+      <input
+        #avatarInput
+        type="file"
+        accept="image/*"
+        aria-label="Subir foto de perfil"
+        class="hidden"
+        [disabled]="disabledForm()"
+        (change)="onAvatarInputChange($event)"
+      />
     </div>
 
-    <p class="text-xs text-slate-400 mt-2.5">
+    <p id="avatar-hint" class="mt-2.5 text-xs text-slate-400">
       JPG o PNG. Opcional, puedes agregarla después.
     </p>
   </div>
 
   <!-- firstName -->
   <div class="form-control">
-    <label class="form-label required" for="firstName">Nombre </label>
+    <label class="form-label required" for="firstName">Nombre</label>
     <input
       pInputText
       id="firstName"
       type="text"
       formControlName="firstName"
       placeholder="Ej. Ana"
+      autocomplete="given-name"
       fluid
-      [invalid]="
-        form.controls.firstName.invalid && form.controls.firstName.touched
-      "
-      [attr.aria-invalid]="
-        form.controls.firstName.invalid && form.controls.firstName.touched
-      "
+      [invalid]="form.controls.firstName.invalid && form.controls.firstName.touched"
+      [attr.aria-invalid]="form.controls.firstName.invalid && form.controls.firstName.touched"
       [attr.aria-describedby]="
-        form.controls.firstName.touched && form.controls.firstName.errors
-          ? 'firstName-error'
-          : null
+        form.controls.firstName.touched && form.controls.firstName.errors ? firstNameErrorId : null
       "
     />
 
     <app-form-validation-error
-      id="firstName-errors"
+      [id]="firstNameErrorId"
       [touched]="form.controls.firstName.touched"
       [errors]="form.controls.firstName.errors"
       label="Nombre"
     />
   </div>
+
   <!-- lastName -->
   <div class="form-control">
-    <label class="form-label" for="lastName">Apellidos </label>
+    <label class="form-label" for="lastName">Apellidos</label>
     <input
       pInputText
       id="lastName"
       type="text"
       formControlName="lastName"
       placeholder="Ej. Martínez López"
+      autocomplete="family-name"
       fluid
-      [invalid]="
-        form.controls.lastName.invalid && form.controls.lastName.touched
-      "
-      [attr.aria-invalid]="
-        form.controls.lastName.invalid && form.controls.lastName.touched
-      "
+      [invalid]="form.controls.lastName.invalid && form.controls.lastName.touched"
+      [attr.aria-invalid]="form.controls.lastName.invalid && form.controls.lastName.touched"
       [attr.aria-describedby]="
-        form.controls.lastName.touched && form.controls.lastName.errors
-          ? 'lastName-error'
-          : null
+        form.controls.lastName.touched && form.controls.lastName.errors ? lastNameErrorId : null
       "
     />
+
+    <app-form-validation-error
+      [id]="lastNameErrorId"
+      [touched]="form.controls.lastName.touched"
+      [errors]="form.controls.lastName.errors"
+      label="Apellidos"
+    />
   </div>
+
   <!-- phone -->
   <div class="form-control">
-    <label class="form-label required" for="phone">Teléfono </label>
+    <label class="form-label required" for="phone">Teléfono</label>
     <input
       pInputText
       id="phone"
       type="text"
       formControlName="phone"
-      placeholder="+52 614 123 4567"
+      autocomplete="tel"
       fluid
       [invalid]="form.controls.phone.invalid && form.controls.phone.touched"
-      [attr.aria-invalid]="
-        form.controls.phone.invalid && form.controls.phone.touched
-      "
+      [attr.aria-invalid]="form.controls.phone.invalid && form.controls.phone.touched"
       [attr.aria-describedby]="
-        form.controls.phone.touched && form.controls.phone.errors
-          ? 'phone-error'
-          : null
+        form.controls.phone.touched && form.controls.phone.errors ? phoneErrorId : null
       "
       pInputMask="(999)-999-9999"
       placeholder="(614)-123-4567"
     />
+
     <app-form-validation-error
-      id="phone-errors"
+      [id]="phoneErrorId"
       [touched]="form.controls.phone.touched"
       [errors]="form.controls.phone.errors"
       label="Teléfono"

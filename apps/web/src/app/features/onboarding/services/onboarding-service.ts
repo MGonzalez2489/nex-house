@@ -1,5 +1,9 @@
 import { inject, Injectable } from "@angular/core";
 import { RequestService } from "@core/services";
+import {
+  ProfileEditPayload,
+  toProfileFormData,
+} from "@core/models/profile-edit-payload";
 import { ChangePassword, CreateUnit } from "@nexhouse/shared-domain/interfaces";
 import { OnboardingStatusResponseModel } from "@nexhouse/shared-domain/models";
 
@@ -23,10 +27,10 @@ export class OnboardingService {
     );
   }
 
-  updateProfile(dto: FormData) {
+  updateProfile(dto: ProfileEditPayload) {
     return this.request.patch<OnboardingStatusResponseModel>(
       `${this.endpoint}/profile`,
-      dto,
+      toProfileFormData(dto),
     );
   }
 

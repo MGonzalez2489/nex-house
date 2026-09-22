@@ -20,18 +20,8 @@
   @if (isResident()) {
     <div class="flex items-center gap-3">
       <p-button label="Inicio" icon="pi pi-home" severity="secondary" text />
-      <p-button
-        label="Mi Fraccionamiento"
-        icon="pi pi-building"
-        severity="secondary"
-        text
-      />
-      <p-button
-        label="Enviar comprobante"
-        icon="pi pi-download"
-        severity="secondary"
-        text
-      />
+      <p-button label="Mi Fraccionamiento" icon="pi pi-building" severity="secondary" text />
+      <p-button label="Enviar comprobante" icon="pi pi-download" severity="secondary" text />
     </div>
   }
 
@@ -41,8 +31,8 @@
     <p-button
       text
       severity="secondary"
-      (click)="toggleTheme()"
-      [icon]="darkMode() ? 'pi pi-moon' : 'pi pi-sun'"
+      (click)="themeService.toggle()"
+      [icon]="themeService.theme() ? 'pi pi-moon' : 'pi pi-sun'"
     />
 
     <!-- Notificaciones -->
@@ -56,18 +46,14 @@
         <div
           class="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between"
         >
-          <span class="text-sm font-semibold text-slate-800 dark:text-white"
-            >Notificaciones</span
-          >
+          <span class="text-sm font-semibold text-slate-800 dark:text-white">Notificaciones</span>
           <span class="text-xs text-cyan-600 dark:text-cyan-400">3 nuevas</span>
         </div>
         <ul class="max-h-64 overflow-y-auto thin-scroll">
           <li
             class="px-4 py-3 flex gap-3 hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer"
           >
-            <span
-              class="h-2 w-2 mt-1.5 rounded-full bg-cyan-500 shrink-0"
-            ></span>
+            <span class="h-2 w-2 mt-1.5 rounded-full bg-cyan-500 shrink-0"></span>
             <div class="min-w-0">
               <p class="text-sm text-slate-700 dark:text-slate-200 truncate">
                 Nueva tarea asignada a ti
@@ -78,9 +64,7 @@
           <li
             class="px-4 py-3 flex gap-3 hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer"
           >
-            <span
-              class="h-2 w-2 mt-1.5 rounded-full bg-cyan-500 shrink-0"
-            ></span>
+            <span class="h-2 w-2 mt-1.5 rounded-full bg-cyan-500 shrink-0"></span>
             <div class="min-w-0">
               <p class="text-sm text-slate-700 dark:text-slate-200 truncate">
                 Ana comentó en "Proyecto Q3"
@@ -102,12 +86,8 @@
             </div>
           </li>
         </ul>
-        <div
-          class="px-4 py-2.5 border-t border-slate-100 dark:border-slate-800 text-center"
-        >
-          <a
-            href="#"
-            class="text-xs font-medium text-cyan-600 dark:text-cyan-400 hover:underline"
+        <div class="px-4 py-2.5 border-t border-slate-100 dark:border-slate-800 text-center">
+          <a href="#" class="text-xs font-medium text-cyan-600 dark:text-cyan-400 hover:underline"
             >Ver todas</a
           >
         </div>
@@ -116,15 +96,11 @@
 
     <!-- Settings -->
     <p-button text (click)="menu.toggle($event)">
-      <app-avatar-component
-        [url]="profile().avatar?.url"
-        [text]="profile().fullName"
-      />
+      <app-avatar-component [url]="profile().avatar?.url" [text]="profile().fullName" />
 
-      <span
-        class="hidden sm:inline text-sm font-medium text-slate-700 dark:text-slate-200"
-        >{{ profile().firstName || "--" }}</span
-      >
+      <span class="hidden sm:inline text-sm font-medium text-slate-700 dark:text-slate-200">{{
+        profile().firstName || '--'
+      }}</span>
       <i class="pi pi-chevron-down text-sm text-slate-500"></i>
     </p-button>
     <p-menu #menu [model]="menuItems()" [popup]="true" appendTo="body" />

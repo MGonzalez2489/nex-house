@@ -3,8 +3,10 @@ import {
   Component,
   input,
   output,
+  signal,
 } from "@angular/core";
 import { CallState } from "@ngrx-toolkit/core";
+import { ProfileEditPayload } from "@core/models/profile-edit-payload";
 import { UserProfileModel } from "@nexhouse/shared-domain/models";
 import { FormOptions, ProfileFormComponent } from "@shared/components/forms";
 import { Panel } from "@openng/optimus-ui/panel";
@@ -18,11 +20,18 @@ import { Panel } from "@openng/optimus-ui/panel";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OnboardingGeneralComponent {
-  profile = input<UserProfileModel>();
-  isLoading = input.required<boolean>();
-  callState = input<CallState>();
+  readonly profile = input<UserProfileModel>();
+  readonly isLoading = input.required<boolean>();
+  readonly callState = input<CallState>();
 
   next = output();
-  doSubmit = output<FormData>();
+  doSubmit = output<ProfileEditPayload>();
   prev = output();
+
+  protected readonly resyncKey = signal(0);
+
+  protected onPrev() {
+    this.resyncKey.update((key) => key + 1);
+    this.prev.emit();
+  }
 }

@@ -1,5 +1,6 @@
 import { TestBed } from "@angular/core/testing";
 import { RequestService } from "@core/services";
+import { ProfileEditPayload } from "@core/models/profile-edit-payload";
 import { of } from "rxjs";
 import { ProfileService } from "./profile-service";
 
@@ -36,12 +37,15 @@ describe("ProfileService", () => {
     expect(request.get).toHaveBeenCalledWith("/api/user/profile");
   });
 
-  it("update delegates to PATCH /api/user/profile with the FormData payload", () => {
-    const dto = new FormData();
-    dto.append("firstName", "Juan");
+  it("update delegates to PATCH /api/user/profile with the multipart payload", () => {
+    const dto: ProfileEditPayload = { firstName: "Juan" };
 
     service.update(dto).subscribe();
 
-    expect(request.patch).toHaveBeenCalledWith("/api/user/profile", dto);
+    expect(request.patch).toHaveBeenCalledTimes(1);
+    const [url, payload] = request.patch.mock.calls[0];
+    expect(url).toBe("/api/user/profile");
+    expect(payload).toBeInstanceOf(FormData);
+    expect((payload as FormData).get("firstName")).toBe("Juan");
   });
 });

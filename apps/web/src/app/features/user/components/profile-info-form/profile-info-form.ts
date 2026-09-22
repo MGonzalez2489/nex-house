@@ -8,6 +8,7 @@ import {
 } from "@angular/core";
 import { CallState } from "@ngrx-toolkit/core";
 import { UserModel, UserProfileModel } from "@nexhouse/shared-domain/models";
+import { ProfileEditPayload } from "@core/models/profile-edit-payload";
 import { FormOptions, ProfileFormComponent } from "@shared/components/forms";
 import { Button } from "@openng/optimus-ui/button";
 import { InputTextModule } from "@openng/optimus-ui/inputtext";
@@ -33,9 +34,10 @@ export class ProfileInfoForm {
   readonly isLoading = input.required<boolean>();
   readonly callState = input<CallState>();
 
-  readonly save = output<FormData>();
+  readonly save = output<ProfileEditPayload>();
 
   protected readonly mode = signal<"info" | "form">("info");
+  protected readonly resyncKey = signal(0);
   private readonly savingInForm = signal(false);
 
   constructor() {
@@ -60,11 +62,12 @@ export class ProfileInfoForm {
     this.mode.set("form");
   }
 
-  protected doSubmit(dto: FormData) {
+  protected doSubmit(dto: ProfileEditPayload) {
     this.save.emit(dto);
   }
 
   protected cancel() {
     this.mode.set("info");
+    this.resyncKey.update((key) => key + 1);
   }
 }

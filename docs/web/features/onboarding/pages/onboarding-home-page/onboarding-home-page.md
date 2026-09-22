@@ -49,9 +49,17 @@ changed" optimization.
 
 ## Navigation
 
-- `activeIndex()` / `activeStepIndex()` compute the active `<p-step>` index from
-  `steps()` + `currentStepId()`.
-- `goNext()` / `goBack()` move `currentStepId()` by one in `steps()`.
+- `currentStepId()` and `steps()` are `linkedSignal` derived from
+  `OnboardingStore` — they reset whenever the store changes (e.g. after
+  `load()`) but stay locally writable for manual step navigation. This replaced
+  the previous effect that manually copied store signals into local `signal`s
+  (a signals anti-pattern).
+- `activeStepIndex()` computes the active `<p-step>` index from
+  `steps()` + `currentStepId()` (single computed; the old duplicate
+  `activeIndex` was removed).
+- `goNext()` / `goBack()` move `currentStepId()` by one in `steps()`, guarding
+  the array bounds (no-op at the wizard edges instead of reading
+  `steps()[out-of-range]`).
 - `finishWelcome()` marks the `welcome` step completed and advances.
 - `completeOnboarding()` calls `store.complete()` and navigates to the dashboard on
   success.
@@ -60,12 +68,12 @@ changed" optimization.
 
 | Trigger | Behavior |
 | --- | --- |
-| `updateProfile(dto)` with an **empty** `FormData` | `ProfileFormComponent#preparePayload` only appends changed fields, so an empty payload means the profile already exists and is unchanged → `goNext()` **without** hitting the server. |
+| `updateProfile(dto)` with an **empty** `ProfileEditPayload` | `ProfileFormComponent#preparePayload` only includes changed fields, so an empty payload means the profile already exists and is unchanged → `goNext()` **without** hitting the server. |
 | `updateProfile(dto)` with entries | `store.updateProfile(dto)` then `userStore.loadProfile()`; the store advances `currentStepId()` via its response. |
 | `createUnit(dto)` while `userStore.units().length > 0` | A unit is already assigned (e.g. revisiting the step) → `goNext()` **without** a creation request, avoiding duplicates. |
 | `createUnit(dto)` with no units | `store.createUnit(dto)` then `userStore.loadUser()` to refresh the assigned units; the store advances the step. |
 
-Empty-payload detection uses `Array.from(dto.keys()).length > 0`.
+Empty-payload detection uses `Object.keys(dto).length > 0`.
 
 ## Test coverage
 

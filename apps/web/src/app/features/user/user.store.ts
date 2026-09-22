@@ -8,6 +8,7 @@ import {
 } from "@ngrx-toolkit/core";
 import { effect, inject } from "@angular/core";
 import { ProfileService } from "@core/services";
+import { ProfileEditPayload } from "@core/models/profile-edit-payload";
 import {
   UserModel,
   UserProfileModel,
@@ -89,7 +90,7 @@ export const UserStore = signalStore(
         return false;
       }
     },
-    update: async (dto: FormData): Promise<boolean> => {
+    update: async (dto: ProfileEditPayload): Promise<boolean> => {
       patchState(store, setLoading());
       try {
         const response = await lastValueFrom(store._profileService.update(dto));

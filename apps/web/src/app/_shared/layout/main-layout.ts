@@ -34,6 +34,6 @@ export class MainLayout {
   protected readonly activeLayout = computed<AppLayout | null>(() => {
     const role = this.store.role();
     if (!role) return null;
-    return this.layoutByRole[role.name] ?? ResidentLayout;
+    return this.layoutByRole[role.name as UserRoleEnum] ?? ResidentLayout;
   });
 }
