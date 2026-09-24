@@ -12,8 +12,7 @@
         "{workspaceRoot}/coverage/{e2eProjectRoot}"
       ],
       "dependsOn": [
-        "api:build",
-        "api:serve"
+        "api:build"
       ],
       "options": {
         "jestConfig": "apps/api-e2e/jest.config.cts",

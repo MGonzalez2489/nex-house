@@ -28,7 +28,10 @@ import {
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      // E2E runs boot a dedicated API against the isolated `nexhouse_e2e`
+      // database. `NX_E2E=1` switches to the committed `.env.e2e` template so
+      // the process never reads dev `.env` values (see docs/api-e2e/testing.md).
+      envFilePath: process.env.NX_E2E === '1' ? '.env.e2e' : '.env',
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],

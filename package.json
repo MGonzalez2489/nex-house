@@ -8,7 +8,10 @@
     "lint:fix": "eslint . --ext .ts,.html --fix",
     "test:api": "NODE_OPTIONS=--experimental-vm-modules nx test api",
     "test-api:cov": "NODE_OPTIONS=--experimental-vm-modules nx test api --coverage",
-    "test:web": "nx test web"
+    "test:web": "nx test web",
+    "e2e:db:reset": "node scripts/e2e/reset-e2e-db.mjs",
+    "e2e:api": "nx run api-e2e:e2e",
+    "e2e:web": "nx run web-e2e:e2e"
   },
   "devDependencies": {
     "@angular-devkit/core": "22.1.7",

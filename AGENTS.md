@@ -16,7 +16,10 @@ NX monorepo. Two apps, one shared lib.
 - `npm run test:web` — web unit tests (jest). **Do NOT pass `--experimental-vm-modules` for web**: jest-preset-angular v17 esbuilds `.mjs` files into CommonJS, and under the vm-modules flag jest places that output in an ESM sandbox → `ReferenceError: module is not defined`. Web jest requires `apps/web/tsconfig.spec.json` to keep `module: ES2022` / `moduleResolution: Bundler`.
 - `npm run test-api:cov` — `nx test api --coverage`
 - `nx lint api`, `nx lint web` — lint; root `npm run lint` lints everything
-- `nx e2e api-e2e` (jest) / `nx e2e web-e2e` (playwright)
+- `npm run e2e:db:reset` — drops/recreates the isolated `nexhouse_e2e` MySQL schema and re-grants `pAdmin` (`scripts/e2e/reset-e2e-db.mjs`)
+- `npm run e2e:api` — `nx run api-e2e:e2e` (jest): builds API, resets DB, boots compiled API on port **3001** with `NX_E2E=1 NODE_ENV=test` (`.env.e2e`), runs the suites serially. **Do not** pass `--experimental-vm-modules` here. Doc: `docs/api-e2e/testing.md`.
+- `npm run e2e:web` — `nx run web-e2e:e2e` (playwright): builds API + web (development), resets DB, serves the built app via `apps/web-e2e/support/static-server.mjs` on port **4288** (proxying `/api`,`/uploads`,`/socket.io` to :3001), 10 specs × 3 browsers. **Never use `nx run web:serve --port=...` for e2e** — Nx waits forever on the `web:serve:development` lock held by the dev's `nx serve web`. Doc: `docs/web-e2e/testing.md`.
+- Default e2e credentials: super admin `root@test.com` / `1234`; new admin/resident fixtures get password `1234` (non-production dev password). Known e2e-asserted latent bugs (`NeighborhoodScopeGuard` → super-admin 500 not 403, `/neighborhood/mine`, `/neighborhood/streets`, `/user/stats` 500s) are documented in the api-e2e spec files — keep those assertions in sync if the API changes.
 - No typecheck script or config exists in the repo.
 - Husky: `commit-msg` enforces conventional commits; `pre-commit` runs `nx affected --target=lint`.
 

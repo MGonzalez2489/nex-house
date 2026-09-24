@@ -47,3 +47,4 @@ apps/api/uploads/*
 /uploads/
 __screenshots__/
 .env
+.env.e2e
