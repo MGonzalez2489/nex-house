@@ -41,10 +41,12 @@ Do not switch these back to `commonjs`/`node10`.
 
 ## Known pre-existing failures
 
-13 spec files **outside** `features/auth` fail at runtime (for example
-`sidebar-item.spec.ts` → `NG0950` required input missing). They are unrelated to
-the auth work and should only be touched when working on those components. The
-whole `features/auth` suite (9 files, 56 tests) passes.
+None since the `should create` harnesses were fixed. The `features/auth` suite
+(9 files, 56 tests) and the rest of the codebase (71 suites / 304 tests) all
+pass. `form-validation-error.spec.ts` once showed a transient
+`SIGSEGV` worker crash during a heavily parallel full run; it passes in
+isolation and in repeated full runs, so treat any single-file crash of that
+kind as an environment flake and re-run before investigating.
 
 ## References
 
