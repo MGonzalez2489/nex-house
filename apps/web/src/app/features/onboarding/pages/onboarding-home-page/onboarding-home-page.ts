@@ -53,12 +53,27 @@ export class OnboardingHomePage {
   protected readonly contextStore = inject(ContextStore);
   protected readonly catalogsStore = inject(CatalogsStore);
 
-protected currentStepId = linkedSignal(() => this.store.currentStepId());
+  protected currentStepId = linkedSignal(() => this.store.currentStepId());
   protected readonly steps = linkedSignal(() => this.store.steps());
 
   protected readonly activeStepIndex = computed(() => {
     const index = this.steps().findIndex((s) => s.id === this.currentStepId());
     return index !== -1 ? index : 0;
+  });
+
+  protected readonly totalSteps = computed(() => this.steps().length);
+
+  protected readonly currentStepNumber = computed(() =>
+    this.totalSteps() === 0 ? 0 : this.activeStepIndex() + 1,
+  );
+
+  protected readonly currentStepLabel = computed(
+    () => this.steps()[this.activeStepIndex()]?.label ?? '',
+  );
+
+  protected readonly progressPercent = computed(() => {
+    const total = this.totalSteps();
+    return total === 0 ? 0 : Math.round((this.currentStepNumber() / total) * 100);
   });
 
   protected async finishWelcome() {

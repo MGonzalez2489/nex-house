@@ -24,6 +24,7 @@ interface PageLike {
   userStore: UserStoreLike;
   updateProfile: (dto?: ProfileEditPayload) => Promise<void>;
   createUnit: (dto?: CreateUnit) => Promise<void>;
+  goNext: () => void;
 }
 
 describe("OnboardingHomePage", () => {
@@ -78,6 +79,64 @@ describe("OnboardingHomePage", () => {
 
   it("should create", () => {
     expect(component).toBeTruthy();
+  });
+
+  describe("step progress", () => {
+    it("renders no progress indicator while the steps are unknown", () => {
+      component.steps.set([]);
+      fixture.detectChanges();
+
+      expect(fixture.nativeElement.querySelector("p-progressbar")).toBeNull();
+      expect(fixture.nativeElement.textContent).not.toContain("Paso ");
+    });
+
+    it("renders the current step number, the total and the step label", async () => {
+      prepareWizard(OnboardingStepEnum.GENERAL_FORM);
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      expect(component.currentStepNumber()).toBe(3);
+      expect(component.totalSteps()).toBe(5);
+      expect(component.progressPercent()).toBe(60);
+
+      const text = fixture.nativeElement.textContent as string;
+      expect(text).toContain("Paso 3 de 5");
+      expect(text).toContain("Información General");
+    });
+
+    it("keeps the stepper navigation out of the page", async () => {
+      prepareWizard(OnboardingStepEnum.WELCOME);
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      const el: HTMLElement = fixture.nativeElement;
+      expect(el.querySelector("p-step-list")).toBeNull();
+      expect(el.querySelector("p-step")).toBeNull();
+      // Only the active step's panel content is reachable through the panels.
+      expect(el.querySelectorAll("p-step-panel").length).toBe(5);
+    });
+
+    it("recomputes the indicator when the step changes", () => {
+      prepareWizard(OnboardingStepEnum.WELCOME);
+      expect(component.currentStepNumber()).toBe(1);
+      expect(component.progressPercent()).toBe(20);
+
+      (component as unknown as PageLike).goNext();
+
+      expect(component.currentStepNumber()).toBe(2);
+      expect(component.currentStepLabel()).toBe("Seguridad");
+      expect(component.progressPercent()).toBe(40);
+    });
+
+    it("reports zero progress when the store has no steps", () => {
+      component.steps.set([]);
+      component.currentStepId.set(OnboardingStepEnum.WELCOME);
+
+      expect(component.totalSteps()).toBe(0);
+      expect(component.currentStepNumber()).toBe(0);
+      expect(component.progressPercent()).toBe(0);
+      expect(component.currentStepLabel()).toBe("");
+    });
   });
 
   describe("updateProfile", () => {
