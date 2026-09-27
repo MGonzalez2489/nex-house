@@ -1,21 +1,13 @@
 <div class="relative space-y-6">
   <!-- Header -->
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-    <div>
-      <div class="flex items-center gap-2 flex-wrap">
-        <h1 class="text-xl sm:text-2xl font-display font-semibold text-slate-900 dark:text-white">
-          Residentes
-        </h1>
-      </div>
-      <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
-        Busca, filtra y administra los residentes de la plataforma.
-      </p>
-    </div>
-
-    <div class="hidden md:flex items-center gap-3">
-      <p-button icon="pi pi-plus" label="Nuevo" (click)="create()" />
-    </div>
-  </div>
+<app-page-header
+  title="Residentes"
+  subTitle="Busca, filtra y administra los residentes de la plataforma."
+>
+  @if (!sessionService.isMobile()) {
+    <p-button icon="pi pi-plus" label="Nuevo" (click)="create()" />
+  }
+</app-page-header>
 
   @if (store.error()) {
     <app-form-feedback [callState]="store.callState()" />

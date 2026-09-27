@@ -7,13 +7,14 @@ import {
 import { Router } from "@angular/router";
 import { Search } from "@nexhouse/shared-domain/interfaces";
 import { ContextStore } from "@stores/context.store";
+import { PageHeader } from "@shared/components";
 import { UnitsStats, UnitsTable } from "@units/components";
 import { UNIT_ROUTES_ENUM } from "@units/units.routes";
 import { UnitStore } from "@units/units.store";
 
 @Component({
   selector: "app-units-home-page",
-  imports: [UnitsTable, UnitsStats],
+  imports: [UnitsTable, UnitsStats, PageHeader],
   templateUrl: "./units-home-page.html",
   styleUrl: "./units-home-page.css",
   standalone: true,

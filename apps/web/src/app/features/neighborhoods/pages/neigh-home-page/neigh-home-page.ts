@@ -7,10 +7,11 @@ import {SearchNeigh} from '@nexhouse/shared-domain/interfaces';
 import {Button} from '@openng/optimus-ui/button';
 import {FormFeedback} from '@shared/components/forms';
 import {NeighborhoodsTable} from '../../components';
+import {PageHeader} from '@shared/components';
 
 @Component({
   selector: 'app-neigh-home-page',
-  imports: [NeighborhoodsTable, Button, FormFeedback],
+  imports: [NeighborhoodsTable, Button, FormFeedback, PageHeader],
   templateUrl: './neigh-home-page.html',
   styleUrl: './neigh-home-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -25,7 +25,15 @@ statistics and navigation.
   `.replace(":id", ...)` string manipulation).
 - Renders `FormFeedback` with `store.callState()` when `store.error()` is set.
 - Header copy typo fixed ("residentes de la plataforma").
-- On mobile a floating "Nuevo" FAB appears next to the stats column.
+- The header is the shared `app-page-header`: `title` + `subTitle` (hidden on
+  mobile by the component) with the "Nuevo" button **projected** as content, so
+  the button is declared by the page and not by the component.
+- The button is projected inside `@if (!sessionService.isMobile())`, so on mobile
+  nothing is projected at all: the header's actions row is genuinely empty, it
+  collapses via `empty:hidden`, and the title is free to use the full width
+  instead of being capped at half the screen for an invisible control. The
+  floating "Nuevo" FAB (already gated on `sessionService.isMobile()`) covers
+  mobile. On desktop the header row and the FAB do not coexist.
 
 ## Test coverage
 

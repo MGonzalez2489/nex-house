@@ -22,6 +22,10 @@ form = fb.nonNullable.group({
 ```
 
 - `isEdit = computed(() => Boolean(id()))`.
+- The header is the shared `app-page-header` with a dynamic
+  `[title]="(id() ? 'Actualizar' : 'Nuevo') + ' fraccionamiento'"` and a static
+  `subTitle` (hidden on mobile by the component), carrying `class="mb-6"`. This
+  page projects no actions.
 - Constructor: when catalogs are loaded it prefills Mexico / Chihuahua /
   Chihuahua by **name** lookup (`cCountry.find(f => f.name === 'mexico')`) and
   patches `countryId`/`stateId`/`cityId`, falling back to `''` and re-running

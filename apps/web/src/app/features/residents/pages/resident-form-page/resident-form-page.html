@@ -1,6 +1,6 @@
 <div class="max-w-2xl mx-auto pb-24 lg:pb-6">
   <!-- Header -->
-  <div class="flex items-center gap-3 mb-6">
+  <div class="flex items-start gap-3 mb-6">
     <p-button
       icon="pi pi-arrow-left"
       severity="secondary"
@@ -10,14 +10,15 @@
       (click)="cancel()"
     />
 
-    <div>
-      <h1 class="text-xl sm:text-2xl font-display font-semibold text-slate-900 dark:text-white">
-        {{ id() ? 'Actualizar' : 'Nuevo' }} residente
-      </h1>
-      <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-        {{ id() ? 'Actualiza' : 'Registra' }} la información básica del residente y su unidad.
-      </p>
-    </div>
+    <app-page-header
+      class="flex-1"
+      [title]="(id() ? 'Actualizar' : 'Nuevo') + ' residente'"
+      [subTitle]="
+        id()
+          ? 'Actualiza la información básica del residente y su unidad.'
+          : 'Registra la información básica del residente y su unidad.'
+      "
+    />
   </div>
   <form class="space-y-5" [formGroup]="form" (submit)="submit()">
     @if (user(); as user) {

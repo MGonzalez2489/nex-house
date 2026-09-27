@@ -26,6 +26,12 @@ Read-only detail page for a single neighborhood.
 
 ## Template
 
+- The header is the shared `app-page-header` (`title` + `subTitle`, the subtitle
+  hidden on mobile). The back button lives **outside** the component in a
+  `flex items-start gap-3` row, with the header filling the rest via
+  `class="flex-1"`, and the "Editar" button **projected** as content. The back
+  button got an explicit `aria-label="Regresar a fraccionamientos"` because it
+  is icon-only.
 - Info panel with `NeighStatusTag`, created/updated dates (`DatePipe`), a
   `location` section (depends on `address?.city`), and the street listing
   iterated with `@for (street of neighborhood().streets; track street.publicId)`.

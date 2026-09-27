@@ -45,11 +45,15 @@ A second effect disables the `email` control once an existing resident is loaded
 - `update` only sends changed fields: `userRoleId` is included when it differs
   from the original; the unit is included when `hasUnitChanged` detects a real
   change (either existing-unit reassignment or a new unit definition).
-- `cancel()` and the header back button navigate back to the home list.
+- `cancel()` and the header back button navigate back to the home list. The back
+  button is rendered **outside** `app-page-header`, in a `flex items-start gap-3`
+  row, and the header fills the rest with `class="flex-1"`.
+- Header title/copy switch on `id()` presence, now expressed as
+  `[title]="(id() ? 'Actualizar' : 'Nuevo') + ' residente'"` and a
+  `[subTitle]` ternary. The subtitle is hidden on mobile by the component.
 
 ## Template
 
-- Header title/copy switch on `id()` presence.
 - Read-only summary panel (name, email, status) in update mode.
 - A sticky mobile action bar (Cancel / Save) plus the desktop `FormOptions`.
 

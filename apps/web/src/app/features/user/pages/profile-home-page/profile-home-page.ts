@@ -5,12 +5,13 @@ import {
   inject,
 } from "@angular/core";
 import { FormFeedback } from "@shared/components/forms";
+import { PageHeader } from "@shared/components";
 import { ProfileInfoForm, ProfileUnit } from "@user/components";
 import { UserStore } from "@user/user.store";
 
 @Component({
   selector: "app-profile-home-page",
-  imports: [ProfileInfoForm, ProfileUnit, FormFeedback],
+  imports: [ProfileInfoForm, ProfileUnit, FormFeedback, PageHeader],
   templateUrl: "./profile-home-page.html",
   styleUrl: "./profile-home-page.css",
   standalone: true,

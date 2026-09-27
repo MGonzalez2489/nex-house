@@ -1,38 +1,33 @@
 <div class="relative h-full">
-  <div class="space-y-6">
-    <!-- Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-      <div>
-        <div class="flex items-center gap-2 flex-wrap">
-          <h1 class="text-xl sm:text-2xl font-display font-semibold text-slate-900 dark:text-white">
-            Fraccionamientos
-          </h1>
-          <span
-            class="text-xs font-medium text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 rounded-full px-2 py-0.5"
-          >
-            {{ totalRegistered() }} registrados · {{ activeEntries() }} activos
-          </span>
-        </div>
-        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Busca, filtra y administra los fraccionamientos de la plataforma.
-        </p>
-      </div>
-
+  <div class="space-y-2">
+    <app-page-header
+      class="block"
+      title="Fraccionamientos"
+      subTitle="Busca, filtra y administra los fraccionamientos de la plataforma."
+    >
       <p-button icon="pi pi-plus" label="Nuevo" (click)="onCreate()" class="hidden md:block" />
-    </div>
+      <p-button
+        icon="pi pi-search"
+        text
+        severity="secondary"
+        (click)="onCreate()"
+        class="md:hidden"
+      />
+    </app-page-header>
 
     <!-- Lista de resultados -->
     @if (neighStore.error()) {
       <app-form-feedback [callState]="neighStore.callState()" />
+    } @else {
+      <app-neighborhoods-table
+        [items]="entries()"
+        [pagination]="neighStore.pagination()"
+        [isLoading]="neighStore.loading()"
+        [isMobile]="sessionService.isMobile()"
+        (paginate)="onSearch($event)"
+        (view)="onView($event)"
+      />
     }
-    <app-neighborhoods-table
-      [items]="entries()"
-      [pagination]="neighStore.pagination()"
-      [isLoading]="neighStore.loading()"
-      [isMobile]="sessionService.isMobile()"
-      (paginate)="onSearch($event)"
-      (view)="onView($event)"
-    />
   </div>
 
   <div class="absolute right-4 bottom-4 md:hidden">

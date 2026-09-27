@@ -48,10 +48,25 @@ describe("NeighHomePage", () => {
     expect(fixture.nativeElement.textContent).toContain("La Hacienda");
   });
 
-  it("should show the register count badge from the pagination meta", () => {
-    expect(fixture.nativeElement.textContent).toContain(
-      "1 registrados · 1 activos",
+  it("should render the page header with the title, subtitle and projected actions", () => {
+    const header = fixture.nativeElement.querySelector("app-page-header");
+    expect(header).toBeTruthy();
+    expect(header.querySelector("h1").textContent.trim()).toBe("Fraccionamientos");
+    expect(header.querySelector("p").textContent).toContain(
+      "Busca, filtra y administra los fraccionamientos",
     );
+
+    // actions are projected as content, not declared by app-page-header
+    const actions = header.querySelector("header > div:last-child");
+    expect(actions.textContent).toContain("Nuevo");
+    expect(actions.querySelectorAll("p-button").length).toBe(2);
+  });
+
+  it("should keep the title and the projected actions on opposite sides of the header row", () => {
+    const headerClasses =
+      fixture.nativeElement.querySelector("app-page-header header").className;
+    expect(headerClasses).toContain("justify-between");
+    expect(headerClasses).toContain("items-start");
   });
 
   it("should render the error feedback when the load fails", async () => {

@@ -26,6 +26,9 @@ information and registered address.
 - `(save)` forwards the `FormData` to `UserStore.update`.
 - If the data never loads (boot error), `FormFeedback` renders the store error;
   otherwise the page body is empty until `vm` resolves.
+- The header is the shared `app-page-header` with a static `title` and
+  `subTitle` (hidden on mobile by the component), carrying `class="mb-6"`. The
+  page projects no actions.
 
 ## Test coverage
 

@@ -49,8 +49,11 @@ describe("NeighborhoodsTable", () => {
     const header = fixture.nativeElement.querySelector(".p-panel-header");
     const content = fixture.nativeElement.querySelector(".p-panel-content");
 
-    expect(header.textContent).toContain("hola soy el reporte");
-    expect(content.textContent).not.toContain("hola soy el reporte");
+    // itemsReport(): "Mostrando registros del 1 al 1 de 1"
+    expect(header.textContent).toContain("Mostrando registros del 1 al 1 de 1");
+    expect(content.textContent).not.toContain("Mostrando registros del");
+    // the table keeps its own, distinct paginator report inside the body
+    expect(content.textContent).toContain("Pagina 1 de 1");
   });
 
   it("renders the filters in the card header actions", () => {

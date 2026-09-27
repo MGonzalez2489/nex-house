@@ -15,6 +15,7 @@ import {
   FormValidationErrorComponent,
   UnitFormComponent,
 } from '@shared/components/forms';
+import {PageHeader} from '@shared/components';
 import {CatalogsStore} from '@stores/catalogs.store';
 import {ContextStore} from '@stores/context.store';
 import {UnitStore} from '@units/units.store';
@@ -31,6 +32,7 @@ import {CreateResidentForm} from './resident-form';
     FormValidationErrorComponent,
     UnitFormComponent,
     FormOptions,
+    PageHeader,
   ],
   templateUrl: './resident-form-page.html',
   styleUrl: './resident-form-page.css',

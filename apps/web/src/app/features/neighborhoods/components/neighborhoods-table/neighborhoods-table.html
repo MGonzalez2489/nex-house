@@ -1,9 +1,10 @@
 <app-nex-card>
   <ng-template #nexHeader>
-    <h2 class="text-sm text-slate-500 dark:text-white">{{ itemsReport() }}</h2>
-  </ng-template>
-  <ng-template #nexActions>
-    <app-neigh-table-filters (filter)="filter($event)" />
+    <div class="flex w-full items-center justify-between">
+      <h2 class="hidden md:block text-sm text-slate-500 dark:text-white">{{ itemsReport() }}</h2>
+
+      <app-neigh-table-filters class="w-full md:w-auto" (filter)="filter($event)" />
+    </div>
   </ng-template>
 
   <ng-template #nexContent>

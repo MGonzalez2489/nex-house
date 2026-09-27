@@ -1,15 +1,10 @@
 <div class="max-w-2xl mx-auto pb-24 lg:pb-6">
   <!-- Header -->
-  <div class="flex items-center gap-3 mb-6">
-    <div>
-      <h1 class="text-xl sm:text-2xl font-display font-semibold text-slate-900 dark:text-white">
-        {{ id() ? 'Actualizar' : 'Nuevo' }} fraccionamiento
-      </h1>
-      <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-        Registra la información básica y las calles que lo componen.
-      </p>
-    </div>
-  </div>
+  <app-page-header
+    class="mb-6"
+    [title]="(id() ? 'Actualizar' : 'Nuevo') + ' fraccionamiento'"
+    subTitle="Registra la información básica y las calles que lo componen."
+  />
   <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-5">
     <!-- Información general -->
     <p-panel>

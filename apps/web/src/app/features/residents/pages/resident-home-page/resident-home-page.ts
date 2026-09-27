@@ -12,11 +12,12 @@ import { RESIDENT_ROUTES_ENUM } from "@residents/resident.routes";
 import { ResidentStore } from "@residents/resident.store";
 import { Button } from "@openng/optimus-ui/button";
 import { FormFeedback } from "@shared/components/forms";
+import { PageHeader } from "@shared/components";
 import { CatalogsStore } from "@stores/catalogs.store";
 
 @Component({
   selector: "app-resident-home-page",
-  imports: [Button, FormFeedback, ResidentsTable, ResidentStats],
+  imports: [Button, FormFeedback, ResidentsTable, ResidentStats, PageHeader],
   templateUrl: "./resident-home-page.html",
   styleUrl: "./resident-home-page.css",
   standalone: true,

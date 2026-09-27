@@ -1,21 +1,9 @@
 <div class="space-y-6">
   <!-- Header -->
-  <div
-    class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
-  >
-    <div>
-      <div class="flex items-center gap-2 flex-wrap">
-        <h1
-          class="text-xl sm:text-2xl font-display font-semibold text-slate-900 dark:text-white"
-        >
-          Unidades
-        </h1>
-      </div>
-      <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
-        Busca, filtra y administra las unidades de la plataforma.
-      </p>
-    </div>
-  </div>
+  <app-page-header
+    title="Unidades"
+    subTitle="Busca, filtra y administra las unidades de la plataforma."
+  />
 
   <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
     <app-units-table

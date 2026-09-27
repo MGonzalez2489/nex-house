@@ -26,6 +26,7 @@ import {InputTextModule} from '@openng/optimus-ui/inputtext';
 import {Panel} from '@openng/optimus-ui/panel';
 import {ToggleSwitchModule} from '@openng/optimus-ui/toggleswitch';
 import {FormOptions, FormValidationErrorComponent} from '@shared/components/forms';
+import {PageHeader} from '@shared/components';
 
 import {SelectModule} from '@openng/optimus-ui/select';
 import {CatalogsStore} from '@stores/catalogs.store';
@@ -42,6 +43,7 @@ import {mapCreateNeighborhoodPayload, mapUpdateNeighborhoodPayload} from './neig
     FormOptions,
     FormValidationErrorComponent,
     SelectModule,
+    PageHeader,
   ],
   templateUrl: './neigh-form-page.html',
   styleUrl: './neigh-form-page.css',

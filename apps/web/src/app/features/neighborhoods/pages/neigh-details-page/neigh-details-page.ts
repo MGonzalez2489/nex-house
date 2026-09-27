@@ -14,10 +14,11 @@ import { NeighborhoodsStore } from "@neighborhoods/neighborhood.store";
 import { NeighborhoodModel } from "@nexhouse/shared-domain/models";
 import { Button } from "@openng/optimus-ui/button";
 import { Panel } from "@openng/optimus-ui/panel";
+import { PageHeader } from "@shared/components";
 
 @Component({
   selector: "app-neigh-details-page",
-  imports: [Button, Panel, DatePipe, NeighStatusTag],
+  imports: [Button, Panel, DatePipe, NeighStatusTag, PageHeader],
   templateUrl: "./neigh-details-page.html",
   styleUrl: "./neigh-details-page.css",
   changeDetection: ChangeDetectionStrategy.OnPush,

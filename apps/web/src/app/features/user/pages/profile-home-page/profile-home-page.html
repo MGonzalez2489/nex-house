@@ -1,17 +1,10 @@
 <div class="max-w-2xl mx-auto">
   <!-- header -->
-  <div class="flex items-center justify-between gap-3 mb-6">
-    <div>
-      <h1
-        class="text-xl sm:text-2xl font-display font-semibold text-slate-900 dark:text-white"
-      >
-        Mi perfil
-      </h1>
-      <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-        Consulta y actualiza tu información personal.
-      </p>
-    </div>
-  </div>
+  <app-page-header
+    class="mb-6"
+    title="Mi perfil"
+    subTitle="Consulta y actualiza tu información personal."
+  />
 
   <div class="space-y-4">
     @if (vm(); as data) {
