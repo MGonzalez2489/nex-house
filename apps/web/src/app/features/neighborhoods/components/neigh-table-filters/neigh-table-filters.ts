@@ -6,25 +6,21 @@ import {
   OnInit,
   output,
   signal,
-} from "@angular/core";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { FormControl, FormGroup, ReactiveFormsModule } from "@angular/forms";
-import { SearchNeigh } from "@nexhouse/shared-domain/interfaces";
-import { IconFieldModule } from "@openng/optimus-ui/iconfield";
-import { InputIconModule } from "@openng/optimus-ui/inputicon";
-import { InputTextModule } from "@openng/optimus-ui/inputtext";
-import { debounceTime, distinctUntilChanged } from "rxjs";
+} from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {SearchNeigh} from '@nexhouse/shared-domain/interfaces';
+import {Button} from '@openng/optimus-ui/button';
+import {IconFieldModule} from '@openng/optimus-ui/iconfield';
+import {InputIconModule} from '@openng/optimus-ui/inputicon';
+import {InputTextModule} from '@openng/optimus-ui/inputtext';
+import {debounceTime, distinctUntilChanged} from 'rxjs';
 
 @Component({
-  selector: "app-neigh-table-filters",
-  imports: [
-    InputTextModule,
-    IconFieldModule,
-    InputIconModule,
-    ReactiveFormsModule,
-  ],
-  templateUrl: "./neigh-table-filters.html",
-  styleUrl: "./neigh-table-filters.css",
+  selector: 'app-neigh-table-filters',
+  imports: [InputTextModule, IconFieldModule, InputIconModule, ReactiveFormsModule, Button],
+  templateUrl: './neigh-table-filters.html',
+  styleUrl: './neigh-table-filters.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
 })
@@ -34,7 +30,7 @@ export class NeighTableFilters implements OnInit {
   protected filters = signal<SearchNeigh>({});
   protected filter = output<SearchNeigh>();
   protected form = new FormGroup({
-    hint: new FormControl<string | null>(null, { nonNullable: true }),
+    hint: new FormControl<string | null>(null, {nonNullable: true}),
   });
 
   ngOnInit(): void {
@@ -47,8 +43,7 @@ export class NeighTableFilters implements OnInit {
       .subscribe((value) => {
         this.filters.update((f) => ({
           ...f,
-          globalFilter:
-            value.hint && value.hint !== "" ? value.hint : undefined,
+          globalFilter: value.hint && value.hint !== '' ? value.hint : undefined,
         }));
 
         this.filter.emit(this.filters());

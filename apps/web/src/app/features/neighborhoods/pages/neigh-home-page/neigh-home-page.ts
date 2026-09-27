@@ -1,23 +1,18 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  inject,
-} from "@angular/core";
-import { Router } from "@angular/router";
-import { SessionService } from "@core/services";
-import { NEIGHBORHOOD_ROUTES_ENUM } from "@neighborhoods/neighborhood.routes";
-import { NeighborhoodsStore } from "@neighborhoods/neighborhood.store";
-import { SearchNeigh } from "@nexhouse/shared-domain/interfaces";
-import { Button } from "@openng/optimus-ui/button";
-import { FormFeedback } from "@shared/components/forms";
-import { NeighborhoodsTable } from "../../components";
+import {ChangeDetectionStrategy, Component, computed, inject} from '@angular/core';
+import {Router} from '@angular/router';
+import {SessionService} from '@core/services';
+import {NEIGHBORHOOD_ROUTES_ENUM} from '@neighborhoods/neighborhood.routes';
+import {NeighborhoodsStore} from '@neighborhoods/neighborhood.store';
+import {SearchNeigh} from '@nexhouse/shared-domain/interfaces';
+import {Button} from '@openng/optimus-ui/button';
+import {FormFeedback} from '@shared/components/forms';
+import {NeighborhoodsTable} from '../../components';
 
 @Component({
-  selector: "app-neigh-home-page",
+  selector: 'app-neigh-home-page',
   imports: [NeighborhoodsTable, Button, FormFeedback],
-  templateUrl: "./neigh-home-page.html",
-  styleUrl: "./neigh-home-page.css",
+  templateUrl: './neigh-home-page.html',
+  styleUrl: './neigh-home-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
 })
@@ -35,9 +30,7 @@ export class NeighHomePage {
   );
 
   onCreate(): void {
-    this.router.navigate([
-      `/${NEIGHBORHOOD_ROUTES_ENUM.HOME}/${NEIGHBORHOOD_ROUTES_ENUM.NEW}`,
-    ]);
+    this.router.navigate([`/${NEIGHBORHOOD_ROUTES_ENUM.HOME}/${NEIGHBORHOOD_ROUTES_ENUM.NEW}`]);
   }
 
   onSearch(filters: SearchNeigh) {

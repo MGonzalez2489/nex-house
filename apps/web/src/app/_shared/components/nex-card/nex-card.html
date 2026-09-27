@@ -1,0 +1,34 @@
+<p-panel
+  [pt]="resolvedPt()"
+  [showHeader]="showPanelHeader()"
+  [toggleable]="toggleable()"
+  [(collapsed)]="collapsed"
+>
+  <ng-content></ng-content>
+
+  <ng-template #header>
+    @if (headerTemplate(); as header) {
+      <ng-container [ngTemplateOutlet]="header"></ng-container>
+    } @else if (headerText(); as text) {
+      <h2 class="text-sm font-semibold text-slate-800 dark:text-white">{{ text }}</h2>
+    }
+  </ng-template>
+
+  <ng-template #icons>
+    @if (actionsTemplate(); as actions) {
+      <ng-container [ngTemplateOutlet]="actions"></ng-container>
+    }
+  </ng-template>
+
+  <ng-template #content>
+    @if (contentTemplate(); as content) {
+      <ng-container [ngTemplateOutlet]="content"></ng-container>
+    }
+  </ng-template>
+
+  <ng-template #footer>
+    @if (footerTemplate(); as footer) {
+      <ng-container [ngTemplateOutlet]="footer"></ng-container>
+    }
+  </ng-template>
+</p-panel>

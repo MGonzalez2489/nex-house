@@ -45,6 +45,23 @@ describe("NeighborhoodsTable", () => {
     expect(fixture.nativeElement.querySelector("p-table")).toBeTruthy();
   });
 
+  it("renders the report title inside the card header, not the body", () => {
+    const header = fixture.nativeElement.querySelector(".p-panel-header");
+    const content = fixture.nativeElement.querySelector(".p-panel-content");
+
+    expect(header.textContent).toContain("hola soy el reporte");
+    expect(content.textContent).not.toContain("hola soy el reporte");
+  });
+
+  it("renders the filters in the card header actions", () => {
+    const actions = fixture.nativeElement.querySelector(
+      ".p-panel-header-actions",
+    );
+
+    expect(actions).toBeTruthy();
+    expect(actions.querySelector("app-neigh-table-filters")).toBeTruthy();
+  });
+
   it("should mark header cells with scope=col", () => {
     const headers = fixture.nativeElement.querySelectorAll("p-table th");
     expect(headers.length).toBeGreaterThan(0);

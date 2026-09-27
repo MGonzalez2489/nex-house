@@ -1,36 +1,26 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  input,
-  output,
-} from "@angular/core";
-import {
-  ApiPaginationMeta,
-  SearchNeigh,
-} from "@nexhouse/shared-domain/interfaces";
-import { NeighborhoodModel } from "@nexhouse/shared-domain/models";
-import { AvatarComponent } from "@shared/components";
-import { Button } from "@openng/optimus-ui/button";
-import { Panel } from "@openng/optimus-ui/panel";
-import { Paginator } from "@openng/optimus-ui/paginator";
-import { TableLazyLoadEvent, TableModule } from "@openng/optimus-ui/table";
-import { NeighStatusTag } from "../neigh-status-tag/neigh-status-tag";
-import { NeighTableFilters } from "../neigh-table-filters/neigh-table-filters";
+import {ChangeDetectionStrategy, Component, computed, input, output} from '@angular/core';
+import {ApiPaginationMeta, SearchNeigh} from '@nexhouse/shared-domain/interfaces';
+import {NeighborhoodModel} from '@nexhouse/shared-domain/models';
+import {Button} from '@openng/optimus-ui/button';
+import {Paginator} from '@openng/optimus-ui/paginator';
+import {TableLazyLoadEvent, TableModule} from '@openng/optimus-ui/table';
+import {AvatarComponent, NexCard} from '@shared/components';
+import {NeighStatusTag} from '../neigh-status-tag/neigh-status-tag';
+import {NeighTableFilters} from '../neigh-table-filters/neigh-table-filters';
 
 @Component({
-  selector: "app-neighborhoods-table",
+  selector: 'app-neighborhoods-table',
   imports: [
     Button,
-    Panel,
     Paginator,
     NeighStatusTag,
     AvatarComponent,
     TableModule,
     NeighTableFilters,
+    NexCard,
   ],
-  templateUrl: "./neighborhoods-table.html",
-  styleUrl: "./neighborhoods-table.css",
+  templateUrl: './neighborhoods-table.html',
+  styleUrl: './neighborhoods-table.css',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -48,9 +38,38 @@ export class NeighborhoodsTable {
     return pagination ? (pagination.page - 1) * pagination.limit : 0;
   });
 
-  protected readonly pageRows = computed(
-    () => this.pagination()?.limit ?? 10,
-  );
+  protected readonly pageRows = computed(() => this.pagination()?.limit ?? 10);
+
+  protected readonly itemsReport = computed(() => {
+    const cMobile = this.isMobile();
+    const paginationMeta = this.pagination();
+    if (cMobile) {
+      return `${this.items().length} de ${this.pagination()?.total ?? 0}`;
+    }
+
+    if (!paginationMeta) {
+      return '';
+    }
+
+    const {total, page, limit} = paginationMeta;
+    const currentCount = this.items().length;
+
+    const startIndex = (page - 1) * limit + 1;
+
+    const endIndex = startIndex + currentCount - 1;
+
+    const totalRecords = total;
+
+    return `Mostrando registros del ${startIndex} al ${endIndex} de ${totalRecords}`;
+  });
+  protected readonly pagesReport = computed(() => {
+    const cMobile = this.isMobile();
+    if (cMobile) {
+      return ``;
+    }
+
+    return `Pagina ${this.pagination()?.page} de ${this.pagination()?.lastPage}`;
+  });
 
   search(event: TableLazyLoadEvent) {
     this.paginate.emit({
@@ -59,7 +78,7 @@ export class NeighborhoodsTable {
     });
   }
 
-  paginateMobile(event: { first?: number; rows?: number }) {
+  paginateMobile(event: {first?: number; rows?: number}) {
     this.paginate.emit({
       first: event.first ?? 0,
       rows: event.rows || 10,
