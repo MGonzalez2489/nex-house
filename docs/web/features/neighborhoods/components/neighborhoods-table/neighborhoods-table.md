@@ -5,6 +5,7 @@ card feed.
 
 - **File:** `apps/web/src/app/features/neighborhoods/components/neighborhoods-table/neighborhoods-table.ts`
 - **Template:** `neighborhoods-table.html` (standalone)
+- **Tests:** `neighborhoods-table.spec.ts` (13 tests)
 
 ## Inputs
 
@@ -13,14 +14,41 @@ card feed.
 | `items` | `NeighborhoodModel[]` (required) | Entities to render |
 | `pagination` | `ApiPaginationMeta \| undefined` | Pagination meta (drives paginator + reports) |
 | `isLoading` | `boolean` | Passed to `p-table [loading]` |
-| `isMobile` | `boolean` | From `SessionService.isMobile()`; switches desktop table → mobile cards |
+| `filters` | `SearchNeigh` | Applied filter state owned by the page; seeds the inline filters |
+
+`isMobile` is **no longer an input**. See
+[Viewport source of truth](#viewport-source-of-truth).
 
 ## Outputs
 
 | Output | Payload | Description |
 |---|---|---|
-| `paginate` | `Partial<SearchNeigh>` `{ first, rows }` | Re-issued pagination request |
+| `paginate` | `Partial<SearchNeigh>` `{ first, rows }` or a full `SearchNeigh` | Pagination **or** filter change request |
 | `view` | `string` (publicId) | Open the details page |
+
+## Viewport source of truth
+
+The component injects `SessionService` and reads `isMobile` from it:
+
+```ts
+private readonly sessionService = inject(SessionService);
+protected readonly isMobile = this.sessionService.isMobile;
+```
+
+`SessionService.getViewSize()` classifies `width < 768` (Tailwind `md`) as
+`"small"`, so the signal and the `md` CSS breakpoint agree at 768px.
+
+This replaced an `input<boolean>(false)` default, which was a silent failure
+mode: a page that forgot `[isMobile]="…"` let CSS hide the desktop table while
+the mobile cards were never rendered, leaving a **blank screen on phones**. The
+breakpoint that hides the table is now something a consumer cannot forget to
+wire. The component is still presentational — `SessionService` is a UI service,
+not a domain store.
+
+The desktop table is still kept in the DOM (hidden with `hidden md:block`) and
+the mobile feed is still rendered by `@if (isMobile())`. Both branches are not
+rendered at once, because `p-table` has `lazyLoadOnInit` and a second instance
+would trigger an extra load.
 
 ## Desktop (md+)
 
@@ -34,9 +62,7 @@ card feed.
 
 ## Mobile (default)
 
-The `p-table` stays in the DOM but is visually hidden (`hidden md:block`) so
-the lazy initial load and pagination state are preserved; the visible feed is a
-list of tappable cards (rendered only when `isMobile()`):
+The visible feed is a list of tappable cards:
 
 - Each card is a full-width `<button>` showing avatar, capitalized name,
   `city, state`, a chevron, the `NeighStatusTag` and a street-count line.
@@ -51,12 +77,30 @@ list of tappable cards (rendered only when `isMobile()`):
 
 ## Filter wiring
 
-The filters bar (`NeighTableFilters`) sits in the panel `#icons` slot and its
-`filter` output is re-emitted through `filter()` → `paginate.emit({ ...event })`.
+The inline filters are **desktop only**:
+
+```html
+@if (!isMobile()) {
+  <app-neigh-table-filters
+    class="w-full md:w-auto"
+    [value]="filters()"
+    (filter)="filter($event)"
+  />
+}
+```
+
+- On mobile the card stays free of form controls; the filters live in the
+  page-level `app-filter-sheet` bottom sheet.
+- `[value]="filters()"` seeds the form from the applied state, so the inline bar
+  survives a re-render or a filter reset coming from the sheet.
+- `(filter)` re-emits through `filter()` → `paginate.emit({ ...event })`, keeping
+  one single reload path.
+- The bar renders inside the `p-panel` header (via the `nex-card` `#nexHeader`
+  slot), next to the `hidden md:block` items report.
 
 ## A11y / responsiveness
 
 - `scope="col"` headers, labelled icon-only buttons, keyboard-focusable cards.
-- No inline `style="..."` in templates (moved to Tailwind utilities).
-- `w-full`/twitch on the search input keeps the toolbar usable on narrow
-  screens.
+- No inline `style="..."` in templates.
+- The mobile search input in the page header carries
+  `aria-label="Filtrar fraccionamientos"`.

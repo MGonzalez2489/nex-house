@@ -1,0 +1,16 @@
+<p-drawer
+  [visible]="visible()"
+  (visibleChange)="onVisibleChange($event)"
+  [header]="title()"
+  position="bottom"
+  appendTo="body"
+  blockScroll="true"
+  [closeOnEscape]="true"
+  [pt]="pt"
+>
+  <ng-content />
+
+  <ng-template #footer>
+    <ng-content select="[filterSheetFooter]" />
+  </ng-template>
+</p-drawer>

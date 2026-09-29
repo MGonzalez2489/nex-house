@@ -1,5 +1,7 @@
+import { signal, WritableSignal } from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { NeighborhoodModel } from "@nexhouse/shared-domain/models";
+import { SessionService } from "@core/services";
 import { NeighborhoodsTable } from "./neighborhoods-table";
 
 const NEIGHBORHOOD: NeighborhoodModel = {
@@ -7,10 +9,9 @@ const NEIGHBORHOOD: NeighborhoodModel = {
   name: "La Hacienda",
   isActive: true,
   createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
   streets: [
-    { publicId: "st-1", name: "Calle A", createdAt: "", updatedAt: "" },
-    { publicId: "st-2", name: "Calle B", createdAt: "", updatedAt: "" },
+    { publicId: "st-1", name: "Calle A", createdAt: "" },
+    { publicId: "st-2", name: "Calle B", createdAt: "" },
   ],
   address: undefined,
 };
@@ -20,10 +21,18 @@ describe("NeighborhoodsTable", () => {
   let fixture: ComponentFixture<NeighborhoodsTable>;
   let paginateSpy: jest.SpyInstance;
   let viewSpy: jest.SpyInstance;
+  let isMobile: WritableSignal<boolean>;
 
-  beforeEach(async () => {
+  const buttons = () =>
+    Array.from(
+      fixture.nativeElement.querySelectorAll("button"),
+    ) as HTMLElement[];
+
+  const build = async (mobile = false) => {
+    isMobile = signal(mobile);
     await TestBed.configureTestingModule({
       imports: [NeighborhoodsTable],
+      providers: [{ provide: SessionService, useValue: { isMobile } }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(NeighborhoodsTable);
@@ -38,6 +47,15 @@ describe("NeighborhoodsTable", () => {
     paginateSpy = jest.spyOn(component.paginate, "emit");
     viewSpy = jest.spyOn(component.view, "emit");
     await fixture.whenStable();
+    return fixture;
+  };
+
+  beforeEach(async () => {
+    await build(false);
+  });
+
+  it("should create", () => {
+    expect(component).toBeTruthy();
   });
 
   it("should render the desktop table with the neighborhood name", () => {
@@ -56,13 +74,38 @@ describe("NeighborhoodsTable", () => {
     expect(content.textContent).toContain("Pagina 1 de 1");
   });
 
-  it("renders the filters in the card header actions", () => {
-    const actions = fixture.nativeElement.querySelector(
-      ".p-panel-header-actions",
-    );
+  it("renders the filters in the card header, not the body", () => {
+    const header = fixture.nativeElement.querySelector(".p-panel-header");
+    const content = fixture.nativeElement.querySelector(".p-panel-content");
 
-    expect(actions).toBeTruthy();
-    expect(actions.querySelector("app-neigh-table-filters")).toBeTruthy();
+    expect(header.querySelector("app-neigh-table-filters")).toBeTruthy();
+    expect(content.querySelector("app-neigh-table-filters")).toBeNull();
+  });
+
+  it("does not expose isMobile as an input anymore", () => {
+    expect(
+      Object.keys(fixture.componentRef.componentType.prototype),
+    ).not.toContain("isMobile");
+  });
+
+  it("seeds the inline filters from the applied filter state", async () => {
+    fixture.componentRef.setInput("filters", { globalFilter: "centro" });
+    await fixture.whenStable();
+
+    const input = fixture.nativeElement.querySelector(
+      "app-neigh-table-filters input[aria-label]",
+    ) as HTMLInputElement;
+
+    expect(input.value).toBe("centro");
+  });
+
+  it("keeps the filters out of the card on mobile", async () => {
+    isMobile.set(true);
+    await fixture.whenStable();
+
+    expect(
+      fixture.nativeElement.querySelector("app-neigh-table-filters"),
+    ).toBeNull();
   });
 
   it("should mark header cells with scope=col", () => {
@@ -86,16 +129,28 @@ describe("NeighborhoodsTable", () => {
   });
 
   it("renders tappable cards on mobile and emits view on tap", async () => {
-    fixture.componentRef.setInput("isMobile", true);
+    isMobile.set(true);
     await fixture.whenStable();
 
-    const card = Array.from(
-      fixture.nativeElement.querySelectorAll("button"),
-    ).find((el: HTMLElement) => el.textContent.includes("2 calles"));
+    const card = buttons().find((el) => el.textContent.includes("2 calles"));
 
     expect(card).toBeDefined();
-    (card as HTMLElement).click();
+    card?.click();
     expect(viewSpy).toHaveBeenCalledWith("nb-1");
+  });
+
+  it("switches back to the desktop layout when the viewport grows", async () => {
+    isMobile.set(true);
+    await fixture.whenStable();
+    expect(
+      fixture.nativeElement.querySelector("app-neigh-table-filters"),
+    ).toBeNull();
+
+    isMobile.set(false);
+    await fixture.whenStable();
+    expect(
+      fixture.nativeElement.querySelector("app-neigh-table-filters"),
+    ).toBeTruthy();
   });
 
   it("shows the empty-state message when there are no items", async () => {

@@ -6,13 +6,23 @@
       subTitle="Busca, filtra y administra los fraccionamientos de la plataforma."
     >
       <p-button icon="pi pi-plus" label="Nuevo" (click)="onCreate()" class="hidden md:block" />
-      <p-button
-        icon="pi pi-search"
-        text
-        severity="secondary"
-        (click)="onCreate()"
-        class="md:hidden"
-      />
+
+      <span class="relative inline-flex md:hidden">
+        <p-button
+          icon="pi pi-search"
+          text
+          severity="secondary"
+          [ariaLabel]="filterButtonLabel()"
+          (click)="openFilters()"
+        />
+        @if (activeFilterCount() > 0) {
+          <p-badge
+            [value]="activeFilterCount()"
+            severity="danger"
+            [pt]="{root: 'absolute -top-1.5 -right-1.5'}"
+          />
+        }
+      </span>
     </app-page-header>
 
     <!-- Lista de resultados -->
@@ -23,12 +33,32 @@
         [items]="entries()"
         [pagination]="neighStore.pagination()"
         [isLoading]="neighStore.loading()"
-        [isMobile]="sessionService.isMobile()"
+        [filters]="appliedFilters()"
         (paginate)="onSearch($event)"
         (view)="onView($event)"
       />
     }
   </div>
+
+  <app-filter-sheet title="Filtros" [visible]="sheetOpen()" (closed)="onSheetClosed()">
+    <div class="px-4 py-4">
+      <app-neigh-table-filters
+        [existingFilters]="draftFilters()"
+        (filter)="draftFilters.set($event)"
+      />
+    </div>
+
+    <div filterSheetFooter class="flex items-center gap-2 p-4 dark:border-slate-700">
+      <p-button label="Limpiar" severity="secondary" fluid [text]="true" (click)="clearDraft()" />
+      <p-button
+        label="Aplicar"
+        class="flex-1"
+        fluid
+        [disabled]="!hasPendingChanges()"
+        (click)="applyFilters()"
+      />
+    </div>
+  </app-filter-sheet>
 
   <div class="absolute right-4 bottom-4 md:hidden">
     <p-button

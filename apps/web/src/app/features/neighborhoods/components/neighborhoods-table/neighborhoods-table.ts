@@ -1,9 +1,17 @@
-import {ChangeDetectionStrategy, Component, computed, input, output} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  input,
+  output,
+} from '@angular/core';
 import {ApiPaginationMeta, SearchNeigh} from '@nexhouse/shared-domain/interfaces';
 import {NeighborhoodModel} from '@nexhouse/shared-domain/models';
 import {Button} from '@openng/optimus-ui/button';
 import {Paginator} from '@openng/optimus-ui/paginator';
 import {TableLazyLoadEvent, TableModule} from '@openng/optimus-ui/table';
+import {SessionService} from '@core/services';
 import {AvatarComponent, NexCard} from '@shared/components';
 import {NeighStatusTag} from '../neigh-status-tag/neigh-status-tag';
 import {NeighTableFilters} from '../neigh-table-filters/neigh-table-filters';
@@ -25,13 +33,24 @@ import {NeighTableFilters} from '../neigh-table-filters/neigh-table-filters';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NeighborhoodsTable {
+  private readonly sessionService = inject(SessionService);
+
   readonly items = input.required<NeighborhoodModel[]>();
   readonly pagination = input<ApiPaginationMeta>();
   readonly isLoading = input<boolean>(false);
-  readonly isMobile = input<boolean>(false);
+
+  /** Applied filter state, owned by the page. Seeded here and reported back through `paginate`. */
+  readonly filters = input<SearchNeigh>({});
 
   readonly paginate = output<Partial<SearchNeigh>>();
   readonly view = output<string>();
+
+  /**
+   * The viewport is read from the session instead of being passed in: the CSS
+   * breakpoint that hides the table is not something a consumer can forget to
+   * wire, so both branches can no longer end up hidden at once.
+   */
+  protected readonly isMobile = this.sessionService.isMobile;
 
   protected readonly pageFirst = computed(() => {
     const pagination = this.pagination();

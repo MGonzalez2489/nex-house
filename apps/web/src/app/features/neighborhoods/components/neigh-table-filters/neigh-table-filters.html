@@ -1,16 +1,14 @@
-<div class="w-full">
-  <form [formGroup]="form" (ngSubmit)="onFormSubmit($event)" class="md:min-w-80">
-    <!-- search input -->
-    <p-iconfield>
-      <p-inputicon class="pi pi-search" />
-      <input
-        pInputText
-        aria-label="Buscar fraccionamiento por nombre o municipio"
-        fluid
-        formControlName="hint"
-        type="text"
-        placeholder="Buscar por nombre o municipio…"
-      />
-    </p-iconfield>
-  </form>
-</div>
+<form>
+  <!-- search input -->
+  <p-iconfield>
+    <p-inputicon class="pi pi-search" />
+    <input
+      pInputText
+      aria-label="Buscar fraccionamiento por nombre o municipio"
+      fluid
+      [formField]="form.globalFilter"
+      type="text"
+      placeholder="Buscar por nombre o municipio…"
+    />
+  </p-iconfield>
+</form>

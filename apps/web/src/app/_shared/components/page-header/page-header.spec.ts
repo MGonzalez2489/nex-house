@@ -115,7 +115,7 @@ describe('PageHeader', () => {
     await create();
     const classes = fixture.nativeElement.querySelector('header').className;
     expect(classes).toContain('flex');
-    expect(classes).toContain('items-start');
+    expect(classes).toContain('items-center');
     expect(classes).toContain('justify-between');
     expect(classes).not.toContain('flex-col');
   });
