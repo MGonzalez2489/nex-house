@@ -8,17 +8,23 @@ modes, keyed off the optional route `id` input.
 
 ## Inputs
 
-| Input | Type | Description |
-|---|---|---|
-| `id` | `string \| undefined` | Set → update mode (`:id/edit`); unset → create mode (`new`) |
+| Input | Type                  | Description                                                 |
+| ----- | --------------------- | ----------------------------------------------------------- |
+| `id`  | `string \| undefined` | Set → update mode (`:id/edit`); unset → create mode (`new`) |
 
 ## Form model
 
 ```ts
 form = fb.nonNullable.group({
-  name, countryId, stateId, cityId, zipCode, firstAdminEmail, active,
-  streets: FormArray<FormGroup<{ name, publicId }>>
-})
+  name,
+  countryId,
+  stateId,
+  cityId,
+  zipCode,
+  firstAdminEmail,
+  active,
+  streets: FormArray<FormGroup<{ name; publicId }>>,
+});
 ```
 
 - `isEdit = computed(() => Boolean(id()))`.
@@ -70,12 +76,24 @@ Payload building lives in the pure helpers of `neigh-form.mapper.ts`.
 
 ## Template notes (a11y & fixes)
 
+- The three sections are `app-nex-card`s driven by `headerText` / `subHeader`
+  ("Información general", "Localización", "Calles / Secciones"), so every section
+  title is level 2 of the shared type scale
+  (`text-base font-semibold text-slate-900 dark:text-white`) and every field
+  label is level 3 (`.form-label`). Do not re-introduce a hand-rolled
+  `text-sm font-semibold` header: that is exactly the size of a label and the
+  hierarchy disappears.
+- The two supporting lines of the form ("El administrador se asigna al crear…",
+  "Los fraccionamientos inactivos…") are level 4 of the scale
+  (`text-xs text-slate-500 dark:text-slate-400`). They were `text-xs
+text-slate-400` with no dark variant, which measured 2.6:1 on the light
+  surface and ~3.1:1 on the dark one.
 - "Agregar calle" / "Eliminar calle" `p-button`s carry `type="button"` so they
   no longer trigger an implicit form submit.
 - `aria-describedby` matches the real error ids: `name-errors`, `zipCode-errors`,
   and per-row `street-errors-{index}`.
 - Selects use `inputId` (`country`, `state`, `city`) linked to their `<label
-  for>` instead of a container `id` (duplicate-id risk).
+for>` instead of a container `id` (duplicate-id risk).
 - The active toggle uses `inputId="isActive"` plus `aria-labelledby` pointing at
   the adjacent paragraph (`isActive-label`).
 - Each street input has a `sr-only` label ("Nombre de la calle N") with a

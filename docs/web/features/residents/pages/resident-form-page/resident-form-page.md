@@ -9,13 +9,13 @@ handles resident creation and update.
 
 ## Dependencies
 
-| Token | Purpose |
-|---|---|
+| Token           | Purpose                                                    |
+| --------------- | ---------------------------------------------------------- |
 | `ResidentStore` | `create`, `update`, `loadById`, `loading()`, `callState()` |
-| `CatalogsStore` | `UserRoles()` for the role select and create prefill |
-| `ContextStore` | `streets()` for the unit form |
-| `UnitStore` | `entities()` reusable units |
-| `Router` | navigation |
+| `CatalogsStore` | `UserRoles()` for the role select and create prefill       |
+| `ContextStore`  | `streets()` for the unit form                              |
+| `UnitStore`     | `entities()` reusable units                                |
+| `Router`        | navigation                                                 |
 
 ## Form
 
@@ -54,7 +54,17 @@ A second effect disables the `email` control once an existing resident is loaded
 
 ## Template
 
-- Read-only summary panel (name, email, status) in update mode.
+- Read-only summary panel (name, email, status) in update mode. Each entry is a
+  `<section>` with a `text-xs font-medium text-slate-500 dark:text-slate-400`
+  term and a `<p class="capitalize">` value: they are **not** headings. They used
+  to be `<h4>`/`<h3>` pairs, which (a) added three fake headings to the document
+  outline right after the page `h1` and the section `h2`, and (b) rendered the
+  term at `text-slate-500/80` (~3.7:1, below AA). The `text-xs` term keeps its
+  quiet look at 4.8:1 / 6.8:1.
+- "Información general" is a raw `p-panel` header (`#header`) with the shared
+  level-2 section title (`text-base font-semibold text-slate-900 dark:text-white`)
+  so it matches `app-nex-card`'s `headerText`; the `.form-label`s below it are
+  level 3 of the same scale.
 - A sticky mobile action bar (Cancel / Save) plus the desktop `FormOptions`.
 
 ## Test coverage

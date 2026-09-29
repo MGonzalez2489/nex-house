@@ -10,7 +10,14 @@
     @if (headerTemplate(); as header) {
       <ng-container [ngTemplateOutlet]="header"></ng-container>
     } @else if (headerText(); as text) {
-      <h2 class="text-sm font-semibold text-slate-800 dark:text-white">{{ text }}</h2>
+      <div class="flex flex-col border-l-3 md:border-none border-slate-500 ps-2 md:ps-0">
+        <h2 class="text-base font-semibold text-slate-900 dark:text-white">{{ text }}</h2>
+        @if (subHeader(); as subHeader) {
+          <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+            {{ subHeader }}
+          </p>
+        }
+      </div>
     }
   </ng-template>
 

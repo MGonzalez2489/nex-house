@@ -7,9 +7,9 @@ Read-only detail page for a single neighborhood.
 
 ## Inputs
 
-| Input | Type | Description |
-|---|---|---|
-| `id` | `string \| undefined` | Neighborhood `publicId` from the `:id` route param |
+| Input | Type                  | Description                                        |
+| ----- | --------------------- | -------------------------------------------------- |
+| `id`  | `string \| undefined` | Neighborhood `publicId` from the `:id` route param |
 
 ## Behavior
 
@@ -19,10 +19,10 @@ Read-only detail page for a single neighborhood.
 
 ## Actions
 
-| Method | Behavior |
-|---|---|
+| Method   | Behavior                                                                        |
+| -------- | ------------------------------------------------------------------------------- |
 | `back()` | Navigates to `NEIGHBORHOOD_ROUTES_ENUM.HOME` (aliased constant, no raw strings) |
-| `edit()` | Navigates to `HOME/:id/edit` via `NEIGHBORHOOD_ROUTES_ENUM.HOME` + `publicId` |
+| `edit()` | Navigates to `HOME/:id/edit` via `NEIGHBORHOOD_ROUTES_ENUM.HOME` + `publicId`   |
 
 ## Template
 
@@ -36,6 +36,11 @@ Read-only detail page for a single neighborhood.
   `location` section (depends on `address?.city`), and the street listing
   iterated with `@for (street of neighborhood().streets; track street.publicId)`.
 - "Volver al listado" and "Editar fraccionamiento" buttons.
+- The "Calles / Secciones" panel title uses the shared level-2 section style
+  (`text-base font-semibold text-slate-900 dark:text-white`) so it matches the
+  card titles of the form pages. The neighborhood **name** above it is
+  deliberately louder (`text-lg font-semibold capitalize`) because it is the
+  page subject, not a section label.
 
 ## Strengths / notes
 

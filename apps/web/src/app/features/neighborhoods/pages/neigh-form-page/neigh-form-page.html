@@ -5,12 +5,9 @@
     [title]="(id() ? 'Actualizar' : 'Nuevo') + ' fraccionamiento'"
     subTitle="Registra la información básica y las calles que lo componen."
   />
-  <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-5">
+  <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-2 md:space-y-5">
     <!-- Información general -->
-    <p-panel>
-      <ng-template #header>
-        <h2 class="text-sm text-slate-400 font-semibold">Información general</h2>
-      </ng-template>
+    <app-nex-card class="block" headerText="Información general">
       <div class="grid grid-cols-1 md:grid-cols-2 md:gap-x-3">
         <!-- Nombre -->
         <div class="form-control">
@@ -20,6 +17,7 @@
             id="name"
             type="text"
             formControlName="name"
+            [variant]="inputVariant()"
             placeholder="Ej. Residencial San Agustín"
             fluid
             [invalid]="form.controls.name.invalid && form.controls.name.touched"
@@ -43,6 +41,7 @@
             id="firstAdminEmail"
             type="email"
             formControlName="firstAdminEmail"
+            [variant]="inputVariant()"
             placeholder="jhon@example.com"
             fluid
             [invalid]="
@@ -64,19 +63,20 @@
             label="Nombre"
           />
           @if (isEdit()) {
-            <p class="text-xs text-slate-400 mt-1">
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
               El administrador se asigna al crear el fraccionamiento.
             </p>
           }
         </div>
       </div>
-      <!-- Activo (toggle) -->
-      <div class="flex items-center justify-between gap-4 pt-1">
+      <div
+        class="flex items-center justify-between gap-4 bg-white md:bg-transparent p-3 md:p-0 border md:border-none rounded-md md:rounded-none"
+      >
         <div>
           <p id="isActive-label" class="text-sm font-medium text-slate-700 dark:text-slate-300">
             Fraccionamiento activo
           </p>
-          <p class="text-xs text-slate-400 mt-0.5">
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 hidden md:block">
             Los fraccionamientos inactivos no aparecerán disponibles para su asignación.
           </p>
         </div>
@@ -90,22 +90,14 @@
           />
         </label>
       </div>
-    </p-panel>
+    </app-nex-card>
+    <hr class="block md:hidden" />
     <!-- Location -->
-    <p-panel>
-      <ng-template #header>
-        <div>
-          <h2 class="text-sm font-semibold text-slate-800 dark:text-white">Localización</h2>
-          <p class="text-xs text-slate-400 mt-0.5">
-            Selecciona el estado y la ciudad donde se ubica el fraccionamiento.
-          </p>
-          @if (isEdit()) {
-            <p class="text-xs text-amber-600 dark:text-amber-400 mt-1">
-              La localización solo se asigna al crear el fraccionamiento.
-            </p>
-          }
-        </div>
-      </ng-template>
+    <app-nex-card
+      class="block"
+      headerText="Localización"
+      subHeader=" La localización solo se asigna al crear el fraccionamiento."
+    >
       <div class="grid grid-cols-1 md:grid-cols-2 md:gap-x-3">
         <!-- Country -->
         <div class="form-control">
@@ -116,6 +108,7 @@
             optionLabel="displayName"
             optionValue="publicId"
             placeholder="Selecciona un país"
+            [variant]="inputVariant()"
             formControlName="countryId"
             fluid
           />
@@ -126,6 +119,7 @@
           <p-select
             inputId="state"
             [options]="catStore.states()"
+            [variant]="inputVariant()"
             optionLabel="displayName"
             optionValue="publicId"
             formControlName="stateId"
@@ -142,6 +136,7 @@
             optionLabel="displayName"
             optionValue="publicId"
             formControlName="cityId"
+            [variant]="inputVariant()"
             placeholder="Selecciona una ciudad"
             fluid
           />
@@ -156,11 +151,14 @@
             formControlName="zipCode"
             placeholder="11532"
             fluid
+            [variant]="inputVariant()"
             maxlength="5"
             [invalid]="form.controls.zipCode.invalid && form.controls.zipCode.touched"
             [attr.aria-invalid]="form.controls.zipCode.invalid && form.controls.zipCode.touched"
             [attr.aria-describedby]="
-              form.controls.zipCode.touched && form.controls.zipCode.errors ? 'zipCode-errors' : null
+              form.controls.zipCode.touched && form.controls.zipCode.errors
+                ? 'zipCode-errors'
+                : null
             "
           />
           <app-form-validation-error
@@ -171,18 +169,15 @@
           />
         </div>
       </div>
-    </p-panel>
+    </app-nex-card>
+    <hr class="block md:hidden" />
     <!-- Calles -->
-    <p-panel>
-      <ng-template #header>
-        <div>
-          <h2 class="text-sm font-semibold text-slate-800 dark:text-white">Calles / Secciones</h2>
-          <p class="text-xs text-slate-400 mt-0.5">
-            Agrega todas las calles o secciones que pertenecen a este fraccionamiento.
-          </p>
-        </div>
-      </ng-template>
-      <ng-template #icons>
+    <app-nex-card
+      class="block"
+      headerText="Calles / Secciones"
+      subHeader="Agrega todas las calles o secciones que pertenecen a este fraccionamiento."
+    >
+      <ng-template #nexActions>
         <p-badge [value]="streets.length" severity="secondary" />
       </ng-template>
 
@@ -191,35 +186,33 @@
           @for (street of streets.controls; track $index) {
             <!-- Use [formGroupName] for each FormGroup in the FormArray -->
             <div [formGroupName]="$index" class="flex items-start gap-2">
-                <div class="flex-1 min-w-0">
-                  <label
-                    [for]="'street-name-' + $index"
-                    class="sr-only"
-                  >Nombre de la calle {{ $index + 1 }}</label>
-                  <input
-                    pInputText
-                    [attr.id]="'street-name-' + $index"
-                    fluid
-                    type="text"
-                    formControlName="name"
-                    placeholder="Ej. Calle Hacienda del Sol"
-                    [invalid]="street.invalid && street.touched"
-                    [attr.aria-invalid]="street.invalid && street.touched"
-                    [attr.aria-describedby]="
-                      street.touched && street.errors
-                        ? 'street-errors-' + $index
-                        : null
-                    "
-                  />
-                  <!-- Hidden input for publicId (if it exists) -->
-                  <input type="hidden" formControlName="publicId" />
+              <div class="flex-1 min-w-0">
+                <label [for]="'street-name-' + $index" class="sr-only"
+                  >Nombre de la calle {{ $index + 1 }}</label
+                >
+                <input
+                  pInputText
+                  [attr.id]="'street-name-' + $index"
+                  fluid
+                  type="text"
+                  [variant]="inputVariant()"
+                  formControlName="name"
+                  placeholder="Ej. Calle Hacienda del Sol"
+                  [invalid]="street.invalid && street.touched"
+                  [attr.aria-invalid]="street.invalid && street.touched"
+                  [attr.aria-describedby]="
+                    street.touched && street.errors ? 'street-errors-' + $index : null
+                  "
+                />
+                <!-- Hidden input for publicId (if it exists) -->
+                <input type="hidden" formControlName="publicId" />
 
-                  <app-form-validation-error
-                    [id]="'street-errors-' + $index"
-                    [touched]="street.controls.name.touched"
-                    [errors]="street.controls.name.errors"
-                    label="Nombre"
-                  />
+                <app-form-validation-error
+                  [id]="'street-errors-' + $index"
+                  [touched]="street.controls.name.touched"
+                  [errors]="street.controls.name.errors"
+                  label="Nombre"
+                />
               </div>
               <p-button
                 (click)="removeStreet($index)"
@@ -244,7 +237,7 @@
           type="button"
         />
       </div>
-    </p-panel>
+    </app-nex-card>
     <!-- Acciones -->
     <app-form-options
       [showCancel]="true"

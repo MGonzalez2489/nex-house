@@ -64,11 +64,8 @@ function mergePt(...sources: (PanelPassThrough | undefined)[]): PanelPassThrough
   standalone: true,
 })
 export class NexCard {
-  /**
-   * Plain-text title rendered as a level 2 heading inside the panel header.
-   * Ignored when a `#nexHeader` template is provided.
-   */
   readonly headerText = input<string>();
+  readonly subHeader = input<string>();
 
   /**
    * When `true` (default) and the viewport is mobile, the panel chrome

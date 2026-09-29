@@ -6,7 +6,7 @@ import {
   input,
   OnInit,
   signal,
-} from "@angular/core";
+} from '@angular/core';
 import {
   FormArray,
   FormBuilder,
@@ -18,25 +18,25 @@ import {
 import {Router} from '@angular/router';
 import {NEIGHBORHOOD_ROUTES_ENUM} from '@neighborhoods/neighborhood.routes';
 import {NeighborhoodsStore} from '@neighborhoods/neighborhood.store';
-import { CreateNeighStreet } from "@nexhouse/shared-domain/interfaces";
+import {CreateNeighStreet} from '@nexhouse/shared-domain/interfaces';
 import {NeighborhoodModel} from '@nexhouse/shared-domain/models';
 import {Badge} from '@openng/optimus-ui/badge';
 import {Button} from '@openng/optimus-ui/button';
 import {InputTextModule} from '@openng/optimus-ui/inputtext';
-import {Panel} from '@openng/optimus-ui/panel';
 import {ToggleSwitchModule} from '@openng/optimus-ui/toggleswitch';
+import {NexCard, PageHeader} from '@shared/components';
 import {FormOptions, FormValidationErrorComponent} from '@shared/components/forms';
-import {PageHeader} from '@shared/components';
 
 import {SelectModule} from '@openng/optimus-ui/select';
 import {CatalogsStore} from '@stores/catalogs.store';
 import {mapCreateNeighborhoodPayload, mapUpdateNeighborhoodPayload} from './neigh-form.mapper';
+import {SessionService} from '@core/services';
+
 @Component({
   selector: 'app-neigh-form-page',
   imports: [
     ReactiveFormsModule,
     Button,
-    Panel,
     InputTextModule,
     Badge,
     ToggleSwitchModule,
@@ -44,6 +44,7 @@ import {mapCreateNeighborhoodPayload, mapUpdateNeighborhoodPayload} from './neig
     FormValidationErrorComponent,
     SelectModule,
     PageHeader,
+    NexCard,
   ],
   templateUrl: './neigh-form-page.html',
   styleUrl: './neigh-form-page.css',
@@ -55,6 +56,7 @@ export class NeighFormPage implements OnInit {
   private readonly router = inject(Router);
   protected readonly store = inject(NeighborhoodsStore);
   protected readonly catStore = inject(CatalogsStore);
+  protected readonly sessionService = inject(SessionService);
 
   readonly id = input<string>();
   readonly neighborhood = signal<NeighborhoodModel | undefined>(undefined);
@@ -81,6 +83,10 @@ export class NeighFormPage implements OnInit {
         publicId: FormControl<string | null>;
       }>
     >([]),
+  });
+
+  readonly inputVariant = computed(() => {
+    return this.sessionService.isMobile() ? 'outlined' : 'filled';
   });
 
   get streets(): FormArray<
@@ -216,15 +222,11 @@ export class NeighFormPage implements OnInit {
       this.form.controls.zipCode,
       this.form.controls.firstAdminEmail,
     ];
-    controls.forEach((control) =>
-      enabled ? control.enable() : control.disable(),
-    );
+    controls.forEach((control) => (enabled ? control.enable() : control.disable()));
   }
 
   private async create() {
-    const response = await this.store.create(
-      mapCreateNeighborhoodPayload(this.form.getRawValue()),
-    );
+    const response = await this.store.create(mapCreateNeighborhoodPayload(this.form.getRawValue()));
     return response;
   }
 

@@ -25,16 +25,16 @@
       <p-panel showHeader="false" class="pt-5">
         <div class="grid grid-cols-2 gap-3">
           <section class="space-y-1">
-            <h4 class="font-semibold text-xs text-slate-500/80">Nombre</h4>
-            <h3 class="capitalize">{{ user.profile?.fullName }}</h3>
+            <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Nombre</p>
+            <p class="capitalize">{{ user.profile?.fullName }}</p>
           </section>
           <section class="space-y-1">
-            <h4 class="font-semibold text-xs text-slate-500/80">Correo Electrónico</h4>
-            <h3 class="capitalize">{{ user.email }}</h3>
+            <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Correo Electrónico</p>
+            <p class="capitalize">{{ user.email }}</p>
           </section>
           <section class="space-y-1">
-            <h4 class="font-semibold text-xs text-slate-500/80">Estatus</h4>
-            <h3 class="capitalize">{{ user.status?.displayName }}</h3>
+            <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Estatus</p>
+            <p class="capitalize">{{ user.status?.displayName }}</p>
           </section>
         </div>
       </p-panel>
@@ -42,7 +42,7 @@
     <!-- Información general -->
     <p-panel>
       <ng-template #header>
-        <h2 class="text-sm font-semibold">Información general</h2>
+        <h2 class="text-base font-semibold text-slate-900 dark:text-white">Información general</h2>
       </ng-template>
 
       <div class="grid grid-cols-1 md:grid-cols-3 md:gap-x-3">

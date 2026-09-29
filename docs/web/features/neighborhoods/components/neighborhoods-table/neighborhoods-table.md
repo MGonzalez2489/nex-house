@@ -9,22 +9,22 @@ card feed.
 
 ## Inputs
 
-| Input | Type | Description |
-|---|---|---|
-| `items` | `NeighborhoodModel[]` (required) | Entities to render |
-| `pagination` | `ApiPaginationMeta \| undefined` | Pagination meta (drives paginator + reports) |
-| `isLoading` | `boolean` | Passed to `p-table [loading]` |
-| `filters` | `SearchNeigh` | Applied filter state owned by the page; seeds the inline filters |
+| Input        | Type                             | Description                                                      |
+| ------------ | -------------------------------- | ---------------------------------------------------------------- |
+| `items`      | `NeighborhoodModel[]` (required) | Entities to render                                               |
+| `pagination` | `ApiPaginationMeta \| undefined` | Pagination meta (drives paginator + reports)                     |
+| `isLoading`  | `boolean`                        | Passed to `p-table [loading]`                                    |
+| `filters`    | `SearchNeigh`                    | Applied filter state owned by the page; seeds the inline filters |
 
 `isMobile` is **no longer an input**. See
 [Viewport source of truth](#viewport-source-of-truth).
 
 ## Outputs
 
-| Output | Payload | Description |
-|---|---|---|
+| Output     | Payload                                                          | Description                             |
+| ---------- | ---------------------------------------------------------------- | --------------------------------------- |
 | `paginate` | `Partial<SearchNeigh>` `{ first, rows }` or a full `SearchNeigh` | Pagination **or** filter change request |
-| `view` | `string` (publicId) | Open the details page |
+| `view`     | `string` (publicId)                                              | Open the details page                   |
 
 ## Viewport source of truth
 
@@ -81,11 +81,11 @@ The inline filters are **desktop only**:
 
 ```html
 @if (!isMobile()) {
-  <app-neigh-table-filters
-    class="w-full md:w-auto"
-    [value]="filters()"
-    (filter)="filter($event)"
-  />
+<app-neigh-table-filters
+  class="w-full md:w-auto"
+  [value]="filters()"
+  (filter)="filter($event)"
+/>
 }
 ```
 
@@ -97,6 +97,11 @@ The inline filters are **desktop only**:
   one single reload path.
 - The bar renders inside the `p-panel` header (via the `nex-card` `#nexHeader`
   slot), next to the `hidden md:block` items report.
+- The items report is an `<h2>` with the shared level-2 section style
+  (`text-base font-semibold text-slate-900 dark:text-white`), i.e. the same
+  treatment `app-nex-card` gives to `headerText`, because it occupies the card
+  title slot. It used to be `text-sm text-slate-500` with no weight (400),
+  rendering the only "title" of the card weaker than the table header cells.
 
 ## A11y / responsiveness
 

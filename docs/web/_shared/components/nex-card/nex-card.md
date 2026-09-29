@@ -33,14 +33,15 @@ supported and are silently ignored.
 
 ## Inputs
 
-| Name             | Type                        | Default | Description                                                     |
-| ---------------- | --------------------------- | ------- | --------------------------------------------------------------- |
-| `headerText`     | `string`                    | –       | Plain title rendered as a level 2 heading inside the header     |
-| `noCardOnMobile` | `boolean`                   | `true`  | Removes the panel chrome when the viewport is mobile            |
-| `toggleable`     | `boolean`                   | `false` | Enables the `Panel` collapse/expand button                      |
-| `collapsed`      | `boolean` (two-way `model`) | `false` | Collapsed state, only meaningful with `toggleable`              |
-| `pt`             | `PanelPassThrough`          | –       | Pass-through applied on every viewport                          |
-| `mobilePt`       | `PanelPassThrough`          | –       | Pass-through applied on top of `pt` when the viewport is mobile |
+| Name             | Type                        | Default | Description                                                           |
+| ---------------- | --------------------------- | ------- | --------------------------------------------------------------------- |
+| `headerText`     | `string`                    | –       | Plain title rendered as a level 2 heading inside the header           |
+| `subHeader`      | `string`                    | –       | Supporting line under `headerText`; ignored when `#nexHeader` is used |
+| `noCardOnMobile` | `boolean`                   | `true`  | Removes the panel chrome when the viewport is mobile                  |
+| `toggleable`     | `boolean`                   | `false` | Enables the `Panel` collapse/expand button                            |
+| `collapsed`      | `boolean` (two-way `model`) | `false` | Collapsed state, only meaningful with `toggleable`                    |
+| `pt`             | `PanelPassThrough`          | –       | Pass-through applied on every viewport                                |
+| `mobilePt`       | `PanelPassThrough`          | –       | Pass-through applied on top of `pt` when the viewport is mobile       |
 
 `booleanAttribute` is used for `noCardOnMobile` and `toggleable`, so
 `noCardOnMobile="false"` works as expected.
@@ -51,6 +52,94 @@ supported and are silently ignored.
   is a `computed` signal fed by a debounced `window.resize` listener
   (`small` / `medium` / `large`, breakpoint at Tailwind's `md` = 768px), so
   rotating a device or resizing the window updates the card reactively.
+
+## Template
+
+```html
+<p-panel
+  [pt]="resolvedPt()"
+  [showHeader]="showPanelHeader()"
+  [toggleable]="toggleable()"
+  [(collapsed)]="collapsed"
+>
+  <ng-content></ng-content>
+
+  <ng-template #header>
+    @if (headerTemplate(); as header) {
+    <ng-container [ngTemplateOutlet]="header"></ng-container>
+    } @else if (headerText(); as text) {
+    <div
+      class="flex flex-col border-l-3 md:border-none border-slate-500 ps-2 md:ps-0"
+    >
+      <h2 class="text-base font-semibold text-slate-900 dark:text-white">
+        {{ text }}
+      </h2>
+      @if (subHeader(); as subHeader) {
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+        {{ subHeader }}
+      </p>
+      }
+    </div>
+    }
+  </ng-template>
+
+  <ng-template #icons>
+    @if (actionsTemplate(); as actions) {
+    <ng-container [ngTemplateOutlet]="actions"></ng-container>
+    }
+  </ng-template>
+
+  <ng-template #content>
+    @if (contentTemplate(); as content) {
+    <ng-container [ngTemplateOutlet]="content"></ng-container>
+    }
+  </ng-template>
+
+  <ng-template #footer>
+    @if (footerTemplate(); as footer) {
+    <ng-container [ngTemplateOutlet]="footer"></ng-container>
+    }
+  </ng-template>
+</p-panel>
+```
+
+## Visual hierarchy (the type scale)
+
+The card header is **level 2** of a four-level scale, one full step above the
+form labels rendered in the body. This matters because the most common body of a
+card is a form: when the section title and the field labels share size, weight
+and colour, the user cannot tell "this group of fields" from "this field".
+
+| Level | Element                              | Size / weight                  | Colour (light / dark)     | Contrast vs surface |
+| ----- | ------------------------------------ | ------------------------------ | ------------------------- | ------------------- |
+| 1     | page title — `app-page-header` `h1`  | `text-xl` / `sm:text-2xl`, 600 | `slate-900` / `white`     | 17.8:1 / 17.9:1     |
+| 2     | **card title** (`headerText` → `h2`) | `text-base`, 600               | `slate-900` / `white`     | 17.8:1 / 17.9:1     |
+| 3     | form label (`.form-label`)           | `text-sm`, 500                 | `slate-700` / `slate-300` | 10.4:1 / 12.0:1     |
+| 4     | hint / supporting copy               | `text-xs`, 400                 | `slate-500` / `slate-400` | 4.8:1 / 6.8:1       |
+
+All levels pass WCAG AA (measured in headless Chromium against the compiled
+stylesheet, light surface `#ffffff` and dark surface `#0f172a`).
+
+- The card title was `text-sm font-semibold text-slate-600` while the label was
+  `text-sm font-medium tracking-wider text-slate-600`: identical size and
+  colour, a hair of weight apart, plus wide letter-spacing on the label that made
+  it read like an eyebrow. The three are now separated by **size (16 vs 14),
+  weight (600 vs 500), colour (900 vs 700) and tracking**.
+- The sub-header dropped `font-light` and moved from `text-xs` to `text-sm`:
+  a description must stay readable (weight 300 at 12px is below the legibility
+  floor) and must not out-shout the title it supports.
+- `font-light` was also removed from the dark-mode sub-header, which used
+  `dark:text-white` — the same pure white as the title, so title and description
+  were indistinguishable in dark mode. It is now `dark:text-slate-400`.
+- On mobile the 3px `border-slate-500` accent bar (`md:border-none`) is the extra
+  non-typographic cue that groups the title with the fields below it.
+- The panel header itself has **no** background tint (Aura sets
+  `panel.header.background: transparent`), so the hierarchy is carried entirely
+  by these type utilities.
+
+Other components that render a section title next to form labels must use the
+same level-2 string (`text-base font-semibold text-slate-900 dark:text-white`) —
+see `unit-form-component`, `resident-form-page` and `neigh-details-page`.
 
 ## Behavior
 
@@ -63,6 +152,10 @@ supported and are silently ignored.
 - **Empty header.** `showHeader` is bound to `showPanelHeader()`
   (`toggleable() || headerText() || headerTemplate() || actionsTemplate()`), so
   no empty header bar is rendered when there is nothing to show.
+- **Title vs sub-title.** `headerText` and `subHeader` are two independent
+  inputs rendered only when `#nexHeader` is absent; a consumer that needs custom
+  markup (a badge, a filter row, a different layout) switches to `#nexHeader` and
+  both strings are ignored.
 - **Empty footer.** The `#footer` template is always projected, so the footer
   element is hidden with the `hidden` utility while `footerTemplate()` is empty.
 - **Pass-through merging.** `mergePt` concatenates two sections when both are
@@ -84,13 +177,16 @@ The flatten only works because of the cascade layer configuration in
 provideOptimus({
   theme: {
     preset: NxPreset,
-    options: { darkModeSelector: '.dark', cssLayer: { name: 'optimus', order: 'theme, base, optimus' } },
+    options: {
+      darkModeSelector: '.dark',
+      cssLayer: { name: 'optimus', order: 'theme, base, optimus' },
+    },
   },
 });
 ```
 
 `@import 'tailwindcss'` declares `@layer theme, base, components, utilities`, so
-Tailwind's `utilities` layer would normally sit *before* a layer created later,
+Tailwind's `utilities` layer would normally sit _before_ a layer created later,
 letting the Optimus component CSS win. The Optimus style engine emits
 `@layer theme, base, optimus` through `UseStyle.use(..., { first: true })`, which
 does `head.insertBefore(styleEl, head.firstChild)` — the statement is prepended
@@ -149,7 +245,10 @@ error TS2537: Type 'PanelPassThrough' has no matching index signature for type '
 The section type has to be derived from the **options** interface instead:
 
 ```ts
-import {PanelPassThrough, PanelPassThroughOptions} from '@openng/optimus-ui/panel';
+import {
+  PanelPassThrough,
+  PanelPassThroughOptions,
+} from '@openng/optimus-ui/panel';
 
 type PtSection = PanelPassThroughOptions[keyof PanelPassThroughOptions];
 type PtRecord = Record<string, PtSection>;
@@ -240,12 +339,12 @@ header actions, and the desktop table body.
 
 ## Migration from the previous API
 
-| Before | Now |
-|---|---|
-| `<ng-template #cardHeader>` | `<ng-template #nexHeader>` |
-| `<ng-template #icons>` | `<ng-template #nexActions>` |
-| `<ng-template #content>` | `<ng-template #nexContent>` |
-| `<ng-template #footer>` | `<ng-template #nexFooter>` |
-| content not wrapped in a template | silently dropped → now projected into the body |
-| `headerText` rendered in the body | now rendered inside the header |
-| `p-panel` used directly by consumers | `app-nex-card` |
+| Before                               | Now                                            |
+| ------------------------------------ | ---------------------------------------------- |
+| `<ng-template #cardHeader>`          | `<ng-template #nexHeader>`                     |
+| `<ng-template #icons>`               | `<ng-template #nexActions>`                    |
+| `<ng-template #content>`             | `<ng-template #nexContent>`                    |
+| `<ng-template #footer>`              | `<ng-template #nexFooter>`                     |
+| content not wrapped in a template    | silently dropped → now projected into the body |
+| `headerText` rendered in the body    | now rendered inside the header                 |
+| `p-panel` used directly by consumers | `app-nex-card`                                 |

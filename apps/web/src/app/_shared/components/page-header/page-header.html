@@ -1,5 +1,5 @@
 <header class="flex items-center justify-between gap-3">
-  <div class="min-w-0 max-w-1/2 sm:max-w-none">
+  <div class="min-w-0 max-sm:has-[~.page-header-actions:not(:empty)]:max-w-1/2 sm:max-w-none">
     <h1
       class="truncate font-display text-xl font-semibold text-slate-900 sm:whitespace-normal sm:text-2xl dark:text-white"
     >
@@ -13,7 +13,7 @@
     }
   </div>
 
-  <div class="empty:hidden flex shrink-0 items-center gap-3">
+  <div class="page-header-actions empty:hidden flex shrink-0 items-center gap-3">
     <ng-content />
   </div>
 </header>

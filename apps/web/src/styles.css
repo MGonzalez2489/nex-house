@@ -19,7 +19,11 @@
   @apply mb-5; /* Espacio entre campos del formulario */
 
   .form-label {
-    @apply block text-sm font-medium  tracking-wider text-slate-600 mb-1.5;
+    /* Nivel 3 de la escala: un paso por debajo del título de sección del card
+       (text-base/600) y del h1 de la página (text-xl/600). Sin tracking para
+       que no se lea como un eyebrow, y con dark: porque slate-600 sobre la
+       superficie oscura queda en ~2.9:1. */
+    @apply block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5;
   }
 
   .required:after {

@@ -120,11 +120,11 @@ describe('PageHeader', () => {
     expect(classes).not.toContain('flex-col');
   });
 
-  it('should cap the title block at half of the screen so projected actions keep their side', async () => {
+  it('should cap the title block at half of the screen only while projected actions are present', async () => {
     await create();
     const classes = fixture.nativeElement.querySelector('header > div').className;
     expect(classes).toContain('min-w-0');
-    expect(classes).toContain('max-w-1/2');
+    expect(classes).toContain('max-sm:has-[~.page-header-actions:not(:empty)]:max-w-1/2');
     expect(classes).toContain('sm:max-w-none');
   });
 
@@ -162,6 +162,12 @@ describe('PageHeader', () => {
     expect(actions).toBeTruthy();
     expect(actions.className).toContain('empty:hidden');
     expect(actions.matches(':empty')).toBe(true);
+  });
+
+  it('should tag the actions wrapper with the hook the conditional title cap targets', async () => {
+    await create();
+    const actions = fixture.nativeElement.querySelector('header > div:last-child');
+    expect(actions.className).toContain('page-header-actions');
   });
 });
 
@@ -216,22 +222,41 @@ describe('PageHeader content projection', () => {
     const p = fixture.nativeElement.querySelector('p');
     expect(p).toBeNull();
     expect(fixture.nativeElement.querySelector('header > div:last-child').textContent).toContain(
-      'Nuevo'
+      'Nuevo',
     );
   });
 
   it('should reflect projected actions added after the first render', async () => {
     await create(false);
     expect(fixture.nativeElement.querySelector('header > div:last-child').matches(':empty')).toBe(
-      true
+      true,
     );
 
     fixture.componentRef.setInput('withActions', true);
     await fixture.whenStable();
 
     expect(fixture.nativeElement.querySelector('header > div:last-child').textContent).toContain(
-      'Nuevo'
+      'Nuevo',
     );
+  });
+
+  it('should drop the half-screen title cap as soon as actions are projected', async () => {
+    // The cap is CSS-only: `max-sm:has-[~.page-header-actions:not(:empty)]:max-w-1/2`.
+    // jsdom's selector engine supports `:has()` only with a child combinator, so the
+    // two DOM facts the selector relies on are asserted instead: the actions wrapper
+    // is a following sibling carrying the hook, and it is `:empty` until something
+    // is projected.
+    await create(false);
+    const [emptyBlock, emptyActions] = fixture.nativeElement.querySelector('header').children;
+    expect(emptyActions.className).toContain('page-header-actions');
+    expect(emptyActions.matches(':empty')).toBe(true);
+
+    fixture.componentRef.setInput('withActions', true);
+    await fixture.whenStable();
+
+    const [filledBlock, filledActions] = fixture.nativeElement.querySelector('header').children;
+    expect(filledBlock).toBe(emptyBlock);
+    expect(filledActions.matches(':empty')).toBe(false);
   });
 });
 
