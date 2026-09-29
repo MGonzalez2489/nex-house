@@ -1,6 +1,7 @@
 import {ChangeDetectionStrategy, Component, output} from '@angular/core';
 import {Button} from '@openng/optimus-ui/button';
 import {Panel} from '@openng/optimus-ui/panel';
+import {NexCard} from '@shared/components';
 
 type infoItem = {
   id: number;
@@ -11,7 +12,7 @@ type infoItem = {
 
 @Component({
   selector: 'app-onboarding-welcome-component',
-  imports: [Button, Panel],
+  imports: [Button, Panel, NexCard],
   templateUrl: './onboarding-welcome-component.html',
   styleUrl: './onboarding-welcome-component.css',
   standalone: true,

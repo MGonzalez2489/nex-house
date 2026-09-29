@@ -13,6 +13,7 @@ import {UserModel} from '@nexhouse/shared-domain/models';
 import {CallState} from '@ngrx-toolkit/core';
 import {Panel} from '@openng/optimus-ui/panel';
 import {PasswordModule} from '@openng/optimus-ui/password';
+import {NexCard} from '@shared/components';
 import {FormOptions, FormValidationErrorComponent} from '@shared/components/forms';
 
 @Component({
@@ -23,6 +24,7 @@ import {FormOptions, FormValidationErrorComponent} from '@shared/components/form
     FormValidationErrorComponent,
     FormOptions,
     Panel,
+    NexCard,
   ],
   templateUrl: './onboarding-pwd-change-component.html',
   styleUrl: './onboarding-pwd-change-component.css',

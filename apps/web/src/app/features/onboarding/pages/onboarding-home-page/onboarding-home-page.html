@@ -18,7 +18,7 @@
         }
       </div>
       <p-progressbar
-        class="mt-2 block"
+        class="hidden mt-2 md:block"
         [value]="progressPercent()"
         aria-label="Progreso del registro"
       />
@@ -33,7 +33,7 @@
         @for (step of steps(); track step.id; let i = $index) {
           <p-step-panel [value]="i">
             <ng-template pTemplate="content">
-              <div class="py-6">
+              <div class="md:py-6">
                 @switch (step.id) {
                   @case ('welcome') {
                     <app-onboarding-welcome-component (next)="finishWelcome()" />

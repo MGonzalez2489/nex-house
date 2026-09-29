@@ -1,19 +1,23 @@
-<p-panel>
-  <div
-    class="h-14 w-14 rounded-2xl bg-cyan-50 dark:bg-cyan-500/10 flex items-center justify-center mb-5"
-  >
-    <i class="pi pi-lock text-cyan-600 dark:text-cyan-400 text-2xl" aria-hidden="true"></i>
-  </div>
+<app-nex-card>
+  <ng-template #nexHeader>
+    <div class="flex flex-col md:flex-row">
+      <div
+        class="hidden md:flex h-14 w-14 rounded-2xl bg-cyan-50 dark:bg-cyan-500/10 items-center justify-center mb-5"
+      >
+        <i class="pi pi-lock text-cyan-600 dark:text-cyan-400 text-2xl" aria-hidden="true"></i>
+      </div>
 
-  <h2
-    id="security-step-title"
-    class="font-display text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white leading-tight"
-  >
-    Actualiza tu contraseña
-  </h2>
-  <p class="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
-    Por seguridad, es necesario que cambies tu contraseña temporal antes de continuar.
-  </p>
+      <h2
+        id="security-step-title"
+        class="font-display text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white leading-tight"
+      >
+        Actualiza tu contraseña
+      </h2>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+        Por seguridad, es necesario que cambies tu contraseña temporal antes de continuar.
+      </p>
+    </div>
+  </ng-template>
 
   @if (requirePwdChange()) {
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-5">
@@ -131,4 +135,4 @@
       </div>
     </form>
   }
-</p-panel>
+</app-nex-card>

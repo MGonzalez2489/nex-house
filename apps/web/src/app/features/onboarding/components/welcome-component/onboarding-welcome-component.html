@@ -1,50 +1,55 @@
-<p-panel showHeader="false" class="pt-5">
-  <div class="flex items-center gap-5">
-    <div
-      class="h-14 w-14 rounded-2xl bg-cyan-50 dark:bg-cyan-500/10 flex items-center justify-center"
-    >
-      <i class="pi pi-heart text-2xl text-cyan-600 dark:text-cyan-400"></i>
-    </div>
-
-    <div class="block">
-      <h1
-        class="font-display text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white leading-tight"
+<app-nex-card [noCardOnMobile]="false">
+  <ng-template #nexHeader>
+    <div class="flex items-center gap-5">
+      <div
+        class="hidden md:flex h-14 w-14 rounded-2xl bg-cyan-50 dark:bg-cyan-500/10 items-center justify-center"
       >
-        ¡Bienvenido a Nimbus!
-      </h1>
-      <p class="text-sm text-slate-500 dark:text-slate-400 text-wrap leading-relaxed max-w-[90%]">
-        Gracias por unirte. Configuremos tu cuenta en menos de un minuto. Esto es lo que podrás
-        hacer una vez dentro:
-      </p>
-    </div>
-  </div>
+        <i class="pi pi-heart text-2xl text-cyan-600 dark:text-cyan-400"></i>
+      </div>
 
-  <ul class="mt-6 space-y-3.5">
-    @for (item of items; track item.id) {
-      <li class="flex items-center gap-5 pl-4">
-        <div
-          class="h-9 w-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-300 shrink-0"
+      <div class="block">
+        <h1
+          class="font-display text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white leading-tight"
         >
-          <i [class]="item.icon"></i>
-        </div>
-        <div class="pt-1.5">
-          <p class="text-sm font-medium text-slate-700 dark:text-slate-200">
-            {{ item.title }}
-          </p>
-          <p class="text-xs text-slate-400 mt-0.5">
-            {{ item.description }}
-          </p>
-        </div>
-      </li>
-    }
-  </ul>
-
-  <p-button
-    label="Comenzar"
-    icon="pi pi-arrow-right"
-    iconPos="right"
-    fluid
-    class="mt-8 block py-3"
-    (click)="next.emit()"
-  />
-</p-panel>
+          ¡Bienvenido a Nimbus!
+        </h1>
+        <p
+          class="hidden md:block text-sm text-slate-500 dark:text-slate-400 text-wrap leading-relaxed max-w-[90%]"
+        >
+          Gracias por unirte. Configuremos tu cuenta en menos de un minuto. Esto es lo que podrás
+          hacer una vez dentro:
+        </p>
+      </div>
+    </div>
+  </ng-template>
+  <ng-template #nexContent>
+    <ul class="md:mt-6 space-y-3.5">
+      @for (item of items; track item.id) {
+        <li class="flex items-center gap-5 pl-4">
+          <div
+            class="md:flex md:h-9 md:w-9 rounded-lg bg-slate-100 dark:bg-slate-800 items-center justify-center text-slate-500 dark:text-slate-300 shrink-0"
+          >
+            <i [class]="item.icon"></i>
+          </div>
+          <div class="pt-1.5">
+            <p class="text-sm font-medium text-slate-700 dark:text-slate-200">
+              {{ item.title }}
+            </p>
+            <p class="text-xs text-slate-400 mt-0.5">
+              {{ item.description }}
+            </p>
+          </div>
+        </li>
+      }
+    </ul>
+  </ng-template>
+  <ng-template #nexFooter>
+    <p-button
+      label="Comenzar"
+      icon="pi pi-arrow-right"
+      iconPos="right"
+      fluid
+      (click)="next.emit()"
+    />
+  </ng-template>
+</app-nex-card>
