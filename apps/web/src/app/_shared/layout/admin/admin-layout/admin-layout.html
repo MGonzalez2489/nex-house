@@ -16,10 +16,7 @@
       <!-- ============ CUERPO: sidebar + contenido ============ -->
       <div class="relative flex flex-1 min-h-0">
         <!-- Overlay móvil -->
-        <div
-          id="overlay"
-          class="hidden fixed inset-0 bg-slate-900/50 z-40 lg:hidden"
-        ></div>
+        <div id="overlay" class="hidden fixed inset-0 bg-slate-900/50 z-40 lg:hidden"></div>
 
         <!-- ============ SIDEBAR ============ -->
         @if (showNavComponentes()) {
@@ -36,7 +33,7 @@
 
         <!-- ============ CONTENIDO PRINCIPAL ============ -->
         <main class="flex-1 min-w-0 overflow-y-auto thin-scroll">
-          <div class="max-w-350 mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+          <div class="px-4 sm:px-6 lg:px-8 py-6 space-y-6">
             <router-outlet />
           </div>
         </main>
@@ -49,7 +46,7 @@
     class="lg:hidden"
     blockScroll="true"
     [closeOnEscape]="true"
-    [pt]="{ header: 'hidden', content: 'p-0', root: 'w-auto' }"
+    [pt]="{header: 'hidden', content: 'p-0', root: 'w-auto'}"
     showCloseIcon="false"
     (visibleChange)="sessionService.toggleSession($event)"
   >
